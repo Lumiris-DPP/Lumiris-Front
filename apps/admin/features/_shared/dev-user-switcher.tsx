@@ -14,11 +14,10 @@ import { cn } from '@lumiris/ui/lib/cn';
 import { useAdminUserSwitcher } from '@/lib/auth';
 
 const ROLE_LABEL: Record<AdminUserRole, string> = {
-    curator: 'Curator',
-    lead_curator: 'Lead Curator',
-    content_manager: 'Content Manager',
-    billing_ops: 'Billing Ops',
-    platform_admin: 'Platform Admin',
+    curator: 'Curateur',
+    lead_curator: 'Curateur principal',
+    billing_ops: 'Ops facturation',
+    platform_admin: 'Admin plateforme',
     dpo: 'DPO',
 };
 
@@ -26,7 +25,6 @@ const ROLE_TONE: Record<AdminUserRole, string> = {
     platform_admin: 'text-lumiris-emerald',
     lead_curator: 'text-lumiris-emerald',
     curator: 'text-lumiris-cyan',
-    content_manager: 'text-lumiris-amber',
     billing_ops: 'text-lumiris-orange',
     dpo: 'text-lumiris-rose',
 };

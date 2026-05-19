@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo } from 'react';
-import { AlertTriangle, Sparkles } from 'lucide-react';
-import { type Passport } from '@lumiris/types';
+import { useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import Link from 'next/link';
+import { AlertTriangle, ExternalLink, Lightbulb, Sparkles } from 'lucide-react';
+import { type AdminAuditLogEntry, type IrisAxis, type Passport, type ScoreResult } from '@lumiris/types';
 import { mockArtisans, mockInvoices } from '@lumiris/mock-data';
 import {
     CompositionList,
@@ -42,18 +43,19 @@ export function PassportDrawer({ passport, onClose }: PassportDrawerProps) {
     return (
         <Sheet open={passport !== null} onOpenChange={(open) => !open && onClose()}>
             <SheetContent side="right" className="bg-background w-full overflow-hidden p-0 sm:max-w-2xl">
-                {passport ? <DrawerBody passport={passport} onClose={onClose} /> : null}
+                {passport ? <DrawerBody passport={passport} /> : null}
             </SheetContent>
         </Sheet>
     );
 }
 
-function DrawerBody({ passport, onClose }: { passport: Passport; onClose: () => void }) {
+function DrawerBody({ passport }: { passport: Passport }) {
     const score = useIrisScore(passport);
     const artisan = mockArtisans.find((a) => a.id === passport.artisanId);
     const auditLog = useAdminAuditLog();
     const { overlays } = useCurationStore();
     const overlay = overlays.get(passport.id);
+    const [lastAction, setLastAction] = useState<AdminAuditLogEntry | null>(null);
 
     const status = deriveEffectiveStatus(passport, overlay?.status);
 
@@ -92,6 +94,7 @@ function DrawerBody({ passport, onClose }: { passport: Passport; onClose: () => 
                     <div className="p-5">
                         <TabsContent value="overview" className="m-0">
                             <div className="space-y-5">
+                                <WhyThisScoreBanner score={score} />
                                 <PassportPhonePreview
                                     passport={passport}
                                     artisan={artisan}
@@ -212,7 +215,117 @@ function DrawerBody({ passport, onClose }: { passport: Passport; onClose: () => 
                 </ScrollArea>
             </Tabs>
 
-            <CuratorActions passport={passport} score={{ grade: score.grade }} onAfterAction={onClose} />
+            {lastAction ? (
+                <div
+                    role="status"
+                    className="border-lumiris-emerald/30 bg-lumiris-emerald/5 text-foreground flex items-center justify-between gap-3 border-t px-4 py-2 text-xs"
+                >
+                    <span className="text-lumiris-emerald inline-flex items-center gap-1.5">
+                        <Sparkles className="h-3 w-3" aria-hidden /> Action <strong>{lastAction.action}</strong>{' '}
+                        enregistrée.
+                    </span>
+                    <Link
+                        href={`/gouvernance?focus=${lastAction.id}`}
+                        className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 font-mono text-[11px] underline-offset-2 hover:underline"
+                    >
+                        Voir cette action dans le journal <ExternalLink className="h-3 w-3" aria-hidden />
+                    </Link>
+                </div>
+            ) : null}
+
+            <CuratorActions passport={passport} score={score} onAfterAction={(entry) => setLastAction(entry)} />
+        </div>
+    );
+}
+
+const AXIS_LABEL: Record<IrisAxis, string> = {
+    transparency: 'Transparence',
+    craftsmanship: 'Savoir-faire',
+    impact: 'Impact',
+    repairability: 'Réparabilité',
+};
+
+const AXIS_MAX_POINTS: Record<IrisAxis, number> = {
+    transparency: 40,
+    craftsmanship: 25,
+    impact: 25,
+    repairability: 10,
+};
+
+/** Les 4 axes avec roving tabindex - flèches haut/bas pour naviguer entre les axes. */
+function WhyThisScoreBanner({ score }: { score: ScoreResult }) {
+    const axes: IrisAxis[] = ['transparency', 'craftsmanship', 'impact', 'repairability'];
+    const rows = axes
+        .map((axis) => ({
+            axis,
+            weighted: score.breakdown[axis] * score.weights[axis],
+            ratio: score.breakdown[axis] / 100,
+            firstReason:
+                score.reasons.find((r) => r.axis === axis && (r.severity === 'error' || r.severity === 'warn'))
+                    ?.message ??
+                score.reasons.find((r) => r.axis === axis)?.message ??
+                'Aucun motif détecté',
+        }))
+        .sort((a, b) => a.ratio - b.ratio);
+
+    const [focusIndex, setFocusIndex] = useState(0);
+    const itemsRef = useRef<Array<HTMLLIElement | null>>([]);
+
+    const handleKey = (event: KeyboardEvent<HTMLLIElement>, index: number) => {
+        if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown' && event.key !== 'Home' && event.key !== 'End') return;
+        event.preventDefault();
+        const max = rows.length - 1;
+        const next =
+            event.key === 'ArrowDown'
+                ? Math.min(max, index + 1)
+                : event.key === 'ArrowUp'
+                  ? Math.max(0, index - 1)
+                  : event.key === 'End'
+                    ? max
+                    : 0;
+        setFocusIndex(next);
+        itemsRef.current[next]?.focus();
+    };
+
+    return (
+        <div className="border-lumiris-amber/30 bg-lumiris-amber/5 rounded-xl border p-4">
+            <p
+                id="why-this-score-heading"
+                className="text-lumiris-amber inline-flex items-center gap-1.5 text-xs font-semibold"
+            >
+                <Lightbulb className="h-3.5 w-3.5" aria-hidden /> Pourquoi ce score ?
+            </p>
+            <ul
+                role="listbox"
+                aria-labelledby="why-this-score-heading"
+                aria-orientation="vertical"
+                className="mt-2 space-y-2 text-xs"
+            >
+                {rows.map((row, index) => {
+                    const points = Math.round(row.weighted);
+                    const max = AXIS_MAX_POINTS[row.axis];
+                    const isFocused = focusIndex === index;
+                    return (
+                        <li
+                            key={row.axis}
+                            ref={(node) => {
+                                itemsRef.current[index] = node;
+                            }}
+                            role="option"
+                            aria-selected={isFocused}
+                            tabIndex={isFocused ? 0 : -1}
+                            onKeyDown={(event) => handleKey(event, index)}
+                            onFocus={() => setFocusIndex(index)}
+                            className="text-foreground focus-visible:ring-ring focus-visible:ring-offset-card -mx-1 rounded-md px-1 outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                        >
+                            <strong>
+                                {AXIS_LABEL[row.axis]} {points}/{max}
+                            </strong>{' '}
+                            — <span className="text-muted-foreground">{row.firstReason}</span>
+                        </li>
+                    );
+                })}
+            </ul>
         </div>
     );
 }
@@ -289,7 +402,7 @@ function InvoicesTab({ passport }: { passport: Passport }) {
                                     </p>
                                 </div>
                                 <Badge variant="outline" className="font-mono text-[10px]">
-                                    {c.verified ? 'verified' : 'unverified'}
+                                    {c.verified ? 'vérifié' : 'non vérifié'}
                                 </Badge>
                             </li>
                         ))}

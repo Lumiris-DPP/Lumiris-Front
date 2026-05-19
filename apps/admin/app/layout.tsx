@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import { Geist_Mono } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
+import { AdminUserProvider, AuditLogProvider } from '@/lib/auth';
+import { Sidebar } from '@/features/sidebar';
+import { TopBar } from '@/features/top-bar';
 import { WebVitals } from './web-vitals';
 import './globals.css';
 
@@ -16,8 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: 'LUMIRIS | Transparency Platform',
-    description: 'Internal auditing and transparency platform for Digital Product Passport compliance.',
+    title: 'LUMIRIS | Console ATELIER',
+    description: 'Console interne LUMIRIS — audit, curation et gouvernance des passeports produits numériques (DPP).',
 };
 
 export const viewport: Viewport = {
@@ -32,10 +35,20 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className={`${inter.variable} ${geistMono.variable} bg-background`}>
+        <html lang="fr" className={`${inter.variable} ${geistMono.variable} bg-background`}>
             <body className="font-sans antialiased">
                 <WebVitals />
-                {children}
+                <AdminUserProvider>
+                    <AuditLogProvider>
+                        <div className="bg-background min-h-screen">
+                            <Sidebar />
+                            <TopBar />
+                            <main className="ml-60 pt-14">
+                                <div className="p-6 lg:p-8">{children}</div>
+                            </main>
+                        </div>
+                    </AuditLogProvider>
+                </AdminUserProvider>
                 {process.env.NODE_ENV === 'production' && <Analytics />}
             </body>
         </html>

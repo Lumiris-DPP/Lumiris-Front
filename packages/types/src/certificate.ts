@@ -12,7 +12,7 @@ export interface CertificationRef {
     issuer: string;
     issuedAt: string;
     expiresAt: string;
-    /** Vérification humaine (founder / content_manager) - si false, poids effectif × 0.5. */
+    /** Vérification humaine (founder / curator) - si false, poids effectif × 0.5. */
     verified: boolean;
     fileUrl: string;
     /** Champ libre - précise sur quoi porte la certification (e.g. "fibre laine origine Vosges"). */

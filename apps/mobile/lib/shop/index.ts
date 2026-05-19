@@ -34,16 +34,6 @@ export const GARMENT_KIND_LABEL: Record<GarmentKind, string> = {
     other: 'Autres',
 };
 
-export const GARMENT_KIND_LABEL_SINGULAR: Record<GarmentKind, string> = {
-    sweater: 'Pull',
-    shirt: 'Chemise',
-    jacket: 'Veste',
-    trouser: 'Pantalon',
-    shoe: 'Chaussure',
-    accessory: 'Accessoire',
-    other: 'Autre',
-};
-
 // Heuristique ATELIER+ MVP - top 3 artisans par nombre de passeports A.
 // Recalculé à chaque appel (déterministe pour un `now` donné).
 function computeFeaturedArtisanIds(now: Date): readonly string[] {

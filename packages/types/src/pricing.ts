@@ -1,4 +1,4 @@
-// plans d'abonnement publiés sur /tarifs et /atelier - facturation backend dans @lumiris/api-client
+// plans d'abonnement publiés sur /tarifs et /atelier
 
 export type AtelierPlanTier = 'solo' | 'studio' | 'maison';
 

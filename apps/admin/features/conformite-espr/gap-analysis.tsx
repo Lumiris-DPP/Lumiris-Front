@@ -1,0 +1,197 @@
+'use client';
+
+import { useState } from 'react';
+import { Megaphone, PartyPopper, Send } from 'lucide-react';
+import { EmptyState } from '../_shared/empty-state';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@lumiris/ui/components/alert-dialog';
+import { Badge } from '@lumiris/ui/components/badge';
+import { Button } from '@lumiris/ui/components/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
+import { Textarea } from '@lumiris/ui/components/textarea';
+import { cn } from '@lumiris/ui/lib/cn';
+import { useLogAction } from '@/lib/auth';
+import { ACTION_LABEL, REASON_LABEL, type GapEntry, type RecommendedAction } from '@/lib/regulatory-calendar';
+
+interface GapAnalysisProps {
+    gaps: readonly GapEntry[];
+    totalArtisans: number;
+}
+
+export function GapAnalysis({ gaps, totalArtisans }: GapAnalysisProps) {
+    const [dialogOpen, setDialogOpen] = useState(false);
+    return (
+        <section className="border-border bg-card opal-shadow rounded-xl border">
+            <div className="border-border flex flex-wrap items-baseline justify-between gap-3 border-b px-5 py-4">
+                <div>
+                    <h3 className="text-foreground text-sm font-semibold">
+                        Gap analysis · {gaps.length} artisans non prêts
+                    </h3>
+                    <p className="text-muted-foreground mt-1 text-xs">
+                        Sur {totalArtisans} artisans actifs. Triés par sévérité descendante. Une campagne
+                        d&apos;activation regroupe les actions recommandées.
+                    </p>
+                </div>
+                <Button
+                    size="sm"
+                    onClick={() => setDialogOpen(true)}
+                    disabled={gaps.length === 0}
+                    className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 gap-1.5"
+                >
+                    <Megaphone className="h-3.5 w-3.5" /> Lancer campagne d&apos;activation
+                </Button>
+            </div>
+
+            {gaps.length === 0 ? (
+                <div className="p-6">
+                    <EmptyState
+                        icon={PartyPopper}
+                        title="Aucun artisan non prêt — bravo"
+                        description="Tous les artisans sont prêts pour l'échéance textile 2028. Continuez à surveiller la cadence des nouveaux entrants."
+                    />
+                </div>
+            ) : (
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Atelier</TableHead>
+                            <TableHead>Tier</TableHead>
+                            <TableHead>Raisons du gap</TableHead>
+                            <TableHead>Action recommandée</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {gaps.map((gap) => (
+                            <TableRow key={gap.artisanId}>
+                                <TableCell>
+                                    <p className="text-foreground text-sm">{gap.artisanName}</p>
+                                    <p className="text-muted-foreground text-[11px]">
+                                        {gap.city} · {gap.artisanId}
+                                    </p>
+                                </TableCell>
+                                <TableCell>
+                                    <Badge variant="outline" className="font-mono text-[10px]">
+                                        {gap.tier}
+                                    </Badge>
+                                </TableCell>
+                                <TableCell>
+                                    <div className="flex flex-wrap gap-1">
+                                        {gap.reasons.map((reason) => (
+                                            <Badge
+                                                key={reason}
+                                                variant="outline"
+                                                className="border-lumiris-rose/40 text-lumiris-rose font-mono text-[10px]"
+                                            >
+                                                {REASON_LABEL[reason]}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                </TableCell>
+                                <TableCell>
+                                    <span
+                                        className={cn(
+                                            'inline-flex items-center gap-1.5 text-xs',
+                                            actionTone(gap.recommendedAction),
+                                        )}
+                                    >
+                                        <Send className="h-3 w-3" />
+                                        {ACTION_LABEL[gap.recommendedAction]}
+                                    </span>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            )}
+
+            <CampaignDialog open={dialogOpen} onOpenChange={setDialogOpen} gaps={gaps} />
+        </section>
+    );
+}
+
+function actionTone(action: RecommendedAction): string {
+    switch (action) {
+        case 'demo':
+            return 'text-lumiris-cyan';
+        case 'training':
+            return 'text-lumiris-amber';
+        case 'relance':
+            return 'text-lumiris-emerald';
+    }
+}
+
+function CampaignDialog({
+    open,
+    onOpenChange,
+    gaps,
+}: {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    gaps: readonly GapEntry[];
+}) {
+    const log = useLogAction();
+    const [message, setMessage] = useState(
+        "L'échéance ESPR textile arrive en 2028 — programmons un point pour finaliser votre DPP.",
+    );
+
+    const handleLaunch = () => {
+        log({
+            action: 'artisan.contact',
+            targetType: 'period',
+            targetId: `espr-campaign-${new Date().toISOString().slice(0, 10)}`,
+            payload: {
+                campaign: 'espr-activation',
+                recipientCount: gaps.length,
+                recipientIds: gaps.map((g) => g.artisanId),
+                breakdown: gaps.reduce<Record<RecommendedAction, number>>(
+                    (acc, g) => ({ ...acc, [g.recommendedAction]: (acc[g.recommendedAction] ?? 0) + 1 }),
+                    { relance: 0, demo: 0, training: 0 },
+                ),
+                messagePreview: message.slice(0, 200),
+                dryRun: true,
+            },
+        });
+        onOpenChange(false);
+    };
+
+    return (
+        <AlertDialog open={open} onOpenChange={onOpenChange}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Lancer la campagne d&apos;activation ESPR</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Prépare un envoi groupé à {gaps.length} ateliers. <strong>Aucun envoi réel</strong> en V1 - la
+                        campagne est uniquement journalisée dans l&apos;audit log pour suivi gouvernance.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <Textarea
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    className="min-h-24"
+                    placeholder="Message envoyé aux ateliers ciblés…"
+                />
+                <p className="text-muted-foreground text-[11px]">
+                    Tracé : <span className="font-mono">artisan.contact</span> · campaign=espr-activation · dryRun=true
+                </p>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogAction
+                        onClick={handleLaunch}
+                        disabled={gaps.length === 0 || message.trim().length < 10}
+                        className="bg-lumiris-emerald hover:bg-lumiris-emerald/90"
+                    >
+                        Lancer · {gaps.length} ateliers
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    );
+}

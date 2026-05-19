@@ -1,6 +1,6 @@
 'use client';
 
-import type { Passport, IrisGrade as IrisGradeLetter } from '@lumiris/types';
+import type { AdminAuditLogEntry, Passport, IrisGrade as IrisGradeLetter } from '@lumiris/types';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -19,7 +19,7 @@ interface ValidateDialogProps {
     grade: IrisGradeLetter;
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onAfterAction: () => void;
+    onAfterAction: (entry: AdminAuditLogEntry) => void;
 }
 
 export function ValidateDialog({ passport, grade, open, onOpenChange, onAfterAction }: ValidateDialogProps) {
@@ -29,8 +29,10 @@ export function ValidateDialog({ passport, grade, open, onOpenChange, onAfterAct
     const handleValidate = () => {
         const publishedAt = new Date().toISOString();
         setOverlay(passport.id, { status: 'validated', publishedAt });
-        log({
-            action: 'passport.curate',
+        // L'approbation finale (status=validated + publication QR) émet `passport.validate` ;
+        // `passport.curate` reste réservé aux étapes de curation technique en amont.
+        const entry = log({
+            action: 'passport.validate',
             targetType: 'passport',
             targetId: passport.id,
             payload: {
@@ -41,7 +43,7 @@ export function ValidateDialog({ passport, grade, open, onOpenChange, onAfterAct
             },
         });
         onOpenChange(false);
-        onAfterAction();
+        onAfterAction(entry);
     };
 
     return (

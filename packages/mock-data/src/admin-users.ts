@@ -1,6 +1,6 @@
 import type { AdminUser } from '@lumiris/types';
 
-// 7 admins (un par rôle) - index 0 doit rester platform_admin pour donner full access en dev
+// 7 admins couvrant tous les rôles - index 0 doit rester platform_admin pour full access en dev
 export const mockAdminUsers: readonly AdminUser[] = [
     {
         id: 'ADM-001',
@@ -28,15 +28,6 @@ export const mockAdminUsers: readonly AdminUser[] = [
         avatarUrl: 'https://cdn.lumiris.local/admins/sophie.jpg',
         createdAt: '2025-05-20T08:00:00Z',
         lastSeenAt: '2026-04-30T09:10:00Z',
-    },
-    {
-        id: 'ADM-004',
-        email: 'claire.dubois@lumiris.fr',
-        fullName: 'Claire Dubois',
-        role: 'content_manager',
-        avatarUrl: 'https://cdn.lumiris.local/admins/claire.jpg',
-        createdAt: '2025-02-10T08:00:00Z',
-        lastSeenAt: '2026-04-30T06:50:00Z',
     },
     {
         id: 'ADM-005',

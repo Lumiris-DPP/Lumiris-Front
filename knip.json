@@ -5,95 +5,64 @@
             "entry": [
                 "turbo.json",
                 "lighthouserc.cjs",
-                "commitlint.config.mjs",
                 "knip.json",
                 "syncpack.config.mjs",
                 "scripts/*.{mjs,js,ts}",
                 "bench/scenarios/*.js"
             ],
-            "ignore": ["**/.next/**", "**/dist/**", "**/.turbo/**", "**/src-tauri/**"],
-            "ignoreDependencies": ["@lhci/cli", "k6", "postcss-load-config", "rimraf", "stylelint", "syncpack"]
+            "ignoreDependencies": ["k6", "postcss-load-config"]
         },
         "apps/admin": {
             "entry": [
                 "app/**/{page,layout,loading,error,not-found,route,template}.{ts,tsx}",
                 "app/web-vitals.tsx",
-                "instrumentation.ts",
                 "env.ts",
                 "features/**/index.tsx",
-                "next.config.mjs"
+                "lib/data/use-*.ts",
+                "test/setup.ts"
             ],
-            "project": ["**/*.{ts,tsx}"],
-            "ignore": [".next/**"]
+            "project": ["**/*.{ts,tsx}"]
         },
         "apps/client": {
             "entry": [
                 "app/**/{page,layout,loading,error,not-found,route,template}.{ts,tsx}",
                 "app/web-vitals.tsx",
-                "instrumentation.ts",
                 "env.ts",
-                "features/**/index.tsx",
-                "next.config.mjs"
+                "features/**/index.tsx"
             ],
-            "project": ["**/*.{ts,tsx}"],
-            "ignore": [".next/**"]
-        },
-        "apps/web": {
-            "entry": [
-                "app/**/{page,layout,loading,error,not-found,route,template}.{ts,tsx}",
-                "app/web-vitals.tsx",
-                "instrumentation.ts",
-                "env.ts",
-                "features/**/index.tsx",
-                "next.config.mjs"
-            ],
-            "project": ["**/*.{ts,tsx}"],
-            "ignore": [".next/**"]
+            "project": ["**/*.{ts,tsx}"]
         },
         "apps/mobile": {
             "entry": [
                 "app/**/{page,layout,loading,error,not-found,route,template}.{ts,tsx}",
                 "app/web-vitals.tsx",
-                "instrumentation.ts",
                 "env.ts",
-                "features/**/index.tsx",
-                "next.config.mjs"
+                "features/**/index.tsx"
             ],
-            "project": ["**/*.{ts,tsx}"],
-            "ignore": [".next/**", "src-tauri/**"]
+            "project": ["**/*.{ts,tsx}"]
         },
         "packages/ui": {
-            "entry": [
-                "src/index.ts",
-                "src/server/index.ts",
-                "src/components/**/*.{ts,tsx}",
-                "src/hooks/*.ts",
-                "src/lib/*.ts"
-            ],
+            "entry": ["src/components/**/*.{ts,tsx}", "src/hooks/*.ts", "src/lib/*.ts"],
             "project": ["src/**/*.{ts,tsx}"]
         },
         "packages/scoring-ui": {
-            "entry": ["src/index.ts", "src/components/**/*.tsx", "src/hooks/*.ts", "src/theme/*.ts"],
+            "entry": ["src/components/**/*.tsx", "src/hooks/*.ts", "src/theme/*.ts"],
             "project": ["src/**/*.{ts,tsx}"]
         },
         "packages/telemetry": {
-            "entry": ["src/index.ts", "src/*.{ts,tsx}"],
+            "entry": ["src/*.{ts,tsx}"],
             "project": ["src/**/*.{ts,tsx}"]
         },
         "packages/core": {
-            "entry": ["src/index.ts"],
             "project": ["src/**/*.ts"]
         },
         "packages/types": {
-            "entry": ["src/index.ts"],
             "project": ["src/**/*.ts"]
         },
         "packages/utils": {
-            "entry": ["src/index.ts"],
             "project": ["src/**/*.ts"]
         },
         "packages/mock-data": {
-            "entry": ["src/index.ts"],
             "project": ["src/**/*.ts"]
         },
         "packages/config": {

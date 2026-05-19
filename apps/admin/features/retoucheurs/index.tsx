@@ -1,11 +1,12 @@
 'use client';
 
 import { memo, useMemo, useState } from 'react';
-import { Filter, MapPin, Search, Star } from 'lucide-react';
+import { Filter, Inbox, MapPin, Megaphone, Search, ShieldCheck, Star } from 'lucide-react';
 import { mockRepairers } from '@lumiris/mock-data';
 import type { Repairer, RepairerSpecialty } from '@lumiris/types';
 import { ActivityTab, KycTab, ProfileTab, ReviewsTab } from './drawer-tabs';
-import type { CandidatureStatus, RepairerOverlay } from './types';
+import { CommissionsTab } from './commissions-tab';
+import type { CandidatureStatus, RetoucheurOverlay } from './types';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -24,14 +25,14 @@ import { ScrollArea } from '@lumiris/ui/components/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@lumiris/ui/components/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@lumiris/ui/components/sheet';
 import { Slider } from '@lumiris/ui/components/slider';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@lumiris/ui/components/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@lumiris/ui/components/tabs';
 import { Textarea } from '@lumiris/ui/components/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
 import { cn } from '@lumiris/ui/lib/cn';
-import { RequirePermission, useLogAction, usePermission } from '@/lib/auth';
-
-// Mock candidatures locales - pas dans les types canoniques. On enrichit Repairer avec un overlay
-// `candidatureStatus` géré en mémoire, comme pour les passeports.
+import { useLogAction, usePermission } from '@/lib/auth';
+import { EmptyState } from '../_shared/empty-state';
+import { NonNegotiableBanner } from '../_shared/non-negotiable-banner';
+import { PermissionRequiredAction } from '../_shared/permission-required-action';
 
 const SPECIALITY_LABEL: Record<RepairerSpecialty, string> = {
     alteration: 'Retouche',
@@ -47,16 +48,18 @@ const SPECIALITY_LABEL: Record<RepairerSpecialty, string> = {
     'appliance-repair': 'Électroménager',
 };
 
+const STATUS_LABEL: Record<CandidatureStatus, string> = {
+    pending: 'À vérifier',
+    verified: 'Vérifié',
+    rejected: 'Rejeté',
+};
+
 function RepairersComponent() {
-    return (
-        <RequirePermission action="retoucheur.read">
-            <RepairersInner />
-        </RequirePermission>
-    );
+    return <RepairersInner />;
 }
 
 function RepairersInner() {
-    const [overlays, setOverlays] = useState<Map<string, RepairerOverlay>>(() => new Map());
+    const [overlays, setOverlays] = useState<Map<string, RetoucheurOverlay>>(() => new Map());
     const [search, setSearch] = useState('');
     const [cityFilter, setCityFilter] = useState<string>('all');
     const [specialityFilter, setSpecialityFilter] = useState<RepairerSpecialty | 'all'>('all');
@@ -93,42 +96,80 @@ function RepairersInner() {
         [overlays],
     );
 
+    const underservedSpecialities = useMemo(() => {
+        const counts: Record<string, number> = {};
+        for (const r of mockRepairers) {
+            for (const s of r.specialities) {
+                counts[s] = (counts[s] ?? 0) + 1;
+            }
+        }
+        return (Object.keys(SPECIALITY_LABEL) as RepairerSpecialty[]).filter((s) => (counts[s] ?? 0) < 3);
+    }, []);
+
+    const scrollToPriorityGaps = () => {
+        if (typeof document === 'undefined') return;
+        document.getElementById('priority-gaps-banner')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    const resetFilters = () => {
+        setSearch('');
+        setCityFilter('all');
+        setSpecialityFilter('all');
+        setStatusFilter('all');
+        setMinRating(0);
+    };
+
+    const hasGaps = pendingCount > 0 || underservedSpecialities.length > 0;
+
     return (
         <div className="space-y-5">
             <div>
-                <h2 className="text-foreground text-xl font-semibold">Repairers (LUMIRIS Local)</h2>
+                <h2 className="text-foreground text-xl font-semibold">Retoucheurs (LUMIRIS Local)</h2>
+                <Badge
+                    variant="outline"
+                    className="border-lumiris-emerald/40 text-lumiris-emerald mt-1.5 font-mono text-[10px]"
+                >
+                    Périmètre V1 — textile artisanal français
+                </Badge>
                 <p className="text-muted-foreground mt-1 text-sm">
-                    {mockRepairers.length} retoucheurs référencés -{' '}
+                    {mockRepairers.length} retoucheurs référencés —{' '}
                     {mockRepairers.filter((r) => r.localSubscribed).length} abonnés Local.
                 </p>
             </div>
 
-            {pendingCount > 5 ? (
-                <div className="border-lumiris-amber/30 bg-lumiris-amber/5 text-lumiris-amber rounded-xl border px-3 py-2 text-xs">
-                    <strong>{pendingCount} candidatures à vérifier.</strong> Filtrer
-                    <code className="bg-muted text-foreground mx-1 rounded px-1 py-0.5">candidatureStatus=pending</code>
-                    pour traiter en lot.
-                </div>
+            <NonNegotiableBanner rule="Modération des avis = retrait ou publication uniquement. Aucun avis ne peut être édité. Audit log obligatoire pour chaque masquage." />
+
+            {hasGaps ? (
+                <PriorityGapsBanner
+                    pendingCount={pendingCount}
+                    underservedSpecialities={underservedSpecialities}
+                    onFilterPending={() => setStatusFilter('pending')}
+                    onFilterSpeciality={(s) => setSpecialityFilter(s)}
+                />
             ) : null}
 
             <CityHeatmap cities={cities} active={cityFilter} onSelect={setCityFilter} />
 
             <div className="border-border bg-card flex flex-wrap items-center gap-2 rounded-xl border p-3">
                 <div className="min-w-55 relative flex-1">
-                    <Search className="text-muted-foreground/60 absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2" />
+                    <Search
+                        className="text-muted-foreground/60 absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2"
+                        aria-hidden
+                    />
                     <Input
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Nom, atelier, ville…"
                         className="pl-8"
+                        aria-label="Filtrer par nom, atelier ou ville"
                     />
                 </div>
                 <Select
                     value={specialityFilter}
                     onValueChange={(v) => setSpecialityFilter(v as RepairerSpecialty | 'all')}
                 >
-                    <SelectTrigger className="w-40">
-                        <Filter className="mr-1 h-3.5 w-3.5" /> <SelectValue />
+                    <SelectTrigger className="w-40" aria-label="Filtrer par spécialité">
+                        <Filter className="mr-1 h-3.5 w-3.5" aria-hidden /> <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">Toutes spécialités</SelectItem>
@@ -140,7 +181,7 @@ function RepairersInner() {
                     </SelectContent>
                 </Select>
                 <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as CandidatureStatus | 'all')}>
-                    <SelectTrigger className="w-45">
+                    <SelectTrigger className="w-45" aria-label="Filtrer par statut KYC">
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -160,11 +201,20 @@ function RepairersInner() {
                         step={0.1}
                         onValueChange={(v) => setMinRating(v[0] ?? 0)}
                         className="flex-1"
+                        aria-label={`Note minimale ${minRating.toFixed(1)} sur 5`}
                     />
                 </div>
             </div>
 
-            <RepairerTable rows={filtered} overlays={overlays} onSelect={setSelected} />
+            <RepairerTable
+                rows={filtered}
+                overlays={overlays}
+                onSelect={setSelected}
+                cityFilter={cityFilter}
+                hasGaps={hasGaps}
+                onScrollToGaps={scrollToPriorityGaps}
+                onResetFilters={resetFilters}
+            />
 
             <RepairerDrawer
                 retoucheur={selected}
@@ -194,12 +244,13 @@ function CityHeatmap({
     return (
         <div className="border-border bg-card rounded-xl border p-3">
             <p className="text-muted-foreground mb-2 inline-flex items-center gap-1 text-[10px] uppercase tracking-wider">
-                <MapPin className="h-3 w-3" /> Implantations
+                <MapPin className="h-3 w-3" aria-hidden /> Implantations
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Filtre par ville">
                 <button
                     type="button"
                     onClick={() => onSelect('all')}
+                    aria-pressed={active === 'all'}
                     className={cn(
                         'rounded-full border px-2 py-1 font-mono text-[11px]',
                         active === 'all'
@@ -214,6 +265,7 @@ function CityHeatmap({
                         key={city}
                         type="button"
                         onClick={() => onSelect(city)}
+                        aria-pressed={active === city}
                         className={cn(
                             'inline-flex items-center gap-1 rounded-full border px-2 py-1 font-mono text-[11px]',
                             active === city
@@ -221,12 +273,96 @@ function CityHeatmap({
                                 : 'border-border text-muted-foreground hover:border-lumiris-emerald/40',
                         )}
                     >
-                        <MapPin className="h-2.5 w-2.5" /> {city}
+                        <MapPin className="h-2.5 w-2.5" aria-hidden /> {city}
                         <span className="text-muted-foreground/60">·{count}</span>
                     </button>
                 ))}
             </div>
+            <table className="sr-only">
+                <caption>Densité retoucheurs par ville (équivalent textuel de la heatmap)</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Ville</th>
+                        <th scope="col">Nombre de retoucheurs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {cities.map(([city, count]) => (
+                        <tr key={`sr-${city}`}>
+                            <th scope="row">{city}</th>
+                            <td>{count}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
+    );
+}
+
+function PriorityGapsBanner({
+    pendingCount,
+    underservedSpecialities,
+    onFilterPending,
+    onFilterSpeciality,
+}: {
+    pendingCount: number;
+    underservedSpecialities: readonly RepairerSpecialty[];
+    onFilterPending: () => void;
+    onFilterSpeciality: (s: RepairerSpecialty) => void;
+}) {
+    return (
+        <section
+            id="priority-gaps-banner"
+            aria-labelledby="priority-gaps-banner-title"
+            className="border-lumiris-amber/30 bg-lumiris-amber/5 space-y-2 rounded-xl border p-3 text-xs"
+        >
+            <p
+                id="priority-gaps-banner-title"
+                className="text-lumiris-amber inline-flex items-center gap-1.5 font-semibold"
+            >
+                <ShieldCheck className="h-3.5 w-3.5" aria-hidden /> Lacunes prioritaires
+            </p>
+            <ul className="space-y-1.5">
+                {pendingCount > 0 ? (
+                    <li className="flex flex-wrap items-baseline gap-2">
+                        <span>
+                            <strong>
+                                {pendingCount} candidature{pendingCount > 1 ? 's' : ''} à vérifier
+                            </strong>{' '}
+                            — KYC en attente, traitez en lot.
+                        </span>
+                        <Button size="sm" variant="outline" onClick={onFilterPending} className="h-6 gap-1 text-[10px]">
+                            Filtrer KYC à vérifier
+                        </Button>
+                    </li>
+                ) : null}
+                {underservedSpecialities.length > 0 ? (
+                    <li className="flex flex-wrap items-baseline gap-2">
+                        <span>
+                            <strong>
+                                {underservedSpecialities.length} spécialité
+                                {underservedSpecialities.length > 1 ? 's' : ''} sous-représentée
+                                {underservedSpecialities.length > 1 ? 's' : ''}
+                            </strong>{' '}
+                            (moins de 3 retoucheurs) — à renforcer pour la promesse LUMIRIS Local.
+                        </span>
+                        <div className="flex flex-wrap gap-1">
+                            {underservedSpecialities.map((s) => (
+                                <Button
+                                    key={s}
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => onFilterSpeciality(s)}
+                                    className="h-6 gap-1 text-[10px]"
+                                >
+                                    {SPECIALITY_LABEL[s]}
+                                </Button>
+                            ))}
+                        </div>
+                    </li>
+                ) : null}
+            </ul>
+        </section>
     );
 }
 
@@ -234,16 +370,42 @@ function RepairerTable({
     rows,
     overlays,
     onSelect,
+    cityFilter,
+    hasGaps,
+    onScrollToGaps,
+    onResetFilters,
 }: {
     rows: readonly Repairer[];
-    overlays: Map<string, RepairerOverlay>;
+    overlays: Map<string, RetoucheurOverlay>;
     onSelect: (r: Repairer) => void;
+    cityFilter: string;
+    hasGaps: boolean;
+    onScrollToGaps: () => void;
+    onResetFilters: () => void;
 }) {
     if (rows.length === 0) {
+        const cityScoped = cityFilter !== 'all';
         return (
-            <div className="border-border bg-card text-muted-foreground rounded-xl border p-12 text-center text-sm">
-                Aucun retoucheur ne correspond aux filtres.
-            </div>
+            <EmptyState
+                icon={cityScoped ? Megaphone : Inbox}
+                title={cityScoped ? 'Aucun retoucheur sur cette zone' : 'Aucun retoucheur ne correspond aux filtres'}
+                description={
+                    cityScoped
+                        ? 'Personne n’est encore référencé ici. Identifiez les spécialités sous-représentées pour cibler le recrutement.'
+                        : 'Élargissez le périmètre ou consultez les lacunes prioritaires pour orienter votre action.'
+                }
+                action={
+                    hasGaps ? (
+                        <Button size="sm" variant="outline" onClick={onScrollToGaps} className="gap-1.5">
+                            <ShieldCheck className="h-3.5 w-3.5" aria-hidden /> Voir les lacunes prioritaires
+                        </Button>
+                    ) : (
+                        <Button size="sm" variant="outline" onClick={onResetFilters} className="gap-1.5">
+                            <Filter className="h-3.5 w-3.5" aria-hidden /> Réinitialiser les filtres
+                        </Button>
+                    )
+                }
+            />
         );
     }
     return (
@@ -251,7 +413,7 @@ function RepairerTable({
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Repairer</TableHead>
+                        <TableHead>Retoucheur</TableHead>
                         <TableHead>Spécialités</TableHead>
                         <TableHead>Note</TableHead>
                         <TableHead>Délai</TableHead>
@@ -291,7 +453,7 @@ function RepairerTable({
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex items-center gap-1 font-mono text-xs">
-                                        <Star className="text-lumiris-amber h-3 w-3 fill-current" />
+                                        <Star className="text-lumiris-amber h-3 w-3 fill-current" aria-hidden />
                                         {r.avgRating.toFixed(1)}
                                         <span className="text-muted-foreground">({r.reviewCount})</span>
                                     </div>
@@ -315,6 +477,7 @@ function RepairerTable({
                                             e.stopPropagation();
                                             onSelect(r);
                                         }}
+                                        aria-label={`Ouvrir la fiche de ${r.displayName}`}
                                     >
                                         Détail
                                     </Button>
@@ -337,16 +500,16 @@ function CandidatureBadge({ status }: { status: CandidatureStatus }) {
               : 'border-lumiris-rose/40 bg-lumiris-rose/10 text-lumiris-rose';
     return (
         <Badge variant="outline" className={cn('font-mono text-[10px]', tone)}>
-            {status}
+            {STATUS_LABEL[status]}
         </Badge>
     );
 }
 
 interface RepairerDrawerProps {
     retoucheur: Repairer | null;
-    overlay: RepairerOverlay | undefined;
+    overlay: RetoucheurOverlay | undefined;
     onClose: () => void;
-    onPatchOverlay: (id: string, patch: Partial<RepairerOverlay>) => void;
+    onPatchOverlay: (id: string, patch: Partial<RetoucheurOverlay>) => void;
 }
 
 function RepairerDrawer({ retoucheur, overlay, onClose, onPatchOverlay }: RepairerDrawerProps) {
@@ -373,45 +536,65 @@ function DrawerBody({
     onPatchOverlay,
 }: {
     retoucheur: Repairer;
-    overlay: RepairerOverlay | undefined;
+    overlay: RetoucheurOverlay | undefined;
     onClose: () => void;
-    onPatchOverlay: (id: string, patch: Partial<RepairerOverlay>) => void;
+    onPatchOverlay: (id: string, patch: Partial<RetoucheurOverlay>) => void;
 }) {
     const log = useLogAction();
-    const canVerify = usePermission('retoucheur.verify_kyc');
-    const canModerate = usePermission('retoucheur.review_moderate');
+    const canVerify = usePermission('retoucheur.kyc_verify');
+    const canModerate = usePermission('retoucheur.review_hide');
     const status = overlay?.candidatureStatus ?? 'verified';
 
     const [rejectOpen, setRejectOpen] = useState(false);
     const [rejectReason, setRejectReason] = useState('');
+    const [rejectTypedName, setRejectTypedName] = useState('');
     const [verifyOpen, setVerifyOpen] = useState(false);
+    const [statusAnnouncement, setStatusAnnouncement] = useState('');
 
     const handleVerify = () => {
         onPatchOverlay(retoucheur.id, { candidatureStatus: 'verified' });
-        log({
-            action: 'retoucheur.verify_kyc',
+        const entry = log({
+            action: 'retoucheur.kyc_verify',
             targetType: 'repairer',
             targetId: retoucheur.id,
             payload: { decision: 'verified' },
         });
+        setStatusAnnouncement(`KYC vérifié pour ${retoucheur.displayName} — audit log ${entry.id} créé.`);
         setVerifyOpen(false);
     };
 
     const handleReject = () => {
         if (rejectReason.trim().length === 0) return;
+        if (rejectTypedName.trim() !== retoucheur.displayName) return;
         onPatchOverlay(retoucheur.id, {
             candidatureStatus: 'rejected',
             rejectReason,
         });
-        log({
-            action: 'retoucheur.verify_kyc',
+        const entry = log({
+            action: 'retoucheur.kyc_reject',
             targetType: 'repairer',
             targetId: retoucheur.id,
             payload: { decision: 'rejected', reason: rejectReason },
         });
+        setStatusAnnouncement(`Candidature rejetée pour ${retoucheur.displayName} — audit log ${entry.id} créé.`);
         setRejectReason('');
+        setRejectTypedName('');
         setRejectOpen(false);
     };
+
+    const handleLocalDunning = () => {
+        const entry = log({
+            action: 'retoucheur.local_dunning',
+            targetType: 'repairer',
+            targetId: retoucheur.id,
+            payload: { subscription: 'overdue_resolved' },
+        });
+        setStatusAnnouncement(
+            `Impayé Local marqué résolu pour ${retoucheur.displayName} — audit log ${entry.id} créé.`,
+        );
+    };
+
+    const rejectReady = rejectReason.trim().length > 0 && rejectTypedName.trim() === retoucheur.displayName;
 
     return (
         <div className="flex h-full flex-col">
@@ -430,28 +613,38 @@ function DrawerBody({
                 </div>
             </SheetHeader>
 
+            <div aria-live="polite" aria-atomic="true" className="sr-only">
+                {statusAnnouncement}
+            </div>
+
             <Tabs defaultValue="profile" className="flex flex-1 flex-col overflow-hidden">
                 <TabsList className="border-border w-full justify-start gap-1 rounded-none border-b bg-transparent px-3">
                     <TabsTrigger value="profile">Profil</TabsTrigger>
                     <TabsTrigger value="kyc">KYC</TabsTrigger>
-                    <TabsTrigger value="reviews">Reviews</TabsTrigger>
+                    <TabsTrigger value="reviews">Avis</TabsTrigger>
+                    <TabsTrigger value="commissions">Commissions</TabsTrigger>
                     <TabsTrigger value="activity">Activité</TabsTrigger>
                 </TabsList>
                 <ScrollArea className="flex-1">
                     <div className="space-y-3 p-5 text-xs">
                         <ProfileTab retoucheur={retoucheur} />
                         <KycTab
+                            retoucheur={retoucheur}
                             overlay={overlay}
                             canVerify={canVerify}
                             onOpenVerify={() => setVerifyOpen(true)}
                             onOpenReject={() => setRejectOpen(true)}
+                            onResolveOverdue={handleLocalDunning}
+                            onPatchOverlay={onPatchOverlay}
                         />
                         <ReviewsTab
                             retoucheur={retoucheur}
                             overlay={overlay}
                             canModerate={canModerate}
                             onPatchOverlay={onPatchOverlay}
+                            onAnnounce={setStatusAnnouncement}
                         />
+                        <CommissionsTab retoucheurId={retoucheur.id} />
                         <ActivityTab />
                     </div>
                 </ScrollArea>
@@ -466,20 +659,24 @@ function DrawerBody({
             <AlertDialog open={verifyOpen} onOpenChange={setVerifyOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Vérifier le KYC ?</AlertDialogTitle>
+                        <AlertDialogTitle className="inline-flex items-center gap-2">
+                            <ShieldCheck className="h-4 w-4" aria-hidden /> Vérifier le KYC ?
+                        </AlertDialogTitle>
                         <AlertDialogDescription>
-                            Le retoucheur passera en <strong>verified</strong> et apparaîtra sur la carte consumer.
-                            Action tracée.
+                            Le retoucheur passera en <strong>vérifié</strong> et apparaîtra sur la carte consumer.
+                            Action tracée dans le journal d&apos;audit.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Annuler</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleVerify}
-                            className="bg-lumiris-emerald hover:bg-lumiris-emerald/90"
-                        >
-                            Confirmer
-                        </AlertDialogAction>
+                        <PermissionRequiredAction requires="retoucheur.kyc_verify">
+                            <AlertDialogAction
+                                onClick={handleVerify}
+                                className="bg-lumiris-emerald hover:bg-lumiris-emerald/90"
+                            >
+                                Confirmer
+                            </AlertDialogAction>
+                        </PermissionRequiredAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -489,24 +686,45 @@ function DrawerBody({
                     <AlertDialogHeader>
                         <AlertDialogTitle>Rejeter la candidature ?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Précisez la raison (obligatoire). Le retoucheur sera notifié et l&apos;action tracée.
+                            Précisez la raison (obligatoire). Le retoucheur sera notifié et l&apos;action tracée. Tapez
+                            le nom exact du retoucheur pour confirmer.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <Textarea
-                        value={rejectReason}
-                        onChange={(e) => setRejectReason(e.target.value)}
-                        placeholder="Raison du rejet"
-                        className="min-h-20"
-                    />
+                    <div className="space-y-3">
+                        <Textarea
+                            value={rejectReason}
+                            onChange={(e) => setRejectReason(e.target.value)}
+                            placeholder="Raison du rejet"
+                            className="min-h-20"
+                            aria-label="Raison du rejet"
+                        />
+                        <div>
+                            <p className="text-muted-foreground mb-1 text-[11px]">
+                                Tapez le nom exact :{' '}
+                                <code className="bg-muted text-foreground rounded px-1 font-mono text-[11px]">
+                                    {retoucheur.displayName}
+                                </code>
+                            </p>
+                            <Input
+                                value={rejectTypedName}
+                                onChange={(e) => setRejectTypedName(e.target.value)}
+                                placeholder={retoucheur.displayName}
+                                autoComplete="off"
+                                aria-label="Nom du retoucheur pour confirmation"
+                            />
+                        </div>
+                    </div>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Annuler</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleReject}
-                            disabled={rejectReason.trim().length === 0}
-                            className="bg-lumiris-rose hover:bg-lumiris-rose/90"
-                        >
-                            Rejeter
-                        </AlertDialogAction>
+                        <PermissionRequiredAction requires="retoucheur.kyc_verify">
+                            <AlertDialogAction
+                                onClick={handleReject}
+                                disabled={!rejectReady}
+                                className="bg-lumiris-rose hover:bg-lumiris-rose/90"
+                            >
+                                Rejeter
+                            </AlertDialogAction>
+                        </PermissionRequiredAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -515,3 +733,5 @@ function DrawerBody({
 }
 
 export const Repairers = memo(RepairersComponent);
+
+export { Repairers as Retoucheurs };

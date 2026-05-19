@@ -9,6 +9,12 @@ export interface PassportRow {
     status: EffectiveStatus;
     /** Délai en heures depuis la soumission (createdAt) - utilisé pour le tri FIFO. */
     ageHours: number;
+    /** Vrai si le score a été plafonné par checkCaps - alimente le filtre dédié. */
+    capApplied: boolean;
+    /** Vrai si au moins un champ ESPR ou AGEC manque. */
+    hasMissingRegulatoryField: boolean;
+    /** Vrai si l'artisan a le flag ATELIER+ - alimente la vue audit d'équité. */
+    isAtelierPlus: boolean;
 }
 
 export const FLAG_TAGS: readonly string[] = [

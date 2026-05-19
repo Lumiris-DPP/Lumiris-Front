@@ -3,25 +3,26 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Flag, MessageSquare, Sparkles } from 'lucide-react';
-import type { Passport, IrisGrade as IrisGradeLetter } from '@lumiris/types';
+import type { AdminAuditLogEntry, Passport, ScoreResult } from '@lumiris/types';
 import { Button } from '@lumiris/ui/components/button';
 import { usePermission } from '@/lib/auth';
 import { ValidateDialog } from './validate-dialog';
 import { RequestChangesDialog } from './request-changes-dialog';
 import { FlagDialog } from './flag-dialog';
 import { OverrideDialog } from './override-dialog';
+import { PermissionRequiredAction } from '../../_shared/permission-required-action';
 
 interface CuratorActionsProps {
     passport: Passport;
-    score: { grade: IrisGradeLetter };
-    onAfterAction: () => void;
+    score: ScoreResult;
+    onAfterAction: (entry: AdminAuditLogEntry) => void;
 }
 
 export function CuratorActions({ passport, score, onAfterAction }: CuratorActionsProps) {
     const canCurate = usePermission('passport.curate');
     const canFlag = usePermission('passport.flag');
     const canRequest = usePermission('passport.request_changes');
-    const canOverride = usePermission('passport.override_score');
+    const canOverride = usePermission('passport.override');
 
     const [validateOpen, setValidateOpen] = useState(false);
     const [requestOpen, setRequestOpen] = useState(false);
@@ -31,7 +32,7 @@ export function CuratorActions({ passport, score, onAfterAction }: CuratorAction
     if (!canCurate && !canFlag && !canRequest && !canOverride) {
         return (
             <div className="border-border text-muted-foreground bg-muted/30 border-t px-5 py-3 text-center text-xs">
-                Vous n&apos;avez aucune permission curator sur ce passeport.
+                Vous ne disposez d&apos;aucune permission de curation sur ce passeport.
             </div>
         );
     }
@@ -48,13 +49,20 @@ export function CuratorActions({ passport, score, onAfterAction }: CuratorAction
                         size="sm"
                         className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 text-primary-foreground gap-1.5"
                         onClick={() => setValidateOpen(true)}
+                        aria-label="Valider et publier ce passeport"
                     >
-                        <CheckCircle2 className="h-3.5 w-3.5" /> Valider et publier
+                        <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> Valider et publier
                     </Button>
                 ) : null}
                 {canRequest ? (
-                    <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setRequestOpen(true)}>
-                        <MessageSquare className="h-3.5 w-3.5" /> Demander des changements
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-1.5"
+                        onClick={() => setRequestOpen(true)}
+                        aria-label="Demander des changements à l'artisan"
+                    >
+                        <MessageSquare className="h-3.5 w-3.5" aria-hidden /> Demander des changements
                     </Button>
                 ) : null}
                 {canFlag ? (
@@ -63,20 +71,22 @@ export function CuratorActions({ passport, score, onAfterAction }: CuratorAction
                         variant="outline"
                         className="border-lumiris-rose/40 text-lumiris-rose hover:bg-lumiris-rose/10 gap-1.5"
                         onClick={() => setFlagOpen(true)}
+                        aria-label="Signaler une anomalie sur ce passeport"
                     >
-                        <Flag className="h-3.5 w-3.5" /> Flagger anomalie
+                        <Flag className="h-3.5 w-3.5" aria-hidden /> Signaler une anomalie
                     </Button>
                 ) : null}
-                {canOverride ? (
+                <PermissionRequiredAction requires="passport.override">
                     <Button
                         size="sm"
                         variant="outline"
                         className="border-lumiris-cyan/40 text-lumiris-cyan hover:bg-lumiris-cyan/10 gap-1.5"
                         onClick={() => setOverrideOpen(true)}
+                        aria-label="Forcer un grade différent — action tracée dans le journal d'audit"
                     >
-                        <Sparkles className="h-3.5 w-3.5" /> Override score
+                        <Sparkles className="h-3.5 w-3.5" aria-hidden /> Forcer le grade
                     </Button>
-                ) : null}
+                </PermissionRequiredAction>
             </motion.div>
 
             {canCurate && (
@@ -104,15 +114,15 @@ export function CuratorActions({ passport, score, onAfterAction }: CuratorAction
                     onAfterAction={onAfterAction}
                 />
             )}
-            {canOverride && (
+            {canOverride ? (
                 <OverrideDialog
                     passport={passport}
-                    grade={score.grade}
+                    score={score}
                     open={overrideOpen}
                     onOpenChange={setOverrideOpen}
                     onAfterAction={onAfterAction}
                 />
-            )}
+            ) : null}
         </>
     );
 }

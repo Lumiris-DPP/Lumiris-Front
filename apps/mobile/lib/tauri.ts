@@ -31,8 +31,3 @@ export async function scoreViaBridge(passport: Passport, now: Date): Promise<Sco
     const validated = await invoke<Passport>('compute_score', { dppJson });
     return scorePassport(validated, now);
 }
-
-export function scoreViaBridgeSync(passport: Passport, now: Date): ScoreResult | null {
-    if (isTauri()) return null;
-    return scorePassport(passport, now);
-}

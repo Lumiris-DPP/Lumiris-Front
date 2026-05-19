@@ -5,7 +5,7 @@ import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-export interface RepairerMapPin {
+interface RepairerMapPin {
     id: string;
     lat: number;
     lng: number;

@@ -20,7 +20,7 @@ export function markGeolocPromptSeen(): void {
     }
 }
 
-export type GeolocPermissionState = 'granted' | 'denied' | 'prompt' | 'unknown';
+type GeolocPermissionState = 'granted' | 'denied' | 'prompt' | 'unknown';
 
 export async function getGeolocPermissionState(): Promise<GeolocPermissionState> {
     if (typeof navigator === 'undefined' || !navigator.permissions) return 'unknown';

@@ -9,7 +9,7 @@ const MapClient = dynamic(() => import('./map-view.client').then((m) => m.MapCli
     loading: () => <div className="bg-card/40 absolute inset-0 animate-pulse" />,
 });
 
-export interface MapViewProps {
+interface MapViewProps {
     points: readonly LocalPoint[];
     userCoords: UserCoords | null;
     selectedId: string | null;

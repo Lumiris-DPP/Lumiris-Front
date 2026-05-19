@@ -79,10 +79,6 @@ function write(requests: readonly RepairRequest[]): void {
     notify();
 }
 
-export function getRepairRequests(): readonly RepairRequest[] {
-    return read();
-}
-
 export function addRepairRequest(request: RepairRequest): void {
     const current = read();
     write([...current, request]);

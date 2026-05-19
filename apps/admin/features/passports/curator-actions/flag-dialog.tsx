@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { Passport } from '@lumiris/types';
+import type { AdminAuditLogEntry, Passport } from '@lumiris/types';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -22,7 +22,7 @@ interface FlagDialogProps {
     passport: Passport;
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onAfterAction: () => void;
+    onAfterAction: (entry: AdminAuditLogEntry) => void;
 }
 
 export function FlagDialog({ passport, open, onOpenChange, onAfterAction }: FlagDialogProps) {
@@ -38,7 +38,7 @@ export function FlagDialog({ passport, open, onOpenChange, onAfterAction }: Flag
             flagReason: reason,
             flagTags: tags,
         });
-        log({
+        const entry = log({
             action: 'passport.flag',
             targetType: 'passport',
             targetId: passport.id,
@@ -47,7 +47,7 @@ export function FlagDialog({ passport, open, onOpenChange, onAfterAction }: Flag
         setReason('');
         setTags([]);
         onOpenChange(false);
-        onAfterAction();
+        onAfterAction(entry);
     };
 
     return (

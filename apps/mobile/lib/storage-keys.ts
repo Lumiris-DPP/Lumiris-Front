@@ -1,4 +1,4 @@
-export const STORAGE_PREFIX = 'lumiris.';
+const STORAGE_PREFIX = 'lumiris.';
 
 /** Clés device-globales : ne dépendent pas du user connecté. */
 export const DEVICE_KEYS = {

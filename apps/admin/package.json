@@ -9,7 +9,11 @@
         "start": "next start --port 3001",
         "lint": "eslint .",
         "typecheck": "tsc --noEmit",
-        "clean": "rimraf .next .turbo"
+        "test": "bun test",
+        "test:cov": "bun test --coverage --coverage-reporter=text --coverage-reporter=lcov --coverage-dir=coverage",
+        "storybook": "storybook dev -p 6006",
+        "storybook:build": "storybook build",
+        "clean": "rimraf .next .turbo coverage storybook-static"
     },
     "dependencies": {
         "@lumiris/core": "workspace:*",
@@ -28,8 +32,11 @@
         "recharts": "^2.15.4"
     },
     "devDependencies": {
+        "@happy-dom/global-registrator": "^15.11.0",
         "@lumiris/config": "workspace:*",
         "@tailwindcss/postcss": "^4.2.0",
+        "@testing-library/react": "^16.1.0",
+        "@types/bun": "^1.1.14",
         "@types/node": "^22.10.0",
         "@types/react": "^19",
         "@types/react-dom": "^19",

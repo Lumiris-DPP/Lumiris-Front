@@ -16,7 +16,7 @@ const STYLE_TO_CATEGORIES: Record<string, readonly JournalCategory[]> = {
     Workwear: ['savoir-faire', 'portrait-artisan'],
 };
 
-export function categoriesForStyles(stylePrefs: readonly string[]): readonly JournalCategory[] {
+function categoriesForStyles(stylePrefs: readonly string[]): readonly JournalCategory[] {
     const set = new Set<JournalCategory>();
     for (const style of stylePrefs) {
         const mapped = STYLE_TO_CATEGORIES[style];

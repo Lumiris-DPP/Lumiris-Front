@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import type { Passport, ScoreResult } from '@lumiris/types';
+import { computeScore } from '@lumiris/core/scoring';
 import { useComputeScore } from '@lumiris/scoring-ui';
 import { mockArtisans, mockRepairers } from '@lumiris/mock-data';
 import { useCurationStore } from './curation-store';
@@ -16,7 +17,17 @@ export function deriveEffectiveStatus(passport: Passport, overlayStatus: Effecti
     return 'pending';
 }
 
-/** Retourne les rows enrichis (passport + status + délai) - base pour la file de curation. */
+function scorePassportSync(passport: Passport): ScoreResult {
+    const artisan = mockArtisans.find((a) => a.id === passport.artisanId);
+    return computeScore(passport, {
+        certificates: passport.materials.flatMap((m) => m.certifications),
+        ...(artisan ? { artisan } : {}),
+        retoucheurs: mockRepairers,
+        now: SCORING_NOW,
+    });
+}
+
+/** Retourne les rows enrichis (passport + status + délai + flags d'audit). */
 export function usePassportRows(passports: readonly Passport[]): readonly PassportRow[] {
     const { overlays } = useCurationStore();
     return useMemo(() => {
@@ -24,10 +35,15 @@ export function usePassportRows(passports: readonly Passport[]): readonly Passpo
         return passports.map((passport) => {
             const overlay = overlays.get(passport.id);
             const ageHours = Math.max(0, Math.round((now - new Date(passport.createdAt).getTime()) / 3_600_000));
+            const score = scorePassportSync(passport);
+            const artisan = mockArtisans.find((a) => a.id === passport.artisanId);
             return {
                 passport,
                 status: deriveEffectiveStatus(passport, overlay?.status),
                 ageHours,
+                capApplied: score.cap?.applied === true,
+                hasMissingRegulatoryField: score.cap?.applied === true && (score.cap.reason ?? '').includes('champ '),
+                isAtelierPlus: artisan?.plus === true,
             };
         });
     }, [passports, overlays]);

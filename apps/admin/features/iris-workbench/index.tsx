@@ -37,9 +37,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@lumiris/ui/components
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
 import { useToast } from '@lumiris/ui/hooks/use-toast';
 import { cn } from '@lumiris/ui/lib/cn';
-import { RequirePermission, useAdminAuditLog, useLogAction, usePermission } from '@/lib/auth';
+import { useAdminAuditLog, useLogAction, usePermission } from '@/lib/auth';
 import { applySimulatorChanges, type SimulatorChanges } from '@/lib/iris-simulator';
 import { GovernanceBanner } from '../_shared/governance-banner';
+import { NonNegotiableBanner } from '../_shared/non-negotiable-banner';
 
 const SCORING_NOW = new Date('2026-04-30T08:00:00Z');
 
@@ -61,11 +62,7 @@ function scorePassport(passport: Passport): ScoreResult {
 }
 
 function IrisWorkbenchComponent() {
-    return (
-        <RequirePermission action="passport.read">
-            <IrisWorkbenchInner />
-        </RequirePermission>
-    );
+    return <IrisWorkbenchInner />;
 }
 
 function IrisWorkbenchInner() {
@@ -85,13 +82,15 @@ function IrisWorkbenchInner() {
                 </div>
             </div>
 
+            <NonNegotiableBanner rule="Outil de simulation uniquement. Aucun changement ici ne modifie le moteur de scoring @lumiris/core — les poids canoniques 40/25/25/10 restent figés." />
+
             <GovernanceBanner />
 
             <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList>
                     <TabsTrigger value="inspector">Inspecteur</TabsTrigger>
                     <TabsTrigger value="simulator">Simulateur</TabsTrigger>
-                    <TabsTrigger value="overrides">Overrides historiques</TabsTrigger>
+                    <TabsTrigger value="overrides">Corrections curateurs</TabsTrigger>
                     <TabsTrigger value="distribution">Distribution</TabsTrigger>
                 </TabsList>
 
@@ -368,20 +367,37 @@ function SimulatorView({ passport }: { passport: Passport }) {
         });
     };
 
+    const deltaWarning = Math.abs(totalDelta) > 50;
+
     return (
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
             <div className="space-y-4">
                 <div className="border-lumiris-amber/30 bg-lumiris-amber/5 rounded-xl border p-3 text-xs">
                     <p className="text-lumiris-amber inline-flex items-center gap-1.5 font-semibold">
-                        <Beaker className="h-3.5 w-3.5" /> Mode simulation - aucun side-effect
+                        <Beaker className="h-3.5 w-3.5" aria-hidden /> Mode simulation - aucun effet de bord
                     </p>
                     <p className="text-muted-foreground mt-1">
                         Le passeport en mémoire est modifié pour le calcul, jamais persisté.
                     </p>
                 </div>
 
+                {deltaWarning ? (
+                    <div
+                        role="alert"
+                        className="border-lumiris-rose/30 bg-lumiris-rose/5 rounded-xl border p-3 text-xs"
+                    >
+                        <p className="text-lumiris-rose inline-flex items-center gap-1.5 font-semibold">
+                            <AlertTriangle className="h-3.5 w-3.5" aria-hidden /> Delta {totalDelta.toFixed(1)} points
+                        </p>
+                        <p className="text-muted-foreground mt-1">
+                            Ce paramétrage produirait une distribution incohérente — l&apos;export reste possible pour
+                            analyse, mais aucun engagement plateforme.
+                        </p>
+                    </div>
+                ) : null}
+
                 <div className="border-border bg-card space-y-3 rounded-xl border p-4">
-                    <p className="text-foreground text-sm font-semibold">What-if</p>
+                    <p className="text-foreground text-sm font-semibold">Hypothèses</p>
 
                     <ToggleRow
                         label="Ajouter une certification GOTS valide à la première matière"
@@ -454,7 +470,7 @@ function SimulatorView({ passport }: { passport: Passport }) {
                     <p className="text-foreground mb-3 text-sm font-semibold">Axes affectés</p>
                     {affectedAxes.length === 0 ? (
                         <p className="text-muted-foreground text-xs">
-                            Aucune modification de score - activez un what-if à gauche.
+                            Aucune modification de score - activez une hypothèse à gauche.
                         </p>
                     ) : (
                         <ul className="space-y-2 text-xs">
@@ -549,7 +565,7 @@ function DeltaTile({
 
 function OverridesView() {
     const liveLog = useAdminAuditLog();
-    const canOverrideScore = usePermission('passport.override_score');
+    const canOverrideScore = usePermission('passport.override');
     const canReadAuditLog = usePermission('governance.read_audit_log');
     const canViewOverrides = canOverrideScore || canReadAuditLog;
 
@@ -563,7 +579,7 @@ function OverridesView() {
         const dedup = allEntries.filter((e) => {
             if (seen.has(e.id)) return false;
             seen.add(e.id);
-            return e.action === 'passport.override_score';
+            return e.action === 'passport.override';
         });
         return dedup;
     }, [liveLog]);
@@ -600,7 +616,7 @@ function OverridesView() {
         return (
             <div className="border-border bg-muted/30 text-muted-foreground rounded-xl border p-6 text-sm">
                 Section restreinte - réservée aux rôles disposant de la permission{' '}
-                <code className="bg-muted rounded px-1">passport.override_score</code> ou{' '}
+                <code className="bg-muted rounded px-1">passport.override</code> ou{' '}
                 <code className="bg-muted rounded px-1">governance.read_audit_log</code>.
             </div>
         );
@@ -636,7 +652,7 @@ function OverridesView() {
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">Tous curators</SelectItem>
+                        <SelectItem value="all">Tous curateurs</SelectItem>
                         {actorIds.map((a) => (
                             <SelectItem key={a} value={a}>
                                 {a}
@@ -661,7 +677,7 @@ function OverridesView() {
                     <TableHeader>
                         <TableRow>
                             <TableHead>Date</TableHead>
-                            <TableHead>Curator</TableHead>
+                            <TableHead>Curateur</TableHead>
                             <TableHead>Passeport</TableHead>
                             <TableHead>Avant → après</TableHead>
                             <TableHead>Raison</TableHead>

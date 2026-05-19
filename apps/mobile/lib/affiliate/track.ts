@@ -5,8 +5,6 @@
 import { readUser } from '../auth/storage';
 import { USER_KEYS, userScopedKey } from '../storage-keys';
 
-export type AffiliateSource = 'passport-buy' | 'repair-request';
-
 interface PassportBuyPayload {
     source: 'passport-buy';
     passportId: string;
@@ -21,9 +19,9 @@ interface RepairRequestPayload {
     requestId: string;
 }
 
-export type AffiliateClickPayload = PassportBuyPayload | RepairRequestPayload;
+type AffiliateClickPayload = PassportBuyPayload | RepairRequestPayload;
 
-export type AffiliateClickRecord = AffiliateClickPayload & { ts: string };
+type AffiliateClickRecord = AffiliateClickPayload & { ts: string };
 
 function currentKey(): string {
     return userScopedKey(readUser()?.id ?? null, USER_KEYS.affiliateClicks);

@@ -1,4 +1,4 @@
-// types billing & affiliation côté admin - deviendront des DTOs avec @lumiris/api-client
+// types billing & affiliation côté admin
 
 import type { ArtisanTier } from './artisan';
 import type { AtelierPlanTier, LocalPlanTier } from './pricing';

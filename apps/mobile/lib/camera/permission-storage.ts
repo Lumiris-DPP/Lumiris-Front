@@ -20,7 +20,7 @@ export function markCameraPromptSeen(): void {
     }
 }
 
-export type CameraPermissionState = 'granted' | 'denied' | 'prompt' | 'unknown';
+type CameraPermissionState = 'granted' | 'denied' | 'prompt' | 'unknown';
 
 // `navigator.permissions.query({ name: 'camera' })` n'est pas typé par TS DOM ;
 // on contourne avec un type local au lieu d'un `any`.

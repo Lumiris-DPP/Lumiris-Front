@@ -161,6 +161,21 @@ export const mockVisionUsers: readonly MockVisionUser[] = [
         consentAffiliation: true,
         city: 'Paris',
     },
+    // Inactif > 60 j → tombe dans le segment "Risque churn" côté admin Vision Users.
+    {
+        id: 'VIS-072',
+        role: 'consumer',
+        email: 'theo.vannier@gmail.com',
+        name: 'Théo',
+        anon: false,
+        createdAt: '2025-05-21T08:00:00Z',
+        lastSeenAt: '2026-02-10T14:00:00Z',
+        wardrobePassportIds: ['pass-paul-001'],
+        scansCount: 9,
+        consentNewsletter: false,
+        consentAffiliation: true,
+        city: 'Nantes',
+    },
 
     // anon - jamais listés individuellement (RGPD)
     {

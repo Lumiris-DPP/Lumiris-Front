@@ -4,7 +4,6 @@ import { createContext, useContext, useMemo, useState, type ReactNode } from 're
 import type { AdminUser } from '@lumiris/types';
 import { mockAdminUsers } from '@lumiris/mock-data';
 
-// Default to the first platform_admin so dev gets full access on launch.
 const DEFAULT_USER: AdminUser = mockAdminUsers[0] ?? {
     id: 'ADM-DEV',
     email: 'dev@lumiris.fr',

@@ -21,13 +21,13 @@ export const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024;
 
 export const ACCEPTED_DOCUMENT_MIMES = ['application/pdf', 'image/png', 'image/jpeg', 'image/webp'] as const;
 
-export type AcceptedDocumentMime = (typeof ACCEPTED_DOCUMENT_MIMES)[number];
+type AcceptedDocumentMime = (typeof ACCEPTED_DOCUMENT_MIMES)[number];
 
 export function isAcceptedDocumentMime(mime: string): mime is AcceptedDocumentMime {
     return (ACCEPTED_DOCUMENT_MIMES as readonly string[]).includes(mime);
 }
 
-export interface EncryptedBlob {
+interface EncryptedBlob {
     ciphertext: string;
     iv: string;
 }

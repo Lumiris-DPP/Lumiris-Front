@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { Passport } from '@lumiris/types';
+import type { AdminAuditLogEntry, Passport } from '@lumiris/types';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -20,7 +20,7 @@ interface RequestChangesDialogProps {
     passport: Passport;
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onAfterAction: () => void;
+    onAfterAction: (entry: AdminAuditLogEntry) => void;
 }
 
 export function RequestChangesDialog({ passport, open, onOpenChange, onAfterAction }: RequestChangesDialogProps) {
@@ -34,7 +34,7 @@ export function RequestChangesDialog({ passport, open, onOpenChange, onAfterActi
             status: 'changes_requested',
             changesMessage: message,
         });
-        log({
+        const entry = log({
             action: 'passport.request_changes',
             targetType: 'passport',
             targetId: passport.id,
@@ -42,7 +42,7 @@ export function RequestChangesDialog({ passport, open, onOpenChange, onAfterActi
         });
         setMessage('');
         onOpenChange(false);
-        onAfterAction();
+        onAfterAction(entry);
     };
 
     return (

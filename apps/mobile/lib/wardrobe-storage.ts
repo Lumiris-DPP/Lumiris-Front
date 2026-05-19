@@ -9,7 +9,7 @@ import { useSyncExternalStore } from 'react';
 import { readUser } from './auth/storage';
 import { USER_KEYS, userScopedKey } from './storage-keys';
 
-export interface CareLogEntry {
+interface CareLogEntry {
     date: string;
     action: string;
 }
@@ -255,7 +255,7 @@ export function itemKey(item: WardrobeItem): string {
     }
 }
 
-export function addLumirisPassport(passportId: string): void {
+function addLumirisPassport(passportId: string): void {
     const current = read();
     if (current.some((it) => it.kind === 'lumiris-passport' && it.passportId === passportId)) return;
     const next: LumirisPassportItem = {
@@ -278,7 +278,7 @@ export function addExternalDpp(gtin: string): void {
     write([...current, { kind: 'external-dpp', gtin, addedAt: new Date().toISOString(), documents: [] }]);
 }
 
-export interface ManualItemInput {
+interface ManualItemInput {
     sector: WardrobeSector;
     productName: string;
     brand?: string;

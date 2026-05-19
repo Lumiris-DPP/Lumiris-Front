@@ -13,7 +13,7 @@ type DecodedScan =
     | { kind: 'unknown'; raw: string };
 
 /** Résultat de la résolution scan : LUMIRIS interne, DPP ESPR externe, ou inconnu. */
-export type ScanResult =
+type ScanResult =
     | { kind: 'lumiris-passport'; passport: Passport }
     | { kind: 'external-dpp'; dpp: ExternalDpp }
     | { kind: 'unknown'; raw: string };

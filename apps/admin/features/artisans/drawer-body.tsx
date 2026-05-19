@@ -1,10 +1,11 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Award, Mail, PauseCircle } from 'lucide-react';
+import { Award, FileCheck2, Mail, MessageSquarePlus, PauseCircle, Sparkles } from 'lucide-react';
+import { EmptyState } from '../_shared/empty-state';
 import { computeScore } from '@lumiris/core/scoring';
 import { mockAdminAuditLog, mockPassports, mockRepairers } from '@lumiris/mock-data';
-import { type Artisan } from '@lumiris/types';
+import { type AdminAuditLogEntry, type Artisan } from '@lumiris/types';
 import { Wardrobe, type WardrobeCardItem } from '@lumiris/scoring-ui';
 import {
     AlertDialog,
@@ -24,7 +25,8 @@ import { SheetHeader, SheetTitle } from '@lumiris/ui/components/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@lumiris/ui/components/tabs';
 import { Textarea } from '@lumiris/ui/components/textarea';
 import { useAdminAuditLog, useLogAction, usePermission } from '@/lib/auth';
-import { PLUS_ADDON, TIER_MRR } from '@/lib/artisan-analytics';
+import { buildArtisanRow, PLUS_ADDON, TIER_MRR } from '@/lib/artisan-analytics';
+import { ContactDialog } from './contact-dialog';
 
 const SCORING_NOW = new Date('2026-04-30T08:00:00Z');
 
@@ -41,6 +43,51 @@ function fmtDate(iso: string): string {
     return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
+interface TimelineEvent {
+    id: string;
+    ts: string;
+    kind: 'audit' | 'passport-published';
+    label: string;
+    actor?: string;
+    refId?: string;
+}
+
+function buildTimeline(auditEntries: readonly AdminAuditLogEntry[], artisan: Artisan): readonly TimelineEvent[] {
+    const artisanPassports = mockPassports.filter((p) => p.artisanId === artisan.id);
+    const artisanPassportIds = new Set(artisanPassports.map((p) => p.id));
+
+    const auditEvents: TimelineEvent[] = auditEntries
+        .filter((entry) => {
+            if (entry.targetId === artisan.id) return true;
+            if (typeof entry.payload?.artisanId === 'string' && (entry.payload.artisanId as string) === artisan.id)
+                return true;
+            if (entry.targetType === 'passport' && artisanPassportIds.has(entry.targetId)) return true;
+            return false;
+        })
+        .map((entry) => ({
+            id: entry.id,
+            ts: entry.ts,
+            kind: 'audit' as const,
+            label: entry.action,
+            actor: entry.actorId,
+            refId: entry.targetId,
+        }));
+
+    const publishedEvents: TimelineEvent[] = artisanPassports
+        .filter((p) => p.status === 'Published')
+        .map((p) => ({
+            id: `pub-${p.id}`,
+            ts: p.publishedAt ?? p.updatedAt ?? p.createdAt,
+            kind: 'passport-published' as const,
+            label: 'passeport publié',
+            refId: p.id,
+        }));
+
+    return [...auditEvents, ...publishedEvents]
+        .sort((a, b) => new Date(b.ts).getTime() - new Date(a.ts).getTime())
+        .slice(0, 30);
+}
+
 export function ArtisanDrawerBody({ artisan, onClose }: { artisan: Artisan; onClose: () => void }) {
     const log = useLogAction();
     const auditLog = useAdminAuditLog();
@@ -50,9 +97,6 @@ export function ArtisanDrawerBody({ artisan, onClose }: { artisan: Artisan; onCl
     const [suspendOpen, setSuspendOpen] = useState(false);
     const [suspendReason, setSuspendReason] = useState('');
     const [contactOpen, setContactOpen] = useState(false);
-    const [contactMessage, setContactMessage] = useState(
-        `Bonjour ${artisan.displayName}, l'équipe LUMIRIS souhaite faire un point avec vous concernant votre atelier.`,
-    );
     const [suspended, setSuspended] = useState(false);
 
     const passports = mockPassports.filter((p) => p.artisanId === artisan.id);
@@ -76,12 +120,13 @@ export function ArtisanDrawerBody({ artisan, onClose }: { artisan: Artisan; onCl
             } satisfies WardrobeCardItem;
         });
 
-    const localActivity = useMemo(
-        () =>
-            [...auditLog, ...mockAdminAuditLog].filter(
-                (entry) => entry.targetId === artisan.id || entry.payload?.artisanId === artisan.id,
-            ),
-        [auditLog, artisan.id],
+    const combinedAuditLog = useMemo(() => [...auditLog, ...mockAdminAuditLog], [auditLog]);
+
+    const timeline = useMemo(() => buildTimeline(combinedAuditLog, artisan), [combinedAuditLog, artisan]);
+
+    const row = useMemo(
+        () => buildArtisanRow(artisan, mockPassports, mockRepairers, combinedAuditLog, SCORING_NOW),
+        [artisan, combinedAuditLog],
     );
 
     const handleSuspend = () => {
@@ -95,16 +140,6 @@ export function ArtisanDrawerBody({ artisan, onClose }: { artisan: Artisan; onCl
         setSuspended(true);
         setSuspendOpen(false);
         setSuspendReason('');
-    };
-
-    const handleContact = () => {
-        log({
-            action: 'artisan.contact',
-            targetType: 'artisan',
-            targetId: artisan.id,
-            payload: { channel: 'email', message: contactMessage.slice(0, 240) },
-        });
-        setContactOpen(false);
     };
 
     const handleDunning = () => {
@@ -130,6 +165,14 @@ export function ArtisanDrawerBody({ artisan, onClose }: { artisan: Artisan; onCl
                             {artisan.displayName} · {artisan.city} · {artisan.region}
                         </p>
                     </div>
+                    {row.upgradeHint ? (
+                        <Badge
+                            variant="outline"
+                            className="border-lumiris-cyan/40 text-lumiris-cyan font-mono text-[10px]"
+                        >
+                            Upgrade conseillé {row.upgradeHint}
+                        </Badge>
+                    ) : null}
                     {suspended ? (
                         <Badge
                             variant="outline"
@@ -191,6 +234,15 @@ export function ArtisanDrawerBody({ artisan, onClose }: { artisan: Artisan; onCl
                                     ) : null}
                                 </div>
                             </InfoCard>
+                            <InfoCard label="Santé compte">
+                                <div className="space-y-1 text-[11px]">
+                                    <p className="font-mono text-sm">{row.health.total}/100</p>
+                                    <p className="text-muted-foreground">
+                                        Capacité {row.health.capacityScore} · Iris {row.health.irisScore} · Overrides{' '}
+                                        {row.health.overrideScore} ({row.health.overrideCount90d} sur 90j)
+                                    </p>
+                                </div>
+                            </InfoCard>
                             <InfoCard label="Bio">
                                 <p>{artisan.story}</p>
                             </InfoCard>
@@ -198,7 +250,10 @@ export function ArtisanDrawerBody({ artisan, onClose }: { artisan: Artisan; onCl
 
                         <TabsContent value="passports" className="m-0">
                             {wardrobeItems.length === 0 ? (
-                                <p className="text-muted-foreground text-xs italic">Aucun passeport publié.</p>
+                                <EmptyState
+                                    title="Aucun passeport publié"
+                                    description="Cet atelier n'a pas encore validé de DPP pour ses pièces."
+                                />
                             ) : (
                                 <Wardrobe items={wardrobeItems} density="cozy" />
                             )}
@@ -249,20 +304,48 @@ export function ArtisanDrawerBody({ artisan, onClose }: { artisan: Artisan; onCl
                         </TabsContent>
 
                         <TabsContent value="activity" className="m-0">
-                            {localActivity.length === 0 ? (
-                                <p className="text-muted-foreground text-xs italic">
-                                    Aucune action admin sur ce profil.
-                                </p>
+                            {timeline.length === 0 ? (
+                                <EmptyState
+                                    icon={MessageSquarePlus}
+                                    title="Aucun message envoyé à cet artisan"
+                                    description="Ouvrez un modèle d'outreach pour amorcer une première prise de contact."
+                                    action={
+                                        canContact ? (
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => setContactOpen(true)}
+                                                className="gap-1.5"
+                                            >
+                                                <Mail className="h-3.5 w-3.5" aria-hidden /> Contacter cet artisan
+                                            </Button>
+                                        ) : undefined
+                                    }
+                                />
                             ) : (
                                 <ol className="relative space-y-2 border-l border-dashed pl-4 text-xs">
-                                    {localActivity.slice(0, 30).map((entry) => (
-                                        <li key={entry.id} className="relative">
+                                    {timeline.map((event) => (
+                                        <li key={event.id} className="relative">
                                             <span className="bg-foreground -left-1.25 absolute mt-1 block h-2 w-2 rounded-full" />
-                                            <p className="text-foreground">
-                                                <span className="font-mono">{entry.action}</span> par{' '}
-                                                <strong>{entry.actorId}</strong>
+                                            <p className="text-foreground flex items-center gap-1.5">
+                                                {event.kind === 'passport-published' ? (
+                                                    <FileCheck2 className="text-lumiris-emerald h-3 w-3" />
+                                                ) : (
+                                                    <Sparkles className="text-muted-foreground h-3 w-3" />
+                                                )}
+                                                <span className="font-mono">{event.label}</span>
+                                                {event.actor ? (
+                                                    <span className="text-muted-foreground">
+                                                        · <strong>{event.actor}</strong>
+                                                    </span>
+                                                ) : null}
+                                                {event.refId ? (
+                                                    <span className="text-muted-foreground font-mono">
+                                                        · {event.refId}
+                                                    </span>
+                                                ) : null}
                                             </p>
-                                            <p className="text-muted-foreground text-[10px]">{fmtDate(entry.ts)}</p>
+                                            <p className="text-muted-foreground text-[10px]">{fmtDate(event.ts)}</p>
                                         </li>
                                     ))}
                                 </ol>
@@ -280,7 +363,7 @@ export function ArtisanDrawerBody({ artisan, onClose }: { artisan: Artisan; onCl
                     disabled={!canContact}
                     className="gap-1.5"
                 >
-                    <Mail className="h-3.5 w-3.5" /> Contacter
+                    <Mail className="h-3.5 w-3.5" /> Contacter cet artisan
                 </Button>
                 <Button
                     size="sm"
@@ -324,25 +407,12 @@ export function ArtisanDrawerBody({ artisan, onClose }: { artisan: Artisan; onCl
                 </AlertDialogContent>
             </AlertDialog>
 
-            <AlertDialog open={contactOpen} onOpenChange={setContactOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Contacter {artisan.displayName}</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Le message sera envoyé par email (mock) - l&apos;action sera tracée.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <Textarea
-                        value={contactMessage}
-                        onChange={(e) => setContactMessage(e.target.value)}
-                        className="min-h-32"
-                    />
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Annuler</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleContact}>Envoyer</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <ContactDialog
+                artisan={artisan}
+                open={contactOpen}
+                onOpenChange={setContactOpen}
+                upgradeHint={row.upgradeHint}
+            />
         </div>
     );
 }

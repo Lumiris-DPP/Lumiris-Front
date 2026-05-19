@@ -8,7 +8,7 @@ export interface UserCoords {
     lng: number;
 }
 
-export type GeolocStatus = 'idle' | 'requesting' | 'granted' | 'denied' | 'unsupported';
+type GeolocStatus = 'idle' | 'requesting' | 'granted' | 'denied' | 'unsupported';
 
 export function useUserCoords() {
     const [coords, setCoords] = useState<UserCoords | null>(null);

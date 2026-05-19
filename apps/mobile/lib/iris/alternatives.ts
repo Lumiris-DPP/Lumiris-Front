@@ -6,7 +6,7 @@ import { mockPassports } from '@lumiris/mock-data';
 import type { Passport, ScoreResult } from '@lumiris/types';
 import { scorePassport } from '../passport-score';
 
-export interface AlternativeMatch {
+interface AlternativeMatch {
     passport: Passport;
     score: ScoreResult;
 }
