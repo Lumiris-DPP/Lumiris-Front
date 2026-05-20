@@ -1,9 +1,6 @@
 'use client';
 
-// Inventaire local multi-secteurs - persistance localStorage *scopée par user.id*
-// pour qu'un persona ne voie pas les pièces d'un autre persona déjà connecté sur
-// le même appareil. La clé est versionnée (`v2`) ; la migration de l'ancien format
-// strictement textile (v1, non scopé) est centralisée dans `migrateLegacyKeys()`.
+// Inventaire local scopé par user (v2). Migration v1 → v2 dans `migrateLegacyKeys()`.
 
 import { useSyncExternalStore } from 'react';
 import { readUser } from './auth/storage';
@@ -14,10 +11,6 @@ interface CareLogEntry {
     action: string;
 }
 
-// Surcouche documentaire utilisateur (cahier des charges §6) : chaque item de la
-// garde-robe peut porter ses propres pièces justificatives, chiffrées AES-GCM
-// localement (cf. `lib/documents/crypto.ts`). Le contenu binaire ne sort jamais
-// en clair de `localStorage`.
 export type DocumentKind = 'invoice' | 'warranty' | 'insurance' | 'receipt' | 'repair-receipt' | 'manual' | 'other';
 
 export const DOCUMENT_KINDS: readonly DocumentKind[] = [
@@ -136,8 +129,7 @@ function isWardrobeDocument(value: unknown): value is WardrobeDocument {
     );
 }
 
-// Les entries pré-§6 ne portaient pas de `documents`. On accepte l'absence côté
-// validateur, et `read()` injecte un tableau vide pour respecter le shape strict.
+// Entries pré-§6 sans `documents` : `read()` injecte un tableau vide.
 function isOptionalDocumentArray(value: unknown): boolean {
     return value === undefined || (Array.isArray(value) && value.every(isWardrobeDocument));
 }
@@ -226,9 +218,7 @@ function read(): WardrobeItem[] {
         if (!raw) return [];
         const parsed: unknown = JSON.parse(raw);
         if (!Array.isArray(parsed)) return [];
-        // Le shape « v1 » (sans `kind`) peut subsister à l'intérieur d'un payload migré
-        // par `migrateLegacyKeys()` — on le mappe au vol vers `lumiris-passport`. Le shape
-        // « pré-documents » (sans `documents`) est normalisé via `withDocuments`.
+        // v1 (sans `kind`) → mappé vers `lumiris-passport` ; absence de `documents` → tableau vide.
         return parsed
             .map((it) => (isLegacyEntry(it) ? legacyToItem(it) : it))
             .filter(isWardrobeItem)
@@ -303,12 +293,7 @@ export function addManualItem(input: ManualItemInput): ManualWardrobeItem {
     return next;
 }
 
-/**
- * Attache un document chiffré à un item de la garde-robe identifié par sa clé. Si
- * la clé pointe vers un passeport Lumiris pas encore présent, l'item est créé à
- * la volée — l'utilisateur n'a pas besoin d'avoir cliqué sur "Garde-Robe" pour
- * stocker une facture.
- */
+/** Crée l'item passeport à la volée s'il n'existe pas — l'user n'a pas besoin de l'ajouter d'abord. */
 export function attachDocumentToPassport(passportId: string, document: WardrobeDocument): void {
     const current = read();
     const exists = current.some((it) => it.kind === 'lumiris-passport' && it.passportId === passportId);
@@ -346,12 +331,11 @@ export function removeFromWardrobe(key: string): void {
     write(read().filter((item) => itemKey(item) !== key));
 }
 
-/** Raccourci pour les call-sites qui ne connaissent qu'un `passportId` (passport-detail). */
 export function removeLumirisPassport(passportId: string): void {
     removeFromWardrobe(`lumiris:${passportId}`);
 }
 
-// Snapshot stable - useSyncExternalStore re-render seulement si la référence change.
+// Snapshot stable — `useSyncExternalStore` ne re-render que si la référence change.
 let snapshotCache: readonly WardrobeItem[] = [];
 let snapshotSerialized = '';
 
@@ -373,9 +357,7 @@ function subscribe(cb: () => void): () => void {
     subscribers.add(cb);
     if (typeof window !== 'undefined') {
         window.addEventListener(EVENT, cb);
-        // `storage` event = sync entre onglets, propre côté web.
         window.addEventListener('storage', cb);
-        // Changement de user → la clé scope change, on doit relire avec la nouvelle clé.
         window.addEventListener(USER_CHANGED, cb);
     }
     return () => {

@@ -96,8 +96,7 @@ function PassportsInner() {
     const [selected, setSelected] = useState<Passport | null>(null);
     const [selectedIds, setSelectedIds] = useState<ReadonlySet<string>>(() => new Set());
 
-    // Deep-link : ?id=PASS-xxx ouvre directement le drawer au chargement.
-    // window.location évite la dépendance à useSearchParams (qui exigerait Suspense côté route).
+    // Deep-link `?id=PASS-xxx` — `window.location` évite useSearchParams qui forcerait Suspense au niveau de la route.
     useEffect(() => {
         if (typeof window === 'undefined') return;
         const params = new URLSearchParams(window.location.search);
@@ -312,13 +311,9 @@ function FairnessBanner() {
     );
 }
 
-// ─── Équité FIFO - audit ────────────────────────────────────────────────────
-
 interface FifoEntry {
     row: PassportRow;
-    /** Rang d'entrée (FIFO sur createdAt parmi tous les passeports). */
     enqueuedRank: number;
-    /** Rang de sortie (ordre chronologique de validation). */
     publishedRank: number;
 }
 
@@ -339,7 +334,6 @@ function FifoEquityAudit({ rows }: { rows: readonly PassportRow[] }) {
             publishedRank: sortedValidated.length - i,
         }));
 
-        // Anomalie : un ATELIER+ publié avant un Solo plus ancien (selon le rang FIFO).
         const orderViolations = entries.filter((e) => {
             if (!e.row.isAtelierPlus) return false;
             const enqueuedThis = e.enqueuedRank;
@@ -469,8 +463,6 @@ function publishedTime(row: PassportRow): number {
     ).getTime();
 }
 
-// ─── KPIs ───────────────────────────────────────────────────────────────────
-
 function Kpis({
     pending,
     flagged,
@@ -510,8 +502,6 @@ function Kpis({
         </motion.div>
     );
 }
-
-// ─── Bulk actions ───────────────────────────────────────────────────────────
 
 function BulkActionsBar({
     rows,
@@ -612,8 +602,7 @@ function BulkActionsBar({
 }
 
 function isGradeAtLeastB(row: PassportRow): boolean {
-    // Approximation : un passeport plafonné ou avec champs ESPR/AGEC manquants ne peut pas être ≥ B
-    // (le grade réel est recalculé dans le drawer pour une vérification fine).
+    // Approximation : un passeport plafonné ou avec champs ESPR/AGEC manquants ne peut pas être ≥ B (grade réel recalculé dans le drawer).
     return !row.capApplied && !row.hasMissingRegulatoryField;
 }
 
@@ -762,8 +751,6 @@ function BulkRequestChangesDialog({
     );
 }
 
-// ─── Table ──────────────────────────────────────────────────────────────────
-
 function PassportTable({
     rows,
     sortKey,
@@ -863,7 +850,7 @@ function PassportTable({
 
 function PassportRowItem({
     row,
-    sortKey,
+    sortKey: _sortKey,
     onSelect,
     checked,
     onCheckedChange,
@@ -877,10 +864,6 @@ function PassportRowItem({
     const score = useIrisScore(row.passport);
     const artisan = mockArtisans.find((a) => a.id === row.passport.artisanId);
     const grade: IrisGradeLetter = score.grade;
-
-    if (sortKey === 'grade') {
-        // re-sort guard handled by parent - placeholder.
-    }
 
     const slaTone =
         row.ageHours >= SLA_ROSE_HOURS

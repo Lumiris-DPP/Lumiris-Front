@@ -8,11 +8,9 @@ import { cn } from '@lumiris/ui/lib/cn';
 
 export interface ArtisanCardProps extends HTMLAttributes<HTMLDivElement> {
     artisan: Artisan;
-    /** Quand vrai, tronque la story à 240 caractères (utile en grille). */
     truncateStory?: boolean;
 }
 
-// vue compacte artisan - annuaire / portrait public / aside passeport
 export function ArtisanCard({ artisan, truncateStory = false, className, ...rest }: ArtisanCardProps) {
     const story =
         truncateStory && artisan.story.length > 240 ? `${artisan.story.slice(0, 240).trimEnd()}…` : artisan.story;

@@ -1,6 +1,4 @@
-// Heuristique "LUMIRIS Local" - atelier vérifié et abonné au plan payant Local.
-// Le champ `localSubscribed` est aujourd'hui la seule source de vérité côté mock ;
-// quand le backend exposera `tier`/`isLumirisLocal`, basculer ici sans toucher l'UI.
+// SSOT "LUMIRIS Local" : remplacera `localSubscribed` par `tier`/`isLumirisLocal` côté backend.
 
 import type { Repairer } from '@lumiris/types';
 

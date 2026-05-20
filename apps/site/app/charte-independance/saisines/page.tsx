@@ -38,10 +38,7 @@ const PLAIGNANT_LABEL: Record<Saisine['plaignant'], string> = {
     concurrent: 'Concurrent',
 };
 
-// Saisines mock - la commission a été constituée en 2026-01, premières saisines à partir de mars.
-// TODO(saisines-réelles) : remplacer ce tableau par un fetch vers `commission@lumiris.fr` (Notion
-// ou backend dédié). Migration prévue dès que la première saisine réelle arrive - la structure
-// Saisine ci-dessus est le contrat de migration. Aucun champ supplémentaire à anticiper.
+// TODO(saisines-réelles) : remplacer ce tableau par un fetch vers commission@lumiris.fr dès la première saisine réelle.
 const SAISINES: readonly Saisine[] = [
     {
         id: 'SAI-2026-001',

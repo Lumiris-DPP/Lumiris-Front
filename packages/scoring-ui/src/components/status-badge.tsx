@@ -10,8 +10,6 @@ import type {
 } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
 
-// AtelierStatusBadge (vu par artisan/consommateur) + ModerationStatusBadge (admin curation only)
-
 export type StatusBadgeSize = 'sm' | 'md';
 
 interface StatusConfig {

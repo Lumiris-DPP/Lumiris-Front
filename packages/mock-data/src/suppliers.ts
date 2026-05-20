@@ -1,7 +1,6 @@
 export interface SupplierRef {
     id: string;
     name: string;
-    /** Pays ISO 3166-1 alpha-2. */
     country: string;
     fibers: readonly string[];
 }

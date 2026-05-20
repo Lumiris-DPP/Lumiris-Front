@@ -252,7 +252,6 @@ const AXIS_MAX_POINTS: Record<IrisAxis, number> = {
     repairability: 10,
 };
 
-/** Les 4 axes avec roving tabindex - flèches haut/bas pour naviguer entre les axes. */
 function WhyThisScoreBanner({ score }: { score: ScoreResult }) {
     const axes: IrisAxis[] = ['transparency', 'craftsmanship', 'impact', 'repairability'];
     const rows = axes
@@ -364,8 +363,6 @@ function InvoicesTab({ passport }: { passport: Passport }) {
     const artisan = mockArtisans.find((a) => a.id === passport.artisanId);
     const passportCerts = passport.certifications;
 
-    // Cross-check par artisan : on récupère les certifs de tous les passeports du même artisan
-    // et on signale les incohérences (ex. fournisseur déclaré différemment selon les passeports).
     const inconsistencies = useMemo(() => {
         return passport.materials.filter((m) => !m.invoiceRef && m.percentage > 0);
     }, [passport]);

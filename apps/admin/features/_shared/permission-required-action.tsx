@@ -8,7 +8,6 @@ import { usePermission } from '@/lib/auth';
 interface PermissionRequiredActionProps {
     requires: AdminAction;
     children: ReactNode;
-    /** Override the tooltip message when permission is missing. */
     deniedMessage?: string;
 }
 

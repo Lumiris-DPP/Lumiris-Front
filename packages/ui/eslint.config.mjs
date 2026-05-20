@@ -6,7 +6,6 @@ export default [
         files: ['src/**/*.{ts,tsx}'],
     },
     {
-        // primitives Shadcn gardées telles quelles par le CLI - on relâche les a11y qui s'y opposent
         files: ['src/components/ui/**/*.{ts,tsx}'],
         rules: {
             'jsx-a11y/anchor-has-content': 'off',

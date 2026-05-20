@@ -143,7 +143,6 @@ describe('computeScore - cas nominaux', () => {
         });
         const score = computeScore(passport, { certificates: [], now: NOW });
         expect(score.cap?.applied).toBe(true);
-        // passeport vide reste E - pas "presque conforme", il est opaque (cf. cap=D ne s'applique qu'au-dessus du seuil)
         expect(score.grade).toBe('E');
     });
 
@@ -157,7 +156,6 @@ describe('computeScore - cas nominaux', () => {
         });
         expect(score.cap?.applied).toBe(false);
         expect(score.grade).toBe('A');
-        // seuil A canonique = 80 (cf. IRIS_THRESHOLDS)
         expect(score.total).toBeGreaterThanOrEqual(80);
     });
 
@@ -205,7 +203,6 @@ describe('computeScore - certifications', () => {
         const a = computeScore(withUnverified, { certificates: [unverified], artisan, retoucheurs, now: NOW });
         const b = computeScore(withValid, { certificates: [validRef], artisan, retoucheurs, now: NOW });
 
-        // ×0.5 baisse le sous-score certifs fibres
         expect(a.breakdown.transparency).toBeLessThan(b.breakdown.transparency);
         expect(a.breakdown.transparency).toBeGreaterThan(b.breakdown.transparency - 15);
     });
@@ -363,7 +360,6 @@ describe('computeScore - care AGEC obligatoire en Published', () => {
             retoucheurs,
             now: NOW,
         });
-        // peu importe les autres caps : on vérifie juste qu'aucun n'est `care.washing`
         const reason = score.cap?.reason ?? '';
         expect(reason).not.toMatch(/care\.washing/);
     });

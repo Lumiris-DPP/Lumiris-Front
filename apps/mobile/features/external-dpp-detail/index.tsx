@@ -42,7 +42,6 @@ export function ExternalDppDetail({ dpp }: ExternalDppDetailProps) {
     const wardrobe = useWardrobe();
     const isSaved = wardrobe.some((entry) => entry.kind === 'external-dpp' && entry.gtin === dpp.gtin);
 
-    // Adapter les certifs ESPR vers le shape `Certificate` consommé par CertificatesList.
     const certificates = useMemo<readonly Certificate[]>(
         () =>
             dpp.certifications.map((cert, idx) => ({
@@ -50,8 +49,6 @@ export function ExternalDppDetail({ dpp }: ExternalDppDetailProps) {
                 kind: 'CUSTOM',
                 customName: cert.name,
                 issuer: cert.issuer,
-                // Quand on n'a pas de date d'émission ESPR, on retombe sur la date de
-                // fabrication - elle borne la validité initiale du certificat.
                 issuedAt: dpp.manufacturedAt,
                 expiresAt: cert.validUntil ?? dpp.manufacturedAt,
                 verified: true,
@@ -68,7 +65,7 @@ export function ExternalDppDetail({ dpp }: ExternalDppDetailProps) {
                 await navigator.share({ title, url });
                 return;
             } catch {
-                // utilisateur annule → retombe sur clipboard
+                // user dismissed the share sheet — fall through to clipboard copy
             }
         }
         if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -165,7 +162,6 @@ export function ExternalDppDetail({ dpp }: ExternalDppDetailProps) {
                 </p>
             </div>
 
-            {/* ActionBar restreinte : pas d'« Acheter », pas de « Voir l'atelier ». */}
             <motion.nav
                 aria-label="Actions du DPP externe"
                 className="border-border/50 bg-background/85 fixed inset-x-0 bottom-0 z-50 mx-auto flex max-w-md items-center justify-around gap-1 border-t px-4 pb-6 pt-3 backdrop-blur-xl"

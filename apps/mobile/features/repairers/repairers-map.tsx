@@ -18,8 +18,7 @@ interface RepairersMapProps {
 }
 
 export function RepairersMap({ repairers, activeId, onMarkerClick }: RepairersMapProps) {
-    // Légère dispersion par index pour éviter que tous les ateliers d'une même ville
-    // se superposent strictement sur le même pin. Stable par id pour ne pas sauter au re-render.
+    // Dispersion stable par index pour éviter la superposition des pins d'une même ville.
     const pins = useMemo(() => {
         const buckets = new Map<string, number>();
         return repairers

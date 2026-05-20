@@ -15,7 +15,6 @@ if (!FALLBACK_RAW) {
 }
 const FALLBACK: Artisan = FALLBACK_RAW;
 
-/** Hook React réactif - re-render à chaque changement d'artisan signé in. */
 export function useCurrentArtisan(): Artisan {
     const id = useAuthArtisanId();
     const router = useRouter();

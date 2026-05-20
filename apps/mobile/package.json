@@ -15,6 +15,7 @@
         "clean": "rimraf .next .turbo"
     },
     "dependencies": {
+        "@lumiris/api-client": "workspace:*",
         "@lumiris/core": "workspace:*",
         "@lumiris/mock-data": "workspace:*",
         "@lumiris/scoring-ui": "workspace:*",

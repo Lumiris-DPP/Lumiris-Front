@@ -18,6 +18,5 @@ export interface LocalPoint {
     reviewCount?: number;
     avgDelayDays?: number;
     specialties?: readonly string[];
-    /** Secteur du repairer (textile, electronics, …). Indéfini pour les artisans. */
     sector?: RepairerSector;
 }

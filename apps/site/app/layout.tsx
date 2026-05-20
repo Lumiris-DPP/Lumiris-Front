@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Geist_Mono } from 'next/font/google';
+import { ApiProvider } from '@lumiris/api-client/react';
+import { env } from '@/env';
 import { Header } from '@/features/header';
 import { Footer } from '@/features/footer';
 import { WebVitals } from './web-vitals';
@@ -59,10 +61,12 @@ export default function RootLayout({
     return (
         <html lang="fr" className={`${inter.variable} ${geistMono.variable} bg-background`}>
             <body className="font-sans antialiased">
-                <WebVitals />
-                <Header />
-                <main>{children}</main>
-                <Footer />
+                <ApiProvider baseUrl={env.NEXT_PUBLIC_API_BASE_URL}>
+                    <WebVitals />
+                    <Header />
+                    <main>{children}</main>
+                    <Footer />
+                </ApiProvider>
             </body>
         </html>
     );

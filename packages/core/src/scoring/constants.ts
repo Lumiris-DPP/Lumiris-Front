@@ -37,20 +37,14 @@ export const FIBER_WATER_COEFFICIENTS: Record<Fiber, number> = {
 } as const;
 
 export const IMPACT_BASELINE = {
-    /** Plafond carbone d'un produit "neutre" (kg CO₂e). Au-delà, score impact carbone = 0. */
     carbonCeilingKg: 12,
-    /** Plafond eau (litres). */
     waterCeilingLiters: 3000,
-    /** Cible part recyclée (%) - au-delà, sous-score atteint 100. */
     recycledTargetPct: 50,
-    /** Plafond transport (km). 0 km → 25 pts ; ≥ 2000 km → 0 pt. */
     transportCeilingKm: 2000,
 } as const;
 
 export interface RequiredFieldCheck {
-    /** Path lisible - `materials[].fiber` est purement déclaratif (pour les messages). */
     path: string;
-    /** Renvoie true si le champ est *présent et valide*. */
     isPresent: (passport: Passport) => boolean;
 }
 
@@ -113,7 +107,6 @@ export const AGEC_REQUIRED_FIELDS: readonly RequiredFieldCheck[] = [
         isPresent: (p) => isNonEmpty(p.gs1?.verificationUrl),
     },
     {
-        // care optionnel pour Draft/InCompletion (rétro-compat) ; AGEC exige `care.washing` dès Published
         path: 'care.washing',
         isPresent: (p) => p.status !== 'Published' || (!!p.care && isNonEmpty(p.care.washing)),
     },

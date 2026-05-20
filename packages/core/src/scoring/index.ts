@@ -28,14 +28,10 @@ export { scoreImpact } from './impact';
 export { scoreRepairability } from './repairability';
 
 export interface ComputeScoreOptions {
-    /** Catalogue plat des certifications connues (artisan + composition + passport). */
     certificates: readonly CertificationRef[];
-    /** Annuaire local des retoucheurs - alimente le sous-score `repairability`. */
     retoucheurs?: readonly Repairer[];
     artisan?: Artisan;
-    /** Toujours requis - pas de `Date.now()` implicite, le scoring reste déterministe. */
     now: Date;
-    /** Surcharge partielle des poids ; renormalisée à 1. */
     weights?: Partial<ScoreWeights>;
 }
 

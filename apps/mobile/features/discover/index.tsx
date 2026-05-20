@@ -19,7 +19,6 @@ const WEB_BASE_URL = 'https://lumiris.fr';
 const COMPACT_SCROLL_THRESHOLD = 60;
 
 export interface DiscoverProps {
-    /** Pré-rendu SSR ; optionnel pour compat AppShell historique. */
     items?: readonly DiscoverFeedItem[];
 }
 

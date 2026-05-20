@@ -9,7 +9,6 @@ export type { TeamMember, TeamMemberRole } from '@lumiris/mock-data';
 
 interface TeamStoreState {
     byArtisan: Record<string, TeamMember[]>;
-    /** Garantit qu'une équipe existe en store pour cet artisan. Idempotent. */
     ensure: (artisanId: string) => void;
     invite: (artisanId: string, email: string, role: TeamMemberRole) => void;
     changeRole: (artisanId: string, memberId: string, role: TeamMemberRole) => void;

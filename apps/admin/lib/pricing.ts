@@ -1,5 +1,4 @@
-// Source unique de prix LUMIRIS (Chiffrage v4.2 § 5).
-// Aucun montant en € ne doit être hard-codé dans un composant — tout passe par ce module.
+// Source unique des prix LUMIRIS (Chiffrage v4.2 § 5) — aucun montant en € ne doit être hard-codé dans un composant.
 
 export type PriceLineId = 'solo' | 'studio' | 'maison' | 'plus' | 'local';
 
@@ -9,7 +8,6 @@ interface PriceLine {
     shortLabel: string;
     monthlyEur: number;
     yearlyEur: number;
-    /** CSS variable for legends, charts, badges. */
     color: string;
     kind: 'atelier' | 'addon' | 'local';
 }

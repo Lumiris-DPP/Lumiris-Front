@@ -8,7 +8,6 @@ interface RegulationMeta {
     slug: string;
     title: string;
     summary: string;
-    /** ISO date `YYYY-MM-DD`. */
     updatedAt: string;
 }
 

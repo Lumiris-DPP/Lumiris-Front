@@ -1,7 +1,3 @@
-// Fixtures DPP non-LUMIRIS lus par VISION (cahier §3 - scanner universel).
-// Multi-secteurs : électronique, électroménager, batterie, mobilier - couvrent les
-// principales catégories ESPR pour exercer la grille adaptée.
-
 import type { ExternalDpp } from '@lumiris/types';
 
 export const mockExternalDpps: readonly ExternalDpp[] = [

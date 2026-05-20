@@ -11,7 +11,6 @@ interface RequirePermissionProps {
     fallback?: ReactNode;
 }
 
-// Hide-or-replace gate. Falls back to a clinical lock card when no fallback prop is provided.
 export function RequirePermission({ action, children, fallback }: RequirePermissionProps) {
     const allowed = usePermission(action);
     if (allowed) return <>{children}</>;

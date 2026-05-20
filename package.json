@@ -13,7 +13,7 @@
         "packages/*"
     ],
     "scripts": {
-        "dev": "turbo run dev",
+        "dev": "turbo run dev --parallel",
         "dev:admin": "turbo run dev --filter=@lumiris/admin",
         "dev:client": "turbo run dev --filter=@lumiris/client",
         "dev:site": "turbo run dev --filter=@lumiris/site",

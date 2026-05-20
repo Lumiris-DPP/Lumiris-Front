@@ -5,8 +5,7 @@ import type { AdminAuditLogEntry } from '@lumiris/types';
 import { mockAdminAuditLog } from '@lumiris/mock-data';
 import { useCurrentUser } from './current-user';
 
-// Mutable in-memory store backing the audit log. When the backend lands, this becomes a thin
-// wrapper around POST /admin/audit; for now we accumulate entries in React state.
+// Store en mémoire — à remplacer par un wrapper POST /admin/audit quand le backend arrivera.
 
 type LogActionInput = Omit<AdminAuditLogEntry, 'id' | 'ts' | 'actorId' | 'actorRole' | 'ipMock'>;
 
@@ -14,7 +13,7 @@ export type AnomalyReviewStatus = 'unreviewed' | 'acknowledged' | 'escalated';
 
 export interface AnomalyReview {
     status: AnomalyReviewStatus;
-    /** Reason supplied when escalating - mandatory for `escalated`. */
+    /** Obligatoire pour `escalated`. */
     reason?: string;
     reviewedBy: string;
     reviewedAt: string;
@@ -74,7 +73,6 @@ function generateId(): string {
     return `LOG-RT-${Date.now().toString(36)}-${nextId}`;
 }
 
-// Logger curried pré-bindé sur le current admin user - à appeler depuis les event handlers.
 export function useLogAction(): (input: LogActionInput) => AdminAuditLogEntry {
     const ctx = useContext(AuditContext);
     if (!ctx) throw new Error('useLogAction must be used inside <AuditLogProvider>.');

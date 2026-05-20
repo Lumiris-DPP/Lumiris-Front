@@ -11,16 +11,9 @@ const SPLASH_DURATION_MS = 700;
 type SplashState = 'pending' | 'redirect' | 'done';
 
 interface SplashProps {
-    /** Rendu une fois le splash terminé (utilisateur déjà onboardé). */
     children: React.ReactNode;
 }
 
-// Splash logo Iris breathing - gate avant le Scanner pour décider :
-//   - première ouverture → redirect /onboarding (sans flash de Scanner)
-//   - sinon → laisse 700ms à l'animation puis monte les enfants
-//
-// Respect strict de prefers-reduced-motion : skip l'attente, redirige/affiche
-// les enfants immédiatement (< 50ms via le useEffect synchrone).
 export function Splash({ children }: SplashProps) {
     const router = useRouter();
     const [state, setState] = useState<SplashState>('pending');

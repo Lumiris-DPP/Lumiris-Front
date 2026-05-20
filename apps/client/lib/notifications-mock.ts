@@ -9,7 +9,6 @@ export interface AtelierNotification {
     title: string;
     description: string;
     href?: string;
-    /** ISO date — drives chronological sort within a severity bucket. */
     date: string;
 }
 
@@ -28,7 +27,6 @@ const SIXTY_DAYS_MS = 60 * 24 * 60 * 60 * 1000;
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 const SEVERITY_RANK: Record<NotificationSeverity, number> = { warn: 0, info: 1 };
 
-// Best-effort : tolère absence du store ou payload malformé → [].
 function readLocalCerts(artisanId: string): readonly CertificationRef[] {
     if (typeof window === 'undefined') return [];
     try {

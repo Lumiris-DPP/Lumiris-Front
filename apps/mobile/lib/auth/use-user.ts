@@ -1,16 +1,11 @@
 'use client';
 
-// Hook user mock - useSyncExternalStore pour rester aligné sur le pattern
-// wardrobe-storage et garder un re-render stable entre onglets.
-
 import { useSyncExternalStore } from 'react';
 import { readUser, writeUser } from './storage';
 import type { MockUser } from './types';
 
 const EVENT = 'lumiris:auth-changed';
-// Évent dédié écouté par les hooks per-user pour invalider leur cache et relire
-// avec la bonne clé scope `lumiris.users.{userId}.{suffix}`. Distinct d'`auth-changed`
-// car il porte une sémantique forte : "le scope localStorage vient de changer".
+// Distinct d'`auth-changed` : signale aux hooks per-user que le scope localStorage a changé.
 const USER_CHANGED_EVENT = 'lumiris:user-changed';
 const subscribers = new Set<() => void>();
 
@@ -63,7 +58,6 @@ interface UseUserResult {
     isAuthenticated: boolean;
     signIn: (email: string, displayName: string) => MockUser;
     signOut: () => void;
-    /** Met à jour le user en place - `email`/`id`/`createdAt` sont immuables côté UI. */
     updateUser: (patch: Partial<Omit<MockUser, 'id' | 'email' | 'createdAt'>>) => void;
 }
 

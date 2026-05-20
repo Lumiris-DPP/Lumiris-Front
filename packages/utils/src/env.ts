@@ -1,5 +1,3 @@
-// Crash-early env validator: never silently coerce - required-but-missing or parse failure throws EnvValidationError.
-
 export interface EnvSpecBase<TRequired extends boolean> {
     required?: TRequired;
     description?: string;
@@ -32,43 +30,92 @@ export type EnvSpec = StringSpec<boolean> | NumberSpec<boolean> | BooleanSpec<bo
 
 export type EnvSchema = Record<string, EnvSpec>;
 
-// fragment partagé Next.js (API base URL + web-vitals sample rate + NODE_ENV) - à étaler par app
+export type NextAppName = 'admin' | 'site' | 'client' | 'mobile';
+
 export const NEXT_APP_BASE_ENV_SCHEMA = {
     NEXT_PUBLIC_API_BASE_URL: {
         kind: 'string',
         required: false,
-        default: 'http://localhost:4000',
+        default: 'https://api.lumiris.local',
+        description: 'Base URL du backend Spring Boot',
     },
     NEXT_PUBLIC_WEB_VITALS_SAMPLE_RATE: {
         kind: 'number',
         required: false,
         min: 0,
         max: 1,
+        default: 1.0,
+        description: 'Sample rate des Web Vitals (1.0 = 100%, prod=0.1)',
+    },
+    NEXT_PUBLIC_OTEL_EXPORTER_OTLP_ENDPOINT: {
+        kind: 'string',
+        required: false,
+        default: 'http://localhost:4318',
+        description: 'Endpoint OTLP HTTP pour traces+metrics',
+    },
+    NEXT_PUBLIC_APP_NAME: {
+        kind: 'enum',
+        values: ['admin', 'site', 'client', 'mobile'] as const,
+        required: true,
+        description: "Identifiant de l'app (tagging telemetry, doit matcher le DTO backend)",
+    },
+    NEXT_PUBLIC_SENTRY_DSN: {
+        kind: 'string',
+        required: false,
+        default: '',
+        description: 'Sentry DSN, vide en dev local (init skip silencieux)',
     },
     NODE_ENV: {
         kind: 'enum',
         values: ['development', 'production', 'test'] as const,
+        required: false,
         default: 'development',
     },
 } as const satisfies EnvSchema;
+
+/**
+ * Build a per-app env schema with NEXT_PUBLIC_APP_NAME pre-defaulted.
+ * Pass `extra` to merge in app-specific keys (e.g. NEXT_PUBLIC_TAURI for mobile).
+ */
+export function makeNextAppEnvSchema<E extends EnvSchema>(appName: NextAppName, extra?: E) {
+    return {
+        ...NEXT_APP_BASE_ENV_SCHEMA,
+        NEXT_PUBLIC_APP_NAME: {
+            ...NEXT_APP_BASE_ENV_SCHEMA.NEXT_PUBLIC_APP_NAME,
+            required: false as const,
+            default: appName,
+        },
+        ...(extra ?? ({} as E)),
+    };
+}
+
+type HasDefault<S> = S extends { default: infer D } ? ([D] extends [undefined] ? false : true) : false;
 
 type Resolve<S extends EnvSpec> =
     S extends StringSpec<infer R>
         ? R extends true
             ? string
-            : string | undefined
+            : HasDefault<S> extends true
+              ? string
+              : string | undefined
         : S extends NumberSpec<infer R>
           ? R extends true
               ? number
-              : number | undefined
+              : HasDefault<S> extends true
+                ? number
+                : number | undefined
           : S extends BooleanSpec<infer R>
             ? R extends true
                 ? boolean
-                : boolean | undefined
+                : HasDefault<S> extends true
+                  ? boolean
+                  : boolean | undefined
             : S extends EnumSpec<infer R, infer V>
               ? R extends true
                   ? V
-                  : V | undefined
+                  : HasDefault<S> extends true
+                    ? V
+                    : V | undefined
               : never;
 
 export type ParsedEnv<S extends EnvSchema> = {
@@ -85,10 +132,9 @@ export class EnvValidationError extends Error {
 const TRUTHY = new Set(['1', 'true', 'yes', 'on']);
 const FALSY = new Set(['0', 'false', 'no', 'off', '']);
 
-export function parseEnv<S extends EnvSchema>(
-    schema: S,
-    source: NodeJS.ProcessEnv | Record<string, string | undefined> = readProcessEnv(),
-): ParsedEnv<S> {
+export type EnvSource = Record<string, string | undefined>;
+
+export function parseEnv<S extends EnvSchema>(schema: S, source: EnvSource = readProcessEnv()): ParsedEnv<S> {
     const out = {} as Record<string, unknown>;
     const issues: string[] = [];
 
@@ -145,7 +191,7 @@ function parseOne(key: string, spec: EnvSpec, raw: string | undefined): { value:
     }
 }
 
-function readProcessEnv(): NodeJS.ProcessEnv | Record<string, string | undefined> {
-    if (typeof process !== 'undefined' && process.env) return process.env;
-    return {};
+function readProcessEnv(): EnvSource {
+    const g = globalThis as { process?: { env?: Record<string, string | undefined> } };
+    return g.process?.env ?? {};
 }

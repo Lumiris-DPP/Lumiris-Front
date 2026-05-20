@@ -1,6 +1,3 @@
-// Adapter mock-data → format consommé par le feed Discover.
-// Sert à la fois la route server-rendered (/discover) et le fallback client (AppShell tab).
-
 import type { IrisGrade, JournalCategory } from '@lumiris/types';
 import { mockJournalPublic, type JournalArticlePublic } from '@lumiris/mock-data';
 
@@ -16,8 +13,6 @@ export interface DiscoverFeedItem {
     coverImage?: string;
 }
 
-// Mapping éditorial : portrait > savoir-faire > entretien > réglementation.
-// Quatre catégories => quatre grades visibles (E reste pour les contenus dépréciés / archives futurs).
 const CATEGORY_GRADE: Record<JournalCategory, IrisGrade> = {
     'portrait-artisan': 'A',
     'savoir-faire': 'B',
@@ -53,8 +48,6 @@ export function gradeForCategory(category: JournalCategory): IrisGrade {
     return CATEGORY_GRADE[category];
 }
 
-// Ordre canonique des catégories (A→D) pour grouper hero + sections sans dépendre
-// de l'ordre d'apparition dans le feed.
 export const JOURNAL_CATEGORIES_ORDERED: readonly JournalCategory[] = [
     'portrait-artisan',
     'savoir-faire',

@@ -6,7 +6,6 @@ interface OriginsMapProps {
     steps: readonly ProductionStep[];
 }
 
-// V1 textile : fibres non-textile (cuir, bois, verre) volontairement sans label.
 const FIBER_LABEL: Partial<Record<Material['fiber'], string>> = {
     wool: 'Laine',
     linen: 'Lin',

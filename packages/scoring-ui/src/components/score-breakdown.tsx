@@ -13,7 +13,6 @@ export interface ScoreBreakdownProps extends HTMLAttributes<HTMLDivElement> {
 
 const AXES_ORDER: readonly IrisAxis[] = ['transparency', 'craftsmanship', 'impact', 'repairability'];
 
-// Four-axis breakdown (40/25/25/10) - a bar per axis × weight, composing visually into the total.
 export function ScoreBreakdown({ breakdown, weights = LUMIRIS_WEIGHTS, className, ...rest }: ScoreBreakdownProps) {
     return (
         <div className={cn('space-y-2', className)} {...rest}>

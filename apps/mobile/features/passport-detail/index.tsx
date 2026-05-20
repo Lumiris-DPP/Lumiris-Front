@@ -21,7 +21,6 @@ import { JourneyTimeline } from './journey-timeline';
 import { ActionBar } from './action-bar';
 import { ScoreSheet } from './score-sheet';
 
-// Animation echelonnée - chaque layer apparaît avec un retard cumulé. Spec passeport.
 const LAYER_DELAYS = {
     identity: 0.25,
     composition: 0.35,
@@ -50,7 +49,6 @@ export function PassportDetail({ passport }: PassportDetailProps) {
     const brand = artisan?.atelierName ?? artisan?.displayName ?? 'Atelier indépendant';
     const productName = passport.garment.reference;
 
-    // Médiane de prix pour la même catégorie - utilisée par le ratio Identity.
     const priceMedian = useMemo(() => {
         const peers = mockPassports
             .filter((p) => p.garment.kind === passport.garment.kind && p.id !== passport.id)
@@ -75,21 +73,16 @@ export function PassportDetail({ passport }: PassportDetailProps) {
         return { kind: 'fair' as const, label: 'Fair Price' };
     }, [score.grade, passport.garment.retailPrice, priceMedian]);
 
-    // Toutes les certifications visibles : passeport + composition (uniques).
     const certificates = useUniqueCertificates(passport);
 
     const isOpaque = score.grade === 'E';
 
-    // Alternatives artisanales pour fast-fashion notée E (cahier §6).
-    // findAlternatives garantit le tri grade → prix, sans pondération ATELIER+/commissions (cahier §10).
     const alternativeItems = useMemo<readonly ShopItem[]>(() => {
         if (score.grade !== 'E') return [];
         return findAlternatives(passport, now, 4).map((row) => ({
             passport: row.passport,
             score: row.score,
             artisanName: mockArtisanById(row.passport.artisanId)?.atelierName ?? '-',
-            // Section clinique : pas de mise en avant ATELIER+ ici pour rester explicitement
-            // indépendant des commissions (cf. sous-titre de section).
             isFeatured: false,
         }));
     }, [score.grade, passport, now]);
@@ -110,8 +103,7 @@ export function PassportDetail({ passport }: PassportDetailProps) {
             />
 
             <div className="flex flex-col gap-5 px-4">
-                {/* Filter saturate sur identity → proofs - jamais sur les alternatives ni le footer
-                    (sinon les alternatives apparaissent désaturées, ce qui contredit l'intention). */}
+                {/* Filter saturate uniquement sur identity → proofs ; les alternatives doivent rester saturées. */}
                 <div
                     className="flex flex-col gap-5"
                     style={isOpaque ? { filter: 'saturate(0.3) brightness(0.95)' } : undefined}

@@ -1,6 +1,4 @@
-// Source unique des taux d'affiliation (Chiffrage v4.2 § 7).
-// Aucun taux ne doit être hard-codé en JSX — tout passe par ce module.
-// Toute modification est audit-loguée via `affiliation.rate_change`.
+// Source unique des taux d'affiliation (Chiffrage v4.2 § 7) — toute modification est audit-loguée via `affiliation.rate_change`.
 
 export type ProductCategory = 'leather' | 'textile' | 'jewelry' | 'shoes' | 'other';
 
@@ -10,7 +8,7 @@ export interface PurchaseRate {
     percent: number;
 }
 
-// Bornes légales (cadre Pratiques Loyales FR + chiffrage v4.2 § 7.1).
+// Bornes légales — cadre Pratiques Loyales FR + chiffrage v4.2 § 7.1.
 export const PURCHASE_RATE_BOUNDS = { min: 3, max: 7 } as const;
 export const REPAIR_FLAT_BOUNDS = { min: 4, max: 10 } as const;
 export const REPAIR_PCT_BOUNDS = { min: 6, max: 10 } as const;

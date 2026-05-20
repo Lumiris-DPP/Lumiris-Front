@@ -11,7 +11,6 @@ import { CoverImage } from './cover-image';
 
 interface HeroCardProps {
     item: DiscoverFeedItem;
-    /** Délai d'apparition (sec). Permet d'enchaîner avec le stagger des sections. */
     delay?: number;
 }
 
@@ -44,18 +43,15 @@ export function HeroCard({ item, delay = 0 }: HeroCardProps) {
                         priority
                     />
 
-                    {/* Dégradé bas pour lisibilité texte - assure contraste AA sur le titre. */}
                     <div
                         aria-hidden
                         className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent"
                     />
 
-                    {/* Pill catégorie - haut gauche */}
                     <span className="border-border/40 bg-background/80 text-foreground absolute left-3 top-3 inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-medium backdrop-blur-md">
                         {JOURNAL_CATEGORY_LABEL[item.category]}
                     </span>
 
-                    {/* Badge grade - haut droite, plus discret */}
                     <span
                         aria-label={`Grade ${item.grade}`}
                         className={cn(
@@ -66,7 +62,6 @@ export function HeroCard({ item, delay = 0 }: HeroCardProps) {
                         {item.grade}
                     </span>
 
-                    {/* Bloc texte overlay bas */}
                     <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-4 text-white">
                         <h2 className="line-clamp-3 text-lg font-bold leading-tight tracking-tight">{item.title}</h2>
                         <div className="flex items-center gap-3 text-[11px] text-white/80">

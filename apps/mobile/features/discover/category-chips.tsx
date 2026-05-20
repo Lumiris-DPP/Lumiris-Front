@@ -9,9 +9,7 @@ interface CategoryChipsProps {
     categories: readonly JournalCategory[];
     value: CategoryFilter;
     onChange: (next: CategoryFilter) => void;
-    /** Variante compactée (-4px en hauteur) déclenchée par scrollTop > 60 dans le parent. */
     compact?: boolean;
-    /** Active le comportement sticky dans un scroll container parent. */
     sticky?: boolean;
 }
 

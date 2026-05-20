@@ -1,5 +1,3 @@
-// vue publique du journal - filtre Published/Scheduled, slug humain garanti, rendu MD côté consumer
-
 import type { JournalArticle } from '@lumiris/types';
 import { mockJournalArticles } from './journal';
 

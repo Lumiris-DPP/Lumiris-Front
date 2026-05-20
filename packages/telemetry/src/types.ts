@@ -1,6 +1,7 @@
-import type { LUMIRIS_SERVICES, WEB_VITAL_NAMES } from './constants';
+import type { LUMIRIS_APP_NAMES, LUMIRIS_SERVICES, WEB_VITAL_NAMES } from './constants';
 
 export type TelemetryEnv = 'development' | 'production' | 'test';
+export type AppName = (typeof LUMIRIS_APP_NAMES)[number];
 export type ServiceName = (typeof LUMIRIS_SERVICES)[number];
 export type WebVitalName = (typeof WEB_VITAL_NAMES)[number];
 
@@ -8,12 +9,9 @@ export interface WebVitalPayload {
     name: WebVitalName;
     value: number;
     rating: 'good' | 'needs-improvement' | 'poor';
-    /** Anonymous, non-PII identifier scoped to a single browser session. */
     sessionId: string;
-    app: ServiceName;
-    /** Templated path (e.g. `/dpp/[id]`), never the raw URL. */
+    app: AppName;
     route: string;
     navigationType?: string;
-    /** Wall-clock ms - never tied to identifying user data. */
     timestamp: number;
 }

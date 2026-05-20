@@ -190,8 +190,6 @@ const THEME_OPTIONS: ReadonlyArray<{ value: ThemePref; label: string }> = [
 function AppearanceSection({ settings }: { settings: Settings }) {
     const reduceMotionId = useId();
 
-    // Effets visuels - `data-theme` lu par le `<html>` ; `data-reduce-motion` neutralise
-    // les transitions via une règle dans `app/globals.css`.
     useEffect(() => {
         if (typeof document === 'undefined') return;
         document.documentElement.setAttribute('data-theme', settings.theme);

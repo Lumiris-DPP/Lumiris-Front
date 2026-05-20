@@ -1,6 +1,3 @@
-// Last-line-of-defence PII scrubber: traces NEVER carry email/JWT/client SKU - strip aggressively, false positives acceptable, leaks are not.
-// Anchor on shape (jwt.jwt.jwt, Bearer prefix, @+TLD); SKUs aren't pattern-matched - callers route them via redactValue('sku.client', value).
-
 const EMAIL_RE = /[\w.+-]+@[\w-]+\.[\w.-]+/g;
 const JWT_RE = /\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/g;
 const BEARER_RE = /Bearer\s+[\w.\-+/=]+/gi;

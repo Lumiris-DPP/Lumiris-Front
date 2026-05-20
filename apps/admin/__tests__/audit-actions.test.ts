@@ -1,8 +1,3 @@
-// Vérifie que chaque littéral `action: '...'` dispatché dans apps/admin/features/**/*.tsx (ou lib)
-// figure bien dans l'union `AdminAction` exportée par @lumiris/types. Une nouvelle clé d'action
-// loguée dans le runtime doit donc s'accompagner d'une extension explicite du type — sinon
-// l'audit log accumule des strings opaques qu'aucun consumer typé ne peut filtrer.
-
 import { describe, expect, it } from 'bun:test';
 import { Glob } from 'bun';
 import { readFile } from 'node:fs/promises';
@@ -10,8 +5,7 @@ import { join } from 'node:path';
 
 const ADMIN_ROOT = join(__dirname, '..');
 
-// Mirroir manuel de l'union `AdminAction` (les types TS sont effacés au runtime). Si tu ajoutes
-// une clé à packages/types/src/admin-rbac.ts, ajoute-la aussi ici.
+// Miroir runtime de l'union `AdminAction` — synchroniser avec packages/types/src/admin-rbac.ts à chaque nouvelle clé.
 const KNOWN_ADMIN_ACTIONS = new Set([
     'passport.read',
     'passport.curate',
@@ -45,7 +39,6 @@ const KNOWN_ADMIN_ACTIONS = new Set([
     'governance.anomaly_escalate',
 ]);
 
-// Actions exigées par la grille d'audit §6 — chacune doit être dispatchée au moins une fois.
 const REQUIRED_DISPATCHES = [
     'passport.validate',
     'passport.override',

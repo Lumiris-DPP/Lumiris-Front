@@ -72,7 +72,6 @@ export default function LoginPage() {
             return;
         }
 
-        // Mode démo : password ignoré (toute saisie non vide passe), seul l'email résout l'artisan.
         const artisan = findArtisanByEmail(parsed.data.email);
         if (!artisan) {
             setErrors({});

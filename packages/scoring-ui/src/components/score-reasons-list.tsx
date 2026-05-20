@@ -8,7 +8,6 @@ import { AXIS_COLOR, AXIS_LABEL } from '../theme/grade-color';
 
 export interface ScoreReasonsListProps extends HTMLAttributes<HTMLUListElement> {
     reasons: readonly ScoreReason[];
-    /** Cap on rendered items; remainder collapsed into a counter. */
     limit?: number;
     emptyLabel?: string;
 }

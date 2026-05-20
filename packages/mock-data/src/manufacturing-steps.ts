@@ -1,7 +1,5 @@
 import type { ProductionStep } from '@lumiris/types';
 
-// templates d'étapes - clonés par passports.ts en ajustant id/performedBy/locationCity
-
 interface StepTemplate {
     label: string;
     kind: ProductionStep['kind'];

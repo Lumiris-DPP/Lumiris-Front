@@ -1,7 +1,5 @@
 import type { AdminAuditLogEntry } from '@lumiris/types';
 
-// 50 entrées sur 30 jours - l'app admin accumule de nouvelles entrées via lib/auth/audit.tsx
-
 const DAY_MS = 86_400_000;
 const BASE = new Date('2026-04-30T08:00:00Z').getTime();
 function ts(daysAgo: number, hour = 9, minute = 0): string {
@@ -494,7 +492,6 @@ export const mockAdminAuditLog: readonly AdminAuditLogEntry[] = [
         ipMock: '127.0.0.1',
     },
 
-    // entrées ciblant les passeports réels de passports.ts (drawer Historique)
     {
         id: 'LOG-101',
         ts: ts(58, 9, 12),
@@ -587,7 +584,6 @@ export const mockAdminAuditLog: readonly AdminAuditLogEntry[] = [
         ipMock: '127.0.0.1',
     },
 
-    // anomalies pour le module governance - pattern 1 : >3 validations art-marie en <5 min (chaîne suspecte)
     {
         id: 'LOG-201',
         ts: ts(2, 11, 0),

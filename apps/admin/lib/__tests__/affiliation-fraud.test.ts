@@ -1,6 +1,3 @@
-// Détection burst / auto-réservation / geo improbable.
-// NOW_REF (2026-04-30) est figé dans le module : l'anonymisation est testable sans clock système.
-
 import { describe, expect, it } from 'bun:test';
 import {
     ANONYMISATION_THRESHOLD_DAYS,
@@ -12,16 +9,16 @@ import {
 } from '../affiliation-fraud';
 import { makeAffiliationEvent, shiftIso } from '@/test/factories';
 
-const REF_ISO = new Date(NOW_REF).toISOString(); // 2026-04-30T08:00:00Z
+const REF_ISO = new Date(NOW_REF).toISOString();
 
 describe('anonymiseUserId', () => {
     it('renvoie le userId tel quel pour les events < 30 jours', () => {
-        const recent = shiftIso(REF_ISO, -29 * 24 * 60); // -29 jours
+        const recent = shiftIso(REF_ISO, -29 * 24 * 60);
         expect(anonymiseUserId('VIS-001', recent)).toBe('VIS-001');
     });
 
     it("hash l'identifiant pour les events > 30 jours", () => {
-        const old = shiftIso(REF_ISO, -60 * 24 * 60); // -60 jours
+        const old = shiftIso(REF_ISO, -60 * 24 * 60);
         const out = anonymiseUserId('VIS-001', old);
         expect(out.startsWith('user_anon_')).toBe(true);
         expect(out).not.toBe('VIS-001');
@@ -36,7 +33,6 @@ describe('anonymiseUserId', () => {
         const old = shiftIso(REF_ISO, -90 * 24 * 60);
         const set = new Set<string>();
         for (let i = 0; i < 50; i++) set.add(anonymiseUserId(`VIS-${i}`, old));
-        // On accepte quelques collisions sur 50 (hash 12 bits → 4096 buckets).
         expect(set.size).toBeGreaterThan(40);
     });
 
@@ -95,7 +91,6 @@ describe('buildSuspicionMap — burst', () => {
             makeAffiliationEvent({ id: `B-${i}`, userId: 'B', occurredAt: shiftIso(REF_ISO, -i) }),
         );
         const map = buildSuspicionMap([...userA, ...userB]);
-        // 4 + 4 = 8 events, mais aucun user ne dépasse BURST_THRESHOLD seul.
         for (const e of [...userA, ...userB]) {
             expect(map.get(e.id)?.burst).toBeUndefined();
         }
@@ -174,9 +169,7 @@ describe('matchesFraudFilter', () => {
     });
 
     it('filter=geo écarte les events sans flag géo (mock ville stable)', () => {
-        // TODO: bug détecté — buildSuspicionMap calcule la distance avec deux fois la même
-        // coordonnée (`userCoord(userId)` répété), donc le flag geo n'arme jamais sur le mock.
-        // Le filtre lui-même reste correct : un event sans flag.geo est exclu.
+        // TODO: bug — `buildSuspicionMap` appelle `userCoord(userId)` deux fois, donc le flag geo n'arme jamais sur le mock.
         expect(matchesFraudFilter(normal, suspicions, 'geo')).toBe(false);
     });
 });

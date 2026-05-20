@@ -5,7 +5,6 @@ const DAY = 86_400_000;
 const ago = (days: number, hour = 9, minute = 0): string =>
     new Date(REF - days * DAY + hour * 3_600_000 + minute * 60_000).toISOString();
 
-// commissions : purchase 4 % du panier (artisan), repair_booking 1.50 € forfait (retoucheur)
 const PURCHASE_COMMISSION_PCT = 0.04;
 const REPAIR_COMMISSION_FLAT = 1.5;
 
@@ -50,7 +49,6 @@ function repair(
     };
 }
 
-// events variés : pending récents, paid mars, patterns suspects ; UI anonymise après 30 j
 export const mockAffiliationEvents: readonly AffiliationEvent[] = [
     purchase({
         id: 'aff-001',
@@ -149,7 +147,6 @@ export const mockAffiliationEvents: readonly AffiliationEvent[] = [
         payoutStatus: 'pending',
     }),
 
-    // pattern suspect : même userId, > 5 conversions le même jour
     purchase({
         id: 'aff-100',
         occurredAt: ago(5, 10, 0),
@@ -207,11 +204,10 @@ export const mockAffiliationEvents: readonly AffiliationEvent[] = [
         payoutStatus: 'pending',
     }),
 
-    // pattern suspect : auto-rdv (userId === beneficiaryId)
     repair({
         id: 'aff-200',
         occurredAt: ago(3, 14, 0),
-        userId: 'rtc-005', // = beneficiaryId (auto-rdv)
+        userId: 'rtc-005',
         beneficiaryId: 'rtc-005',
         beneficiaryDisplayName: 'Yann Cuir',
         transactionAmountEur: 80,
@@ -220,7 +216,7 @@ export const mockAffiliationEvents: readonly AffiliationEvent[] = [
     repair({
         id: 'aff-201',
         occurredAt: ago(8, 10, 22),
-        userId: 'rtc-011', // = beneficiaryId (auto-rdv)
+        userId: 'rtc-011',
         beneficiaryId: 'rtc-011',
         beneficiaryDisplayName: 'Atelier Local 11',
         transactionAmountEur: 50,

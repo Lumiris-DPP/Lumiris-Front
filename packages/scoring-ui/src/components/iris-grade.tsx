@@ -12,9 +12,7 @@ export type IrisGradeShape = 'pill' | 'square';
 export interface IrisGradeProps extends HTMLAttributes<HTMLDivElement> {
     grade: IrisGradeLetter;
     size?: IrisGradeSize;
-    /** `soft` pour surfaces denses, `solid` (lettre blanche) pour cartes qui doivent ressortir. */
     tone?: IrisGradeTone;
-    /** `pill` (default, ronde) - `square` pour la grosse vignette de la fiche publique. */
     shape?: IrisGradeShape;
 }
 
@@ -30,7 +28,6 @@ const SHAPE: Record<IrisGradeShape, string> = {
     square: 'rounded-2xl',
 };
 
-// Ne calcule jamais le grade - il est passé en prop (calculé par @lumiris/core).
 export function IrisGrade({ grade, size = 'md', tone = 'soft', shape = 'pill', className, ...rest }: IrisGradeProps) {
     const toneClasses =
         tone === 'solid'

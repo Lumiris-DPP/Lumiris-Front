@@ -1,12 +1,4 @@
 #!/usr/bin/env bun
-/**
- * Lumiris workspace topology guard.
- *
- * Hard rule: an `apps/*` workspace MUST NOT depend on another `apps/*` workspace,
- * directly or transitively. Apps consume packages — never each other. Run as
- * `bun run check:topo` and from the Turbo `topo` task.
- */
-
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
@@ -32,7 +24,7 @@ function appPackageNames() {
             const pkg = readJson(pkgPath);
             if (pkg?.name) names.add(pkg.name);
         } catch {
-            /* missing package.json — surface as a separate issue, not here */
+            // package.json missing or malformed — skip this app
         }
     }
     return names;
@@ -69,7 +61,7 @@ function main() {
 
     if (issues.length > 0) {
         console.error('[topo] cross-app dependency detected:');
-        for (const i of issues) console.error('  - ' + i);
+        for (const i of issues) console.error(`  - ${  i}`);
         process.exit(1);
     }
 

@@ -29,8 +29,7 @@ import { EmptyState } from '../_shared/empty-state';
 import { LoadingState } from '../_shared/loading-state';
 import { NonNegotiableBanner } from '../_shared/non-negotiable-banner';
 
-// Référence temporelle stable — alignée sur les fixtures (`ts(0, …)` dans admin-audit-log.ts).
-// Permet aux KPI calculés (churn, médiane, countdown) d'être déterministes en CI.
+// Aligné sur les fixtures (`ts(0, …)` dans admin-audit-log.ts) pour rendre les KPI déterministes en CI.
 const COCKPIT_NOW = new Date('2026-05-17T08:00:00Z');
 
 const containerAnim: Variants = {
@@ -60,7 +59,6 @@ const eurCompact = (value: number): string => {
 function CockpitComponent() {
     const auditLog = useAdminAuditLog();
     const [stress, setStress] = useState(false);
-    // Petit délai pour laisser respirer la projection lourde — affiche le squelette ARR.
     const [trajectoryReady, setTrajectoryReady] = useState(false);
     useEffect(() => {
         let alive = true;
@@ -147,8 +145,6 @@ function CockpitComponent() {
         </div>
     );
 }
-
-// ─── KPI header ─────────────────────────────────────────────────────────────────────────────
 
 interface KpiHeaderProps {
     artisanKpi: ReturnType<typeof buildArtisanKpi>;
@@ -272,8 +268,6 @@ function KpiHeader({ artisanKpi, curationKpi, irisKpi, mrrKpi }: KpiHeaderProps)
     );
 }
 
-// ─── Trajectoire ARR vs charges ─────────────────────────────────────────────────────────────
-
 interface TrajectoryCardProps {
     stress: boolean;
     onStressChange: (next: boolean) => void;
@@ -378,8 +372,6 @@ function TrajectoryCard({ stress, onStressChange, data }: TrajectoryCardProps) {
     );
 }
 
-// ─── LTV / CAC table ────────────────────────────────────────────────────────────────────────
-
 const RATIO_TONE: Record<LtvCacRow['tone'], string> = {
     good: 'bg-lumiris-emerald/10 text-lumiris-emerald',
     watch: 'bg-lumiris-amber/10 text-lumiris-amber',
@@ -452,8 +444,6 @@ function LtvCacCard({ rows }: { rows: readonly LtvCacRow[] }) {
     );
 }
 
-// ─── Funnel ATELIER ─────────────────────────────────────────────────────────────────────────
-
 const SOURCE_TONE: Record<string, string> = {
     Salon: 'bg-lumiris-emerald',
     CMA: 'bg-lumiris-cyan',
@@ -518,8 +508,6 @@ function FunnelCard({ funnel }: { funnel: ReturnType<typeof buildAcquisitionFunn
     );
 }
 
-// ─── Countdown ESPR ─────────────────────────────────────────────────────────────────────────
-
 function EsprCountdown({ entries }: { entries: ReturnType<typeof buildEsprCountdown> }) {
     return (
         <div className="opal-shadow border-border bg-card rounded-xl border">
@@ -569,8 +557,6 @@ function EsprCountdown({ entries }: { entries: ReturnType<typeof buildEsprCountd
         </div>
     );
 }
-
-// ─── Audit feed ─────────────────────────────────────────────────────────────────────────────
 
 function CurationActivity({ auditLog }: { auditLog: ReturnType<typeof useAdminAuditLog> }) {
     const entries = auditLog.slice(0, 6);

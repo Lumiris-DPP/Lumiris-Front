@@ -49,7 +49,6 @@ export function FiltersSheet({
 }: FiltersSheetProps) {
     const [draft, setDraft] = useState<VaultFilters>(value);
 
-    // Resync le draft à chaque réouverture pour refléter l'état appliqué.
     useEffect(() => {
         if (open) setDraft(value);
     }, [open, value]);
@@ -94,9 +93,6 @@ export function FiltersSheet({
         onOpenChange(false);
     };
 
-    // La section « Catégorie textile » n'a de sens que si le secteur textile est dans
-    // l'inventaire visible. Si l'utilisateur a explicitement filtré sur d'autres secteurs,
-    // on la masque aussi.
     const textileScope = sortedSectors.includes('textile');
     const sectorFilteredOutTextile = draft.sectors.length > 0 && !draft.sectors.includes('textile');
     const showKindsSection = textileScope && sortedKinds.length > 0 && !sectorFilteredOutTextile;

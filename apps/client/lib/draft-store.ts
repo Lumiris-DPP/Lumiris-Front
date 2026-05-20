@@ -37,7 +37,6 @@ interface DraftPassport {
     steps: ProductionStep[];
     certifications: CertificationRef[];
     warranty: PassportWarranty;
-    /** Dernière étape complétée — point de reprise depuis /create/[id]. */
     lastStep?: WizardStep;
 }
 
@@ -136,7 +135,6 @@ const noopStorage = {
     removeItem: () => undefined,
 };
 
-/** Convertit un draft en `Passport` (snapshot frozen-style pour `computeScore`). */
 export function draftToPassport(draft: DraftPassport): Passport {
     return {
         id: draft.id,

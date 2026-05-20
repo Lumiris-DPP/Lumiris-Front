@@ -5,15 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Scan } from 'lucide-react';
 import { EASE_OUT, SPRING_BOUNCY } from '@/lib/motion';
 
-// Iris ring - élément visuel central du scanner. Compose :
-//   - un anneau prismatique externe en conic-gradient (rotation 10s)
-//   - un cercle principal avec animation `iris-breathe` (CSS keyframes - packages/ui/src/styles/prismatic.css)
-//   - 3 cercles concentriques internes
-//   - un scanline qui balaie quand `status === 'scanning'`
-//   - un état "Locked" (point vert + corner brackets passent à --iris-grade-a) quand matched
-// Le composant est `memo` car il est rendu à l'intérieur d'un parent qui maintient une boucle
-// `requestAnimationFrame` - on n'a pas envie qu'un re-render involontaire casse le `iris-breathe`.
-
+// `memo` impératif : le parent boucle en rAF, un re-render casserait l'animation `iris-breathe`.
 export type IrisRingStatus = 'idle' | 'scanning' | 'denied' | 'unreadable' | 'unknown' | 'matched';
 
 interface IrisRingProps {
@@ -26,7 +18,6 @@ function IrisRingImpl({ status }: IrisRingProps) {
 
     return (
         <div className="relative flex items-center justify-center">
-            {/* Anneau prismatique externe - légèrement plus grand que le cercle principal */}
             <motion.div
                 className="absolute h-[clamp(14rem,72vw,17rem)] w-[clamp(14rem,72vw,17rem)] rounded-full motion-reduce:hidden"
                 style={{
@@ -38,7 +29,6 @@ function IrisRingImpl({ status }: IrisRingProps) {
                 aria-hidden
             />
 
-            {/* Cercle principal - clamp pour viewport < 360px */}
             <motion.div
                 className="border-border/50 bg-glass relative flex h-[clamp(13rem,68vw,16rem)] w-[clamp(13rem,68vw,16rem)] items-center justify-center rounded-full border backdrop-blur-2xl"
                 style={{
@@ -49,12 +39,10 @@ function IrisRingImpl({ status }: IrisRingProps) {
                 }
                 transition={isMatched ? EASE_OUT : { duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
             >
-                {/* Cercles concentriques */}
                 <div className="border-border/25 pointer-events-none absolute h-[80%] w-[80%] rounded-full border" />
                 <div className="border-border/15 pointer-events-none absolute h-[62%] w-[62%] rounded-full border" />
                 <div className="border-border/10 pointer-events-none absolute h-[44%] w-[44%] rounded-full border" />
 
-                {/* Scanline pendant scanning */}
                 <AnimatePresence>
                     {isScanning ? (
                         <motion.div
@@ -80,7 +68,6 @@ function IrisRingImpl({ status }: IrisRingProps) {
                     ) : null}
                 </AnimatePresence>
 
-                {/* Contenu central */}
                 <div className="relative z-10 flex flex-col items-center gap-2">
                     <AnimatePresence mode="wait">
                         {isMatched ? (
@@ -136,7 +123,6 @@ function IrisRingImpl({ status }: IrisRingProps) {
                     </AnimatePresence>
                 </div>
 
-                {/* Corner brackets (SVG superposé - passe à --iris-grade-a quand lock) */}
                 <svg
                     className="absolute inset-0 h-full w-full"
                     viewBox="0 0 256 256"

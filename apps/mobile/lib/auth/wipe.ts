@@ -1,10 +1,4 @@
-// Effacement « toutes mes données » : ne touche qu'aux buckets per-user du user
-// courant + à l'éventuel scope `anon` (données saisies avant signIn). On préserve
-// volontairement :
-// - les `DEVICE_KEYS` (auth slot, onboarding marketing, prompts permission OS) :
-//   ce sont des données device-globales, pas perso ;
-// - les buckets per-user des autres personas (`lumiris.users.{otherId}.*`) : si
-//   plusieurs comptes co-existent sur l'appareil, l'un ne peut pas effacer l'autre.
+// N'efface que le scope user courant + scope `anon`. Préserve `DEVICE_KEYS` et les autres personas.
 
 import { ANON_SCOPE_PREFIX, userScopePrefix } from '../storage-keys';
 import { readUser } from './storage';

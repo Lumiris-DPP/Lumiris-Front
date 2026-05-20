@@ -4,7 +4,6 @@ import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
 import globals from 'globals';
 
-/** Base layer - JS + TS strict. Use in any pure-TS workspace. */
 export default [
     {
         ignores: [

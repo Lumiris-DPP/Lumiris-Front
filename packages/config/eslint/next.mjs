@@ -2,7 +2,6 @@
 import nextPlugin from '@next/eslint-plugin-next';
 import react from './react.mjs';
 
-/** Next.js layer. Use in any apps/* Next workspace. */
 export default [
     ...react,
     {

@@ -1,12 +1,6 @@
-// Personnalisation Discover - heuristique mapping `stylePrefs` → catégories Journal,
-// croisée avec l'historique de scans Garde-Robe pour les suggestions de pièces.
-// Pas de ML : règle d'affinité simple, déterministe.
-
 import { mockJournalPublic, type JournalArticlePublic } from '@lumiris/mock-data';
 import type { JournalCategory } from '@lumiris/types';
 
-// Mapping spec D : Casual→entretien, Formel→savoir-faire, Streetwear→portrait-artisan.
-// Les autres styles partagent ces 3 catégories pour rester cohérents avec l'éditorial existant.
 const STYLE_TO_CATEGORIES: Record<string, readonly JournalCategory[]> = {
     Casual: ['entretien'],
     Formel: ['savoir-faire'],

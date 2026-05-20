@@ -7,11 +7,9 @@ import { cn } from '@lumiris/ui/lib/cn';
 
 export interface PassportStatusBannerProps extends HTMLAttributes<HTMLDivElement> {
     passport: Passport;
-    /** Optionnel - quand fourni, le cap ESPR/AGEC est aussi pris en compte pour afficher la bannière. */
     score?: ScoreResult;
 }
 
-// bannière orange - affichée si InCompletion ou cap ESPR/AGEC ; on signale, on n'empêche jamais
 export function PassportStatusBanner({ passport, score, className, ...rest }: PassportStatusBannerProps) {
     const inCompletion = passport.status === 'InCompletion';
     const capped = score?.cap?.applied === true;

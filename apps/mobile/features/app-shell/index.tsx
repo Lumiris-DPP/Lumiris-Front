@@ -64,9 +64,6 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
     const activeTab = activeTabFor(pathname);
     const tabBarHidden = hideTabBar || shouldHideTabBar(pathname);
 
-    // Déplace une seule fois les buckets legacy (`lumiris.<suffix>`) vers leur scope
-    // par user (`lumiris.users.{id}.<suffix>`) ou anon. Idempotent : ré-appelé à
-    // chaque mount sans risque puisqu'il vérifie l'existence de la clé cible.
     useEffect(() => {
         migrateLegacyKeys();
     }, []);

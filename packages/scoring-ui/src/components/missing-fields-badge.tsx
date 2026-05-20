@@ -7,11 +7,9 @@ import { cn } from '@lumiris/ui/lib/cn';
 
 export interface MissingFieldsBadgeProps extends HTMLAttributes<HTMLSpanElement> {
     passport: Passport;
-    /** When true, renders the 0/N counter even at zero missing - useful in tables. */
     showWhenComplete?: boolean;
 }
 
-// compteur dérivé du même checkCaps que le scoring - badge lock-step avec le grade
 export function MissingFieldsBadge({
     passport,
     showWhenComplete = false,

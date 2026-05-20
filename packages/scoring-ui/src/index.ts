@@ -1,5 +1,3 @@
-// barrel public - apps préfèrent les imports granulaires (./components/<x>) pour le tree-shaking
-
 export {
     IrisGrade,
     type IrisGradeProps,

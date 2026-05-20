@@ -6,14 +6,6 @@ import { GRADE_LABEL, IrisGrade, gradeBackgroundSolid, gradeBorder2px } from '@l
 import type { Artisan, ExternalDpp, Passport, ScoreResult } from '@lumiris/types';
 import { SPRING_OVERLAY } from '@/lib/motion';
 
-// Bottom-sheet 70vh qui apparaît quand un DPP est lu - LUMIRIS ou externe ESPR.
-// Mise en avant :
-//   - cercle de grade 96px (border 2px, glow couleur grade)
-//   - référence produit + atelier / émetteur
-//   - 2 CTA empilés : "Voir le passeport / le DPP" (primaire) + "Scanner un autre" (secondaire)
-// Le wrapper porte un `layoutId="scan-result-<id>"` pour préparer la transition partagée
-// vers la fiche.
-
 interface LumirisVariant {
     kind: 'lumiris-passport';
     passport: Passport;
@@ -60,7 +52,6 @@ export function ScanResultModal({ result, score, onClose, onOpen }: ScanResultMo
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
             >
-                {/* Halo prismatique d'arrivée - disparaît en 1.2s */}
                 <motion.div
                     className="pointer-events-none absolute inset-0 motion-reduce:hidden"
                     style={{
@@ -73,7 +64,6 @@ export function ScanResultModal({ result, score, onClose, onOpen }: ScanResultMo
                     aria-hidden
                 />
 
-                {/* Backdrop blur */}
                 <button
                     type="button"
                     className="bg-background/60 absolute inset-0 backdrop-blur-md"
@@ -81,7 +71,6 @@ export function ScanResultModal({ result, score, onClose, onOpen }: ScanResultMo
                     aria-label="Fermer"
                 />
 
-                {/* Bottom sheet - hauteur cible 70vh */}
                 <motion.div
                     layoutId={`scan-result-${layoutKey}`}
                     className="border-border/50 bg-card/95 relative flex max-h-[70vh] w-full max-w-md flex-col gap-5 rounded-t-3xl border-x border-t p-6 pb-8 shadow-2xl backdrop-blur-2xl"

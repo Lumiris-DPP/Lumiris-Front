@@ -122,10 +122,8 @@ export const mockSubscriptions: readonly Subscription[] = [
 ] as const;
 
 export interface MrrPoint {
-    /** ISO month `YYYY-MM`. */
     month: string;
     label: string;
-    /** Détail par ligne. */
     solo: number;
     studio: number;
     maison: number;
@@ -150,7 +148,6 @@ function buildPayments(): PaymentEvent[] {
 
     for (const sub of mockSubscriptions) {
         if (sub.tier === 'free') continue;
-        // ~12 événements par sub sur 12 mois
         for (let i = 12; i >= 1; i--) {
             counter += 1;
             const dayJitter = (counter * 7) % 5;

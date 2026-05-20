@@ -8,7 +8,6 @@ import { cn } from '@lumiris/ui/lib/cn';
 
 export interface FactureOcrViewerProps extends HTMLAttributes<HTMLDivElement> {
     invoice: SupplierInvoice;
-    /** Score de confiance OCR (0–1). Sous 0.7 → flag visuel. */
     confidence?: number;
 }
 

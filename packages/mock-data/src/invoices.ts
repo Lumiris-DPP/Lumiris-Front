@@ -1,6 +1,5 @@
 import type { SupplierInvoice } from '@lumiris/types';
 
-// 8 factures fournisseurs - 5 avec OcrExtraction, 3 en attente d'OCR
 export const mockInvoices: readonly SupplierInvoice[] = [
     {
         id: 'inv-001',
@@ -76,7 +75,6 @@ export const mockInvoices: readonly SupplierInvoice[] = [
         linkedPassportIds: ['pass-jules-001'],
     },
 
-    // OCR à faire (3)
     {
         id: 'inv-006',
         supplierId: 'sup-chanvre-allier',

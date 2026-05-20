@@ -392,7 +392,6 @@ function SidebarGroupAction({
             data-sidebar="group-action"
             className={cn(
                 'text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground outline-hidden absolute right-3 top-3.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 transition-transform focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
-                // Invisible 8px tap-target padding on mobile.
                 'after:absolute after:-inset-2 md:after:hidden',
                 'group-data-[collapsible=icon]:hidden',
                 className,
@@ -519,7 +518,6 @@ function SidebarMenuAction({
             data-sidebar="menu-action"
             className={cn(
                 'text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground peer-hover/menu-button:text-sidebar-accent-foreground outline-hidden absolute right-1 top-1.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 transition-transform focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
-                // Invisible 8px tap-target padding on mobile.
                 'after:absolute after:-inset-2 md:after:hidden',
                 'peer-data-[size=sm]/menu-button:top-1',
                 'peer-data-[size=default]/menu-button:top-1.5',

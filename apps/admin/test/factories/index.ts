@@ -1,6 +1,3 @@
-// Test fixtures - minimum viable shapes for unit / interaction tests.
-// Pas de dépendance à @lumiris/mock-data : chaque test contrôle exactement ce qu'il injecte.
-
 import type {
     AdminAction,
     AdminAuditLogEntry,
@@ -124,7 +121,6 @@ export function makeAffiliationEvent(overrides: Partial<AffiliationEvent> = {}):
     };
 }
 
-// Helpers temporels - décalage simple par minutes / heures depuis une référence ISO.
 export function shiftIso(baseIso: string, offsetMinutes: number): string {
     return new Date(new Date(baseIso).getTime() + offsetMinutes * 60_000).toISOString();
 }

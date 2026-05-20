@@ -27,7 +27,6 @@ function scorePassportSync(passport: Passport): ScoreResult {
     });
 }
 
-/** Retourne les rows enrichis (passport + status + délai + flags d'audit). */
 export function usePassportRows(passports: readonly Passport[]): readonly PassportRow[] {
     const { overlays } = useCurationStore();
     return useMemo(() => {
@@ -49,7 +48,6 @@ export function usePassportRows(passports: readonly Passport[]): readonly Passpo
     }, [passports, overlays]);
 }
 
-/** Score Iris d'un passeport, calculé en injectant l'artisan + retoucheurs locaux. */
 export function useIrisScore(passport: Passport): ScoreResult {
     const options = useMemo(() => {
         const artisan = mockArtisans.find((a) => a.id === passport.artisanId);

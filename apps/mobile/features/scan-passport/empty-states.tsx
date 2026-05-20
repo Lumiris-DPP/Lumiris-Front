@@ -5,13 +5,6 @@ import { motion } from 'framer-motion';
 import { CameraOff, RefreshCw, ScanSearch, KeyRound } from 'lucide-react';
 import { GlassCard, IridescentBackground, SPRING_OVERLAY } from '@/lib/motion';
 
-// Trois états vides du scanner :
-//   - CameraDeniedState  : permission refusée par le navigateur
-//   - QrUnreadableState  : aucun QR détecté pendant N secondes
-//   - PassportNotFoundState : QR lu mais id/gtin absent du catalogue
-// Présentation glass (translucide + backdrop-blur) avec orbes ambient prismatiques pour
-// rester cohérent avec le langage iris ring quand la caméra n'est pas dispo.
-
 interface CameraDeniedStateProps {
     onRetry: () => void;
     onManualEntry: () => void;

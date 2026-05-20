@@ -1,9 +1,5 @@
 'use client';
 
-// Demandes de retouche locales - persistance localStorage *scopée par user.id*
-// pour qu'un persona ne voie pas les demandes d'un autre. Format versionné (`v1`)
-// pour permettre une migration ultérieure sans casser l'historique d'un utilisateur.
-
 import { useSyncExternalStore } from 'react';
 import type { RepairerSpecialty } from '@lumiris/types';
 import { SPECIALTY_TO_SECTOR } from '@lumiris/types';
@@ -90,7 +86,6 @@ export function updateRepairRequest(id: string, patch: Partial<Omit<RepairReques
     write(next);
 }
 
-// Snapshot stable - useSyncExternalStore re-render seulement si la référence change.
 let snapshotCache: readonly RepairRequest[] = [];
 let snapshotSerialized = '';
 
@@ -112,7 +107,6 @@ function subscribe(cb: () => void): () => void {
     subscribers.add(cb);
     if (typeof window !== 'undefined') {
         window.addEventListener(EVENT, cb);
-        // `storage` event = sync entre onglets, propre côté web.
         window.addEventListener('storage', cb);
         window.addEventListener(USER_CHANGED, cb);
     }

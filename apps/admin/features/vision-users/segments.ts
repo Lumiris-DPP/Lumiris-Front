@@ -1,8 +1,3 @@
-// Pure derivations from MockVisionUser - no React, no DOM.
-// Encodes the V0 business rules: 2-tier ARPU, ESPR-wide wardrobe (textile is one of six),
-// 4 user segments, attached-document metadata, RGPD lifecycle states.
-// When the backend lands, these helpers become the contract for /vision-users endpoints.
-
 import type { MockVisionUser } from '@lumiris/mock-data';
 
 export const ESPR_CATEGORIES = [
@@ -71,8 +66,7 @@ function daysBetween(later: Date, earlier: Date): number {
     return Math.floor((later.getTime() - earlier.getTime()) / MS_PER_DAY);
 }
 
-// Deterministic FNV-1a 32-bit hash. Used to derive stable synthetic numbers per user.id
-// so segments / breakdown / documents stay identical across renders and mock generations.
+// FNV-1a 32-bit déterministe — chiffres synthétiques stables par user.id entre renders.
 function hash(input: string): number {
     let h = 0x811c9dc5;
     for (let i = 0; i < input.length; i += 1) {
@@ -107,7 +101,6 @@ export function isMauActive(user: MockVisionUser, now: Date): boolean {
     return lastSeenWithin(user, now, 30);
 }
 
-// Average commission per scan ≈ 1.5 € — purely illustrative, no business meaning yet.
 export function getAffiliationCommissionsEur(user: MockVisionUser): number {
     if (user.anon || !user.consentAffiliation) return 0;
     const seed = hash(`${user.id}:affil`);
@@ -120,9 +113,7 @@ interface CategoryBreakdownEntry {
     count: number;
 }
 
-// Wardrobe is global multi-secteurs by design (V0). For now passports are textile-only,
-// so the non-textile counters are synthesized deterministically from user.id to demonstrate
-// the breakdown UI. Wired to real attachments once the inventory backend ships.
+// V0 multi-secteurs : seuls les passeports textile sont réels, le reste est synthétisé depuis user.id jusqu'à l'arrivée du backend inventaire.
 export function getCategoryBreakdown(user: MockVisionUser): readonly CategoryBreakdownEntry[] {
     if (user.erased) return ESPR_CATEGORIES.map((c) => ({ category: c, count: 0 }));
     const textile = user.wardrobePassportIds.length;
@@ -155,7 +146,7 @@ export const DOCUMENT_TYPE_LABEL: Record<DocumentType, string> = {
 };
 
 interface AttachedDocument {
-    /** Metadata-only handle. The encrypted payload never reaches the admin surface. */
+    /** Metadata-only — la charge utile chiffrée n'atteint jamais l'admin. */
     id: string;
     type: DocumentType;
     productLabel: string;
@@ -235,8 +226,6 @@ export function computeTierKpis(users: readonly MockVisionUser[], now: Date): { 
 
     const anonScans30d = anonUsers.reduce((sum, u) => sum + getScans30d(u, now), 0);
 
-    // Anon → account conversion proxy: accounts created in the last 30 j, normalized over
-    // the funnel top (anon sessions + new accounts) on the same window.
     const newAccounts30d = accountUsers.filter((u) => daysBetween(now, new Date(u.createdAt)) <= 30).length;
     const funnelTop = newAccounts30d + anonUsers.filter((u) => lastSeenWithin(u, now, 30)).length;
     const conversionPct = funnelTop === 0 ? 0 : (newAccounts30d / funnelTop) * 100;

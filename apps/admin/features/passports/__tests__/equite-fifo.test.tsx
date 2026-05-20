@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { makePassport } from '../../../test/factories';
 
-// Comparateur source : passports/index.tsx (FifoEquityAudit).
 function fifoCompare<T extends { passport: { createdAt: string } }>(a: T, b: T): number {
     return new Date(a.passport.createdAt).getTime() - new Date(b.passport.createdAt).getTime();
 }

@@ -1,5 +1,3 @@
-// Score santé artisan : 3 axes pondérés (40 % capacité, 35 % iris, 25 % overrides).
-
 import { describe, expect, it } from 'bun:test';
 import { HEALTH_WEIGHTS, computeHealthScore, healthBand } from '@/lib/health-score';
 

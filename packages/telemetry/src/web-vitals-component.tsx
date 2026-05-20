@@ -3,14 +3,11 @@
 import { useReportWebVitals } from 'next/web-vitals';
 import { usePathname } from 'next/navigation';
 import { initWebVitals } from './web-vitals';
-import type { ServiceName } from './types';
+import type { AppName } from './types';
 
 export interface WebVitalsProps {
-    /** Service name reported with each beacon - `lumiris-admin`, `lumiris-web`, etc. */
-    app: ServiceName;
-    /** Telemetry endpoint (e.g. `${API}/telemetry/web-vitals`). */
+    app: AppName;
     endpoint: string;
-    /** 0..1; defaults to dev=1.0 / prod=0.1. */
     sampleRate?: number;
 }
 

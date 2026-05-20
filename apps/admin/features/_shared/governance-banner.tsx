@@ -4,12 +4,10 @@ import { ShieldCheck } from 'lucide-react';
 import { cn } from '@lumiris/ui/lib/cn';
 
 interface GovernanceBannerProps {
-    /** Click handler for the "voir le journal" link - gives the host module a way to deep-link into governance. */
     onOpenAuditLog?: () => void;
     className?: string;
 }
 
-// Bandeau charte d'indépendance - non-fermable par design (modules billing/affiliation/iris-workbench).
 export function GovernanceBanner({ onOpenAuditLog, className }: GovernanceBannerProps) {
     return (
         <div

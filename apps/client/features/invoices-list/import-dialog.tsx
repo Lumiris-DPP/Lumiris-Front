@@ -98,7 +98,6 @@ export function ImportInvoiceDialog({ open, onOpenChange, artisanId }: Props) {
         setFileError(null);
         const dataUri = await readFileAsDataUrl(f);
         if (dataUri.length > WARN_BYTES) {
-            // data URI inline → risque de saturer le quota localStorage (~5 MB).
             console.warn(
                 `[invoices] data URI ~${formatBytes(dataUri.length)} pour ${f.name} — proche du quota localStorage.`,
             );

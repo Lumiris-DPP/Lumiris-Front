@@ -1,48 +1,29 @@
-// Jalons réglementaires ESPR / AGEC - source unique pour les surfaces qui rendent un calendrier
-// (Conformité ESPR aujourd'hui, Cockpit/Overview demain). Aucune dépendance React : utilisable
-// en RSC, en client component ou dans un script d'audit.
-
 import type { Artisan, Passport } from '@lumiris/types';
 
-/**
- * Secteurs visés par les actes délégués ESPR. `textile` est le seul actif côté LUMIRIS V1 ;
- * les autres sont préparés pour les vagues 2027-2030.
- */
+/** `textile` seul actif en V1 ; les autres sont préparés pour les vagues 2027-2030. */
 export type RegulatorySector = 'textile' | 'electronics' | 'appliances' | 'furniture' | 'cross';
 
-/** Type de jalon - distingue les ouvertures réglementaires des dates d'application. */
 export type RegulatoryMilestoneKind =
-    | 'registry_open' // le registre central DPP ouvre / s'élargit
-    | 'delegated_act' // un acte délégué est publié
-    | 'application_start' // les obligations deviennent opposables
-    | 'reporting_deadline' // une échéance de reporting AGEC / ESPR
-    | 'national_law'; // texte national (AGEC, LCAP, ...)
+    | 'registry_open'
+    | 'delegated_act'
+    | 'application_start'
+    | 'reporting_deadline'
+    | 'national_law';
 
 export interface RegulatoryMilestone {
     id: string;
-    /** Date ISO 8601 (`YYYY-MM-DD`). Utilisée pour le positionnement sur la timeline. */
     date: string;
     kind: RegulatoryMilestoneKind;
     sector: RegulatorySector;
-    /** Libellé court FR affiché sur la timeline et dans les compteurs. */
     title: string;
-    /** Texte source réglementaire complet, ~1-3 phrases. */
     description: string;
-    /** Référence textuelle (article ESPR, JOUE n°…, code AGEC…). */
     legalReference: string;
-    /** Lien public vers le texte de référence quand disponible. */
     sourceUrl?: string;
-    /** Marquer les jalons stratégiques qu'on affiche en bandeau de countdown. */
+    /** Affiché dans le bandeau de countdown. */
     major: boolean;
 }
 
-// --- Constantes officielles ---------------------------------------------------------------------
-
-/**
- * Calendrier ESPR / AGEC tel qu'il est connu au 2026-05. Les dates de la vague textile sont
- * datées sur la base de la projection M+18 après acte délégué (cf. business model LUMIRIS).
- * Toute mise à jour officielle remplace l'entrée correspondante ici - jamais ailleurs.
- */
+// Calendrier ESPR / AGEC au 2026-05 — dates textile basées sur projection M+18 après acte délégué.
 export const REGULATORY_MILESTONES: readonly RegulatoryMilestone[] = [
     {
         id: 'AGEC-2025-LABEL',
@@ -133,13 +114,11 @@ export const REGULATORY_MILESTONES: readonly RegulatoryMilestone[] = [
     },
 ];
 
-/** Bornes temporelles utilisées pour positionner les jalons sur la timeline. */
 export const TIMELINE_RANGE = {
     start: new Date('2026-01-01T00:00:00Z'),
     end: new Date('2030-12-31T00:00:00Z'),
 } as const;
 
-/** Palette par secteur, alignée sur les tokens Prismatic Clarity. */
 export const SECTOR_TONE: Record<RegulatorySector, { dot: string; text: string; chip: string }> = {
     textile: {
         dot: 'bg-lumiris-emerald',
@@ -176,12 +155,7 @@ export const SECTOR_LABEL: Record<RegulatorySector, string> = {
     cross: 'Tous secteurs',
 };
 
-// --- Helpers ------------------------------------------------------------------------------------
-
-/**
- * Position d'un jalon sur la timeline 2026-2030, exprimée en pourcentage. Borne `[0, 100]` -
- * les jalons hors plage sont clampés au début / à la fin pour rester visibles.
- */
+/** Pourcentage clampé `[0, 100]` sur la timeline 2026-2030. */
 export function timelinePositionPct(milestone: RegulatoryMilestone): number {
     const t = new Date(milestone.date).getTime();
     const span = TIMELINE_RANGE.end.getTime() - TIMELINE_RANGE.start.getTime();
@@ -189,26 +163,18 @@ export function timelinePositionPct(milestone: RegulatoryMilestone): number {
     return Math.min(100, Math.max(0, pct));
 }
 
-/** Nombre de jours entre `now` et le jalon. Négatif quand le jalon est dépassé. */
 export function daysUntil(milestone: RegulatoryMilestone, now: Date = new Date()): number {
     const diff = new Date(milestone.date).getTime() - now.getTime();
     return Math.round(diff / (1000 * 60 * 60 * 24));
 }
 
-/** Jalons majeurs uniquement, triés chronologiquement. Sert au bandeau de countdown. */
 export function majorMilestones(now: Date = new Date()): readonly RegulatoryMilestone[] {
     return REGULATORY_MILESTONES.filter((m) => m.major)
         .filter((m) => daysUntil(m, now) > -180)
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }
 
-// --- Gap analysis -------------------------------------------------------------------------------
-
-export type GapReason =
-    | 'no_published_dpp' // aucun passeport publié pour cet artisan
-    | 'all_capped_d' // tous les passeports publiés sont plafonnés D
-    | 'missing_espr_fields' // au moins un passeport manque des champs ESPR/AGEC clés
-    | 'low_average_score'; // score moyen < B (les passeports existent mais sont sous-classés)
+export type GapReason = 'no_published_dpp' | 'all_capped_d' | 'missing_espr_fields' | 'low_average_score';
 
 export type RecommendedAction = 'relance' | 'demo' | 'training';
 
@@ -239,10 +205,7 @@ function passportMissingFields(passport: Passport): readonly string[] {
     return missing;
 }
 
-/**
- * Calcule l'état de préparation des artisans face à l'échéance DPP textile. "Prêt" = au moins
- * un passeport publié avec un grade ≥ B et aucun champ ESPR clé manquant.
- */
+/** "Prêt" = au moins un passeport publié, grade ≥ B et aucun champ ESPR clé manquant. */
 export function computeReadiness(
     artisans: readonly Artisan[],
     passports: readonly Passport[],

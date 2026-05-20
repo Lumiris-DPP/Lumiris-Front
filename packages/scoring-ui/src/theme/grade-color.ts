@@ -1,7 +1,5 @@
 import type { IrisAxis, IrisGrade } from '@lumiris/types';
 
-// source unique des tokens grade/axis - mappés sur les vars --lumiris-* de @lumiris/ui prismatic.css
-
 export type GradeColorToken = 'lumiris-emerald' | 'lumiris-cyan' | 'lumiris-amber' | 'lumiris-orange' | 'lumiris-rose';
 
 export const GRADE_COLOR: Record<IrisGrade, GradeColorToken> = {
@@ -28,17 +26,14 @@ export function gradeBackgroundSolid(grade: IrisGrade): string {
     return `bg-${GRADE_COLOR[grade]}`;
 }
 
-// Classes hardcodées pour que le scanner Tailwind v4 les pickup (pas de `border-${var}` dynamique).
 export function gradeBorder2px(grade: IrisGrade): string {
     return `border-2 border-${GRADE_COLOR[grade]}`;
 }
 
-/** Retourne la CSS var bruite (`var(--lumiris-emerald)`) - utile pour `style={{ stroke: ... }}` ou SVG inline. */
 export function gradeColorVar(grade: IrisGrade): string {
     return `var(--${GRADE_COLOR[grade]})`;
 }
 
-// Lives next to the colour tokens so admin/web/mobile stay in lock-step on the human-facing label.
 export const GRADE_LABEL: Record<IrisGrade, string> = {
     A: 'Excellent',
     B: 'Bon',
@@ -47,7 +42,6 @@ export const GRADE_LABEL: Record<IrisGrade, string> = {
     E: 'Opaque',
 };
 
-// Per-axis colour mapping - drives the four-axis breakdown bar.
 export const AXIS_COLOR: Record<IrisAxis, GradeColorToken> = {
     transparency: 'lumiris-emerald',
     craftsmanship: 'lumiris-cyan',

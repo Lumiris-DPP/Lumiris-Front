@@ -1,6 +1,5 @@
 import type { BlogArticle } from '@lumiris/types';
 
-// 5 catégories × workflow Draft/Review/Scheduled/Published/Archived
 export const mockBlogArticles: readonly BlogArticle[] = [
     {
         id: 'blog-fr-001',

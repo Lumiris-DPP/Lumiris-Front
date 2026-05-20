@@ -24,9 +24,7 @@ function hashString(s: string): number {
 }
 
 interface ScansDataPoint {
-    /** ISO date `YYYY-MM-DD`. */
     date: string;
-    /** Étiquette courte pour l'axe X (`30/04`). */
     label: string;
     total: number;
     unique: number;
@@ -52,9 +50,9 @@ export function getScansSeries(artisanId: string, days = 30): ScansSeries {
     for (let i = days - 1; i >= 0; i--) {
         const dayMs = PIVOT - i * DAY_MS;
         const d = new Date(dayMs);
-        const dow = d.getUTCDay(); // 0 = dim
+        const dow = d.getUTCDay();
         const isWeekend = dow === 0 || dow === 6;
-        const base = 8 + Math.floor(rng() * 22); // 8..29
+        const base = 8 + Math.floor(rng() * 22);
         const total = Math.round(base * (isWeekend ? 1.3 : 1));
         const unique = Math.round(total * (0.55 + rng() * 0.2));
         const label = `${String(d.getUTCDate()).padStart(2, '0')}/${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
@@ -100,15 +98,12 @@ export function getTopPassports(artisanId: string, limit = 5): readonly TopPassp
 }
 
 interface PerformancePoint {
-    /** Étiquette mois (`déc`, `janv`…). */
     label: string;
     score: number;
 }
 
 interface PerformanceSummary {
-    /** Score moyen courant (publiés uniquement). */
     currentAvg: number;
-    /** Évolution sur 6 mois. */
     series: PerformancePoint[];
 }
 
@@ -147,9 +142,7 @@ export function getPerformance(artisanId: string): PerformanceSummary {
 }
 
 interface MarketBenchmark {
-    /** Score moyen marché tous artisans confondus (figé). */
     avgScore: number;
-    /** Top tier benchmark (90e percentile). */
     topScore: number;
 }
 

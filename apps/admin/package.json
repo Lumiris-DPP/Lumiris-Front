@@ -16,6 +16,7 @@
         "clean": "rimraf .next .turbo coverage storybook-static"
     },
     "dependencies": {
+        "@lumiris/api-client": "workspace:*",
         "@lumiris/core": "workspace:*",
         "@lumiris/mock-data": "workspace:*",
         "@lumiris/scoring-ui": "workspace:*",

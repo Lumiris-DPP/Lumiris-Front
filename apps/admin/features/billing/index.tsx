@@ -130,8 +130,6 @@ function BillingInner() {
     );
 }
 
-// ─── Overview ───────────────────────────────────────────────────────────────
-
 function OverviewTab() {
     const kpi = useMemo(() => computeBillingKpi(mockSubscriptions, mockMrrTrajectory), []);
     const ltvCac = useMemo(() => computeLtvCac(), []);
@@ -277,8 +275,6 @@ function SplitRow({ label, value, tone }: { label: string; value: number; tone: 
         </li>
     );
 }
-
-// ─── Viability ──────────────────────────────────────────────────────────────
 
 function ViabilityTab() {
     const [stressed, setStressed] = useState(false);
@@ -433,8 +429,6 @@ function ViabilityTab() {
         </>
     );
 }
-
-// ─── Subscriptions ──────────────────────────────────────────────────────────
 
 function SubscriptionsTab() {
     const [internalTab, setInternalTab] = useState<'artisans' | 'repairers'>('artisans');
@@ -834,8 +828,6 @@ function SubscriptionsTable({ scope }: { scope: 'artisan' | 'repairer' }) {
     );
 }
 
-// ─── Dunning templates ──────────────────────────────────────────────────────
-
 interface DunningTemplate {
     id: string;
     tierId: PriceLineId;
@@ -920,8 +912,6 @@ function DunningTemplates({ scope }: { scope: 'artisan' | 'repairer' }) {
     );
 }
 
-// ─── Invoice stub ───────────────────────────────────────────────────────────
-
 function openInvoiceWindow(sub: Subscription) {
     const win = window.open('', '_blank', 'noopener,noreferrer,width=720,height=900');
     if (!win) return;
@@ -980,8 +970,6 @@ function openInvoiceWindow(sub: Subscription) {
     win.document.write(html);
     win.document.close();
 }
-
-// ─── Payment history ────────────────────────────────────────────────────────
 
 function HistoryTab() {
     const [statusFilter, setStatusFilter] = useState<PaymentEvent['status'] | 'all'>('all');

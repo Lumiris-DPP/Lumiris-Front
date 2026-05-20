@@ -12,7 +12,6 @@ type Layout = 'horizontal' | 'vertical';
 
 interface ArticleCardProps {
     item: DiscoverFeedItem;
-    /** Index dans la séquence parente - pilote le stagger. */
     index: number;
     layout?: Layout;
 }
@@ -21,7 +20,6 @@ export function ArticleCard({ item, index, layout = 'horizontal' }: ArticleCardP
     const prefersReduced = useReducedMotion();
     const isE = item.grade === 'E';
 
-    // Largeur cible pour la row scroll-x : ~62% de la viewport mobile (peek de la suivante).
     const widthClass = layout === 'horizontal' ? 'w-[62vw] max-w-[18rem] shrink-0' : 'w-full';
 
     return (

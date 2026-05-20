@@ -13,7 +13,6 @@ export interface ScoredPassport {
 const ATELIER_INVOICES_KEY = 'atelier-invoices';
 const ATELIER_CERTS_KEY = 'atelier-certs';
 
-/** Tolère SSR, JSON invalide, format inattendu → []. */
 function readPersistedByArtisan<T>(key: string, artisanId: string): readonly T[] {
     if (typeof window === 'undefined') return [];
     try {
@@ -37,14 +36,12 @@ function dedupeById<T extends { id: string }>(...sources: ReadonlyArray<readonly
     return [...seen.values()];
 }
 
-/** Mocks (filtrés via passeport lié) + locales `atelier-invoices`. */
 export function loadMergedInvoices(artisanId: string): readonly SupplierInvoice[] {
     const local = readPersistedByArtisan<SupplierInvoice>(ATELIER_INVOICES_KEY, artisanId);
     const scopedMocks = mockInvoices.filter((inv) => mockInvoiceArtisanId(inv) === artisanId);
     return dedupeById<SupplierInvoice>(scopedMocks, local);
 }
 
-/** Mocks (scopés via `MOCK_CERT_TO_ARTISAN`) + locales `atelier-certs`. */
 export function loadMergedCertificates(artisanId: string): readonly Certificate[] {
     const local = readPersistedByArtisan<Certificate>(ATELIER_CERTS_KEY, artisanId);
     const scopedMocks = mockCertificates.filter((c) => MOCK_CERT_TO_ARTISAN[c.id] === artisanId);
@@ -135,7 +132,6 @@ export function quotaUsage(passports: readonly Passport[], tier: ArtisanTier): Q
     return { used, total, percent };
 }
 
-/** Reprendre un passeport là où il s'est arrêté. */
 export function resumeHref(passport: Passport): string {
     if (passport.status === 'Published') return `/passports/${passport.id}`;
     if (passport.materials.length === 0) return `/create/${passport.id}/identification`;

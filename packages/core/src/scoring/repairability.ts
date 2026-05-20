@@ -32,10 +32,8 @@ export function scoreRepairability(passport: Passport, input: RepairabilityInput
         if (sameCity >= 3) {
             retouchePts = 60;
         } else if (sameCity > 0) {
-            // dégressif : 1 → 20 pts, 2 → 40 pts
             retouchePts = sameCity * 20;
         } else {
-            // aucun retoucheur dans la ville → fallback sur ceux avec distanceKm ≤ 25
             const nearby = retoucheurs.filter(
                 (r) => typeof r.distanceKm === 'number' && (r.distanceKm ?? 99) <= 25,
             ).length;
@@ -63,7 +61,6 @@ export function scoreRepairability(passport: Passport, input: RepairabilityInput
                 (sum, m) => sum + (FIBER_REPAIRABILITY[m.fiber] ?? FIBER_REPAIRABILITY.other) * m.percentage,
                 0,
             ) / totalPct;
-        // weighted ∈ [10, 30] → ramené linéairement à [0, 30] pts
         fiberPts = (weighted / 30) * 30;
         if (weighted < 25) {
             reasons.push({

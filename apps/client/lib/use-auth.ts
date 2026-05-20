@@ -3,12 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore } from './auth-store';
 
-/** Id artisan courant côté store réactif (null si non connecté). */
 export function useAuthArtisanId(): string | null {
     return useAuthStore((s) => s.artisanId);
 }
 
-/** Évite le flash redirect d'<AuthGuard> avant que zustand/persist ait relu le localStorage. */
 export function useAuthHydrated(): boolean {
     const [hydrated, setHydrated] = useState(() => useAuthStore.persist.hasHydrated());
 

@@ -34,9 +34,7 @@ export function computeBillingKpi(
     return { mrr, arr, churnPct, churnEur, netNew, split };
 }
 
-// ─── LTV / CAC par segment ──────────────────────────────────────────────────
 // Estimations conservatrices Chiffrage v4.2 § 8.2.
-
 export type SegmentId = PriceLineId;
 
 export interface LtvCacRow {
@@ -91,9 +89,7 @@ export function computeLtvCac(): readonly LtvCacRow[] {
     });
 }
 
-// ─── Viabilité M0 → M36 (Chiffrage v4.2 § 8) ───────────────────────────────
-// Trajectoire calibrée pour point-mort en M22-M24 (base) et M28-M30 (stress -30/-33 %).
-
+// Trajectoire M0→M36 calibrée pour point-mort en M22-M24 (base) et M28-M30 (stress -30/-33 %).
 export interface ViabilityPoint {
     month: number;
     label: string;
@@ -140,8 +136,6 @@ export function findBreakevenMonth(points: readonly ViabilityPoint[], stressed =
     }
     return null;
 }
-
-// ─── Conversion mensuel → annuel (90 j) ────────────────────────────────────
 
 interface MonthlyToAnnualConversion {
     totalActive: number;

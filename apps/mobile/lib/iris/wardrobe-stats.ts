@@ -1,12 +1,6 @@
 'use client';
 
-// Stats agrégées d'un inventaire multi-secteurs : distribution A→E + grade global pour
-// la jauge "Wardrobe Health" + bilan CO₂/eau "évité" pour le profil. Helpers purs
-// (testables isolément) + hook `useWardrobeStats`.
-//
-// Seuls les items qui ont un score (Lumiris passport, DPP externe) participent au
-// calcul du grade et de l'impact. Les `manual` sont comptés dans le total mais
-// n'ont pas de DPP donc pas de grade.
+// Items `manual` comptés dans le total mais exclus du grade/impact (pas de DPP).
 
 import { useMemo } from 'react';
 import { FIBER_IMPACT_COEFFICIENTS, FIBER_WATER_COEFFICIENTS, IMPACT_BASELINE } from '@lumiris/core/scoring';
@@ -29,7 +23,6 @@ const GRADE_VALUE: Record<IrisGrade, number> = { A: 5, B: 4, C: 3, D: 2, E: 1 };
 
 interface OverallScore {
     grade: IrisGrade;
-    /** 0–100, alimente le `strokeDashoffset` de la jauge circulaire. */
     percentage: number;
 }
 
@@ -60,15 +53,12 @@ function waterForPassport(p: Passport): number {
 }
 
 interface ImpactSummary {
-    /** Somme `max(0, plafond ADEME − empreinte calculée)` sur toutes les pièces, en kgCO₂e arrondis. */
     co2AvoidedKg: number;
-    /** Idem pour l'eau, en litres entiers. */
     waterSavedLiters: number;
 }
 
 interface WardrobeStats {
     items: readonly WardrobeItem[];
-    /** Items qui ont un DPP (Lumiris ou externe) et donc un score. */
     scoredCount: number;
     grades: readonly IrisGrade[];
     distribution: GradeDistribution;

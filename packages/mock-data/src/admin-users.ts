@@ -1,6 +1,5 @@
 import type { AdminUser } from '@lumiris/types';
 
-// 7 admins couvrant tous les rôles - index 0 doit rester platform_admin pour full access en dev
 export const mockAdminUsers: readonly AdminUser[] = [
     {
         id: 'ADM-001',

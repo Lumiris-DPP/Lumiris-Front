@@ -4,7 +4,6 @@ import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import base from './base.mjs';
 
-/** React layer - base + react/hooks/jsx-a11y rules on .{jsx,tsx}. */
 export default [
     ...base,
     {

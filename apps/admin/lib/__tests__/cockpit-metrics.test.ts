@@ -1,5 +1,3 @@
-// KPI cockpit : artisans, curation, iris, MRR, trajectoire, LTV/CAC, funnel, countdown ESPR.
-
 import { describe, expect, it } from 'bun:test';
 import {
     buildAcquisitionFunnel,
@@ -42,7 +40,7 @@ describe('buildArtisanKpi — split par tier + churn 30 j', () => {
             makeAuditEntry({
                 targetType: 'artisan',
                 action: 'artisan.unsubscribe' as never,
-                ts: '2026-01-01T00:00:00Z', // > 30 j
+                ts: '2026-01-01T00:00:00Z',
             }),
         ];
         expect(buildArtisanKpi([], log, NOW).churn30d).toBe(1);
@@ -80,12 +78,12 @@ describe('buildCurationKpi — file de validation', () => {
             status: 'Published',
             createdAt: '2026-04-01T00:00:00Z',
             moderation: { status: 'Approved', reviewerId: 'CUR', reviewedAt: '2026-04-03T00:00:00Z' },
-        }); // 2 jours
+        });
         const p2 = makePassport({
             status: 'Published',
             createdAt: '2026-04-01T00:00:00Z',
             moderation: { status: 'Approved', reviewerId: 'CUR', reviewedAt: '2026-04-05T00:00:00Z' },
-        }); // 4 jours
+        });
         const kpi = buildCurationKpi([p1, p2]);
         expect(kpi.medianValidationDays).toBe(3);
     });

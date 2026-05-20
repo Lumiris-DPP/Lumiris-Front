@@ -1,7 +1,4 @@
-// Marketplace helpers - tri exclusivement par score Iris (règle d'or, spec 5.3).
-// Aucun champ `featured` data-side : le boost ATELIER+ est une heuristique
-// (« 3 premiers artisans triés par nombre de passeports A »), strictement à
-// score équivalent (cf. About).
+// INVARIANT spec 5.3 : tri exclusivement par score Iris ; ATELIER+ ne joue qu'à score équivalent.
 
 import { mockArtisans, mockPassports } from '@lumiris/mock-data';
 import type { GarmentKind, Passport, ScoreResult } from '@lumiris/types';
@@ -34,8 +31,6 @@ export const GARMENT_KIND_LABEL: Record<GarmentKind, string> = {
     other: 'Autres',
 };
 
-// Heuristique ATELIER+ MVP - top 3 artisans par nombre de passeports A.
-// Recalculé à chaque appel (déterministe pour un `now` donné).
 function computeFeaturedArtisanIds(now: Date): readonly string[] {
     const aCount = new Map<string, number>();
     for (const p of mockPassports) {
@@ -55,7 +50,6 @@ const FEATURED_DESC = (a: ShopItem, b: ShopItem): number => Number(b.isFeatured)
 const NAME_ASC = (a: ShopItem, b: ShopItem): number =>
     a.passport.garment.reference.localeCompare(b.passport.garment.reference, 'fr', { sensitivity: 'base' });
 
-// Tri spec 5.3 : score DESC, isFeatured DESC, nom ASC.
 function compareShopItems(a: ShopItem, b: ShopItem): number {
     return SCORE_DESC(a, b) || FEATURED_DESC(a, b) || NAME_ASC(a, b);
 }

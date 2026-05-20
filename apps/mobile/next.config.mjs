@@ -15,6 +15,7 @@ const nextConfig = {
         '@lumiris/types',
         '@lumiris/mock-data',
         '@lumiris/telemetry',
+        '@lumiris/api-client',
     ],
     serverExternalPackages: [
         '@opentelemetry/sdk-node',
@@ -34,7 +35,13 @@ const nextConfig = {
     ...(!isTauri && {
         output: 'standalone',
         outputFileTracingRoot: path.resolve(__dirname, '../..'),
-        images: { unoptimized: true },
+        images: {
+            remotePatterns: [
+                { protocol: 'https', hostname: 'cdn.lumiris.local' },
+                { protocol: 'https', hostname: 'cdn.lumiris.eu' },
+                { protocol: 'http', hostname: 'localhost', port: '9000' },
+            ],
+        },
     }),
 };
 

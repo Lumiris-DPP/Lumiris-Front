@@ -113,8 +113,6 @@ function IrisWorkbenchInner() {
     );
 }
 
-// ─── Passport picker ────────────────────────────────────────────────────────
-
 function PassportPicker({ selectedId, onSelect }: { selectedId: string; onSelect: (id: string) => void }) {
     const [search, setSearch] = useState('');
     const filtered = useMemo(() => {
@@ -174,8 +172,6 @@ function PassportPicker({ selectedId, onSelect }: { selectedId: string; onSelect
         </div>
     );
 }
-
-// ─── Inspector ──────────────────────────────────────────────────────────────
 
 function InspectorView({ passport }: { passport: Passport }) {
     const score = useMemo(() => scorePassport(passport), [passport]);
@@ -325,8 +321,6 @@ function ContributionTable({ score }: { score: ScoreResult }) {
         </div>
     );
 }
-
-// ─── Simulator ──────────────────────────────────────────────────────────────
 
 function SimulatorView({ passport }: { passport: Passport }) {
     const log = useLogAction();
@@ -561,8 +555,6 @@ function DeltaTile({
     );
 }
 
-// ─── Overrides historiques ──────────────────────────────────────────────────
-
 function OverridesView() {
     const liveLog = useAdminAuditLog();
     const canOverrideScore = usePermission('passport.override');
@@ -725,8 +717,6 @@ function OverridesView() {
         </>
     );
 }
-
-// ─── Distribution ───────────────────────────────────────────────────────────
 
 function DistributionView() {
     const data = useMemo(() => {

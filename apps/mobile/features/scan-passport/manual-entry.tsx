@@ -6,10 +6,6 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Info } from 'lucide-react';
 import { GlassCard, IridescentBackground, SPRING_OVERLAY } from '@/lib/motion';
 
-// Page de fallback du scanner - l'utilisateur saisit un identifiant LUMIRIS à la main
-// (visible au dos de l'étiquette) et atterrit sur la fiche passeport correspondante.
-// Pas de validation côté client : la page passeport gère le `notFound()` si l'id est inconnu.
-
 export function ManualEntry() {
     const router = useRouter();
     const [value, setValue] = useState('');

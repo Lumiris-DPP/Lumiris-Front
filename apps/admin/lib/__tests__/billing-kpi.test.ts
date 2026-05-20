@@ -1,5 +1,3 @@
-// MRR split, LTV/CAC, viabilité M0→M36, conversion mensuel→annuel.
-
 import { describe, expect, it } from 'bun:test';
 import type { MrrPoint } from '@lumiris/mock-data';
 import {

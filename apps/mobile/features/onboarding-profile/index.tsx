@@ -51,8 +51,6 @@ export function OnboardingProfile() {
     }
 
     if (!isAuthenticated) {
-        // Pas connecté → l'utilisateur a contourné le flux. On le renvoie sur l'auth
-        // plutôt que de bloquer la page (ne devrait pas arriver depuis sign-in).
         router.replace('/auth');
         return null;
     }
