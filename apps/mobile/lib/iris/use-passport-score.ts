@@ -1,11 +1,6 @@
 'use client';
 
-// Hook React qui résout le score d'un passeport via le bridge Tauri.
-// - mode web : valeur synchrone immédiate (mémoïsée), pas d'IPC.
-// - mode Tauri : preview sync immédiat (déterministe via `scorePassport`) puis refresh
-//   après IPC ; comme la commande Rust valide le JSON et renvoie le même DPP, le
-//   résultat post-refresh est identique → pas de flicker ni saut de layout.
-// Tolère un passeport `null` pour les call sites conditionnels (ex. modale de scan).
+// Mode Tauri : score sync immédiat puis refresh post-IPC (identique → pas de flicker).
 
 import { useEffect, useMemo, useState } from 'react';
 import type { Passport, ScoreResult } from '@lumiris/types';

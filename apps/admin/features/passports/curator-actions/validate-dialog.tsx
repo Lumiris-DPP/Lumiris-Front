@@ -29,8 +29,7 @@ export function ValidateDialog({ passport, grade, open, onOpenChange, onAfterAct
     const handleValidate = () => {
         const publishedAt = new Date().toISOString();
         setOverlay(passport.id, { status: 'validated', publishedAt });
-        // L'approbation finale (status=validated + publication QR) émet `passport.validate` ;
-        // `passport.curate` reste réservé aux étapes de curation technique en amont.
+        // Approbation finale (validated + publication QR) → `passport.validate` ; `passport.curate` est réservé aux étapes en amont.
         const entry = log({
             action: 'passport.validate',
             targetType: 'passport',

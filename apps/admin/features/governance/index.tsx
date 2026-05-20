@@ -642,6 +642,7 @@ function EscalateDialog({
                             value={typed}
                             onChange={(e) => setTyped(e.target.value)}
                             placeholder={ESCALATE_CONFIRMATION}
+                            aria-label="Confirmation d'escalade — saisissez le mot de confirmation"
                             className="border-border bg-background text-foreground focus-visible:ring-ring w-full rounded-md border px-3 py-2 font-mono text-xs outline-none focus-visible:ring-2"
                         />
                     </div>

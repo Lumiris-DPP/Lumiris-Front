@@ -6,7 +6,6 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { mockCertificates } from '@lumiris/mock-data';
 import type { CertificationKind, CertificationRef } from '@lumiris/types';
 
-/** `CertificationRef` mock n'a pas d'`artisanId` natif — mapping statique le temps que l'API enrichisse le type. */
 export const MOCK_CERT_TO_ARTISAN: Record<string, string> = {
     'cert-gots-marie-lin': 'art-marie',
     'cert-oeko-claire-laine': 'art-claire',
@@ -28,14 +27,12 @@ export function isMockCertificate(id: string): boolean {
     return MOCK_CERT_IDS.has(id);
 }
 
-/** Cert stocké côté store local — superset de `CertificationRef` avec data URI + artisanId. */
 export interface LocalCertificate extends CertificationRef {
     artisanId: string;
     fileDataUri?: string;
     addedAt: string;
 }
 
-/** Vue fusionnée affichée par la page (mock + local), avec flag d'origine. */
 export interface ArtisanCertificate extends CertificationRef {
     artisanId: string;
     isLocal: boolean;
@@ -45,7 +42,6 @@ export interface ArtisanCertificate extends CertificationRef {
 
 interface CertificatesStoreState {
     byArtisan: Record<string, LocalCertificate[]>;
-    /** Force un cert (mock OU local) en `Expired` indépendamment de sa date. */
     expiredOverrides: Record<string, true>;
     addCertificate: (cert: LocalCertificate) => void;
     markExpired: (id: string) => void;
@@ -96,7 +92,6 @@ function applyOverride<T extends CertificationRef>(cert: T, overrides: Record<st
     return overrides[cert.id] ? { ...cert, expiresAt: EPOCH } : cert;
 }
 
-/** Sélecteur — fusionne mocks scopés sur l'artisan + certs locaux + overrides expirés. */
 export function useCertificatesForArtisan(artisanId: string): ArtisanCertificate[] {
     const local = useCertificatesStore((s) => s.byArtisan[artisanId]);
     const overrides = useCertificatesStore((s) => s.expiredOverrides);

@@ -17,7 +17,6 @@ const ITEMS: ReadonlyArray<{ key: keyof CareInstructions; label: string; Icon: t
     { key: 'storage', label: 'Stockage', Icon: Sparkles },
 ];
 
-// 4 instructions d'entretien + encart garantie ; placeholder discret en `InCompletion`
 export function CareGuide({ care, warranty, className, ...rest }: CareGuideProps) {
     return (
         <section className={cn('flex flex-col gap-4', className)} {...rest}>

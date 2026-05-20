@@ -1,5 +1,3 @@
-// Shape + dispatcher only - the consuming app imports the actual `web-vitals` library and feeds the handler returned here.
-
 export type WebVitalsName = 'CLS' | 'FCP' | 'INP' | 'LCP' | 'TTFB';
 export type WebVitalsRating = 'good' | 'needs-improvement' | 'poor';
 
@@ -15,7 +13,6 @@ export interface WebVitalsMetric {
 export type WebVitalsHandler = (metric: WebVitalsMetric) => void;
 
 export interface WebVitalsReporterOptions {
-    /** 1 = report everything, 0 = silent. */
     sampleRate?: number;
     tags?: Record<string, string>;
 }

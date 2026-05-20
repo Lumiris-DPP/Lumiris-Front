@@ -11,7 +11,6 @@ export type InvoiceStatus = 'extracted' | 'pending' | 'failed';
 
 export interface InvoiceFiberLine {
     fiber: Fiber;
-    /** 0–100, somme ≈ 100. */
     pct: number;
     label?: string;
 }
@@ -21,23 +20,18 @@ export interface InvoiceExtraction {
     fibers: InvoiceFiberLine[];
 }
 
-/** Facture créée en local par l'artisan via le dialog d'import. */
 export interface LocalInvoice {
     id: string;
     artisanId: string;
     fileDataUri: string;
     supplierId: string;
-    /** Date d'émission de la facture (ISO yyyy-mm-dd). */
     issuedAt: string;
-    /** Total HT en EUR. */
     totalAmount: number;
     notes?: string;
     extraction: InvoiceExtraction;
-    /** Date d'ajout dans l'atelier (ISO datetime). */
     addedAt: string;
 }
 
-/** Vue normalisée mock + local pour l'affichage tableau. */
 export interface InvoiceView {
     id: string;
     artisanId: string;
@@ -51,7 +45,6 @@ export interface InvoiceView {
     notes?: string;
     fileDataUri?: string;
     fileUrl?: string;
-    /** `false` quand l'invoice provient de mockInvoices (non supprimable). */
     isLocal: boolean;
 }
 
@@ -110,7 +103,6 @@ function supplierNameFor(supplierId: string): string {
     return mockSuppliers.find((s) => s.id === supplierId)?.name ?? supplierId;
 }
 
-/** Dérivé du premier passeport mock lié — sans rattachement, invoice orpheline et invisible workspace. */
 export function mockInvoiceArtisanId(inv: SupplierInvoice): string | null {
     for (const pid of inv.linkedPassportIds) {
         const p = mockPassportById(pid);
@@ -163,7 +155,6 @@ function localToView(inv: LocalInvoice): InvoiceView {
     };
 }
 
-/** Merge mocks (scopés par passeports liés) + locales, tri `addedAt` desc. */
 export function useInvoicesForArtisan(artisanId: string): readonly InvoiceView[] {
     const local = useInvoicesStore((s) => s.byArtisan[artisanId]);
     return useMemo(() => {
@@ -184,7 +175,6 @@ interface LinkedPassportRef {
     status: 'Draft' | 'InCompletion' | 'Published';
 }
 
-/** Liste mocks + drafts locaux dont `materials[].invoiceRef === invoiceId`. */
 export function usePassportsLinkedTo(invoiceId: string, artisanId: string): readonly LinkedPassportRef[] {
     const drafts = useDraftStore((s) => s.drafts);
     return useMemo(() => {

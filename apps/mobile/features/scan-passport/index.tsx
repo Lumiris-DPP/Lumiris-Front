@@ -16,8 +16,6 @@ import { ScanResultModal } from './scan-result-modal';
 import { CameraDeniedState, QrUnreadableState, PassportNotFoundState } from './empty-states';
 import { PermissionPrompt } from './permission-prompt';
 
-// Délai en ms après lequel on considère que le QR est introuvable et on bascule sur l'état "unreadable".
-// Volontairement long (12 s) pour ne pas frustrer l'utilisateur - l'iris ring respire en permanence.
 const UNREADABLE_TIMEOUT_MS = 12_000;
 
 const STATUS_CHIP: Record<IrisRingStatus, { label: string; dot: string }> = {
@@ -80,7 +78,6 @@ export function ScanPassport() {
         }
     }, []);
 
-    // Boucle requestAnimationFrame - déléguer le décodage à processVideoFrame, gérer le timeout.
     const tick = useCallback(() => {
         const video = videoRef.current;
         if (!video) return;
@@ -109,7 +106,6 @@ export function ScanPassport() {
             setStatus('unknown');
             return;
         }
-        // no-frame ou no-code : on continue, sauf timeout dépassé.
         if (performance.now() - startedAtRef.current > UNREADABLE_TIMEOUT_MS) {
             stopCamera();
             setStatus('unreadable');
@@ -127,14 +123,6 @@ export function ScanPassport() {
         };
     }, [status, tick]);
 
-    // Au mount : on choisit entre pre-prompt explicatif et démarrage direct selon
-    // l'état de permission caméra et notre flag local "déjà vu".
-    //   - granted  → démarrage direct (l'iris ring respire, pas de friction)
-    //   - denied   → pre-prompt réaffiché (l'utilisateur a refusé une fois ; on
-    //                redonne du contexte avant de retenter, puis CameraDeniedState
-    //                prend le relais si nouveau refus)
-    //   - autres   → pre-prompt si jamais vu, sinon démarrage direct (le natif
-    //                prendra la décision)
     useEffect(() => {
         let cancelled = false;
         (async () => {
@@ -196,7 +184,6 @@ export function ScanPassport() {
     }, [router, stopCamera]);
 
     const [now] = useState(() => new Date());
-    // usePassportScore tolère un null - actif uniquement quand le match est LUMIRIS.
     const lumirisMatch = match?.kind === 'lumiris-passport' ? match : null;
     const lumirisScore = usePassportScore(lumirisMatch?.passport ?? null, now);
     const externalScore = useMemo(
@@ -223,10 +210,8 @@ export function ScanPassport() {
                 aria-label="Vue caméra"
             />
 
-            {/* Voile sombre pour faire ressortir l'iris ring */}
             <div className="bg-background/30 pointer-events-none absolute inset-0" />
 
-            {/* Header */}
             <motion.header
                 className="absolute left-0 right-0 top-0 z-20 flex items-center justify-between px-5 pb-3 pt-12"
                 initial={{ opacity: 0, y: -10 }}
@@ -247,12 +232,10 @@ export function ScanPassport() {
                 </div>
             </motion.header>
 
-            {/* Iris ring centré */}
             <div className="absolute inset-0 z-10 flex items-center justify-center">
                 <IrisRing status={status} />
             </div>
 
-            {/* Bottom : aide + bouton saisie manuelle (au-dessus de la tab bar de l'AppShell) */}
             <motion.div
                 className="absolute bottom-28 left-0 right-0 z-20 flex flex-col items-center gap-3 px-8"
                 initial={{ opacity: 0, y: 10 }}

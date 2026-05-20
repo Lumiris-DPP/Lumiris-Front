@@ -1,7 +1,3 @@
-// Cockpit — dérivations pures depuis @lumiris/mock-data / @lumiris/core et les cibles v4.2.
-// Aucun chiffre commercial en dur ici ; tout passe par `business-targets.ts`.
-// Pas de React, pas d'effets de bord → testable Bun-natif, réutilisable dans un script ou un job.
-
 import { computeScore } from '@lumiris/core/scoring';
 import {
     IRIS_GRADES,
@@ -38,12 +34,9 @@ import {
 
 const DAY_MS = 86_400_000;
 
-// ─── KPI 1 — Artisans ────────────────────────────────────────────────────────────────────────
-
 interface ArtisanKpi {
     readonly total: number;
     readonly splitByTier: Record<ArtisanTier, number>;
-    /** Nombre de désabonnements artisan détectés sur les 30 derniers jours via audit log. */
     readonly churn30d: number;
 }
 
@@ -56,8 +49,7 @@ export function buildArtisanKpi(
     for (const a of artisans) splitByTier[a.tier] += 1;
 
     const thirtyDaysAgo = now.getTime() - 30 * DAY_MS;
-    // L'action `artisan.unsubscribe` n'est pas encore typée dans AdminAction (arrivera avec le
-    // backend billing). Match string-side pour rester forward-compatible.
+    // `artisan.unsubscribe` n'est pas encore typée dans AdminAction (arrive avec le backend billing) — match string pour rester forward-compatible.
     const churn30d = auditLog
         .filter(
             (e) => e.targetType === 'artisan' && e.action === ('artisan.unsubscribe' as AdminAuditLogEntry['action']),
@@ -67,13 +59,10 @@ export function buildArtisanKpi(
     return { total: artisans.length, splitByTier, churn30d };
 }
 
-// ─── KPI 2 — File de curation ────────────────────────────────────────────────────────────────
-
 interface CurationKpi {
     readonly pendingCount: number;
     readonly draftCount: number;
     readonly inCompletionCount: number;
-    /** Médiane (en jours) du délai entre soumission et validation, sur les passeports Published. */
     readonly medianValidationDays: number | null;
 }
 
@@ -90,9 +79,7 @@ export function buildCurationKpi(passports: readonly Passport[]): CurationKpi {
     const draftCount = passports.filter((p) => p.status === 'Draft').length;
     const inCompletionCount = passports.filter((p) => p.status === 'InCompletion').length;
 
-    // `submittedAt` ≈ createdAt (date d'entrée en file), `validatedAt` ≈ moderation.reviewedAt
-    // (date de l'action curator). On n'utilise pas publishedAt car certaines fixtures historiques
-    // ne le portent pas.
+    // `createdAt` = entrée en file, `moderation.reviewedAt` = validation curator ; `publishedAt` ignoré car absent de certaines fixtures.
     const validationDays = passports.flatMap((p) => {
         if (p.status !== 'Published') return [];
         const reviewedAt = p.moderation?.status === 'Approved' ? p.moderation.reviewedAt : undefined;
@@ -110,17 +97,13 @@ export function buildCurationKpi(passports: readonly Passport[]): CurationKpi {
     };
 }
 
-// ─── KPI 3 — Iris moyen plateforme ───────────────────────────────────────────────────────────
-
 interface IrisKpi {
     readonly sampleSize: number;
-    /** Score moyen 0-100 sur les passeports Published. */
     readonly avgTotal: number;
-    /** Score moyen exprimé sur 5 — comparable à la cible plateforme. */
+    /** Score moyen sur 5 — comparable à la cible plateforme. */
     readonly avgOnFive: number;
     readonly dominantGrade: IrisGrade | '-';
     readonly cappedCount: number;
-    /** Delta vs la cible business (en points sur 5, positif = au-dessus). */
     readonly deltaVsTarget: number;
 }
 
@@ -172,8 +155,6 @@ export function buildIrisKpi(
     };
 }
 
-// ─── KPI 4 — MRR consolidé ───────────────────────────────────────────────────────────────────
-
 interface MrrKpi {
     readonly atelierMrr: number;
     readonly plusMrr: number;
@@ -200,17 +181,13 @@ export function buildMrrKpi(subscriptions: readonly Subscription[]): MrrKpi {
     return { atelierMrr, plusMrr, localMrr, mrrTotal, arrTotal: mrrTotal * 12 };
 }
 
-// ─── Trajectoire ARR vs charges ──────────────────────────────────────────────────────────────
-
 interface TrajectoryPoint {
     readonly month: string;
     readonly monthIndex: number;
     readonly arrAtelier: number;
     readonly arrAffiliation: number;
     readonly arrLocal: number;
-    /** Charge annualisée à ce mois (mensuelle × 12). */
     readonly chargesAnnualized: number;
-    /** Somme des trois lignes ARR — utile au tooltip. */
     readonly arrTotal: number;
 }
 
@@ -229,7 +206,6 @@ export function buildTrajectory(stress: boolean): TrajectoryResult {
         const adjustedVisionUsers = t.visionUsers * b2cFactor;
         const adjustedLocal = t.localPaid * b2bFactor;
 
-        // ARR = MRR × 12. MRR ATELIER = mix tier × prix tier + part ATELIER+ × prix add-on.
         const tierMrr =
             adjustedArtisans *
             ((ARTISAN_TIER_MIX.Solo ?? 0) * (ATELIER_MONTHLY_EUR.Solo ?? 0) +
@@ -259,8 +235,6 @@ export function buildTrajectory(stress: boolean): TrajectoryResult {
         breakevenRange: stress ? BREAKEVEN_STRESS_RANGE : BREAKEVEN_NOMINAL_RANGE,
     };
 }
-
-// ─── LTV / CAC par segment ───────────────────────────────────────────────────────────────────
 
 export interface LtvCacRow {
     readonly id: LtvCacTarget['id'];
@@ -296,12 +270,9 @@ export function buildLtvCacRows(): readonly LtvCacRow[] {
     });
 }
 
-// ─── Funnel d'acquisition ATELIER ────────────────────────────────────────────────────────────
-
 interface FunnelStage {
     readonly id: 'lead' | 'demo' | 'signature' | 'activation';
     readonly label: string;
-    /** Conversion cumulée depuis le lead (0..1). */
     readonly conversion: number;
 }
 
@@ -312,15 +283,13 @@ interface FunnelSlice {
 
 interface AcquisitionFunnel {
     readonly stages: readonly FunnelStage[];
-    /** Total leads du mois en cours, ventilé canal. */
     readonly slices: readonly FunnelSlice[];
     readonly totalLeads: number;
 }
 
-// Mock seedé (~stable d'un render à l'autre) — V1, le helper sera remplacé par un GET /metrics.
+// Mock seedé — sera remplacé par un GET /metrics quand le backend arrivera.
 export function buildAcquisitionFunnel(now: Date): AcquisitionFunnel {
     const month = now.getUTCMonth();
-    // 60-100 leads/mois selon où on est dans le calendrier — pas critique, juste une variation.
     const totalLeads = 60 + ((month * 13) % 41);
 
     const demoConversion = FUNNEL_CONVERSION.leadToDemo;
@@ -350,11 +319,8 @@ export function buildAcquisitionFunnel(now: Date): AcquisitionFunnel {
     return { stages, slices, totalLeads };
 }
 
-// ─── Countdown ESPR ──────────────────────────────────────────────────────────────────────────
-
 interface CountdownEntry {
     readonly deadline: EsprDeadline;
-    /** Jours restants — peut être négatif si l'échéance est dépassée. */
     readonly daysLeft: number;
 }
 

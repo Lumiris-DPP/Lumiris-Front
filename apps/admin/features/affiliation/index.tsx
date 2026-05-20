@@ -79,7 +79,6 @@ import { NonNegotiableBanner } from '../_shared/non-negotiable-banner';
 import { PaginationBar } from '../_shared/pagination-bar';
 import { usePagination } from '../_shared/use-pagination';
 
-// ─── Statut bancaire payout (couche UI, persistée en local pour la démo) ───
 type BankStatus = 'awaiting' | 'wire_sent' | 'reconciled' | 'failed';
 
 const BANK_STATUS_LABEL: Record<BankStatus, string> = {
@@ -191,8 +190,6 @@ function AffiliationInner() {
         </div>
     );
 }
-
-// ─── Overview ───────────────────────────────────────────────────────────────
 
 function OverviewTab({ events }: { events: readonly AffiliationEvent[] }) {
     const stats = useMemo(() => {
@@ -396,8 +393,6 @@ function SplitColumn({
         </section>
     );
 }
-
-// ─── Events ─────────────────────────────────────────────────────────────────
 
 function EventsTab({
     events,
@@ -818,8 +813,6 @@ function SuspiciousPanel({
     );
 }
 
-// ─── Payouts ────────────────────────────────────────────────────────────────
-
 function PayoutsTab({
     events,
     suspicions,
@@ -1111,8 +1104,6 @@ function Stat({ label, value, sub, tone }: { label: string; value: string; sub?:
         </div>
     );
 }
-
-// ─── Rates editor ───────────────────────────────────────────────────────────
 
 function RatesTab() {
     const canWriteRates = usePermission('affiliation.rate_change');

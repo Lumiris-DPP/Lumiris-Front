@@ -148,7 +148,6 @@ function UserList() {
     const [readReason, setReadReason] = useState('');
     const [statusAnnouncement, setStatusAnnouncement] = useState('');
 
-    // Deep-link via ?id=VIS-XXX — only resolves account users, anonymes restent masqués.
     const deepLinkId = searchParams.get('id');
     useEffect(() => {
         if (!deepLinkId) return;
@@ -161,7 +160,7 @@ function UserList() {
     const filtered = useMemo(() => {
         const needle = search.trim().toLowerCase();
         return accountUsers.filter((u) => {
-            if (tierFilter === 'anonymous') return false; // anonymes ne sont jamais listés individuellement
+            if (tierFilter === 'anonymous') return false;
             if (
                 needle.length > 0 &&
                 !(

@@ -8,11 +8,8 @@ import { cn } from '@lumiris/ui/lib/cn';
 
 export interface RepairersNearbyProps extends HTMLAttributes<HTMLUListElement> {
     repairers: readonly Repairer[];
-    /** Position du consommateur - quand fournie, le composant trie par distance haversine. */
     userCoordinates?: Coordinates;
-    /** Cap d'affichage. */
     limit?: number;
-    /** Libellé du CTA. */
     ctaLabel?: string;
     onRepairerSelect?: (repairer: Repairer) => void;
 }
@@ -37,7 +34,6 @@ const PRICE_LABEL: Record<'low' | 'mid' | 'high', string> = {
     high: '€€€',
 };
 
-// liste retoucheurs proches - tri Haversine si userCoordinates, sinon ordre tel-quel
 export function RepairersNearby({
     repairers,
     userCoordinates,

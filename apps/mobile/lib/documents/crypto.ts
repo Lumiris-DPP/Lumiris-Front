@@ -1,15 +1,6 @@
 'use client';
 
-// Surcouche documentaire utilisateur (cahier §6) — chiffrement local AES-GCM 256.
-//
-// Mock dev : la clé est dérivée par PBKDF2 d'un secret stable. Quand un user est
-// authentifié, on prend `user.id` ; sinon, on retombe sur un secret par appareil
-// généré à la première écriture (`crypto.getRandomValues`) et persisté dans
-// `lumiris.devicekey.v1`. Pas de KMS, pas de mot de passe : la promesse cahier §6
-// est tenue *fonctionnellement* (« stocké chiffré, accessible uniquement à
-// l'utilisateur ») — un attaquant qui exécute du code côté client peut toujours
-// extraire la clé. À remplacer par un vrai schéma wrapped-key dès que le backend
-// est en place.
+// AES-GCM 256 dérivé PBKDF2 (user.id ou device secret). TODO: schéma wrapped-key côté backend.
 
 import { DEVICE_KEYS } from '../storage-keys';
 

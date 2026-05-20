@@ -1,5 +1,3 @@
-// Analyse cohorte artisan : row builder, score santé, cohortes M-3/M-6/M-12.
-
 import { describe, expect, it } from 'bun:test';
 import {
     PLUS_ADDON,
@@ -62,7 +60,7 @@ describe('buildArtisanRow', () => {
             makePassport({ artisanId: 'ART-A', status: 'Published' }),
             makePassport({ artisanId: 'ART-A', status: 'Published' }),
         ];
-        const row = buildArtisanRow(artisan, passports, [], [], NOW); // 5/5 = 100%
+        const row = buildArtisanRow(artisan, passports, [], [], NOW);
         expect(row.upgradeHint).toBe('Studio');
     });
 
@@ -80,7 +78,7 @@ describe('buildArtisanRow', () => {
     it('cohortOffset négatif quand joinedAt est antérieur à now', () => {
         const row = buildArtisanRow(artisan, [], [], [], NOW);
         expect(row.cohortOffset).toBeLessThan(0);
-        expect(row.cohortOffset).toBe(-6); // oct 2025 → avril 2026
+        expect(row.cohortOffset).toBe(-6);
     });
 
     it('compte les overrides 90j via audit log + payload.artisanId', () => {
@@ -97,7 +95,7 @@ describe('buildArtisanRow', () => {
                 targetType: 'artisan',
                 targetId: 'ART-A',
                 payload: { artisanId: 'ART-A' },
-                ts: '2025-10-01T00:00:00Z', // > 90j → exclu
+                ts: '2025-10-01T00:00:00Z',
             }),
         ];
         const row = buildArtisanRow(artisan, [], [], auditLog, NOW);
@@ -154,7 +152,7 @@ describe('computeCohortMetrics', () => {
     });
 
     it('cohortSize ignore les artisans trop récents pour le bucket', () => {
-        const recent = makeArtisan({ joinedAt: '2026-04-01T00:00:00Z' }); // -1 mois
+        const recent = makeArtisan({ joinedAt: '2026-04-01T00:00:00Z' });
         const result = computeCohortMetrics([recent], [], cohortNow, [3]);
         expect(result[0]?.cohortSize).toBe(0);
     });

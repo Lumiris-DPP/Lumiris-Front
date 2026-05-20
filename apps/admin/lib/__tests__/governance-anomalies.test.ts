@@ -1,6 +1,3 @@
-// 4 règles testées en isolation : override+validation rapide, bursting, cross-role, after-hours.
-// `detectAnomalies` lit `Date.now()` → clock mocké par bun:test `setSystemTime`.
-
 import { afterAll, beforeAll, describe, expect, it, setSystemTime } from 'bun:test';
 import { ANOMALY_RULE_LABEL, SENSITIVE_ACTIONS, detectAnomalies, type AnomalyRule } from '../governance-anomalies';
 import { makeAuditEntry, shiftIso } from '@/test/factories';
@@ -48,7 +45,7 @@ describe('Règle override_then_validate — override puis validation < 5 min, m�
                 targetType: 'passport',
                 targetId: 'PASS-1',
                 actorId: 'CUR-X',
-                ts: shiftIso(NOW_ISO, -10), // -10 min
+                ts: shiftIso(NOW_ISO, -10),
                 payload: {
                     from: 'C',
                     to: 'B',
@@ -60,7 +57,7 @@ describe('Règle override_then_validate — override puis validation < 5 min, m�
                 targetType: 'passport',
                 targetId: 'PASS-1',
                 actorId: 'CUR-X',
-                ts: shiftIso(NOW_ISO, -8), // override + 2 min
+                ts: shiftIso(NOW_ISO, -8),
             }),
         ];
         const alerts = detectAnomalies(log);
@@ -145,7 +142,7 @@ describe('Règle bursting — > 8 actions sensibles / actor / 10 min', () => {
         const log = Array.from({ length: 9 }, (_, i) =>
             makeAuditEntry({
                 id: `READ-${i}`,
-                action: 'passport.read', // non sensible
+                action: 'passport.read',
                 actorId: 'CUR-READ',
                 ts: shiftIso(NOW_ISO, -i),
             }),
@@ -192,12 +189,12 @@ describe('Règle cross_role — 1 actor, 3 familles distinctes en 7 jours', () =
 
 describe('Règle sensitive_after_hours — 22h-6h / WE + raison < 30 chars', () => {
     it('lève une alerte pour une action sensible le dimanche avec raison courte', () => {
-        const sunday = '2026-04-26T14:00:00Z'; // dim
+        const sunday = '2026-04-26T14:00:00Z';
         const log = [
             makeAuditEntry({
                 action: 'passport.override',
                 ts: sunday,
-                payload: { from: 'C', to: 'B', reason: 'urgence' }, // < 30 chars
+                payload: { from: 'C', to: 'B', reason: 'urgence' },
             }),
         ];
         const alerts = detectAnomalies(log);
@@ -218,9 +215,7 @@ describe('Règle sensitive_after_hours — 22h-6h / WE + raison < 30 chars', () 
     });
 
     it('ne lève pas pour une action sensible en heures ouvrées (mardi 10h locale)', () => {
-        // Mardi 28 avril 2026, 10h locale dans la TZ système : on ne peut pas garantir
-        // que cette heure ne soit pas "après 22h" UTC sur une machine américaine. On
-        // contrôle donc directement en heure « milieu de journée europe » mardi.
+        // Selon la TZ système la règle peut s'activer ou non — on vérifie juste l'absence de crash, la vraie règle est testée sur le dimanche.
         const tuesday = '2026-04-28T12:00:00Z';
         const log = [
             makeAuditEntry({
@@ -230,8 +225,6 @@ describe('Règle sensitive_after_hours — 22h-6h / WE + raison < 30 chars', () 
             }),
         ];
         const alerts = detectAnomalies(log);
-        // Selon la TZ système la règle peut s'activer ou non — on vérifie seulement
-        // qu'aucun crash ne se produit. La règle vraie est testée sur le dimanche.
         expect(alerts).toBeInstanceOf(Array);
     });
 

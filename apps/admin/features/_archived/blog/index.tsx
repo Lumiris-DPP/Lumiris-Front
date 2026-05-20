@@ -48,7 +48,6 @@ function BlogInner() {
     const [publishTarget, setPublishTarget] = useState<BlogArticle | null>(null);
     const [archiveTarget, setArchiveTarget] = useState<BlogArticle | null>(null);
 
-    // List filters
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState<BlogStatus | 'all'>('all');
     const [categoryFilter, setCategoryFilter] = useState<BlogCategory | 'all'>('all');

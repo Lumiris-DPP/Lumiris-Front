@@ -193,9 +193,7 @@ function RightsSection() {
     }
 
     function handleDeleteAccount() {
-        // Wipe d'abord, signOut ensuite : `wipeAllUserData` lit le user courant pour
-        // identifier le scope à effacer ; déconnecter avant aurait laissé les données
-        // de l'user en place sous `lumiris.users.{id}.*`.
+        // Ordre critique : wipe avant signOut, sinon le scope `lumiris.users.{id}.*` reste.
         wipeAllUserData();
         signOut();
         router.push('/');

@@ -48,11 +48,8 @@ export function scoreImpact(passport: Passport): AxisResult {
 
     let transportPts = 25;
     if (typeof passport.transportKm === 'number') {
-        // spec : `max(0, 1 - transportKm/2000) × 25` - 0 km → 25 pts ; 2000 km → 0
         transportPts = clamp(1 - passport.transportKm / IMPACT_BASELINE.transportCeilingKm, 0, 1) * 25;
     } else if (composition.length > 0) {
-        // fallback : malus proportionnel aux origines non-FR
-
         const nonFrShare = composition
             .filter((m) => m.originCountry.toUpperCase() !== 'FR')
             .reduce((s, m) => s + m.percentage, 0);

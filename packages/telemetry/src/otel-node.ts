@@ -1,5 +1,3 @@
-/** OTel Node SDK bootstrap - appelé depuis instrumentation.ts ; OTLP/HTTP en prod, sampling = web-vitals rate. */
-
 import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
@@ -20,9 +18,7 @@ import type { ServiceName, TelemetryEnv } from './types';
 export interface InitOtelOptions {
     service: ServiceName;
     env?: TelemetryEnv;
-    /** Override sampling ratio. Default: dev=1.0 / prod=0.1 (PUBLIC_WEB_VITALS_SAMPLE_RATE). */
     sampleRate?: number;
-    /** OTLP endpoint base (no trailing slash). Default: `OTEL_EXPORTER_OTLP_ENDPOINT` env. */
     endpoint?: string;
     serviceVersion?: string;
 }
@@ -39,7 +35,11 @@ export function initOtel(options: InitOtelOptions): NodeSDK | null {
         options.sampleRate ??
         (Number.isFinite(envRate) ? envRate : isProd ? LUMIRIS_SAMPLE_RATE_PROD : LUMIRIS_SAMPLE_RATE_DEV);
 
-    const endpoint = options.endpoint ?? process.env.OTEL_EXPORTER_OTLP_ENDPOINT ?? 'http://localhost:4318';
+    const endpoint =
+        options.endpoint ??
+        process.env.OTEL_EXPORTER_OTLP_ENDPOINT ??
+        process.env.NEXT_PUBLIC_OTEL_EXPORTER_OTLP_ENDPOINT ??
+        'http://localhost:4318';
 
     if (process.env.OTEL_LOG_LEVEL === 'debug') {
         diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);

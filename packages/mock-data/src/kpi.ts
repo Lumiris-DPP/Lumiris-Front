@@ -1,23 +1,13 @@
 import type { IrisGrade } from '@lumiris/types';
 
-// KPIs admin/founder - création/publication passeports + distribution grades
-
 export interface MockKpi {
-    /** Période de référence (mois en cours). */
     periodLabel: string;
-    /** Nb passeports créés ce mois (Draft + InCompletion + Published). */
     passportsCreatedThisMonth: number;
-    /** Nb passeports publiés ce mois. */
     passportsPublishedThisMonth: number;
-    /** Distribution des grades parmi les passeports Published. Somme = 100 %. */
     gradeDistribution: Record<IrisGrade, number>;
-    /** Top 5 régions artisans (% des artisans actifs). */
     topRegions: ReadonlyArray<{ region: string; share: number }>;
-    /** Top fibres utilisées en composition (% des passeports les contenant). */
     topFibers: ReadonlyArray<{ fiber: string; share: number }>;
-    /** Conversion Draft → Published (%). */
     draftToPublishedRate: number;
-    /** Nb passeports plafonnés D ce mois (signal alerting pour le founder). */
     cappedThisMonth: number;
 }
 

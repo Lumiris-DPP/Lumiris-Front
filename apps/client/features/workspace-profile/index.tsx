@@ -75,7 +75,6 @@ function ProfileEditor({ artisan }: { artisan: Artisan }) {
     const [draft, setDraft] = useState<ProfileSnapshot>(persisted);
     const [tagInput, setTagInput] = useState('');
 
-    // Resync au changement d'artisan : sinon le draft local survit au switch de persona.
     useEffect(() => {
         setDraft(persisted);
         // eslint-disable-next-line react-hooks/exhaustive-deps

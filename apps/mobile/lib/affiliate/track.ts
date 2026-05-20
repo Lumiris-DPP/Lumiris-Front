@@ -1,6 +1,4 @@
-// Affiliate click tracking - local-only stub for the MVP. À remplacer par appel
-// `/v1/track/affiliate` quand l'API LUMIRIS sera prête (POST { source, ...payload, ts }
-// - backend dédupe + signe la commission).
+// TODO: remplacer par POST `/v1/track/affiliate` quand l'API LUMIRIS sera prête.
 
 import { readUser } from '../auth/storage';
 import { USER_KEYS, userScopedKey } from '../storage-keys';
@@ -46,7 +44,7 @@ export function trackAffiliateClick(payload: AffiliateClickPayload): void {
         const next = [...read(), record];
         window.localStorage.setItem(currentKey(), JSON.stringify(next));
     } catch {
-        // localStorage indisponible (mode privé / quota) - on retombe sur le log dev.
+        // localStorage indisponible (mode privé / quota) — on retombe sur le log dev.
     }
     if (process.env.NODE_ENV !== 'production') {
         console.info('[affiliate]', record);

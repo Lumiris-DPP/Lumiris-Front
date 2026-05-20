@@ -1,11 +1,7 @@
-// Register happy-dom at preload time so `document` / `window` are available when
-// individual test files import React + @testing-library at module-evaluation time.
+// Happy-dom doit être enregistré en preload pour exposer `document` / `window` aux imports React.
 import { GlobalRegistrator } from '@happy-dom/global-registrator';
 
-// Happy-dom replaces `fetch` / `Response` / `Request` / `Headers` with its own
-// implementations. Those collide with MSW's node interceptor (body stream double-read).
-// Capture Bun's native versions, then restore them after happy-dom registration so
-// we keep happy-dom's DOM + location but reuse the native HTTP primitives.
+// Restore Bun's native `fetch`/`Response`/`Request`/`Headers` après registration — happy-dom les remplace et casse MSW (double-read du body stream).
 const nativeFetch = globalThis.fetch;
 const nativeResponse = globalThis.Response;
 const nativeRequest = globalThis.Request;

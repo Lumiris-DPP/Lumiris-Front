@@ -4,11 +4,9 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 interface NotificationsStoreState {
-    /** ids lus, par artisan. */
     dismissedByArtisan: Record<string, string[]>;
     dismiss: (artisanId: string, notificationId: string) => void;
     dismissAll: (artisanId: string, ids: readonly string[]) => void;
-    /** Purge les ids dismissed orphelins — évite que le storage gonfle indéfiniment. */
     pruneStale: (artisanId: string, liveIds: readonly string[]) => void;
 }
 

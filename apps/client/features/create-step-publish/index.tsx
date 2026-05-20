@@ -84,7 +84,6 @@ export function CreateStepPublish({ draftId }: { draftId: string }) {
     const missing = listMissingFields(passport);
     const willBeIncomplete = missing.length > 0;
 
-    // Quota = tout non-Draft (Published + InCompletion). Republier un déjà-actif ne consomme pas → on ne bloque que les Draft.
     const tier: ArtisanTier = billing.tier;
     const quotaWouldExceed = passport.status === 'Draft' && isQuotaReached(passports, tier);
     const usedSlots = activePassportCount(passports);

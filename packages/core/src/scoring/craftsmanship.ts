@@ -6,7 +6,6 @@ import type { AxisResult } from './types';
 
 interface CraftsmanshipInput {
     artisan?: Artisan;
-    /** Catalogue plat des certifications connues - utilisé pour les certs CUSTOM artisan. */
     certificates: readonly CertificationRef[];
     now: Date;
 }
@@ -59,7 +58,6 @@ export function scoreCraftsmanship(passport: Passport, input: CraftsmanshipInput
 
     const customCerts = certificates.filter((c) => c.kind === 'CUSTOM');
     const customWeight = customCerts.reduce((acc, c) => acc + getEffectiveWeight(c, now), 0);
-    // 5 pts par certif CUSTOM, pondérée par effectiveWeight, plafond 30
     labelsPts += customWeight * 5;
     labelsPts = Math.min(30, labelsPts);
 

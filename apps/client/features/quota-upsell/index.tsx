@@ -37,7 +37,6 @@ export function QuotaUpsellDialog({ open, onOpenChange, currentTier, used }: Quo
 
     useEffect(() => {
         if (!open || !upgradeTier) return;
-        // Telemetry démo — trace dev en attendant Sentry.
         console.info(`[upsell] ${currentTier.toLowerCase()}→${upgradeTier.toLowerCase()} quota_reached`);
     }, [open, currentTier, upgradeTier]);
 

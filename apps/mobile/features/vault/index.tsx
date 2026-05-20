@@ -44,9 +44,6 @@ const SECTOR_ICON: Record<WardrobeSector, typeof Shirt> = {
     battery: BatteryCharging,
 };
 
-// Vue normalisée d'un item de l'inventaire pour la grille — combine le shape stocké et
-// les données enrichies (passport, score, secteur) pour les items qui en ont. Les
-// `manual` n'ont ni score ni passeport ; le compare-mode les ignore.
 interface ScoredVaultRow {
     kind: 'scored';
     key: string;
@@ -99,9 +96,7 @@ function buildRow(item: WardrobeItem, now: Date): VaultRow | null {
             sublabel: item.brand ?? 'Sans marque',
         };
     }
-    // `external-dpp` : pas encore exploitable côté UI tant que la mock-data des DPP
-    // externes n'est pas branchée. On masque silencieusement plutôt que d'afficher un
-    // placeholder confus.
+    // `external-dpp` : masqué tant que mock-data externe pas branchée.
     return null;
 }
 
@@ -188,7 +183,6 @@ export function Vault() {
         return sorted;
     }, [rows, gradeFilter, filters]);
 
-    // Auto-ouverture du compare depuis `/vault?compareWith=<id>` - une seule fois au mount.
     const autoComparePinned = useRef(false);
     useEffect(() => {
         if (autoComparePinned.current) return;
@@ -201,7 +195,6 @@ export function Vault() {
         toast.info('Sélectionne une 2e pièce à comparer');
     }, [searchParams, scoredRows]);
 
-    // Quand 2 items sont sélectionnés, on ouvre l'overlay après un court délai pour la transition.
     useEffect(() => {
         if (compareIds.length === COMPARE_MAX && !showComparison) {
             const id = window.setTimeout(() => setShowComparison(true), 200);
@@ -210,14 +203,12 @@ export function Vault() {
         return undefined;
     }, [compareIds, showComparison]);
 
-    // Sortie du mode compare → reset complet.
     const exitCompare = useCallback(() => {
         setShowComparison(false);
         setCompareMode(false);
         clearCompare();
     }, []);
 
-    // Au démontage du composant, on nettoie le store éphémère.
     useEffect(() => () => clearCompare(), []);
 
     const onToggleCompareMode = useCallback(() => {
@@ -459,7 +450,7 @@ function WardrobeHealth({ grade, percentage, scoredCount }: WardrobeHealthProps)
             <div className="relative flex h-20 w-20 shrink-0 items-center justify-center">
                 <svg className="h-full w-full -rotate-90" viewBox="0 0 80 80">
                     <circle cx="40" cy="40" r={radius} fill="none" strokeWidth="4" className="stroke-secondary" />
-                    {/* `key` retrigger l'animation seulement quand le grade global change. */}
+                    {/* `key` retrigger l'animation au changement de grade. */}
                     <motion.circle
                         key={grade}
                         cx="40"

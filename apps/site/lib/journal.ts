@@ -1,8 +1,3 @@
-// Index statique des articles du journal - tous les articles sont des fichiers .mdx dans
-// content/journal/{slug}.mdx. Chaque fichier expose `meta` (frontmatter typé) et `default`
-// (composant MDX). On les importe en dur pour que Next.js puisse SSG la liste à la
-// génération sans accès filesystem au runtime.
-
 import type { ComponentType } from 'react';
 import * as A1 from '@/content/journal/comprendre-le-dpp-textile.mdx';
 import * as A2 from '@/content/journal/agec-pour-les-artisans.mdx';
@@ -18,12 +13,9 @@ export interface ArticleMeta {
     title: string;
     category: JournalCategory;
     author: string;
-    /** ISO date `YYYY-MM-DD`. */
     publishedAt: string;
-    /** Minutes de lecture, arrondi entier. */
     readingTime: number;
     excerpt: string;
-    /** URL absolue (placehold.co ou CDN externe). */
     coverImage: string;
 }
 

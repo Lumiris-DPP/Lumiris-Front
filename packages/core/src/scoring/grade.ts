@@ -1,9 +1,7 @@
 import type { IrisGrade } from '@lumiris/types';
 
-/** Seuils Iris canoniques - brand commitment, modifier requiert justification PR. */
 export const IRIS_THRESHOLDS = { A: 80, B: 65, C: 50, D: 35 } as const;
 
-/** Total → grade A→E. cap=D plafonne (sauf en dessous du seuil D où on garde E). */
 export function toIrisGrade(total: number, cap?: 'D'): IrisGrade {
     if (!Number.isFinite(total)) return 'E';
     if (cap === 'D') return total < IRIS_THRESHOLDS.D ? 'E' : 'D';

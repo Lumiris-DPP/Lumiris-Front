@@ -1,8 +1,4 @@
-// Grade config consommé par les écrans Vision (Wardrobe, Discover…). Ré-utilise
-// les tokens de @lumiris/scoring-ui ; ajoute uniquement les libellés EN courts
-// (B2C) que la version FR de scoring-ui ne couvre pas.
-//
-// Ne PAS dupliquer dans scoring-ui : ces labels sont propres à la surface mobile.
+// Labels EN courts spécifiques à la surface mobile — ne pas remonter dans scoring-ui.
 
 import { gradeBackground, gradeBackgroundSolid, gradeBorder, gradeColor } from '@lumiris/scoring-ui';
 import type { IrisGrade } from '@lumiris/types';
@@ -16,7 +12,6 @@ const GRADE_LABEL_EN: Record<IrisGrade, string> = {
 };
 
 interface GradeConfigEntry {
-    /** CSS color reference (uses the prismatic CSS var so theme switches stay in sync). */
     color: string;
     label: string;
     cssClass: string;

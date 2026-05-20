@@ -1,5 +1,3 @@
-// plans d'abonnement publiés sur /tarifs et /atelier
-
 export type AtelierPlanTier = 'solo' | 'studio' | 'maison';
 
 export interface AtelierPlan {

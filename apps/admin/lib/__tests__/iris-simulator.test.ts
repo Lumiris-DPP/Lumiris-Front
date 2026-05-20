@@ -1,5 +1,3 @@
-// What-if Iris : ajout cert GOTS sur fibre, marquage verified, ajout étape, remplissage care.
-
 import { describe, expect, it } from 'bun:test';
 import type { Material, Passport } from '@lumiris/types';
 import { applySimulatorChanges } from '../iris-simulator';

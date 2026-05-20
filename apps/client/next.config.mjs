@@ -15,6 +15,7 @@ const nextConfig = {
         '@lumiris/types',
         '@lumiris/mock-data',
         '@lumiris/telemetry',
+        '@lumiris/api-client',
     ],
     serverExternalPackages: [
         '@opentelemetry/sdk-node',
@@ -26,7 +27,11 @@ const nextConfig = {
         optimizePackageImports: ['lucide-react', '@lumiris/ui'],
     },
     images: {
-        unoptimized: true,
+        remotePatterns: [
+            { protocol: 'https', hostname: 'cdn.lumiris.local' },
+            { protocol: 'https', hostname: 'cdn.lumiris.eu' },
+            { protocol: 'http', hostname: 'localhost', port: '9000' },
+        ],
     },
 };
 

@@ -1,6 +1,5 @@
 import type { CertificationRef } from '@lumiris/types';
 
-// 12 certifs (8 Valid / 2 Expired / 2 Unverified) au mock NOW = 2026-04-30
 export const mockCertificates: readonly CertificationRef[] = [
     {
         id: 'cert-gots-marie-lin',
@@ -84,7 +83,6 @@ export const mockCertificates: readonly CertificationRef[] = [
         scope: 'Amélie Berthier - Lyon',
     },
 
-    // expired - ignorées par le scoring
     {
         id: 'cert-gots-pauline-expired',
         kind: 'GOTS',
@@ -106,7 +104,6 @@ export const mockCertificates: readonly CertificationRef[] = [
         scope: 'Laine vierge Reims',
     },
 
-    // unverified - comptées ×0.5
     {
         id: 'cert-custom-leila-unverified',
         kind: 'CUSTOM',

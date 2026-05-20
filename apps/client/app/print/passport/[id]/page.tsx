@@ -12,7 +12,6 @@ interface PageProps {
     params: Promise<{ id: string }>;
 }
 
-// V1 textile : fibres non-textile (cuir, bois, verre) volontairement sans label.
 const FIBER_LABEL_FR: Partial<Record<Material['fiber'], string>> = {
     wool: 'Laine',
     linen: 'Lin',

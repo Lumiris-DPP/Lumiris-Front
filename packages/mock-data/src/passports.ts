@@ -3,8 +3,6 @@ import { buildGS1Identifier } from '@lumiris/types';
 import { mockCertificateById } from './certificates';
 import { CHAUSSURE_CUIR_STEPS, CHEMISE_LIN_STEPS, PULL_LIN_STEPS, instantiateSteps } from './manufacturing-steps';
 
-// care helpers AGEC - texte clair par fibre dominante, pictogrammes officiels viendront en UI v2
-
 const CARE_LINEN: CareInstructions = {
     washing: 'Lavage 30 °C, programme délicat, lessive sans phosphates.',
     drying: "Séchage à plat, à l'abri du soleil direct.",
@@ -39,8 +37,6 @@ const CARE_LEATHER: CareInstructions = {
     ironing: 'Pas de repassage. Brossage doux pour redresser les fibres.',
     storage: 'Embauchoirs en bois pour les chaussures, housse coton pour le reste.',
 };
-
-// 20 passeports : 3 Draft / 5 InCompletion / 12 Published - grades émergent de computeScore()
 
 const certs = (...ids: readonly string[]) =>
     ids.map(mockCertificateById).filter((c): c is NonNullable<typeof c> => !!c);
@@ -101,7 +97,6 @@ export const mockPassports: readonly Passport[] = [
             repairabilityCommitment:
                 "Pièces détachées disponibles 10 ans. Tout défaut de couture est repris à l'atelier sans frais.",
         },
-        // Spec textile : care AGEC + déclarations impact (ACV interne courte chaîne).
         care: {
             washing: 'Lavage 30 °C, programme délicat, lessive sans phosphates.',
             drying: "Séchage à plat, à l'abri du soleil direct.",
@@ -242,7 +237,6 @@ export const mockPassports: readonly Passport[] = [
         carbonKg: 22.0,
         waterLiters: 2515,
         recycledPct: 0,
-        // Cachemire mongol - empreinte transport élevée mais déclarée publiquement.
         transportKm: 7100,
         moderation: { status: 'Approved', reviewerId: 'usr-fdr-juba', reviewedAt: '2026-04-02T10:00:00Z' },
     },
@@ -497,7 +491,6 @@ export const mockPassports: readonly Passport[] = [
         }),
         certifications: [],
         warranty: { durationMonths: 12, terms: 'Garantie 12 mois.' },
-        // Mix coton/soie : on conserve les conseils du fibre dominante (coton).
         care: CARE_COTTON,
         carbonKg: 2.0,
         waterLiters: 1584,
@@ -634,10 +627,7 @@ export const mockPassports: readonly Passport[] = [
             retailPrice: 220,
             currency: 'EUR',
         },
-        materials: [
-            // supplierId vide → AGEC manquant → cap-D
-            { fiber: 'linen', percentage: 100, supplierId: '', originCountry: 'FR', certifications: [] },
-        ],
+        materials: [{ fiber: 'linen', percentage: 100, supplierId: '', originCountry: 'FR', certifications: [] }],
         steps: instantiateSteps(CHEMISE_LIN_STEPS, {
             idPrefix: 'pass-leila-002',
             performedBy: 'Leïla Couture',
@@ -656,7 +646,6 @@ export const mockPassports: readonly Passport[] = [
         garment: {
             kind: 'sweater',
             reference: 'PUL-NIC-002',
-            // mainPhotoUrl vide → ESPR manquant → cap-D
             mainPhotoUrl: '',
             dimensions: { weightG: 460 },
             retailPrice: 165,
@@ -828,7 +817,6 @@ export function mockPassportById(id: string): Passport | undefined {
     return mockPassports.find((p) => p.id === id);
 }
 
-/** Lookup passeport par GTIN - tolère le leading zero manquant pour scanners qui le droppent. */
 export function mockPassportByGtin(gtin: string): Passport | undefined {
     if (!gtin) return undefined;
     const normalized = gtin.replace(/\D/g, '');

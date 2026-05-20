@@ -3,11 +3,9 @@ import type { AffiliationEvent } from '@lumiris/types';
 export const ANONYMISATION_THRESHOLD_DAYS = 30;
 export const NOW_REF = new Date('2026-04-30T08:00:00Z').getTime();
 
-// Burst: > 5 events / actor / 10 min (Chiffrage v4.2 § 7.4).
 const BURST_WINDOW_MS = 10 * 60_000;
 export const BURST_THRESHOLD = 5;
 
-// Geo improbable: 2 events > 500 km en < 1h pour un même userId.
 const GEO_DISTANCE_KM = 500;
 const GEO_TIME_MS = 60 * 60_000;
 
@@ -33,10 +31,7 @@ interface Coord {
     city: string;
 }
 
-// En prod chaque event porte sa géolocalisation IP. Ce mock attache une ville stable
-// par userId (utilisateur sédentaire) → la règle geo est armée mais ne flagge pas les patterns
-// existants. La fonction est isolée pour qu'un backend puisse la remplacer.
-// Typée comme tuple non-vide pour que `CITY_BANK[0]` soit garanti défini côté TS.
+// Mock géo : ville stable par userId (utilisateur sédentaire) — la règle geo est armée mais n'attrape pas les patterns existants ; à remplacer par la géoloc IP réelle.
 const CITY_BANK = [
     { lat: 48.86, lng: 2.35, city: 'Paris' },
     { lat: 43.3, lng: 5.37, city: 'Marseille' },

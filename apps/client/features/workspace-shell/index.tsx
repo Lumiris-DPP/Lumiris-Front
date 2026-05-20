@@ -27,7 +27,6 @@ interface NavItem {
     label: string;
     icon: React.ComponentType<{ className?: string }>;
     primary?: boolean;
-    /** Hidden until the atelier-billing store flags ATELIER+ for the current artisan. */
     plusOnly?: boolean;
 }
 

@@ -38,10 +38,8 @@ import { validateForPublish } from '@/lib/blog-validation';
 
 interface BlogEditorProps {
     article: BlogArticle;
-    /** Tous les articles existants - utilisé pour valider l'unicité du slug. */
     siblings: readonly BlogArticle[];
     onChange: (next: BlogArticle) => void;
-    /** Renvoie la liste des erreurs bloquantes pour la publication. */
     onValidationChange?: (errors: readonly string[]) => void;
     readOnly?: boolean;
 }
@@ -49,9 +47,7 @@ interface BlogEditorProps {
 interface ToolbarAction {
     icon: React.ComponentType<{ className?: string }>;
     label: string;
-    /** Insère du markdown autour de la sélection courante. */
     wrap?: { before: string; after: string };
-    /** Insère un bloc à la position du curseur. */
     insertLine?: string;
 }
 
@@ -69,7 +65,6 @@ export function BlogEditor({ article, siblings, onChange, onValidationChange, re
 
     const errors = useMemo(() => validateForPublish(article, siblings), [article, siblings]);
 
-    // Notifie le parent des erreurs (sans setState pour éviter les boucles).
     const lastReported = useRef<string>('');
     const serialized = errors.join('|');
     if (serialized !== lastReported.current) {
@@ -410,8 +405,6 @@ function Field({
         </div>
     );
 }
-
-// ─── Helpers exposés ────────────────────────────────────────────────────────
 
 interface StatusBadgeStyles {
     label: string;

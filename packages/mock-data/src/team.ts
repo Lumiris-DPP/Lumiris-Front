@@ -1,8 +1,6 @@
 import type { AdminProfile, ArtisanTier } from '@lumiris/types';
 import { mockArtisanById } from './artisans';
 
-// équipe interne pour timeline d'activité back-office - User.role limité à 3 valeurs (cf. AdminUserRole)
-
 export type TeamMemberRole = 'owner' | 'editor' | 'viewer';
 export type TeamMemberStatus = 'active' | 'pending';
 
@@ -11,7 +9,6 @@ export interface TeamMember {
     name: string;
     email: string;
     role: TeamMemberRole;
-    /** ISO date d'arrivée (ou date d'invitation si `pending`). */
     joinedAt: string;
     status: TeamMemberStatus;
 }
@@ -88,14 +85,13 @@ function pick<T>(arr: readonly T[], rng: () => number): T {
     return item;
 }
 
-/** Équipe ATELIER déterministe pour un artisan donné — vide si tier Solo. */
 export function generateInitialTeam(artisanId: string): TeamMember[] {
     const artisan = mockArtisanById(artisanId);
     if (!artisan) return [];
     if (artisan.tier !== 'Studio' && artisan.tier !== 'Maison') return [];
 
     const rng = mulberry32(hashString(artisanId));
-    const count = 3 + Math.floor(rng() * 3); // 3..5 inclus
+    const count = 3 + Math.floor(rng() * 3);
     const domain = slug(artisan.atelierName) || 'atelier';
     const ownerEmail = `${slug(artisan.displayName).replace(/-/g, '.')}@${domain}.fr`;
 
@@ -133,7 +129,6 @@ export interface MockTeamActivityEntry {
     id: string;
     actorId: string;
     actorName: string;
-    /** Rôle d'affichage interne - distinct de UserRole, sert à la timeline. */
     role: 'admin';
     action: string;
     targetType: 'passport' | 'artisan' | 'journal' | 'repairer';

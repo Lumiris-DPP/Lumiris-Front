@@ -87,7 +87,6 @@ interface CertificateFormProps {
     submitLabel: string;
     onSubmit: (values: CertificateFormValues) => void;
     onCancel: () => void;
-    /** Si vrai, le champ "Type" est désactivé (renew → on ne change pas le type). */
     lockKind?: boolean;
 }
 

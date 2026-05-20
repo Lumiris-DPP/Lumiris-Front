@@ -19,6 +19,7 @@ const nextConfig = {
         '@lumiris/core',
         '@lumiris/types',
         '@lumiris/telemetry',
+        '@lumiris/api-client',
         'react-leaflet',
         '@react-leaflet/core',
     ],
@@ -32,8 +33,12 @@ const nextConfig = {
         optimizePackageImports: ['lucide-react', '@lumiris/ui'],
     },
     images: {
-        unoptimized: true,
-        remotePatterns: [{ protocol: 'https', hostname: 'placehold.co' }],
+        remotePatterns: [
+            { protocol: 'https', hostname: 'placehold.co' },
+            { protocol: 'https', hostname: 'cdn.lumiris.local' },
+            { protocol: 'https', hostname: 'cdn.lumiris.eu' },
+            { protocol: 'http', hostname: 'localhost', port: '9000' },
+        ],
     },
 };
 

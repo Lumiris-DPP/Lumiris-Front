@@ -8,7 +8,14 @@ const nextConfig = {
     reactStrictMode: true,
     output: 'standalone',
     outputFileTracingRoot: path.resolve(__dirname, '../..'),
-    transpilePackages: ['@lumiris/ui', '@lumiris/scoring-ui', '@lumiris/core', '@lumiris/types', '@lumiris/telemetry'],
+    transpilePackages: [
+        '@lumiris/ui',
+        '@lumiris/scoring-ui',
+        '@lumiris/core',
+        '@lumiris/types',
+        '@lumiris/telemetry',
+        '@lumiris/api-client',
+    ],
     serverExternalPackages: [
         '@opentelemetry/sdk-node',
         '@opentelemetry/auto-instrumentations-node',
@@ -19,7 +26,11 @@ const nextConfig = {
         optimizePackageImports: ['lucide-react', '@lumiris/ui'],
     },
     images: {
-        unoptimized: true,
+        remotePatterns: [
+            { protocol: 'https', hostname: 'cdn.lumiris.local' },
+            { protocol: 'https', hostname: 'cdn.lumiris.eu' },
+            { protocol: 'http', hostname: 'localhost', port: '9000' },
+        ],
     },
 };
 

@@ -16,7 +16,6 @@ export const PLUS_ADDON = 19;
 
 const NINETY_DAYS_MS = 90 * 86_400_000;
 
-/** Tier directement supérieur si une migration upsell a du sens (Solo→Studio, Studio→Maison). */
 function nextTier(tier: ArtisanTier): ArtisanTier | null {
     if (tier === 'Solo') return 'Studio';
     if (tier === 'Studio') return 'Maison';
@@ -32,11 +31,9 @@ export interface ArtisanRow {
     flaggedShare: number;
     health: HealthBreakdown;
     overrideCount90d: number;
-    /** Mois d'inscription au format `YYYY-MM` (cohorte). */
     cohortMonth: string;
-    /** Offset en mois par rapport à `now` - 0 = mois courant, -3 = inscrit il y a 3 mois. */
+    /** Offset en mois par rapport à `now` (0 = mois courant, -3 = il y a 3 mois). */
     cohortOffset: number;
-    /** Tier conseillé si l'artisan dépasse 80% de sa limite, sinon `null`. */
     upgradeHint: ArtisanTier | null;
     mrr: number;
 }
@@ -140,25 +137,15 @@ export function buildArtisanRow(
 }
 
 export interface CohortBucketMetrics {
-    /** Étiquette compacte `M-3`, `M-6`, `M-12`. */
     label: string;
-    /** Seuil d'ancienneté en mois (positif). */
     monthsAgo: number;
     cohortSize: number;
-    /** Net Revenue Retention - MRR retenu / MRR initial, en pourcentage. */
     nrr: number;
-    /** Nombre d'artisans de la cohorte ayant activé ATELIER+ (proxy d'expansion). */
     expansion: number;
-    /** Nombre de souscriptions `canceled` dans la cohorte. */
     churn: number;
 }
 
-/**
- * Calcule NRR / expansion / churn pour des cohortes définies par ancienneté (M-3, M-6, M-12).
- * Une cohorte M-X = artisans inscrits il y a >= X mois. L'absence d'historique de tier nous
- * force à supposer que le tier actuel est celui de souscription : l'expansion réelle est
- * donc proxiée par l'activation d'ATELIER+.
- */
+/** Cohorte M-X = artisans inscrits il y a ≥ X mois ; expansion proxiée par ATELIER+ faute d'historique de tier. */
 export function computeCohortMetrics(
     artisans: readonly Artisan[],
     subscriptions: readonly Subscription[],
@@ -188,7 +175,6 @@ export function computeCohortMetrics(
     });
 }
 
-/** Liste les mois de souscription distincts présents dans la base (triés du plus récent au plus ancien). */
 export function listCohortMonths(artisans: readonly Artisan[]): readonly string[] {
     const set = new Set<string>();
     artisans.forEach((a) => set.add(monthKey(a.joinedAt)));

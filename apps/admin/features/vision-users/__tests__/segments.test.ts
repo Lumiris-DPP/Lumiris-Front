@@ -1,6 +1,3 @@
-// Vision Users — segmentation, RGPD, documents et KPIs ARPU.
-// Pur, sans React. Toutes les dates sont injectées.
-
 import { describe, expect, it } from 'bun:test';
 import type { MockVisionUser } from '@lumiris/mock-data';
 import {
@@ -252,7 +249,6 @@ describe('getDocuments — metadata only, jamais de payload', () => {
         for (const doc of docs) {
             const keys = Object.keys(doc).sort();
             expect(keys).toEqual(['id', 'productLabel', 'sizeBytes', 'type', 'uploadedAt']);
-            // Aucun champ payload / url / blob
             expect(doc).not.toHaveProperty('url');
             expect(doc).not.toHaveProperty('downloadUrl');
             expect(doc).not.toHaveProperty('blob');

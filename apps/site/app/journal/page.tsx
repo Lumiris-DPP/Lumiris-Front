@@ -10,8 +10,6 @@ export const metadata: Metadata = {
 };
 
 export default function JournalPage() {
-    // Le composant MDX (`Component`) ne peut pas traverser la frontière server→client : on
-    // passe uniquement les métadonnées sérialisables au client.
     const articles: ArticleMeta[] = getAllArticles().map(({ Component, ...meta }) => {
         void Component;
         return meta;

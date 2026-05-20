@@ -1,10 +1,7 @@
-// villes des fixtures - pins carte SVG + distance approx à vol d'oiseau pour /local
-
 export interface CityCoords {
     name: string;
     lat: number;
     lng: number;
-    /** Premier chiffre du code postal pour le matching ?cp=. */
     postalPrefix?: string;
 }
 
@@ -23,7 +20,6 @@ export const CITY_COORDS: Record<string, CityCoords> = {
     Paris: { name: 'Paris', lat: 48.857, lng: 2.351, postalPrefix: '75' },
 };
 
-/** Mapping postal prefix (premier ou deux chiffres) → ville représentative. */
 export const POSTAL_PREFIX_TO_CITY: Record<string, string> = {
     '29': 'Quimper',
     '69': 'Lyon',
@@ -37,7 +33,6 @@ export const POSTAL_PREFIX_TO_CITY: Record<string, string> = {
     '75': 'Paris',
 };
 
-/** Distance grand-cercle en km (approximation Haversine). */
 export function distanceKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
     const R = 6371;
     const toRad = (deg: number) => (deg * Math.PI) / 180;
@@ -49,7 +44,6 @@ export function distanceKm(a: { lat: number; lng: number }, b: { lat: number; ln
     return Math.round(2 * R * Math.asin(Math.sqrt(h)));
 }
 
-/** Récupère la ville centrale associée à un code postal. */
 export function cityFromPostalCode(cp: string | undefined | null): CityCoords | undefined {
     if (!cp) return undefined;
     const trimmed = cp.trim();

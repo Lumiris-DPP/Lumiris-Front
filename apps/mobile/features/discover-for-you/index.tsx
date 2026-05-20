@@ -30,8 +30,6 @@ export function DiscoverForYou() {
     const [showStyleToast, setShowStyleToast] = useState(false);
     const [filter, setFilter] = useState<CategoryFilter>('all');
 
-    // Redirect doux côté client - le serveur peut pré-rendre la page (statique export Tauri),
-    // mais l'état d'auth n'est connu qu'au mount.
     useEffect(() => {
         if (!isAuthenticated) router.replace('/auth');
     }, [isAuthenticated, router]);

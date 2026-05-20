@@ -1,6 +1,4 @@
-// Tri par grade puis prix croissant. AUCUNE pondération ATELIER+, AUCUNE commission.
-// Cf. cahier §10 « mise en avant à score équivalent uniquement, indépendant des commissions ».
-// Toute modification qui introduit un poids commercial doit faire l'objet d'une revue produit.
+// INVARIANT cahier §10 : aucune pondération commerciale ; tri par grade puis prix croissant.
 
 import { mockPassports } from '@lumiris/mock-data';
 import type { Passport, ScoreResult } from '@lumiris/types';
@@ -11,7 +9,6 @@ interface AlternativeMatch {
     score: ScoreResult;
 }
 
-// Renvoie des pièces A/B du même `garment.kind`, triées par grade puis prix croissant.
 export function findAlternatives(source: Passport, now: Date, limit = 6): readonly AlternativeMatch[] {
     return mockPassports
         .filter((p) => p.id !== source.id && p.garment.kind === source.garment.kind && p.status === 'Published')

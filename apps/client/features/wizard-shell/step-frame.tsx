@@ -13,7 +13,6 @@ interface WizardStepFrameProps {
     onPrev?: () => void;
     onNext?: () => void;
     nextLabel?: string;
-    /** Missing field labels - when non-empty disables Next and surfaces tooltip. */
     nextMissing?: string[];
     contentClassName?: string;
     children: React.ReactNode;

@@ -10,7 +10,6 @@ export const ESPR_TEXTILE_TIMELINE: readonly RegulatoryMilestone[] = [
     { date: '2028-H2', label: 'Application effective DPP textile (TPE incluses)', scope: 'EU' },
 ];
 
-/** Fenêtre commerciale "anticipez" — court jusqu'à l'application effective ESPR (mi-2028). */
 export function isEsprWindowActive(now: Date): boolean {
     return now.getFullYear() < 2028;
 }

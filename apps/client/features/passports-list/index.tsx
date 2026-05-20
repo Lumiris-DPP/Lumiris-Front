@@ -112,7 +112,6 @@ export function PassportsList() {
     const safePage = Math.min(page, pageCount);
     const visible = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
-    // Lecture défensive : si atelier-billing n'a pas la clé, bandeau muet (pas de fallback synthétique).
     const billing = useBillingStore((s) => s.byArtisan[artisan.id]);
     const tier: ArtisanTier | null = billing?.tier ?? null;
     const quota = tier ? ARTISAN_PASSPORT_LIMIT[tier] : Number.NaN;
@@ -128,7 +127,6 @@ export function PassportsList() {
     };
 
     const handleDuplicate = (source: Passport) => {
-        // Draft local prioritaire sur le snapshot mock — sinon on copierait un état figé.
         const draftSource = drafts[source.id];
         const newId = createDraft(artisan.id);
         setDraft(newId, {
@@ -138,7 +136,6 @@ export function PassportsList() {
             steps: draftSource ? [...draftSource.steps] : [...source.steps],
             certifications: draftSource ? [...draftSource.certifications] : [...source.certifications],
             warranty: { ...source.warranty },
-            // GS1 reset : un brouillon ne doit pas hériter du gtin/serial d'un passeport publié.
             gs1: buildGS1Identifier('0000000000000', newId),
             lastStep: undefined,
         });

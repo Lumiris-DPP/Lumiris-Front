@@ -1,6 +1,4 @@
-// Score équivalent pour les DPP non-LUMIRIS lus par VISION (cahier §8).
-// Réutilise les poids 40/25/25/10 et la logique de plafond D, mais adapte les
-// pilotes aux champs standardisés ESPR : on ne touche jamais à @lumiris/core/scoring.
+// Réutilise les poids 40/25/25/10 de @lumiris/core, adapté aux champs ESPR (DPP non-LUMIRIS).
 
 import { LUMIRIS_WEIGHTS } from '@lumiris/core/scoring';
 import { toIrisGrade } from '@lumiris/core/scoring';
@@ -14,8 +12,7 @@ import type {
     ScoreResult,
 } from '@lumiris/types';
 
-// Plafond carbone "neutre" par secteur (kg CO₂e). Au-delà → sous-score carbone = 0.
-// Sources : ADEME Base Empreinte 2024 + ICT Footprint v3 + Higg MSI v3.5.
+// Sources : ADEME Base Empreinte 2024 + ICT Footprint v3 + Higg MSI v3.5. Au-delà → sous-score = 0.
 const CARBON_CEILING_BY_SECTOR: Record<ExternalDppSector, number> = {
     electronics: 80,
     appliance: 800,
@@ -25,8 +22,6 @@ const CARBON_CEILING_BY_SECTOR: Record<ExternalDppSector, number> = {
     textile: 12,
 };
 
-// Labels secteur-agnostiques considérés "savoir-faire" - ESPR + référentiels publics
-// (à étoffer plus tard si on rapatrie des labels d'un autre référentiel).
 const CRAFTSMANSHIP_LABELS = [
     'EPV',
     'OFG',
@@ -42,7 +37,6 @@ const CRAFTSMANSHIP_LABELS = [
 
 interface MissingField {
     path: string;
-    /** ESPR (obligatoire pour tous DPP) ou AGEC (français, hors VISION → ignoré ici). */
     spec: 'ESPR';
 }
 
@@ -77,14 +71,12 @@ interface AxisOutput {
     reasons: ScoreReason[];
 }
 
-// Transparence 40% - présence origine, certifications valides, complétude matières.
 function scoreTransparency(dpp: ExternalDpp, now: Date): AxisOutput {
     const reasons: ScoreReason[] = [];
     const axis: IrisAxis = 'transparency';
 
     let score = 0;
 
-    // Origine pays + région : 25 points.
     if (dpp.origin?.country) {
         const originScore = dpp.origin.region ? 25 : 18;
         score += originScore;
@@ -99,7 +91,6 @@ function scoreTransparency(dpp: ExternalDpp, now: Date): AxisOutput {
         reasons.push({ axis, message: "Pays d'origine non renseigné.", severity: 'warn' });
     }
 
-    // Certifications valides au temps `now` : jusqu'à 40 points (palier 10 / 25 / 40).
     const validCerts = dpp.certifications.filter((c) => {
         if (!c.validUntil) return true;
         const exp = new Date(c.validUntil);
@@ -118,7 +109,6 @@ function scoreTransparency(dpp: ExternalDpp, now: Date): AxisOutput {
         reasons.push({ axis, message: `${validCerts.length} certifications valides.`, severity: 'info' });
     }
 
-    // Complétude matières : 35 points si somme = 100 et toutes les lignes ont une part.
     if (dpp.materials.length > 0) {
         const sum = dpp.materials.reduce((s, m) => s + (m.percentage ?? 0), 0);
         const balanced = Math.abs(sum - 100) < 1 && dpp.materials.every((m) => (m.percentage ?? 0) > 0);
@@ -144,7 +134,6 @@ function scoreTransparency(dpp: ExternalDpp, now: Date): AxisOutput {
     return { score: clamp(score), reasons };
 }
 
-// Savoir-faire 25% - labels reconnus + garantie longue.
 function scoreCraftsmanship(dpp: ExternalDpp, now: Date): AxisOutput {
     const reasons: ScoreReason[] = [];
     const axis: IrisAxis = 'craftsmanship';
@@ -185,7 +174,6 @@ function scoreCraftsmanship(dpp: ExternalDpp, now: Date): AxisOutput {
     return { score: clamp(score), reasons };
 }
 
-// Impact 25% - empreinte carbone (rang sectoriel) + part recyclée.
 function scoreImpact(dpp: ExternalDpp): AxisOutput {
     const reasons: ScoreReason[] = [];
     const axis: IrisAxis = 'impact';
@@ -205,7 +193,6 @@ function scoreImpact(dpp: ExternalDpp): AxisOutput {
         reasons.push({ axis, message: 'Empreinte carbone non déclarée.', severity: 'warn' });
     }
 
-    // Part recyclée pondérée par la part matière de chaque ligne.
     const totalShare = dpp.materials.reduce((s, m) => s + (m.percentage ?? 0), 0);
     const recycledWeighted = dpp.materials.reduce(
         (s, m) => s + ((m.recycledShare ?? 0) * (m.percentage ?? 0)) / 100,
@@ -227,7 +214,6 @@ function scoreImpact(dpp: ExternalDpp): AxisOutput {
     return { score: clamp(score), reasons };
 }
 
-// Réparabilité 10% - index FR + garantie longue.
 function scoreRepairability(dpp: ExternalDpp): AxisOutput {
     const reasons: ScoreReason[] = [];
     const axis: IrisAxis = 'repairability';
@@ -256,11 +242,6 @@ function scoreRepairability(dpp: ExternalDpp): AxisOutput {
     return { score: clamp(score), reasons };
 }
 
-/**
- * Calcule un ScoreResult équivalent à computeScore() de @lumiris/core, mais à partir
- * d'un ExternalDpp ESPR. Mêmes poids 40/25/25/10, même typage `ScoreResult` →
- * réutilisable par `IrisGrade`, `ScoreBreakdown`, `ScoreReasonsList`.
- */
 export function computeExternalScore(dpp: ExternalDpp, now: Date = new Date()): ScoreResult {
     const transparency = scoreTransparency(dpp, now);
     const craftsmanship = scoreCraftsmanship(dpp, now);

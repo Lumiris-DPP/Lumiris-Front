@@ -1,5 +1,3 @@
-// libellés/poids des piliers Iris pour vitrine - calcul dans @lumiris/core
-
 import type { IrisAxis } from './score';
 
 export interface IrisPillarDefinition {

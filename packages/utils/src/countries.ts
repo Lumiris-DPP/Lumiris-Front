@@ -1,10 +1,7 @@
-/** Sous-ensemble ISO 3166-1 alpha-2 des pays utiles à l'atelier textile artisanal FR. */
 export interface Country {
     code: string;
     label: string;
-    /** Latitude WGS84 du centroïde — utilisée par la mini-carte des origines. */
     latitude?: number;
-    /** Longitude WGS84 du centroïde — utilisée par la mini-carte des origines. */
     longitude?: number;
 }
 

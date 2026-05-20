@@ -6,23 +6,19 @@ import type { IrisGrade as IrisGradeLetter } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
 import { gradeBackgroundSolid, gradeColor } from '../theme/grade-color';
 
-/** Item Garde-Robe - projection Passport ou fallback manuel injecté par le caller. */
 export interface WardrobeCardItem {
     id: string;
     name: string;
     brand: string;
     grade: IrisGradeLetter;
-    /** 0–100 - drives the bar fill. */
     score: number;
     price?: number;
     currencySymbol?: string;
-    /** Présent quand l'item provient d'un Passport. */
     passportId?: string;
 }
 
 export interface WardrobeProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onSelect'> {
     items: readonly WardrobeCardItem[];
-    /** `compact` = ligne marketing horizontale, `cozy` = grille 2 colonnes (default). */
     density?: 'compact' | 'cozy';
     onSelect?: (item: WardrobeCardItem) => void;
     selectedIds?: readonly string[];

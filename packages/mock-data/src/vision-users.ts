@@ -1,19 +1,14 @@
 import type { ConsumerProfile } from '@lumiris/types';
 
-// vision users - Garde-Robe + Iris Scanner ; admin ne voit jamais les anon individuellement (RGPD)
-
 export interface MockRgpdRequest {
-    /** Type RGPD attendu côté DPO. */
     kind: 'export' | 'erase';
     requestedAt: string;
     status: 'pending' | 'completed';
 }
 
 export interface MockVisionUser extends ConsumerProfile {
-    /** Optionnelle - uniquement quand le user accepte de partager sa ville. */
     city?: string;
     rgpdRequests?: readonly MockRgpdRequest[];
-    /** Marqueur d'anonymisation post-effacement RGPD. */
     erased?: boolean;
 }
 
@@ -161,7 +156,6 @@ export const mockVisionUsers: readonly MockVisionUser[] = [
         consentAffiliation: true,
         city: 'Paris',
     },
-    // Inactif > 60 j → tombe dans le segment "Risque churn" côté admin Vision Users.
     {
         id: 'VIS-072',
         role: 'consumer',
@@ -177,7 +171,6 @@ export const mockVisionUsers: readonly MockVisionUser[] = [
         city: 'Nantes',
     },
 
-    // anon - jamais listés individuellement (RGPD)
     {
         id: 'VIS-A-001',
         role: 'consumer',
@@ -224,7 +217,6 @@ export function mockVisionUserById(id: string): MockVisionUser | undefined {
     return mockVisionUsers.find((u) => u.id === id);
 }
 
-/** Compte d'utilisateurs avec compte (anon=false). Sert au panel agrégé du module Vision Users. */
 export function visionUsersWithAccount(): readonly MockVisionUser[] {
     return mockVisionUsers.filter((u) => !u.anon);
 }

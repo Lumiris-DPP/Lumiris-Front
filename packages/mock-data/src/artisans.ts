@@ -2,7 +2,6 @@ import type { Artisan } from '@lumiris/types';
 import { ARTISAN_PASSPORT_LIMIT } from '@lumiris/types';
 import { slugify } from '@lumiris/utils';
 
-// 12 artisans (8 Solo / 3 Studio / 1 Maison, 4 EPV) - personas Marie + Théo inclus
 export const mockArtisans: readonly Artisan[] = [
     {
         id: 'art-marie',

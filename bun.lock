@@ -29,6 +29,7 @@
       "name": "@lumiris/admin",
       "version": "0.1.0",
       "dependencies": {
+        "@lumiris/api-client": "workspace:*",
         "@lumiris/core": "workspace:*",
         "@lumiris/mock-data": "workspace:*",
         "@lumiris/scoring-ui": "workspace:*",
@@ -63,6 +64,7 @@
       "name": "@lumiris/client",
       "version": "0.1.0",
       "dependencies": {
+        "@lumiris/api-client": "workspace:*",
         "@lumiris/core": "workspace:*",
         "@lumiris/mock-data": "workspace:*",
         "@lumiris/scoring-ui": "workspace:*",
@@ -95,6 +97,7 @@
       "name": "@lumiris/mobile",
       "version": "0.1.0",
       "dependencies": {
+        "@lumiris/api-client": "workspace:*",
         "@lumiris/core": "workspace:*",
         "@lumiris/mock-data": "workspace:*",
         "@lumiris/scoring-ui": "workspace:*",
@@ -130,6 +133,7 @@
       "name": "@lumiris/site",
       "version": "0.1.0",
       "dependencies": {
+        "@lumiris/api-client": "workspace:*",
         "@lumiris/mock-data": "workspace:*",
         "@lumiris/scoring-ui": "workspace:*",
         "@lumiris/telemetry": "workspace:*",
@@ -160,6 +164,34 @@
         "rimraf": "^6.0.1",
         "typescript": "^5.7.3",
       },
+    },
+    "packages/api-client": {
+      "name": "@lumiris/api-client",
+      "version": "0.1.0",
+      "dependencies": {
+        "@lumiris/types": "workspace:*",
+      },
+      "devDependencies": {
+        "@lumiris/config": "workspace:*",
+        "@tanstack/react-query": "^5.62.0",
+        "@tanstack/react-query-devtools": "^5.62.0",
+        "@types/node": "^22.10.0",
+        "@types/react": "^19",
+        "eslint": "^9.17.0",
+        "react": "^19",
+        "rimraf": "^6.0.1",
+        "typescript": "^5.7.3",
+      },
+      "peerDependencies": {
+        "@tanstack/react-query": "^5.62.0",
+        "@tanstack/react-query-devtools": "^5.62.0",
+        "react": "^19",
+      },
+      "optionalPeers": [
+        "@tanstack/react-query",
+        "@tanstack/react-query-devtools",
+        "react",
+      ],
     },
     "packages/config": {
       "name": "@lumiris/config",
@@ -578,6 +610,8 @@
     "@lhci/utils": ["@lhci/utils@0.14.0", "", { "dependencies": { "debug": "^4.3.1", "isomorphic-fetch": "^3.0.0", "js-yaml": "^3.13.1", "lighthouse": "12.1.0", "tree-kill": "^1.2.1" } }, "sha512-LyP1RbvYQ9xNl7uLnl5AO8fDRata9MG/KYfVFKFkYenlsVS6QJsNjLzWNEoMIaE4jOPdQQlSp4tO7dtnyDxzbQ=="],
 
     "@lumiris/admin": ["@lumiris/admin@workspace:apps/admin"],
+
+    "@lumiris/api-client": ["@lumiris/api-client@workspace:packages/api-client"],
 
     "@lumiris/client": ["@lumiris/client@workspace:apps/client"],
 
@@ -1056,6 +1090,14 @@
     "@tailwindcss/oxide-win32-x64-msvc": ["@tailwindcss/oxide-win32-x64-msvc@4.2.4", "", { "os": "win32", "cpu": "x64" }, "sha512-ESlKG0EpVJQwRjXDDa9rLvhEAh0mhP1sF7sap9dNZT0yyl9SAG6T7gdP09EH0vIv0UNTlo6jPWyujD6559fZvw=="],
 
     "@tailwindcss/postcss": ["@tailwindcss/postcss@4.2.4", "", { "dependencies": { "@alloc/quick-lru": "^5.2.0", "@tailwindcss/node": "4.2.4", "@tailwindcss/oxide": "4.2.4", "postcss": "^8.5.6", "tailwindcss": "4.2.4" } }, "sha512-wgAVj6nUWAolAu8YFvzT2cTBIElWHkjZwFYovF+xsqKsW2ADxM/X2opxj5NsF/qVccAOjRNe8X2IdPzMsWyHTg=="],
+
+    "@tanstack/query-core": ["@tanstack/query-core@5.100.11", "", {}, "sha512-lmE0994apShXPj8CUxgx4ch5yUJhE9k/+tVwihBvPOyerACWdBocfFg24t8+0RhtlTd7tEgchDkhlCxNssvDxw=="],
+
+    "@tanstack/query-devtools": ["@tanstack/query-devtools@5.100.11", "", {}, "sha512-47rVBDuGMW/A4ekt3YQdz+q0JSIwktwGnWCYyQUvSs2/g/Oa+6Fi2/IQk4/Y4vf6u1uwI7hOogHslgMC8f3X/Q=="],
+
+    "@tanstack/react-query": ["@tanstack/react-query@5.100.11", "", { "dependencies": { "@tanstack/query-core": "5.100.11" }, "peerDependencies": { "react": "^18 || ^19" } }, "sha512-J0f9s5x3LE1450nNNfYx+e/n0DMa0uOBdFJUy5r0RvmsXd4nB/n0rbHtHI1vYXhikNFan+wf51p6Tmp4c8ucrg=="],
+
+    "@tanstack/react-query-devtools": ["@tanstack/react-query-devtools@5.100.11", "", { "dependencies": { "@tanstack/query-devtools": "5.100.11" }, "peerDependencies": { "@tanstack/react-query": "^5.100.11", "react": "^18 || ^19" } }, "sha512-75RFlJEG53Ed/Cxe5WLmgIpOElPNpgLZq7h0fLFnM5XwTYxSTk1rX/gC6MqGVXsSdrbP7zn7hPSJx9MinwiUHA=="],
 
     "@tauri-apps/api": ["@tauri-apps/api@2.11.0", "", {}, "sha512-7CinYODhky9lmO23xHnUFv0Xt43fbtWMyxZcLcRBlFkcgXKuEirBvHpmtJ89YMhyeGcq20Wuc47Fa4XjyniywA=="],
 

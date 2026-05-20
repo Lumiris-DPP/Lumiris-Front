@@ -10,11 +10,9 @@ import { ScoreCapWarning } from './score-cap-warning';
 
 export interface IrisScoreCardProps extends HTMLAttributes<HTMLDivElement> {
     score: ScoreResult;
-    /** Si vrai, affiche en grisé - passeport en cours de complétion. */
     muted?: boolean;
 }
 
-// carte synthèse Score Iris (vitrine + atelier) - DOM statique, pas d'animation above-the-fold (Lighthouse)
 export function IrisScoreCard({ score, muted = false, className, ...rest }: IrisScoreCardProps) {
     return (
         <div

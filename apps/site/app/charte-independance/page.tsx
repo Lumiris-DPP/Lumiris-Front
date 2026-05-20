@@ -49,15 +49,11 @@ const SOURCE_REPO_URL = 'https://github.com/lumiris-fr/lumiris';
 
 interface BaselineRelease {
     version: string;
-    /** ISO date d'entrée en vigueur. Toujours ≥ 90 j après l'annonce. */
     effectiveAt: string;
     summary: string;
-    /** Liste plate des changements appliqués. */
     changes: readonly string[];
 }
 
-// Changelog versionné des datasets baseline qui pondèrent l'algo Iris (carbone, eau, seuils ESPR).
-// Toute modification d'un coefficient est annoncée 90 j avant son entrée en vigueur - voir article 5.
 const BASELINE_RELEASES: readonly BaselineRelease[] = [
     {
         version: 'v1.2.0',

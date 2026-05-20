@@ -11,11 +11,8 @@ type PaymentEntryKind = 'plan' | 'atelier-plus';
 
 interface PaymentEntry {
     id: string;
-    /** ISO date. */
     date: string;
-    /** Montant en euros. */
     amount: number;
-    /** Libellé humain : "Studio (mensuel)", "ATELIER+", … */
     plan: string;
     status: 'paid';
     kind: PaymentEntryKind;
@@ -68,7 +65,6 @@ export function planYearly(tier: ArtisanTier): number {
     return plan?.yearlyEur ?? 0;
 }
 
-/** Tarif final selon le cycle, déjà arrondi à l'entier. */
 export function planAmount(tier: ArtisanTier, cycle: BillingCycle): number {
     return cycle === 'annual' ? planYearly(tier) : planMonthly(tier);
 }
@@ -155,7 +151,6 @@ export const useBillingStore = create<BillingStoreState>()(
                             },
                         };
                     }
-                    // OFF → retire la dernière entrée ATELIER+ pour éviter de laisser un "fantôme" en historique.
                     const idx = cur.invoiceHistory.findIndex((e) => e.kind === 'atelier-plus');
                     const nextHistory =
                         idx === -1 ? cur.invoiceHistory : cur.invoiceHistory.filter((_, i) => i !== idx);

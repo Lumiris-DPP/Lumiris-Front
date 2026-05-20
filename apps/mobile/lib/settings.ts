@@ -1,9 +1,5 @@
 'use client';
 
-// Préférences UI (apparence + notifs) - persistance localStorage en mode démo.
-// L'identité utilisateur (`displayName`, `email`, `city`) reste dans `lib/auth`
-// (cf. `MockUser`) ; ce module ne stocke que ce qui n'a pas de propriétaire backend.
-
 import { useSyncExternalStore } from 'react';
 import { readUser } from './auth/storage';
 import { USER_KEYS, userScopedKey } from './storage-keys';
@@ -65,7 +61,6 @@ function read(): Settings {
         const raw = window.localStorage.getItem(currentKey());
         if (!raw) return DEFAULT_SETTINGS;
         const parsed: unknown = JSON.parse(raw);
-        // Merge avec les defaults - préserve forward-compat si une nouvelle clé est ajoutée.
         return { ...DEFAULT_SETTINGS, ...pickSettings(parsed) };
     } catch {
         return DEFAULT_SETTINGS;

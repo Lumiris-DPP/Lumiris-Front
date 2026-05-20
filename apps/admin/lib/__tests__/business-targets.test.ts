@@ -131,7 +131,6 @@ describe('monthlyCostEur — palier-courbe Chiffrage v4.2 § 7', () => {
     it('charges cumulées M0→M18 dans la fourchette ~235 k€', () => {
         let sum = 0;
         for (let m = 1; m <= 18; m++) sum += monthlyCostEur(m);
-        // Tolérance large (calibration du modèle ≠ cible commerciale).
         expect(sum).toBeGreaterThan(CHARGES_CUMULATIVE_M18_EUR * 0.85);
         expect(sum).toBeLessThan(CHARGES_CUMULATIVE_M18_EUR * 1.5);
     });

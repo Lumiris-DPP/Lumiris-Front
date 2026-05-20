@@ -55,7 +55,6 @@ interface ContactDialogProps {
     artisan: Artisan;
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    /** Si fourni, pré-sélectionne `capacity-upgrade` quand l'artisan dépasse 80% du plafond. */
     upgradeHint?: ArtisanTier | null;
 }
 

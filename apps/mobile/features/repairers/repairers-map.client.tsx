@@ -10,7 +10,7 @@ interface RepairerMapPin {
     lat: number;
     lng: number;
     label: string;
-    /** Atelier "LUMIRIS Local" - pin doré au lieu du cyan. */
+    /** Atelier "LUMIRIS Local" — pin doré. */
     highlighted?: boolean;
 }
 
@@ -59,7 +59,7 @@ function FitBounds({ pins }: { pins: readonly RepairerMapPin[] }) {
 }
 
 export function RepairersMapClient({ pins, activeId, onMarkerClick }: RepairersMapClientProps) {
-    const fallback = useMemo<[number, number]>(() => [46.6, 2.5], []); // Centre France
+    const fallback = useMemo<[number, number]>(() => [46.6, 2.5], []);
     const initial = pins[0] ? ([pins[0].lat, pins[0].lng] as [number, number]) : fallback;
     const markerRefs = useRef<Map<string, L.Marker>>(new Map());
 

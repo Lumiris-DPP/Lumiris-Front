@@ -9,9 +9,7 @@ import { cn } from '@lumiris/ui/lib/cn';
 
 export interface CompositionListProps extends HTMLAttributes<HTMLDivElement> {
     composition: readonly Material[];
-    /** Date utilisée pour calculer le statut effectif des certifications. */
     now: Date;
-    /** Optionnel - résolveur d'un fournisseur depuis son id (pour afficher le nom). */
     resolveSupplier?: (supplierId: string) => string | undefined;
 }
 
@@ -81,7 +79,6 @@ function CertChip({ cert, now }: { cert: CertificationRef; now: Date }) {
     const expired = status === 'Expired';
     const unverified = status === 'Unverified';
     const Icon = expired ? ShieldX : ShieldCheck;
-    // contraste WCAG AA via text-foreground ; statut porté par icône+bordure+fond (Lighthouse v13)
     return (
         <Badge
             variant="outline"

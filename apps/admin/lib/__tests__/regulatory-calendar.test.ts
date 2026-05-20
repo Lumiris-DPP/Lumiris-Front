@@ -1,5 +1,3 @@
-// Countdown ESPR + détection des champs manquants — date système injectée via prop.
-
 import { describe, expect, it } from 'bun:test';
 import {
     REGULATORY_MILESTONES,
@@ -32,7 +30,7 @@ describe('daysUntil — clock injectée via prop now', () => {
     });
 
     it("renvoie un nombre négatif après l'échéance (registre déjà ouvert)", () => {
-        const ms = milestoneFor('AGEC-2025-LABEL'); // 2025-01-01
+        const ms = milestoneFor('AGEC-2025-LABEL');
         const after = new Date('2026-04-30T00:00:00Z');
         expect(daysUntil(ms, after)).toBeLessThan(0);
     });

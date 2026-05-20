@@ -1,7 +1,3 @@
-// Persistance locale du flag onboarding (clé `lumiris.onboarding.completed.v1`).
-// Stocke uniquement '1' / absence - pas besoin de structure plus riche pour un boolean.
-// Bucket device-global : l'onboarding produit n'est pas une donnée perso.
-
 import { DEVICE_KEYS } from '../storage-keys';
 
 const KEY = DEVICE_KEYS.onboardingCompleted;
@@ -20,7 +16,6 @@ export function markOnboardingCompleted(): void {
     try {
         window.localStorage.setItem(KEY, '1');
     } catch {
-        // localStorage indisponible (Safari privé) - silencieux : l'onboarding
-        // se rejouera au prochain lancement, ce qui est dégradé mais acceptable.
+        // localStorage indisponible (Safari privé) — l'onboarding se rejouera au prochain lancement.
     }
 }

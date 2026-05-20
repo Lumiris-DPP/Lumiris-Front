@@ -1,5 +1,3 @@
-// LUMIRIS Local V1 strict textile : 7 spécialités exposées, jamais plus.
-
 import { describe, expect, it } from 'bun:test';
 import type { RepairerSpecialty } from '@lumiris/types';
 import {
@@ -36,7 +34,6 @@ describe('V1_SPECIALTIES — 7 spécialités textile uniquement (V1)', () => {
     it('ne contient PAS de spécialités hors-textile (électronique, mobilier, électroménager…)', () => {
         const forbidden = ['electronics', 'furniture', 'appliances', 'batteries', 'electromenager'] as const;
         for (const code of forbidden) {
-            // V1_SPECIALTIES est typé strict, mais on vérifie en runtime que rien ne fuit.
             expect((V1_SPECIALTIES as readonly string[]).includes(code)).toBe(false);
         }
     });
@@ -71,7 +68,6 @@ describe('toV1Specialty — mapping codes @lumiris/types → V1', () => {
     });
 
     it('renvoie null pour des codes inconnus / hors-textile', () => {
-        // Cast nécessaire car le type @lumiris/types ne couvre pas ces valeurs en V1.
         expect(toV1Specialty('electronics' as RepairerSpecialty)).toBeNull();
         expect(toV1Specialty('furniture' as RepairerSpecialty)).toBeNull();
         expect(toV1Specialty('unknown' as RepairerSpecialty)).toBeNull();

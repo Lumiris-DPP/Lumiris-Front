@@ -1,5 +1,3 @@
-// Distinct from ./sentry-next because @sentry/nextjs ships React/Next integrations that pull in JSX.
-
 import * as Sentry from '@sentry/node';
 
 import { LUMIRIS_SAMPLE_RATE_DEV, LUMIRIS_SAMPLE_RATE_PROD } from './constants';

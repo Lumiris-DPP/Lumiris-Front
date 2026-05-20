@@ -1,9 +1,5 @@
 'use client';
 
-// Sélection de comparaison Vault - useSyncExternalStore + localStorage
-// (`lumiris.compare.v1`). Max 2 items ; survit aux reloads et se synchronise
-// entre onglets via l'event `storage`.
-
 import { useSyncExternalStore } from 'react';
 import { readUser } from '../auth/storage';
 import { USER_KEYS, userScopedKey } from '../storage-keys';

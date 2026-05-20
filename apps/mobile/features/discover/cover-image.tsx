@@ -14,8 +14,6 @@ interface CoverImageProps {
     priority?: boolean;
 }
 
-// Accents secondaires par catégorie - donne une teinte editoriale au fallback
-// quand mockJournalPublic n'expose pas de `coverImage`. Reste lisible en dark.
 const CATEGORY_ACCENT: Record<JournalCategory, string> = {
     'portrait-artisan': 'var(--lumiris-amber)',
     'savoir-faire': 'var(--lumiris-cyan)',
@@ -38,8 +36,6 @@ export function CoverImage({ src, alt, category, grade, sizes, className, priori
         );
     }
 
-    // Fallback editorial : dégradé multi-stops basé sur le grade + accent catégorie.
-    // Le `aria-hidden` est posé par le parent via `alt=""` quand utile - ici on garde un fond visuel.
     return (
         <div
             aria-hidden

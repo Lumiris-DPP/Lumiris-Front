@@ -44,7 +44,6 @@ interface WizardShellProps {
     onPrev?: () => void;
     onNext?: () => void;
     nextLabel?: string;
-    /** Missing field labels for the current step. When non-empty, Next is disabled and a tooltip lists them. */
     nextMissing?: string[];
 }
 
@@ -163,7 +162,6 @@ function Stepper({ currentStep, draftId, draft }: { currentStep: WizardStep; dra
                 const state: StepState =
                     i === currentIndex ? 'current' : i < currentIndex ? (validation.ok ? 'done' : 'error') : 'todo';
 
-                // Past steps toujours cliquables ; futur bloqué tant que l'étape courante n'est pas valide.
                 const canClick = i <= currentIndex || currentValid;
                 const missing = validation.ok ? [] : validation.missing;
 

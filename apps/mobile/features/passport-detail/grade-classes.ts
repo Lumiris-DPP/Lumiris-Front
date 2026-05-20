@@ -1,5 +1,4 @@
-// Static class maps for the passport detail layers - literal strings so Tailwind v4
-// content scanning picks them up without needing @source inline directives.
+// Strings littérales : Tailwind v4 doit pouvoir les scanner sans `@source inline`.
 
 import type { IrisGrade } from '@lumiris/types';
 

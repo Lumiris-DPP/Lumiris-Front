@@ -23,16 +23,7 @@
             ],
             "project": ["**/*.{ts,tsx}"]
         },
-        "apps/client": {
-            "entry": [
-                "app/**/{page,layout,loading,error,not-found,route,template}.{ts,tsx}",
-                "app/web-vitals.tsx",
-                "env.ts",
-                "features/**/index.tsx"
-            ],
-            "project": ["**/*.{ts,tsx}"]
-        },
-        "apps/mobile": {
+        "apps/{client,mobile}": {
             "entry": [
                 "app/**/{page,layout,loading,error,not-found,route,template}.{ts,tsx}",
                 "app/web-vitals.tsx",
@@ -63,6 +54,10 @@
             "project": ["src/**/*.ts"]
         },
         "packages/mock-data": {
+            "project": ["src/**/*.ts"]
+        },
+        "packages/api-client": {
+            "entry": ["src/index.ts"],
             "project": ["src/**/*.ts"]
         },
         "packages/config": {

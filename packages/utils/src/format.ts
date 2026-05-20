@@ -1,8 +1,5 @@
-// Locale-stable defaults so admin, web, and mobile render the same string for the same input.
-
 import type { GarmentKind, IrisGrade } from '@lumiris/types';
 
-/** Libellés FR canoniques des types de vêtements - partagés entre apps. */
 export const KIND_LABEL_FR: Record<GarmentKind, string> = {
     sweater: 'Pull',
     shirt: 'Chemise',
@@ -53,7 +50,6 @@ export function formatRelativeDate(
     return rtf.format(0, 'second');
 }
 
-/** `value` is treated as 0–100 by default; pass `fromUnit: true` for 0–1 ratios. */
 export function formatPercent(
     value: number,
     options: FormatOptions & { fromUnit?: boolean; digits?: number } = {},
@@ -72,7 +68,6 @@ export function formatScoreTotal(total: number): string {
     return `${roundTo(total, 1)} / 100`;
 }
 
-/** Passthrough today; exists so callers route through one helper if formatting evolves. */
 export function formatGrade(grade: IrisGrade | null | undefined): string {
     return grade ?? '-';
 }

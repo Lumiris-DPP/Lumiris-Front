@@ -3,7 +3,6 @@ import type { AdminAction, AdminAuditLogEntry, AdminUserRole } from '@lumiris/ty
 export interface AnomalyAlert {
     id: string;
     severity: 'warn' | 'error';
-    /** Rule code - used to drive the workflow status store and UI grouping. */
     rule: AnomalyRule;
     title: string;
     detail: string;
@@ -11,13 +10,13 @@ export interface AnomalyAlert {
 }
 
 export type AnomalyRule =
-    | 'actor_burst' // >10 sensitive actions in <1h (legacy)
-    | 'override_grade_jump' // override increases grade by >=2 letters (legacy)
-    | 'chain_validation' // 4 validations on same artisan in <5min (legacy)
-    | 'override_then_validate' // same curator overrides + validates same passport in <5min
-    | 'bursting' // >8 sensitive actions by same actor in <10min
-    | 'cross_role' // 1 actor exercises 3 distinct role-actions in 7d
-    | 'sensitive_after_hours'; // sensitive action 22h-6h or weekend with reason <30 chars
+    | 'actor_burst'
+    | 'override_grade_jump'
+    | 'chain_validation'
+    | 'override_then_validate'
+    | 'bursting'
+    | 'cross_role'
+    | 'sensitive_after_hours';
 
 export const SENSITIVE_ACTIONS = new Set<AdminAction>([
     'passport.override',
@@ -35,10 +34,7 @@ const TEN_MIN_MS = 10 * 60 * 1000;
 const SEVEN_DAYS_MS = 7 * 24 * HOUR_MS;
 const GRADE_RANK: Record<string, number> = { A: 5, B: 4, C: 3, D: 2, E: 1 };
 
-/**
- * Mappe une action sur la "famille de rôle" la plus naturelle. Sert à détecter les acteurs qui
- * agissent transversalement (curator + billing_ops + dpo par ex.).
- */
+/** Mappe une action sur sa famille de rôle pour détecter les acteurs transversaux. */
 const ROLE_FAMILY: Record<AdminAction, AdminUserRole | null> = {
     'passport.read': null,
     'passport.curate': 'curator',
@@ -72,10 +68,9 @@ const ROLE_FAMILY: Record<AdminAction, AdminUserRole | null> = {
     'governance.anomaly_escalate': 'platform_admin',
 };
 
-/** True if the timestamp falls in the 22h-6h window or a weekend (FR locale). */
 function isAfterHours(iso: string): boolean {
     const d = new Date(iso);
-    const day = d.getDay(); // 0 = sun, 6 = sat
+    const day = d.getDay();
     if (day === 0 || day === 6) return true;
     const hour = d.getHours();
     return hour >= 22 || hour < 6;
@@ -85,7 +80,6 @@ export function detectAnomalies(auditLog: readonly AdminAuditLogEntry[]): readon
     const alerts: AnomalyAlert[] = [];
     const now = Date.now();
 
-    // --- Rule: actor_burst (>10 sensitive actions in <1h) ---------------------------------------
     const recentSensitive = auditLog.filter(
         (e) => SENSITIVE_ACTIONS.has(e.action) && now - new Date(e.ts).getTime() < HOUR_MS,
     );
@@ -108,7 +102,6 @@ export function detectAnomalies(auditLog: readonly AdminAuditLogEntry[]): readon
         }
     }
 
-    // --- Rule: override_grade_jump (>=2 letters up) ---------------------------------------------
     for (const entry of auditLog) {
         if (entry.action !== 'passport.override') continue;
         const from = entry.payload.from as string | undefined;
@@ -129,7 +122,6 @@ export function detectAnomalies(auditLog: readonly AdminAuditLogEntry[]): readon
         }
     }
 
-    // --- Rule: chain_validation (4 curations on same artisan in <5min) --------------------------
     const validationsByArtisan = new Map<string, AdminAuditLogEntry[]>();
     for (const entry of auditLog) {
         if (entry.action !== 'passport.curate') continue;
@@ -162,7 +154,6 @@ export function detectAnomalies(auditLog: readonly AdminAuditLogEntry[]): readon
         }
     }
 
-    // --- Rule: override_then_validate (override puis curate <5min sur même passeport) ----------
     const passportEvents = new Map<string, AdminAuditLogEntry[]>();
     for (const entry of auditLog) {
         if (entry.targetType !== 'passport') continue;
@@ -193,7 +184,6 @@ export function detectAnomalies(auditLog: readonly AdminAuditLogEntry[]): readon
         }
     }
 
-    // --- Rule: bursting (>8 actions sensibles par même actor en <10min) -------------------------
     const sensitiveByActor = new Map<string, AdminAuditLogEntry[]>();
     for (const entry of auditLog) {
         if (!SENSITIVE_ACTIONS.has(entry.action)) continue;
@@ -225,7 +215,6 @@ export function detectAnomalies(auditLog: readonly AdminAuditLogEntry[]): readon
         }
     }
 
-    // --- Rule: cross_role (1 actor, 3 role-families distinctes, 7 jours) ------------------------
     const recentByActor = new Map<string, AdminAuditLogEntry[]>();
     for (const entry of auditLog) {
         if (now - new Date(entry.ts).getTime() > SEVEN_DAYS_MS) continue;
@@ -252,7 +241,6 @@ export function detectAnomalies(auditLog: readonly AdminAuditLogEntry[]): readon
         }
     }
 
-    // --- Rule: sensitive_after_hours (22h-6h ou WE + raison <30 chars) --------------------------
     for (const entry of auditLog) {
         if (!SENSITIVE_ACTIONS.has(entry.action)) continue;
         if (!isAfterHours(entry.ts)) continue;

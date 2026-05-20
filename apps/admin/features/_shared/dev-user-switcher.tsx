@@ -29,7 +29,7 @@ const ROLE_TONE: Record<AdminUserRole, string> = {
     dpo: 'text-lumiris-rose',
 };
 
-// Dev-only - à wrapper sous `process.env.NODE_ENV` côté intégration pour ne pas leaker en prod.
+// Dev-only — wrapper sous `process.env.NODE_ENV` côté intégration pour ne pas leaker en prod.
 export function DevUserSwitcher() {
     const { currentUser, setCurrentUser, availableUsers } = useAdminUserSwitcher();
 

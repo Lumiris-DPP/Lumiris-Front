@@ -9,7 +9,6 @@ type FrameResult =
     | { kind: 'external'; dpp: ExternalDpp; raw: string }
     | { kind: 'unknown'; raw: string };
 
-// Pure - la boucle rAF et l'état de scan vivent côté composant.
 export function processVideoFrame(video: HTMLVideoElement, canvas: HTMLCanvasElement): FrameResult {
     if (video.readyState !== video.HAVE_ENOUGH_DATA) return { kind: 'no-frame' };
     const w = video.videoWidth;

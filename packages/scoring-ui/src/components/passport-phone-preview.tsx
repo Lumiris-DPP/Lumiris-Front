@@ -10,13 +10,10 @@ import { gradeBackground, gradeBorder, gradeColor } from '../theme/grade-color';
 export interface PassportPhonePreviewProps extends HTMLAttributes<HTMLDivElement> {
     passport: Passport;
     artisan?: Artisan;
-    /** Score calculé en amont par l'appelant via `computeScore()`. */
     score: ScoreResult;
-    /** Lettre éventuellement overridée par un curator senior - overlay visuel uniquement. */
     overrideGrade?: IrisGradeLetter;
 }
 
-/** Aperçu téléphone - composant pur, score injecté par le caller. */
 export function PassportPhonePreview({
     passport,
     artisan,

@@ -5,7 +5,6 @@ import { AGEC_REQUIRED_FIELDS, ESPR_REQUIRED_FIELDS } from './constants';
 
 interface CapDecision {
     capped: boolean;
-    /** Raison FR détaillée - concaténée dans `ScoreResult.cap.reason`. */
     reason?: string;
     missingFields: readonly string[];
 }

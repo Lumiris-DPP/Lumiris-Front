@@ -1,6 +1,3 @@
-// Each app gets its own DSN, tagged by `service` so one Sentry org hosts all four projects without cross-talk.
-// beforeSend/beforeBreadcrumb are the PII safety net - primary mitigation is keeping PII out of logs/spans at the source.
-
 import * as Sentry from '@sentry/nextjs';
 
 import { LUMIRIS_SAMPLE_RATE_DEV, LUMIRIS_SAMPLE_RATE_PROD } from './constants';
@@ -8,11 +5,9 @@ import { redactString } from './redact';
 import type { ServiceName, TelemetryEnv } from './types';
 
 export interface InitSentryOptions {
-    /** App-specific DSN - pull from per-app env var (e.g. `SENTRY_DSN_ADMIN`). */
     dsn: string | undefined;
     service: ServiceName;
     env?: TelemetryEnv;
-    /** Defaults to dev=1.0 / prod=0.1. */
     sampleRate?: number;
     release?: string;
 }

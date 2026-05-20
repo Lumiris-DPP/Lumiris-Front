@@ -1,5 +1,3 @@
-// vue publique d'un Passport - score pré-calculé une fois au chargement, consommé tel quel
-
 import { computeScore, type ComputeScoreOptions } from '@lumiris/core/scoring';
 import type { Artisan, Passport, ScoreResult } from '@lumiris/types';
 import { mockArtisans } from './artisans';
@@ -10,13 +8,9 @@ import { mockRepairers } from './retoucheurs';
 export interface PassportPublicView {
     passport: Passport;
     artisan: Artisan;
-    /** Slug humain stable, dérivé de `artisan.displayName` + `product.reference`. */
     slug: string;
-    /** Court résumé éditorial (~120 car.) - utilisé pour OG / meta description. */
     excerpt: string;
-    /** Score complet - `undefined` si le passeport n'a pas assez de données (Draft / InCompletion sévère). */
     irisScore: ScoreResult | undefined;
-    /** Vrai si le passeport est encore en cours de complétion (statut InCompletion). */
     inProgress: boolean;
 }
 

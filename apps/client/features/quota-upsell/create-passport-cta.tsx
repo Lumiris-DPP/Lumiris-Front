@@ -12,13 +12,11 @@ import { QuotaUpsellDialog } from './index';
 
 interface CreatePassportCtaProps {
     children: ReactNode;
-    /** Optional override className to mirror existing button styling. */
     className?: string;
     variant?: 'default' | 'outline' | 'ghost';
     size?: 'sm' | 'default' | 'lg' | 'icon';
 }
 
-/** Source de vérité unique pour le gating CTA — link /create en normal, dialog upsell si quota atteint. */
 export function CreatePassportCta({ children, className, variant, size }: CreatePassportCtaProps) {
     const artisan = useCurrentArtisan();
     const billing = useBilling(artisan.id);

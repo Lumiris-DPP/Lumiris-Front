@@ -1,6 +1,3 @@
-// Smoke tests apps/admin — couvre deux helpers pivots que la pyramide de tests doit garantir
-// avant tout merge : computeHealthScore (lib/health-score) et findRoute (_shared/nav-routes).
-
 import { describe, expect, it } from 'bun:test';
 import { computeHealthScore } from '@/lib/health-score';
 import { findRoute } from '@/features/_shared/nav-routes';

@@ -2,9 +2,7 @@
 
 import { useSyncExternalStore } from 'react';
 
-// `navigator.onLine` n'existe pas côté serveur. Pour éviter tout mismatch
-// d'hydratation Next 16, on renvoie `true` (online) avant la première frame
-// puis on bascule sur la valeur réelle dès que React a hydraté côté client.
+// SSR : retourne `true` pour éviter le mismatch d'hydratation Next 16 (pas de `navigator`).
 function getSnapshot(): boolean {
     return typeof navigator === 'undefined' ? true : navigator.onLine;
 }

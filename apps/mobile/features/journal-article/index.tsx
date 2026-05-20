@@ -17,7 +17,6 @@ export interface JournalArticleProps {
 
 export function JournalArticle({ article }: JournalArticleProps) {
     const grade = gradeForCategory(article.category);
-    // Body en plain text avec doubles sauts de ligne - pas de markdown lourd, on découpe en paragraphes.
     const paragraphs = article.body
         .split(/\n\n+/)
         .map((p) => p.trim())
@@ -96,10 +95,6 @@ export function JournalArticle({ article }: JournalArticleProps) {
                         <p className="text-foreground mt-1 text-sm font-semibold">{article.author}</p>
                     </GlassCard>
                 ) : null}
-
-                {/* CTA passeport / artisan : conditionnels - décommenter quand le type
-                    JournalArticle exposera `relatedPassportId` ou `relatedArtisanSlug`.
-                    Hors data-model actuel, donc skipped pour rester sec. */}
             </article>
         </div>
     );

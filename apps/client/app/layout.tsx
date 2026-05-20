@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Geist_Mono } from 'next/font/google';
 import { Toaster } from '@lumiris/ui/components/sonner';
 import { ThemeProvider } from '@lumiris/ui/theme-provider';
+
+import { ApiProvider } from '@lumiris/api-client/react';
+import { env } from '@/env';
 import { WebVitals } from './web-vitals';
 import './globals.css';
 
@@ -38,11 +41,13 @@ export default function RootLayout({
     return (
         <html lang="fr" className={`${inter.variable} ${geistMono.variable} bg-background`} suppressHydrationWarning>
             <body className="font-sans antialiased">
-                <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-                    <WebVitals />
-                    {children}
-                    <Toaster position="bottom-right" closeButton />
-                </ThemeProvider>
+                <ApiProvider baseUrl={env.NEXT_PUBLIC_API_BASE_URL}>
+                    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+                        <WebVitals />
+                        {children}
+                        <Toaster position="bottom-right" closeButton />
+                    </ThemeProvider>
+                </ApiProvider>
             </body>
         </html>
     );

@@ -7,7 +7,6 @@ import { ArticleCard } from './article-card';
 interface CategoryRowProps {
     category: JournalCategory;
     items: readonly DiscoverFeedItem[];
-    /** Offset de stagger : poursuit la séquence d'animation du parent. */
     baseIndex?: number;
 }
 

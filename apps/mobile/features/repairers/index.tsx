@@ -87,9 +87,7 @@ export function RepairersDirectory() {
         if (typeof navigator === 'undefined' || !navigator.geolocation) return;
         navigator.geolocation.getCurrentPosition(
             (pos) => setUserCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-            () => {
-                // Refus géoloc → fallback tri par note (cf. memo ci-dessous).
-            },
+            () => {},
             { timeout: 5000, maximumAge: 60_000 },
         );
     }, []);

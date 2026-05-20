@@ -72,7 +72,6 @@ export function buildInitialRows(invoice: SupplierInvoice): DraftRow[] {
     });
 }
 
-/** Dédup par `fiber + supplierId`, somme cap à 100% (réduction proportionnelle). */
 export function mergeMaterials(existing: readonly Material[], extracted: readonly ExtractedRow[]): Material[] {
     const map = new Map<string, Material>();
     for (const m of existing) {
