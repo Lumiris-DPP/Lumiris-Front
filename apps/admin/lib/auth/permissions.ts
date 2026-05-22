@@ -81,5 +81,6 @@ export function can(role: AdminUserRole, action: AdminAction): boolean {
 
 export function usePermission(action: AdminAction): boolean {
     const user = useCurrentUser();
+    if (!user) return false;
     return can(user.role, action);
 }

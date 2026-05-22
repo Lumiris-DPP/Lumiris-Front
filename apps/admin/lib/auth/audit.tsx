@@ -1,13 +1,17 @@
 'use client';
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
-import type { AdminAuditLogEntry } from '@lumiris/types';
+import type { AdminAuditLogEntry, AdminUserRole } from '@lumiris/types';
 import { mockAdminAuditLog } from '@lumiris/mock-data';
 import { useCurrentUser } from './current-user';
 
 // Store en mémoire — à remplacer par un wrapper POST /admin/audit quand le backend arrivera.
 
-type LogActionInput = Omit<AdminAuditLogEntry, 'id' | 'ts' | 'actorId' | 'actorRole' | 'ipMock'>;
+type LogActionInput = Omit<AdminAuditLogEntry, 'id' | 'ts' | 'actorId' | 'actorRole' | 'ipMock'> & {
+    // Override pour les évènements pré/post-session (auth.signin, auth.signin_failed, auth.signout)
+    // où le user du context n'est pas encore (ou plus) la bonne source.
+    actor?: { id: string; role: AdminUserRole };
+};
 
 export type AnomalyReviewStatus = 'unreviewed' | 'acknowledged' | 'escalated';
 
@@ -80,17 +84,18 @@ export function useLogAction(): (input: LogActionInput) => AdminAuditLogEntry {
 
     return useCallback(
         (input: LogActionInput) => {
+            const { actor, ...rest } = input;
             const entry: AdminAuditLogEntry = {
                 id: generateId(),
                 ts: new Date().toISOString(),
-                actorId: user.id,
-                actorRole: user.role,
+                actorId: actor?.id ?? user?.id ?? 'anonymous',
+                actorRole: actor?.role ?? user?.role ?? 'curator',
                 ipMock: '127.0.0.1',
-                ...input,
+                ...rest,
             };
             ctx.push(entry);
             return entry;
         },
-        [ctx, user.id, user.role],
+        [ctx, user?.id, user?.role],
     );
 }

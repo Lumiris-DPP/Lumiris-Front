@@ -1,14 +1,7 @@
 @import '@lumiris/ui/styles/prismatic.css';
 
-/* Tailwind v4 walks from this file to find class usages but skips node_modules,
- * so symlinked workspace packages (@lumiris/ui, @lumiris/scoring-ui) live
- * outside the scanned tree. Point the scanner at their sources explicitly. */
 @source "../../../packages/ui/src/**/*.{ts,tsx}";
 @source "../../../packages/scoring-ui/src/**/*.{ts,tsx}";
-
-/* methodology-content + recent-scans build grade utilities via template
- * literals (`text-${color}`, `border-${grade.color}/20`) the scanner cannot
- * resolve. Force-emit the full A-E triad so each grade button keeps its hue. */
 @source inline("text-grade-a text-grade-b text-grade-c text-grade-d text-grade-e");
 @source inline("bg-grade-a bg-grade-b bg-grade-c bg-grade-d bg-grade-e");
 @source inline("bg-grade-a/8 bg-grade-b/8 bg-grade-c/8 bg-grade-d/8 bg-grade-e/8");
@@ -16,9 +9,24 @@
 @source inline("border-grade-a/15 border-grade-b/15 border-grade-c/15 border-grade-d/15 border-grade-e/15");
 @source inline("border-grade-a/20 border-grade-b/20 border-grade-c/20 border-grade-d/20 border-grade-e/20");
 
-/* The marketing site shipped with a 0.75rem radius - slightly rounder than the
- * 0.625rem product/admin default. Keep the brand-site visual without dragging
- * admin/mobile along. */
 :root {
     --radius: 0.75rem;
+}
+
+@keyframes lumiris-motion-fallback {
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+[style*='opacity:0'][style*='translateY'] {
+    animation: lumiris-motion-fallback 0.7s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [style*='opacity:0'][style*='translateY'] {
+        animation-duration: 0.01s;
+        animation-delay: 0s;
+    }
 }

@@ -6,19 +6,11 @@ production = false
 optional = true
 dev = true
 
-# Strict workspace resolution — never silently fall back to the registry for a
-# package that exists locally. Mirrors `link-workspace-packages=true` in .npmrc.
 linkWorkspacePackages = true
 
-# Deduplicate transitively shared deps (especially next/react/react-dom) so the
-# whole monorepo runs against a single instance. Bun has no `nohoist` knob, but
-# explicit deduping plus the syncpack `versionGroups.policy: sameRange` rule on
-# next/react in syncpack.config.mjs gives us the same guarantee with a clearer
-# failure mode (a `bun run check:deps` exit code, not a runtime "two Reacts" error).
 dedupe = ["next", "react", "react-dom", "@types/react", "@types/react-dom"]
 
 [install.scopes]
-# Configure private registries here when needed
 
 [install.cache]
 disable = false

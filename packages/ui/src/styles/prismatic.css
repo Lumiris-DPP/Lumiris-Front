@@ -121,19 +121,6 @@
     }
 }
 
-/* Opal shadow utility */
-.opal-shadow {
-    box-shadow:
-        0 1px 3px oklch(50% 0.01 260deg / 4%),
-        0 4px 12px oklch(50% 0.01 260deg / 3%);
-}
-
-.opal-shadow-lg {
-    box-shadow:
-        0 2px 6px oklch(50% 0.01 260deg / 5%),
-        0 8px 24px oklch(50% 0.01 260deg / 6%);
-}
-
 /* Clean scrollbar for light theme */
 ::-webkit-scrollbar {
     width: 5px;

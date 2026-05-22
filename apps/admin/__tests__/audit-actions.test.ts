@@ -37,6 +37,9 @@ const KNOWN_ADMIN_ACTIONS = new Set([
     'governance.export_audit_log',
     'governance.anomaly_acknowledge',
     'governance.anomaly_escalate',
+    'auth.signin',
+    'auth.signin_failed',
+    'auth.signout',
 ]);
 
 const REQUIRED_DISPATCHES = [

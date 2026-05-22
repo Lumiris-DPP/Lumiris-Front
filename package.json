@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "description": "LUMIRIS Ecosystem — Back-office (admin), Public Web, Mobile-optimized View. Powered by Bun + Turbo.",
-    "packageManager": "bun@1.1.38",
+    "packageManager": "bun@1.3.14",
     "engines": {
         "node": ">=20",
         "bun": ">=1.1.0"

@@ -20,12 +20,12 @@ export default function ReglementationIndex() {
                     Réglementation
                 </p>
                 <h1 className="text-foreground text-balance text-4xl font-bold tracking-tight sm:text-5xl">
-                    Comprendre la réglementation textile
+                    Comprendre AGEC, ESPR et le DPP
                 </h1>
                 <p className="text-muted-foreground mt-4 max-w-2xl text-pretty text-base leading-relaxed">
-                    Trois textes structurent l’avenir du textile européen : la loi française AGEC (2020), le règlement
-                    européen ESPR (2024) et le Digital Product Passport (DPP) qui en découle. Voici les sujets, sans
-                    jargon.
+                    Trois textes structurent l’avenir de la consommation européenne : la loi française AGEC (2020), le
+                    règlement européen ESPR (2024) et le Digital Product Passport (DPP) qui en découle. Le textile ouvre
+                    la marche ; tech, batteries, électroménager et mobilier suivent entre 2027 et 2030.
                 </p>
             </header>
 

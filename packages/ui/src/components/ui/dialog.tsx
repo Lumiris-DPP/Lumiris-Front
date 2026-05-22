@@ -89,11 +89,15 @@ function DialogFooter({ className, ...props }: React.ComponentProps<'div'>) {
     );
 }
 
-function DialogTitle({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Title>) {
+function DialogTitle({
+    className,
+    srOnly,
+    ...props
+}: React.ComponentProps<typeof DialogPrimitive.Title> & { srOnly?: boolean }) {
     return (
         <DialogPrimitive.Title
             data-slot="dialog-title"
-            className={cn('text-lg font-semibold leading-none', className)}
+            className={cn(srOnly ? 'sr-only' : 'text-lg font-semibold leading-none', className)}
             {...props}
         />
     );

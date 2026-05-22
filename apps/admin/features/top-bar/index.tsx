@@ -1,12 +1,32 @@
 'use client';
 
 import { memo, Fragment, Suspense, useEffect, useState } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { Bell, CalendarClock, ChevronRight } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { CalendarClock, ChevronRight, LogOut } from 'lucide-react';
+import type { AdminUserRole } from '@lumiris/types';
+import { Avatar, AvatarFallback } from '@lumiris/ui/components/avatar';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@lumiris/ui/components/dropdown-menu';
+import { cn } from '@lumiris/ui/lib/cn';
 import { daysUntil, majorMilestones } from '@/lib/regulatory-calendar';
+import { auth, useCurrentUser, useLogAction } from '@/lib/auth';
 import { findRoute } from '../_shared/nav-routes';
 import { CommandPalette } from '../_shared/command-palette';
 import { DevUserSwitcher } from '../_shared/dev-user-switcher';
+
+const ROLE_LABEL: Record<AdminUserRole, string> = {
+    curator: 'Curateur',
+    lead_curator: 'Curateur principal',
+    billing_ops: 'Ops facturation',
+    platform_admin: 'Admin plateforme',
+    dpo: 'DPO',
+};
 
 function Breadcrumb() {
     const pathname = usePathname() ?? '';
@@ -80,7 +100,10 @@ function EsprCountdownChip() {
         <a
             href="/conformite"
             aria-label={label}
-            className={`flex items-center gap-2 rounded-lg border px-3 py-1.5 transition-opacity hover:opacity-80 ${tone}`}
+            className={cn(
+                'flex items-center gap-2 rounded-lg border px-3 py-1.5 transition-opacity hover:opacity-80',
+                tone,
+            )}
         >
             <CalendarClock className="h-3.5 w-3.5" aria-hidden />
             <span className="text-xs font-medium tabular-nums">
@@ -93,31 +116,90 @@ function EsprCountdownChip() {
     );
 }
 
-function TopBarComponent() {
+function getInitials(fullName: string): string {
+    return fullName
+        .split(' ')
+        .filter(Boolean)
+        .map((part) => part[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase();
+}
+
+function UserAvatar() {
+    const user = useCurrentUser();
+    const router = useRouter();
+    const log = useLogAction();
+
+    if (!user) return null;
+
+    const handleLogout = async () => {
+        log({
+            action: 'auth.signout',
+            targetType: 'session',
+            targetId: user.id,
+            payload: {},
+            actor: { id: user.id, role: user.role },
+        });
+        await auth.signOut();
+        router.replace('/login');
+    };
+
     return (
-        <header className="border-border bg-card/80 fixed left-60 right-0 top-0 z-30 flex h-14 items-center justify-between border-b px-6 backdrop-blur-sm">
-            <div className="flex items-center gap-4">
-                <CommandPalette />
-                {/* `useSearchParams` bail-out exige une Suspense boundary à la frontière du prerender (`/_not-found`). */}
-                <Suspense fallback={<span className="text-muted-foreground text-sm">Admin</span>}>
-                    <Breadcrumb />
-                </Suspense>
-            </div>
-
-            <div className="flex items-center gap-3">
-                <DevUserSwitcher />
-
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
                 <button
                     type="button"
-                    aria-label="Notifications"
-                    className="text-muted-foreground hover:bg-muted hover:text-foreground relative rounded-lg p-2 transition-colors"
+                    aria-label={`Compte ${user.fullName}`}
+                    className="focus-visible:ring-ring rounded-full outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                 >
-                    <Bell className="h-4 w-4" aria-hidden />
-                    <span className="bg-lumiris-rose absolute right-1.5 top-1.5 h-2 w-2 rounded-full" />
+                    <Avatar className="size-8">
+                        <AvatarFallback className="text-[10px] font-semibold">
+                            {getInitials(user.fullName)}
+                        </AvatarFallback>
+                    </Avatar>
                 </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuLabel className="flex flex-col gap-0.5">
+                    <span className="text-foreground text-sm font-medium">{user.fullName}</span>
+                    <span className="text-muted-foreground text-xs font-normal">{user.email}</span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="text-muted-foreground font-mono text-[10px] uppercase tracking-wider">
+                    {ROLE_LABEL[user.role]}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                    onSelect={(event) => {
+                        event.preventDefault();
+                        void handleLogout();
+                    }}
+                    className="text-lumiris-rose focus:text-lumiris-rose"
+                >
+                    <LogOut className="h-4 w-4" aria-hidden /> Déconnexion
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+}
 
-                <EsprCountdownChip />
-            </div>
+const IS_DEV = process.env.NODE_ENV !== 'production';
+
+function TopBarComponent() {
+    return (
+        <header className="border-border bg-card/80 fixed left-60 right-0 top-0 z-30 flex h-14 items-center gap-3 border-b px-6 backdrop-blur-sm">
+            {/* `useSearchParams` bail-out exige une Suspense boundary à la frontière du prerender (`/_not-found`). */}
+            <Suspense fallback={<span className="text-muted-foreground text-sm">Admin</span>}>
+                <Breadcrumb />
+            </Suspense>
+
+            <div className="flex-1" />
+
+            <CommandPalette />
+            <EsprCountdownChip />
+            {IS_DEV ? <DevUserSwitcher /> : null}
+            <UserAvatar />
         </header>
     );
 }

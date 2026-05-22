@@ -9,7 +9,6 @@ import {
     type Subscription,
 } from '@lumiris/types';
 import {
-    ACQUISITION_SOURCE_MIX,
     ARTISAN_TIER_MIX,
     ATELIER_MONTHLY_EUR,
     ATELIER_PLUS_ADOPTION_PCT,
@@ -19,16 +18,10 @@ import {
     BREAKEVEN_NOMINAL_RANGE,
     BREAKEVEN_STRESS_RANGE,
     buildMonthlyTargets,
-    ESPR_DEADLINES,
-    FUNNEL_CONVERSION,
     LOCAL_MONTHLY_EUR,
-    LTV_CAC_TARGETS,
     monthlyCostEur,
     STRESS_B2B_FACTOR,
     STRESS_B2C_FACTOR,
-    type AcquisitionSource,
-    type EsprDeadline,
-    type LtvCacTarget,
     type MonthlyTarget,
 } from './business-targets';
 
@@ -234,100 +227,4 @@ export function buildTrajectory(stress: boolean): TrajectoryResult {
         points,
         breakevenRange: stress ? BREAKEVEN_STRESS_RANGE : BREAKEVEN_NOMINAL_RANGE,
     };
-}
-
-export interface LtvCacRow {
-    readonly id: LtvCacTarget['id'];
-    readonly label: string;
-    readonly arpuAnnualEur: number;
-    readonly lifetimeMonths: number;
-    readonly ltvEur: number;
-    readonly cacEur: number;
-    readonly ratio: number;
-    readonly tone: 'good' | 'watch' | 'bad';
-}
-
-function ratioTone(ratio: number): LtvCacRow['tone'] {
-    if (ratio >= 3) return 'good';
-    if (ratio >= 1) return 'watch';
-    return 'bad';
-}
-
-export function buildLtvCacRows(): readonly LtvCacRow[] {
-    return LTV_CAC_TARGETS.map((t) => {
-        const ltv = t.arpuMonthlyEur * t.lifetimeMonths;
-        const ratio = t.cacEur === 0 ? Number.POSITIVE_INFINITY : ltv / t.cacEur;
-        return {
-            id: t.id,
-            label: t.label,
-            arpuAnnualEur: t.arpuMonthlyEur * 12,
-            lifetimeMonths: t.lifetimeMonths,
-            ltvEur: ltv,
-            cacEur: t.cacEur,
-            ratio,
-            tone: ratioTone(ratio),
-        };
-    });
-}
-
-interface FunnelStage {
-    readonly id: 'lead' | 'demo' | 'signature' | 'activation';
-    readonly label: string;
-    readonly conversion: number;
-}
-
-interface FunnelSlice {
-    readonly source: AcquisitionSource;
-    readonly stages: Record<FunnelStage['id'], number>;
-}
-
-interface AcquisitionFunnel {
-    readonly stages: readonly FunnelStage[];
-    readonly slices: readonly FunnelSlice[];
-    readonly totalLeads: number;
-}
-
-// Mock seedé — sera remplacé par un GET /metrics quand le backend arrivera.
-export function buildAcquisitionFunnel(now: Date): AcquisitionFunnel {
-    const month = now.getUTCMonth();
-    const totalLeads = 60 + ((month * 13) % 41);
-
-    const demoConversion = FUNNEL_CONVERSION.leadToDemo;
-    const signatureConversion = demoConversion * FUNNEL_CONVERSION.demoToSignature;
-    const activationConversion = signatureConversion * FUNNEL_CONVERSION.signatureToActivation;
-
-    const stages: readonly FunnelStage[] = [
-        { id: 'lead', label: 'Lead', conversion: 1 },
-        { id: 'demo', label: 'Démo', conversion: demoConversion },
-        { id: 'signature', label: 'Signature', conversion: signatureConversion },
-        { id: 'activation', label: 'Activation', conversion: activationConversion },
-    ];
-
-    const slices = (Object.entries(ACQUISITION_SOURCE_MIX) as Array<[AcquisitionSource, number]>).map(
-        ([source, share]) => {
-            const sourceLeads = Math.round(totalLeads * share);
-            const stagesCount: Record<FunnelStage['id'], number> = {
-                lead: sourceLeads,
-                demo: Math.round(sourceLeads * demoConversion),
-                signature: Math.round(sourceLeads * signatureConversion),
-                activation: Math.round(sourceLeads * activationConversion),
-            };
-            return { source, stages: stagesCount };
-        },
-    );
-
-    return { stages, slices, totalLeads };
-}
-
-interface CountdownEntry {
-    readonly deadline: EsprDeadline;
-    readonly daysLeft: number;
-}
-
-export function buildEsprCountdown(now: Date): readonly CountdownEntry[] {
-    const today = now.getTime();
-    return ESPR_DEADLINES.map((d) => ({
-        deadline: d,
-        daysLeft: Math.ceil((new Date(d.date).getTime() - today) / DAY_MS),
-    }));
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
+import { Card, CardContent } from '@lumiris/ui/components/card';
 import { cn } from '@lumiris/ui/lib/cn';
 import { WizardShell } from './index';
 import type { WizardStep } from '@/lib/draft-store';
@@ -8,8 +8,6 @@ import type { WizardStep } from '@/lib/draft-store';
 interface WizardStepFrameProps {
     draftId: string;
     step: WizardStep;
-    title: React.ReactNode;
-    subtitle?: React.ReactNode;
     onPrev?: () => void;
     onNext?: () => void;
     nextLabel?: string;
@@ -21,8 +19,6 @@ interface WizardStepFrameProps {
 export function WizardStepFrame({
     draftId,
     step,
-    title,
-    subtitle,
     onPrev,
     onNext,
     nextLabel,
@@ -40,11 +36,7 @@ export function WizardStepFrame({
             nextMissing={nextMissing}
         >
             <Card>
-                <CardHeader>
-                    <CardTitle>{title}</CardTitle>
-                    {subtitle && <p className="text-muted-foreground text-sm">{subtitle}</p>}
-                </CardHeader>
-                <CardContent className={cn(contentClassName)}>{children}</CardContent>
+                <CardContent className={cn('pt-6', contentClassName)}>{children}</CardContent>
             </Card>
         </WizardShell>
     );

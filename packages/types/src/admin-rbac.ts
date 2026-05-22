@@ -30,7 +30,10 @@ export type AdminAction =
     | 'governance.read_audit_log'
     | 'governance.export_audit_log'
     | 'governance.anomaly_acknowledge'
-    | 'governance.anomaly_escalate';
+    | 'governance.anomaly_escalate'
+    | 'auth.signin'
+    | 'auth.signin_failed'
+    | 'auth.signout';
 
 export interface AdminUser {
     id: string;

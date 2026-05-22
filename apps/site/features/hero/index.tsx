@@ -4,8 +4,6 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Scan } from 'lucide-react';
 import Link from 'next/link';
 
-const ATELIER_HREF = '#';
-
 export function Hero() {
     return (
         <section className="relative isolate overflow-hidden">
@@ -20,14 +18,15 @@ export function Hero() {
                 transition={{ duration: 0.6, ease: 'easeOut' }}
             >
                 <p className="text-muted-foreground text-xs font-medium uppercase tracking-[0.25em]">
-                    LUMIRIS · Le passeport numérique
+                    LUMIRIS · Le passeport numérique de la consommation
                 </p>
                 <h1 className="text-foreground max-w-4xl text-balance text-4xl font-bold leading-tight tracking-tight sm:text-5xl md:text-6xl">
-                    Le passeport numérique du textile artisanal français.
+                    Un scan, une histoire, un score Iris.
                 </h1>
                 <p className="text-muted-foreground max-w-2xl text-balance text-base leading-relaxed sm:text-lg">
-                    Pour chaque pièce, l’histoire complète : matières, atelier, étapes, savoir-faire. Conforme au
-                    Digital Product Passport européen (ESPR) et à l’affichage AGEC - sans les complexités.
+                    LUMIRIS aide les artisans textile français à créer le passeport numérique de leurs pièces, et permet
+                    à tout client de scanner n’importe quel DPP européen — textile, tech, électroménager, mobilier — en
+                    un geste.
                 </p>
                 <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
                     <Link
@@ -38,7 +37,7 @@ export function Hero() {
                         Scanner une pièce
                     </Link>
                     <Link
-                        href={ATELIER_HREF}
+                        href="/atelier"
                         className="border-border text-foreground hover:bg-secondary inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-colors"
                     >
                         Je suis artisan
@@ -46,7 +45,7 @@ export function Hero() {
                     </Link>
                 </div>
                 <p className="text-muted-foreground/70 mt-4 text-xs">
-                    Aucun acteur n’achète son score. Aucun classement sponsorisé.
+                    Aucun acteur ne peut payer pour modifier son score Iris.
                 </p>
             </motion.div>
         </section>

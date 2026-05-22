@@ -1,4 +1,4 @@
-export { AdminUserProvider, useCurrentUser, useAdminUserSwitcher } from './current-user';
+export { AdminUserProvider, useCurrentUser, useSession, useAdminUserSwitcher } from './current-user';
 export { usePermission } from './permissions';
 export {
     AuditLogProvider,
@@ -9,3 +9,5 @@ export {
     type AnomalyReviewStatus,
 } from './audit';
 export { RequirePermission } from './require-permission';
+export { RequireSession } from './require-session';
+export { auth, type AdminSession, type SignInError, type SignInResult } from './session';

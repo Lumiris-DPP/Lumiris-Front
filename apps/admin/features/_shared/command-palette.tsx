@@ -2,7 +2,6 @@
 
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AnimatePresence, motion } from 'framer-motion';
 import { Command, Search, X } from 'lucide-react';
 import type { AdminUserRole } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
@@ -30,7 +29,7 @@ function CommandPaletteComponent() {
     const inputRef = useRef<HTMLInputElement>(null);
     const chordBuffer = useRef<{ key: string; expiresAt: number } | null>(null);
 
-    const items = useMemo(() => buildItems(user.role), [user.role]);
+    const items = useMemo(() => (user ? buildItems(user.role) : []), [user]);
 
     const filtered = useMemo(() => {
         if (!query.trim()) return items;
@@ -142,24 +141,19 @@ function CommandPaletteComponent() {
                 </kbd>
             </button>
 
-            <AnimatePresence>
+            <>
                 {open && (
                     <>
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
+                        <button
+                            type="button"
+                            aria-label="Fermer la palette de commandes"
                             className="bg-foreground/10 fixed inset-0 z-50 backdrop-blur-sm"
                             onClick={close}
                         />
-                        <motion.div
+                        <div
                             role="dialog"
                             aria-label="Palette de commandes"
-                            initial={{ opacity: 0, scale: 0.97, y: -8 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.97, y: -8 }}
-                            transition={{ duration: 0.15 }}
-                            className="opal-shadow-lg border-border bg-card fixed left-1/2 top-[20%] z-50 w-full max-w-lg -translate-x-1/2 overflow-hidden rounded-xl border"
+                            className="border-border bg-card fixed left-1/2 top-[20%] z-50 w-full max-w-lg -translate-x-1/2 overflow-hidden rounded-xl border shadow-lg"
                         >
                             <div className="border-border flex items-center gap-3 border-b px-4 py-3">
                                 <Search className="text-muted-foreground h-4 w-4" aria-hidden />
@@ -216,10 +210,10 @@ function CommandPaletteComponent() {
                                     </p>
                                 )}
                             </div>
-                        </motion.div>
+                        </div>
                     </>
                 )}
-            </AnimatePresence>
+            </>
         </>
     );
 }

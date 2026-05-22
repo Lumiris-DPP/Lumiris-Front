@@ -17,7 +17,7 @@ export default function AnalyticsPage() {
     if (!hydrated) {
         return (
             <>
-                <WorkspaceHeader title="Analytics" description="Tableau de bord ATELIER+." />
+                <WorkspaceHeader title="Statistiques" description="Scans, top passeports, performance." />
                 <div className="text-muted-foreground flex flex-col items-center gap-3 px-8 py-16 text-sm">
                     <Sparkles className="text-lumiris-amber h-6 w-6" />
                     Vérification de l’accès ATELIER+…
@@ -29,7 +29,7 @@ export default function AnalyticsPage() {
     if (!billing.atelierPlus) {
         return (
             <>
-                <WorkspaceHeader title="Analytics" description="Tableau de bord ATELIER+." />
+                <WorkspaceHeader title="Statistiques" description="Scans, top passeports, performance." />
                 <div className="p-4 md:p-8">
                     <EmptyState
                         icon={Sparkles}
@@ -46,10 +46,7 @@ export default function AnalyticsPage() {
     if (passports.length === 0) {
         return (
             <>
-                <WorkspaceHeader
-                    title="Analytics"
-                    description="Scans QR, performance Iris et top pièces — données déterministes (mock)."
-                />
+                <WorkspaceHeader title="Statistiques" description="Scans, top passeports, performance." />
                 <div className="p-4 md:p-8">
                     <EmptyState
                         icon={BarChart3}
@@ -64,10 +61,7 @@ export default function AnalyticsPage() {
 
     return (
         <>
-            <WorkspaceHeader
-                title="Analytics"
-                description="Scans QR, performance Iris et top pièces — données déterministes (mock)."
-            />
+            <WorkspaceHeader title="Statistiques" description="Scans, top passeports, performance." />
             <Analytics />
         </>
     );

@@ -16,6 +16,7 @@ interface CurationOverlay {
     /** Overlay visuel uniquement — pas un vrai changement de score. */
     overrideGrade?: IrisGrade;
     overrideReason?: string;
+    overrideSource?: string;
     publishedAt?: string;
 }
 

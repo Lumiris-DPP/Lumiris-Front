@@ -1,16 +1,5 @@
 import type { ComponentType } from 'react';
-import {
-    BarChart3,
-    Coins,
-    FileText,
-    Gavel,
-    LayoutDashboard,
-    Scissors,
-    ScrollText,
-    Sparkles,
-    Store,
-    Users,
-} from 'lucide-react';
+import { AlertTriangle, Coins, FileText, LayoutDashboard, ScrollText, Store, Users } from 'lucide-react';
 import type { AdminAction } from '@lumiris/types';
 
 export interface NavRoute {
@@ -40,15 +29,16 @@ export const NAV_GROUPS: readonly NavGroup[] = [
                 shortcut: ['g', 'c'],
             },
             {
-                href: '/conformite',
-                label: 'Conformité ESPR',
-                icon: ScrollText,
+                href: '/signaux',
+                label: 'Signaux',
+                icon: AlertTriangle,
                 requires: 'governance.read_audit_log',
+                shortcut: ['g', 's'],
             },
             {
-                href: '/gouvernance',
-                label: 'Gouvernance',
-                icon: Gavel,
+                href: '/audit',
+                label: 'Audit',
+                icon: ScrollText,
                 requires: 'governance.read_audit_log',
             },
         ],
@@ -65,13 +55,6 @@ export const NAV_GROUPS: readonly NavGroup[] = [
                 shortcut: ['g', 'p'],
             },
             {
-                href: '/iris',
-                label: 'Iris Workbench',
-                icon: Sparkles,
-                requires: 'passport.read',
-                shortcut: ['g', 'i'],
-            },
-            {
                 href: '/artisans',
                 label: 'Artisans',
                 icon: Store,
@@ -82,34 +65,21 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     },
     {
         id: 'reseau',
-        label: 'Réseau & revenus',
+        label: 'Réseau',
         routes: [
             {
-                href: '/retoucheurs',
-                label: 'Retoucheurs',
-                icon: Scissors,
+                href: '/reseau',
+                label: 'Réseau',
+                icon: Users,
                 requires: 'retoucheur.read',
                 shortcut: ['g', 'r'],
             },
             {
-                href: '/vision-users',
-                label: 'Vision Users',
-                icon: Users,
-                requires: 'vision_user.read',
-                shortcut: ['g', 'v'],
-            },
-            {
-                href: '/billing',
-                label: 'Billing',
+                href: '/revenus',
+                label: 'Revenus',
                 icon: Coins,
                 requires: 'billing.read',
-                shortcut: ['g', 'b'],
-            },
-            {
-                href: '/affiliation',
-                label: 'Affiliation',
-                icon: BarChart3,
-                requires: 'affiliation.read',
+                shortcut: ['g', 'v'],
             },
         ],
     },
