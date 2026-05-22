@@ -3,16 +3,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Send } from 'lucide-react';
 import type { Artisan, ArtisanTier } from '@lumiris/types';
+import { Button } from '@lumiris/ui/components/button';
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@lumiris/ui/components/alert-dialog';
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@lumiris/ui/components/dialog';
+import { Label } from '@lumiris/ui/components/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@lumiris/ui/components/select';
 import { Textarea } from '@lumiris/ui/components/textarea';
 import { useToast } from '@lumiris/ui/hooks/use-toast';
@@ -98,24 +98,23 @@ export function ContactDialog({ artisan, open, onOpenChange, upgradeHint = null 
     };
 
     return (
-        <AlertDialog open={open} onOpenChange={onOpenChange}>
-            <AlertDialogContent className="sm:max-w-xl">
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Contacter {artisan.displayName}</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Choisissez un modèle d&apos;outreach, ajustez le message, puis confirmez. Le contenu final est
-                        écrit dans le journal d&apos;audit avec son identifiant de modèle.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-xl">
+                <DialogHeader>
+                    <DialogTitle>Contacter {artisan.displayName}</DialogTitle>
+                    <DialogDescription>
+                        Choisissez un modèle d&apos;outreach, ajustez le message, puis envoyez.
+                    </DialogDescription>
+                </DialogHeader>
 
                 <div className="space-y-3">
-                    <div>
-                        <label
+                    <div className="space-y-1.5">
+                        <Label
                             htmlFor="contact-template-select"
-                            className="text-muted-foreground mb-1 block text-[10px] uppercase tracking-wider"
+                            className="text-muted-foreground text-[11px] uppercase tracking-wider"
                         >
                             Modèle
-                        </label>
+                        </Label>
                         <Select value={templateId} onValueChange={(value) => setTemplateId(value as ContactTemplateId)}>
                             <SelectTrigger id="contact-template-select" aria-label="Choisir un modèle de message">
                                 <SelectValue />
@@ -130,13 +129,13 @@ export function ContactDialog({ artisan, open, onOpenChange, upgradeHint = null 
                         </Select>
                     </div>
 
-                    <div>
-                        <label
+                    <div className="space-y-1.5">
+                        <Label
                             htmlFor="contact-message-body"
-                            className="text-muted-foreground mb-1 block text-[10px] uppercase tracking-wider"
+                            className="text-muted-foreground text-[11px] uppercase tracking-wider"
                         >
                             Message final
-                        </label>
+                        </Label>
                         <Textarea
                             id="contact-message-body"
                             value={body}
@@ -146,17 +145,15 @@ export function ContactDialog({ artisan, open, onOpenChange, upgradeHint = null 
                     </div>
                 </div>
 
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Annuler</AlertDialogCancel>
-                    <AlertDialogAction
-                        onClick={handleSend}
-                        disabled={!canContact || body.trim().length === 0}
-                        className="gap-1.5"
-                    >
+                <DialogFooter>
+                    <Button variant="ghost" onClick={() => onOpenChange(false)}>
+                        Annuler
+                    </Button>
+                    <Button onClick={handleSend} disabled={!canContact || body.trim().length === 0} className="gap-1.5">
                         <Send className="h-3.5 w-3.5" aria-hidden /> Envoyer
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 }

@@ -8,7 +8,8 @@ import {
     type ArtisanCertificate,
     type LocalCertificate,
 } from '@/lib/certificates-store';
-import { CertificateForm, KIND_LABEL, type CertificateFormValues } from './add-dialog';
+import { CertificateForm, type CertificateFormValues } from './certificate-form';
+import { KIND_LABEL } from './certification-status';
 
 interface RenewCertificateDialogProps {
     open: boolean;

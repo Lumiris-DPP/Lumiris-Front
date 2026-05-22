@@ -66,6 +66,9 @@ const ROLE_FAMILY: Record<AdminAction, AdminUserRole | null> = {
     'governance.export_audit_log': 'platform_admin',
     'governance.anomaly_acknowledge': 'platform_admin',
     'governance.anomaly_escalate': 'platform_admin',
+    'auth.signin': null,
+    'auth.signin_failed': null,
+    'auth.signout': null,
 };
 
 function isAfterHours(iso: string): boolean {

@@ -1,7 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { Menu } from 'lucide-react';
 import { Button } from '@lumiris/ui/components/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@lumiris/ui/components/tooltip';
 import { cn } from '@lumiris/ui/lib/cn';
 import { NotificationsBell } from '@/features/notifications-bell';
 import { UserMenu } from '@/features/user-menu';
@@ -34,31 +36,38 @@ export function WorkspaceHeader({ title, description, actions }: WorkspaceHeader
                 </Button>
 
                 <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                        <p className="text-muted-foreground truncate text-[11px] font-medium uppercase tracking-wider">
-                            {artisan.atelierName} · {artisan.city}
-                        </p>
-                        <span
-                            className={cn(
-                                'rounded-md px-2 py-0.5 font-mono text-[10px] font-semibold uppercase',
-                                artisan.tier === 'Solo' && 'bg-tier-solo/15 text-tier-solo',
-                                artisan.tier === 'Studio' && 'bg-tier-studio/15 text-tier-studio',
-                                artisan.tier === 'Maison' && 'bg-tier-maison/15 text-tier-maison',
-                            )}
-                        >
-                            {artisan.tier}
-                        </span>
-                    </div>
-                    <h1 className="text-foreground mt-1 truncate text-xl font-semibold tracking-tight">{title}</h1>
+                    <h1 className="text-foreground truncate text-xl font-semibold tracking-tight">{title}</h1>
                     {description && <p className="text-muted-foreground mt-0.5 truncate text-sm">{description}</p>}
                 </div>
 
                 <div className="flex items-center gap-2 md:gap-3">
                     {actions}
+                    <TierBadge tier={artisan.tier} />
                     <NotificationsBell notifications={notifications} />
                     <UserMenu artisan={artisan} />
                 </div>
             </div>
         </header>
+    );
+}
+
+function TierBadge({ tier }: { tier: 'Solo' | 'Studio' | 'Maison' }) {
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <Link
+                    href="/subscription"
+                    className={cn(
+                        'rounded-md px-2 py-1 font-mono text-[10px] font-semibold uppercase',
+                        tier === 'Solo' && 'bg-tier-solo/15 text-tier-solo',
+                        tier === 'Studio' && 'bg-tier-studio/15 text-tier-studio',
+                        tier === 'Maison' && 'bg-tier-maison/15 text-tier-maison',
+                    )}
+                >
+                    {tier}
+                </Link>
+            </TooltipTrigger>
+            <TooltipContent>Plan {tier} — voir l’abonnement</TooltipContent>
+        </Tooltip>
     );
 }

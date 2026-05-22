@@ -5,7 +5,6 @@ import { mockAffiliationEvents } from '@lumiris/mock-data';
 import type { AffiliationEvent } from '@lumiris/types';
 import { Badge } from '@lumiris/ui/components/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
-import { TabsContent } from '@lumiris/ui/components/tabs';
 import { cn } from '@lumiris/ui/lib/cn';
 import {
     COMMISSION_ANONYMIZE_AFTER_DAYS,
@@ -54,7 +53,7 @@ export function CommissionsTab({ retoucheurId }: CommissionsTabProps) {
     const total = rows.reduce((acc, ev) => acc + ev.commission.amountEur, 0);
 
     return (
-        <TabsContent value="commissions" className="m-0 space-y-3">
+        <div className="space-y-3">
             <div className="border-border bg-card flex items-baseline justify-between rounded-xl border p-3">
                 <div>
                     <p className="text-foreground font-medium">Mises en relation — 90 derniers jours</p>
@@ -114,7 +113,7 @@ export function CommissionsTab({ retoucheurId }: CommissionsTabProps) {
                     </Table>
                 </div>
             )}
-        </TabsContent>
+        </div>
     );
 }
 

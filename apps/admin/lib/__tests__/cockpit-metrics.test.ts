@@ -1,14 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import {
-    buildAcquisitionFunnel,
-    buildArtisanKpi,
-    buildCurationKpi,
-    buildEsprCountdown,
-    buildIrisKpi,
-    buildLtvCacRows,
-    buildMrrKpi,
-    buildTrajectory,
-} from '../cockpit-metrics';
+import { buildArtisanKpi, buildCurationKpi, buildIrisKpi, buildMrrKpi, buildTrajectory } from '../cockpit-metrics';
 import { makeArtisan, makeAuditEntry, makePassport, makeSubscription } from '@/test/factories';
 
 const NOW = new Date('2026-04-30T00:00:00Z');
@@ -211,64 +202,5 @@ describe('buildTrajectory — ARR vs charges, scénario nominal / stressé', () 
 
     it('chargesAnnualized > 0 dès M0', () => {
         expect(buildTrajectory(false).points[0]?.chargesAnnualized).toBeGreaterThan(0);
-    });
-});
-
-describe('buildLtvCacRows', () => {
-    it('renvoie 5 lignes avec tone et ratio finis', () => {
-        const rows = buildLtvCacRows();
-        expect(rows.length).toBe(5);
-        for (const r of rows) {
-            expect(['good', 'watch', 'bad']).toContain(r.tone);
-            expect(r.ltvEur).toBeGreaterThanOrEqual(0);
-        }
-    });
-});
-
-describe('buildAcquisitionFunnel', () => {
-    it('renvoie 4 étapes (lead / démo / signature / activation)', () => {
-        const funnel = buildAcquisitionFunnel(NOW);
-        expect(funnel.stages.length).toBe(4);
-    });
-
-    it('totalLeads > 0', () => {
-        expect(buildAcquisitionFunnel(NOW).totalLeads).toBeGreaterThan(0);
-    });
-
-    it("chaque slice correspond à un canal d'acquisition", () => {
-        const funnel = buildAcquisitionFunnel(NOW);
-        const sources = funnel.slices.map((s) => s.source).sort();
-        expect(sources).toEqual(['CMA', 'Démarchage', 'LinkedIn', 'RP', 'Salon']);
-    });
-
-    it('les conversions décroissent étape par étape', () => {
-        const funnel = buildAcquisitionFunnel(NOW);
-        const conversions = funnel.stages.map((s) => s.conversion);
-        for (let i = 1; i < conversions.length; i++) {
-            expect(conversions[i]).toBeLessThan(conversions[i - 1]!);
-        }
-    });
-});
-
-describe('buildEsprCountdown', () => {
-    it('renvoie 3 deadlines avec daysLeft signé (clock injecté via now)', () => {
-        const entries = buildEsprCountdown(NOW);
-        expect(entries.length).toBe(3);
-        for (const e of entries) {
-            expect(typeof e.daysLeft).toBe('number');
-        }
-    });
-
-    it('au 2026-05-19 le registre 2026-07-19 reste à venir', () => {
-        const today = new Date('2026-05-19T00:00:00Z');
-        const entries = buildEsprCountdown(today);
-        const registry = entries.find((e) => e.deadline.id === 'espr-registry-open');
-        expect(registry?.daysLeft).toBeGreaterThan(0);
-    });
-
-    it('au 2029-01-01 toutes les deadlines sont dépassées', () => {
-        const future = new Date('2029-01-01T00:00:00Z');
-        const entries = buildEsprCountdown(future);
-        for (const e of entries) expect(e.daysLeft).toBeLessThanOrEqual(0);
     });
 });

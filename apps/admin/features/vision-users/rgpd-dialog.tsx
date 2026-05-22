@@ -14,13 +14,12 @@ import {
     AlertDialogTitle,
 } from '@lumiris/ui/components/alert-dialog';
 import { Button } from '@lumiris/ui/components/button';
-import { Input } from '@lumiris/ui/components/input';
+import { Checkbox } from '@lumiris/ui/components/checkbox';
+import { Label } from '@lumiris/ui/components/label';
 import { Textarea } from '@lumiris/ui/components/textarea';
 import { useLogAction, usePermission } from '@/lib/auth';
 import { PermissionRequiredAction } from '../_shared/permission-required-action';
 import type { RgpdLocalStatus } from './segments';
-
-const MIN_REASON_LENGTH = 30;
 
 interface RgpdDialogProps {
     user: MockVisionUser;
@@ -36,18 +35,15 @@ export function RgpdDialog({ user, status, onStatusChange, onAnnounce }: RgpdDia
 
     const [exportOpen, setExportOpen] = useState(false);
     const [exportReason, setExportReason] = useState('');
+    const [exportConfirmed, setExportConfirmed] = useState(false);
 
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [deleteReason, setDeleteReason] = useState('');
-    const [deleteTypedEmail, setDeleteTypedEmail] = useState('');
+    const [deleteConfirmed, setDeleteConfirmed] = useState(false);
     const [announcement, setAnnouncement] = useState('');
 
     const isCompleted = status === 'completed';
     const isPendingDeletion = status === 'pending_deletion';
-
-    const exportReady = exportReason.trim().length >= MIN_REASON_LENGTH;
-    const deleteReady =
-        deleteReason.trim().length >= MIN_REASON_LENGTH && !!user.email && deleteTypedEmail.trim() === user.email;
 
     const announce = (message: string) => {
         setAnnouncement(message);
@@ -55,7 +51,7 @@ export function RgpdDialog({ user, status, onStatusChange, onAnnounce }: RgpdDia
     };
 
     const handleExportConfirm = () => {
-        if (!exportReady) return;
+        if (!exportConfirmed) return;
         const entry = log({
             action: 'vision_user.gdpr_export',
             targetType: 'vision_user',
@@ -69,11 +65,12 @@ export function RgpdDialog({ user, status, onStatusChange, onAnnounce }: RgpdDia
         announce(`Export RGPD enregistré — audit log ${entry.id} créé.`);
         onStatusChange('requested');
         setExportReason('');
+        setExportConfirmed(false);
         setExportOpen(false);
     };
 
     const handleDeleteConfirm = () => {
-        if (!deleteReady) return;
+        if (!deleteConfirmed) return;
         const entry = log({
             action: 'vision_user.gdpr_delete',
             targetType: 'vision_user',
@@ -87,7 +84,7 @@ export function RgpdDialog({ user, status, onStatusChange, onAnnounce }: RgpdDia
         announce(`Suppression enregistrée — audit log ${entry.id} créé.`);
         onStatusChange('pending_deletion');
         setDeleteReason('');
-        setDeleteTypedEmail('');
+        setDeleteConfirmed(false);
         setDeleteOpen(false);
     };
 
@@ -125,7 +122,10 @@ export function RgpdDialog({ user, status, onStatusChange, onAnnounce }: RgpdDia
                 open={exportOpen}
                 onOpenChange={(open) => {
                     setExportOpen(open);
-                    if (!open) setExportReason('');
+                    if (!open) {
+                        setExportReason('');
+                        setExportConfirmed(false);
+                    }
                 }}
             >
                 <AlertDialogContent>
@@ -134,31 +134,33 @@ export function RgpdDialog({ user, status, onStatusChange, onAnnounce }: RgpdDia
                             <Download className="h-4 w-4" aria-hidden /> Export RGPD
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            La demande sera tracée dans le journal d&apos;audit et le statut passera à{' '}
-                            <strong>Export demandé</strong>. Aucun fichier n&apos;est généré côté V1 — l&apos;export
-                            complet est délivré hors-bande par le DPO.
+                            Tracé dans l&apos;audit log. Export hors-bande par le DPO.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <div className="space-y-2">
-                        <p className="text-muted-foreground text-[11px]">
-                            Motif (≥ {MIN_REASON_LENGTH} caractères) :{' '}
-                            <span className="font-mono">
-                                {exportReason.trim().length}/{MIN_REASON_LENGTH}
-                            </span>
-                        </p>
+                    <div className="space-y-3">
                         <Textarea
                             value={exportReason}
                             onChange={(e) => setExportReason(e.target.value)}
-                            placeholder="Exemple : demande utilisateur transmise par email — ticket support #4231"
-                            className="min-h-24"
-                            aria-label="Motif de l'export RGPD"
+                            placeholder="Motif"
+                            className="min-h-20"
+                            aria-label="Motif"
                         />
+                        <div className="inline-flex items-center gap-2">
+                            <Checkbox
+                                id="rgpd-export-confirm"
+                                checked={exportConfirmed}
+                                onCheckedChange={(v) => setExportConfirmed(Boolean(v))}
+                            />
+                            <Label htmlFor="rgpd-export-confirm" className="text-foreground cursor-pointer text-xs">
+                                Je confirme — l&apos;accès est tracé
+                            </Label>
+                        </div>
                     </div>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Annuler</AlertDialogCancel>
                         <PermissionRequiredAction requires="vision_user.gdpr_export">
-                            <AlertDialogAction onClick={handleExportConfirm} disabled={!exportReady}>
-                                Confirmer la demande
+                            <AlertDialogAction onClick={handleExportConfirm} disabled={!exportConfirmed}>
+                                Confirmer
                             </AlertDialogAction>
                         </PermissionRequiredAction>
                     </AlertDialogFooter>
@@ -171,51 +173,34 @@ export function RgpdDialog({ user, status, onStatusChange, onAnnounce }: RgpdDia
                     setDeleteOpen(open);
                     if (!open) {
                         setDeleteReason('');
-                        setDeleteTypedEmail('');
+                        setDeleteConfirmed(false);
                     }
                 }}
             >
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle className="text-lumiris-rose inline-flex items-center gap-2">
-                            <ShieldAlert className="h-4 w-4" aria-hidden /> Supprimer le compte
+                            <ShieldAlert className="h-4 w-4" aria-hidden /> Supprimer compte
                         </AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Le compte sera marqué <strong>Suppression en attente</strong> et entrera dans la file
-                            d&apos;anonymisation. Action tracée dans le journal d&apos;audit ; irréversible après
-                            confirmation.
-                        </AlertDialogDescription>
+                        <AlertDialogDescription>Irréversible. Tracé dans l&apos;audit log.</AlertDialogDescription>
                     </AlertDialogHeader>
                     <div className="space-y-3">
-                        <div>
-                            <p className="text-muted-foreground mb-1 text-[11px]">
-                                Motif (≥ {MIN_REASON_LENGTH} caractères) :{' '}
-                                <span className="font-mono">
-                                    {deleteReason.trim().length}/{MIN_REASON_LENGTH}
-                                </span>
-                            </p>
-                            <Textarea
-                                value={deleteReason}
-                                onChange={(e) => setDeleteReason(e.target.value)}
-                                placeholder="Exemple : demande utilisateur par formulaire DPO du 2026-04-30, identité vérifiée"
-                                className="min-h-20"
-                                aria-label="Motif de la suppression"
+                        <Textarea
+                            value={deleteReason}
+                            onChange={(e) => setDeleteReason(e.target.value)}
+                            placeholder="Motif"
+                            className="min-h-20"
+                            aria-label="Motif"
+                        />
+                        <div className="inline-flex items-start gap-2">
+                            <Checkbox
+                                id="rgpd-delete-confirm"
+                                checked={deleteConfirmed}
+                                onCheckedChange={(v) => setDeleteConfirmed(Boolean(v))}
                             />
-                        </div>
-                        <div>
-                            <p className="text-muted-foreground mb-1 text-[11px]">
-                                Tapez l&apos;email exact du compte pour confirmer :{' '}
-                                <code className="bg-muted text-foreground rounded px-1 font-mono text-[11px]">
-                                    {user.email ?? '-'}
-                                </code>
-                            </p>
-                            <Input
-                                value={deleteTypedEmail}
-                                onChange={(e) => setDeleteTypedEmail(e.target.value)}
-                                placeholder="email@exemple.com"
-                                autoComplete="off"
-                                aria-label="Email exact du compte pour confirmation"
-                            />
+                            <Label htmlFor="rgpd-delete-confirm" className="text-foreground cursor-pointer text-xs">
+                                Je confirme — l&apos;action est tracée
+                            </Label>
                         </div>
                     </div>
                     <AlertDialogFooter>
@@ -223,10 +208,10 @@ export function RgpdDialog({ user, status, onStatusChange, onAnnounce }: RgpdDia
                         <PermissionRequiredAction requires="vision_user.gdpr_delete">
                             <AlertDialogAction
                                 onClick={handleDeleteConfirm}
-                                disabled={!deleteReady}
+                                disabled={!deleteConfirmed}
                                 className="bg-lumiris-rose hover:bg-lumiris-rose/90"
                             >
-                                Confirmer la suppression
+                                Supprimer
                             </AlertDialogAction>
                         </PermissionRequiredAction>
                     </AlertDialogFooter>

@@ -56,5 +56,11 @@ export default [
             curly: ['error', 'all'],
         },
     },
+    {
+        files: ['**/__tests__/**', '**/*.test.{ts,tsx,js,jsx}', '**/*.spec.{ts,tsx,js,jsx}'],
+        rules: {
+            '@typescript-eslint/no-non-null-assertion': 'off',
+        },
+    },
     prettier,
 ];

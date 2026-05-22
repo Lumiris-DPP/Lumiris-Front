@@ -1,3 +1,5 @@
+import { PlusCircle } from 'lucide-react';
+import { CreatePassportCta } from '@/features/quota-upsell/create-passport-cta';
 import { WorkspaceHeader } from '@/features/workspace-header';
 import { Dashboard } from '@/features/dashboard';
 
@@ -6,7 +8,11 @@ export default function DashboardPage() {
         <>
             <WorkspaceHeader
                 title="Tableau de bord"
-                description="Vue d'ensemble de vos passeports et de votre score Iris."
+                actions={
+                    <CreatePassportCta className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 text-white">
+                        <PlusCircle className="mr-1.5 h-4 w-4" /> Nouveau passeport
+                    </CreatePassportCta>
+                }
             />
             <Dashboard />
         </>

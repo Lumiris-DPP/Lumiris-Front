@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Megaphone, PartyPopper, Send } from 'lucide-react';
 import { EmptyState } from '../_shared/empty-state';
 import {
@@ -27,18 +28,15 @@ interface GapAnalysisProps {
 }
 
 export function GapAnalysis({ gaps, totalArtisans }: GapAnalysisProps) {
+    const router = useRouter();
     const [dialogOpen, setDialogOpen] = useState(false);
     return (
-        <section className="border-border bg-card opal-shadow rounded-xl border">
+        <section className="border-border bg-card rounded-xl border">
             <div className="border-border flex flex-wrap items-baseline justify-between gap-3 border-b px-5 py-4">
                 <div>
                     <h3 className="text-foreground text-sm font-semibold">
-                        Gap analysis · {gaps.length} artisans non prêts
+                        Gap analysis · {gaps.length} / {totalArtisans}
                     </h3>
-                    <p className="text-muted-foreground mt-1 text-xs">
-                        Sur {totalArtisans} artisans actifs. Triés par sévérité descendante. Une campagne
-                        d&apos;activation regroupe les actions recommandées.
-                    </p>
                 </div>
                 <Button
                     size="sm"
@@ -46,17 +44,13 @@ export function GapAnalysis({ gaps, totalArtisans }: GapAnalysisProps) {
                     disabled={gaps.length === 0}
                     className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 gap-1.5"
                 >
-                    <Megaphone className="h-3.5 w-3.5" /> Lancer campagne d&apos;activation
+                    <Megaphone className="h-3.5 w-3.5" /> Lancer campagne
                 </Button>
             </div>
 
             {gaps.length === 0 ? (
                 <div className="p-6">
-                    <EmptyState
-                        icon={PartyPopper}
-                        title="Aucun artisan non prêt — bravo"
-                        description="Tous les artisans sont prêts pour l'échéance textile 2028. Continuez à surveiller la cadence des nouveaux entrants."
-                    />
+                    <EmptyState icon={PartyPopper} title="Aucun gap." />
                 </div>
             ) : (
                 <Table>
@@ -70,7 +64,20 @@ export function GapAnalysis({ gaps, totalArtisans }: GapAnalysisProps) {
                     </TableHeader>
                     <TableBody>
                         {gaps.map((gap) => (
-                            <TableRow key={gap.artisanId}>
+                            <TableRow
+                                key={gap.artisanId}
+                                tabIndex={0}
+                                role="button"
+                                aria-label={`Ouvrir l'atelier ${gap.artisanName}`}
+                                onClick={() => router.push(`/artisans?id=${gap.artisanId}`)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        router.push(`/artisans?id=${gap.artisanId}`);
+                                    }
+                                }}
+                                className="hover:bg-muted/40 cursor-pointer"
+                            >
                                 <TableCell>
                                     <p className="text-foreground text-sm">{gap.artisanName}</p>
                                     <p className="text-muted-foreground text-[11px]">
@@ -166,29 +173,25 @@ function CampaignDialog({
         <AlertDialog open={open} onOpenChange={onOpenChange}>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Lancer la campagne d&apos;activation ESPR</AlertDialogTitle>
+                    <AlertDialogTitle>Lancer la campagne</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Prépare un envoi groupé à {gaps.length} ateliers. <strong>Aucun envoi réel</strong> en V1 - la
-                        campagne est uniquement journalisée dans l&apos;audit log pour suivi gouvernance.
+                        Envoi groupé à {gaps.length} ateliers. Tracé dans l&apos;audit log.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <Textarea
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     className="min-h-24"
-                    placeholder="Message envoyé aux ateliers ciblés…"
+                    placeholder="Message…"
                 />
-                <p className="text-muted-foreground text-[11px]">
-                    Tracé : <span className="font-mono">artisan.contact</span> · campaign=espr-activation · dryRun=true
-                </p>
                 <AlertDialogFooter>
                     <AlertDialogCancel>Annuler</AlertDialogCancel>
                     <AlertDialogAction
                         onClick={handleLaunch}
-                        disabled={gaps.length === 0 || message.trim().length < 10}
+                        disabled={gaps.length === 0}
                         className="bg-lumiris-emerald hover:bg-lumiris-emerald/90"
                     >
-                        Lancer · {gaps.length} ateliers
+                        Lancer · {gaps.length}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

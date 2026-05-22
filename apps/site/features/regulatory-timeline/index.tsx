@@ -16,42 +16,42 @@ const ENTRIES: readonly TimelineEntry[] = [
         label: 'AGEC promulguée',
         region: 'France',
         description:
-            'Loi anti-gaspillage : socle français de l’affichage environnemental. Affichage progressif de 2020 à 2029.',
+            'Loi anti-gaspillage : socle français de l’étiquetage environnemental textile et du bonus réparation.',
     },
     {
         date: 'Juillet 2024',
         label: 'ESPR en vigueur',
         region: 'UE',
         description:
-            'Le règlement européen ESPR entre en vigueur. Programme de travail textile en priorité 1 dès mars 2025.',
+            'Le règlement européen ESPR entre en vigueur. Programme de travail 2025-2030 : textile prioritaire, puis tech, batteries, électroménager, meubles.',
     },
     {
         date: '19 juillet 2026',
         label: 'Registre central DPP',
         region: 'UE',
         description:
-            'Ouverture du registre central des Digital Product Passports. URL canonique pour chaque passeport européen.',
+            'Ouverture du registre central des Digital Product Passports. URL canonique unique pour chaque passeport européen, tous secteurs confondus.',
     },
     {
-        date: '1ᵉʳ janvier 2027',
-        label: 'AGEC obligatoire',
-        region: 'France',
-        description:
-            'Affichage environnemental obligatoire pour les acteurs > 50 M€ de chiffre d’affaires. Sanctions DGCCRF.',
-    },
-    {
-        date: 'Q2 2027',
+        date: '2027',
         label: 'Acte délégué textile',
         region: 'UE',
         description:
-            'Adoption de l’acte délégué qui définit les seuils précis par catégorie (vêtement, chaussure, accessoire).',
+            'Adoption de l’acte délégué qui définit les exigences DPP précises pour le textile (catégories, seuils, formats). Premières vagues élec et batteries la même année.',
     },
     {
-        date: 'Mi-2028',
-        label: 'DPP en application',
+        date: 'Mi-2028 → 2029',
+        label: 'DPP textile obligatoire',
         region: 'UE',
         description:
-            'Application pleine et entière du DPP textile. Premiers contrôles DGCCRF. Tout vêtement vendu en UE doit l’exposer.',
+            'Application pleine et entière du DPP textile, 18 mois après l’adoption. TPE et micro-entreprises incluses : tout vêtement vendu en UE doit l’exposer.',
+    },
+    {
+        date: '2028 → 2030',
+        label: 'Vagues suivantes',
+        region: 'UE',
+        description:
+            'Actes délégués pour l’électronique, l’électroménager, le mobilier, les jouets. Extension méthodique de la plateforme ATELIER au rythme du calendrier ESPR.',
     },
 ];
 
@@ -76,11 +76,12 @@ export function RegulatoryTimeline() {
                         Calendrier réglementaire
                     </p>
                     <h2 id="timeline-title" className="text-foreground text-balance text-3xl font-bold sm:text-4xl">
-                        AGEC, ESPR, DPP : tous les jalons
+                        AGEC, ESPR, DPP : la fenêtre 2026-2030
                     </h2>
                     <p className="text-muted-foreground mt-3 leading-relaxed">
-                        Le passage à un textile traçable se déroule en six étapes. LUMIRIS prépare votre conformité dès
-                        aujourd’hui - sans attendre la dernière vague.
+                        Le textile ouvre la marche, puis l’ESPR couvre tech, batteries, électroménager et mobilier. Une
+                        fenêtre de 24 à 30 mois pour s’imposer sur le textile avant que les vagues suivantes
+                        n’élargissent le marché.
                     </p>
                 </motion.div>
 

@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
 
-export const alt = 'LUMIRIS - Le passeport numérique du textile artisanal français';
+export const alt = 'LUMIRIS — Le passeport numérique de la consommation européenne';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -49,10 +49,10 @@ export default function Image() {
                         color: '#0f172a',
                     }}
                 >
-                    Le passeport numérique du textile artisanal français.
+                    Un scan, une histoire, un score Iris.
                 </div>
                 <div style={{ display: 'flex', fontSize: 28, color: '#64748b', marginTop: 28 }}>
-                    Conforme ESPR / AGEC · Aucun acteur n’achète son score
+                    DPP textile artisanal + scanner universel ESPR · Aucun acteur n’achète son score
                 </div>
             </div>
 

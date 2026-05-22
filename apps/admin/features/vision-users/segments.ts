@@ -51,12 +51,6 @@ export const SEGMENT_META: Record<SegmentKey, SegmentMeta> = {
     },
 };
 
-export const TIER_OPTIONS = ['all', 'with_account', 'anonymous'] as const;
-export type TierFilter = (typeof TIER_OPTIONS)[number];
-
-export const RGPD_STATUS_OPTIONS = ['all', 'none', 'requested', 'pending_deletion', 'completed'] as const;
-export type RgpdStatusFilter = (typeof RGPD_STATUS_OPTIONS)[number];
-
 export const ARPU_NO_ACCOUNT_EUR = 2;
 export const ARPU_WITH_ACCOUNT_EUR = 3.8;
 

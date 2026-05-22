@@ -1,52 +1,63 @@
 'use client';
 
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { AdminUser } from '@lumiris/types';
 import { mockAdminUsers } from '@lumiris/mock-data';
-
-const DEFAULT_USER: AdminUser = mockAdminUsers[0] ?? {
-    id: 'ADM-DEV',
-    email: 'dev@lumiris.fr',
-    fullName: 'Dev Admin',
-    role: 'platform_admin',
-    createdAt: new Date('2026-01-01').toISOString(),
-};
+import { auth, type AdminSession } from './session';
 
 interface CurrentUserContextValue {
-    currentUser: AdminUser;
-    setCurrentUser: (user: AdminUser) => void;
+    session: AdminSession | null;
+    currentUser: AdminUser | null;
     availableUsers: readonly AdminUser[];
 }
 
 const CurrentUserContext = createContext<CurrentUserContextValue | null>(null);
 
 export function AdminUserProvider({ children }: { children: ReactNode }) {
-    const [currentUser, setCurrentUser] = useState<AdminUser>(DEFAULT_USER);
+    const [session, setSession] = useState<AdminSession | null>(null);
+
+    useEffect(() => {
+        setSession(auth.getSession());
+        return auth.subscribe(setSession);
+    }, []);
 
     const value = useMemo<CurrentUserContextValue>(
         () => ({
-            currentUser,
-            setCurrentUser,
+            session,
+            currentUser: session?.user ?? null,
             availableUsers: mockAdminUsers,
         }),
-        [currentUser],
+        [session],
     );
 
     return <CurrentUserContext.Provider value={value}>{children}</CurrentUserContext.Provider>;
 }
 
-export function useCurrentUser(): AdminUser {
+function useContextOrThrow(): CurrentUserContextValue {
     const ctx = useContext(CurrentUserContext);
-    if (!ctx) throw new Error('useCurrentUser must be used inside <AdminUserProvider>.');
-    return ctx.currentUser;
+    if (!ctx) throw new Error('useCurrentUser/useSession must be used inside <AdminUserProvider>.');
+    return ctx;
+}
+
+export function useCurrentUser(): AdminUser | null {
+    return useContextOrThrow().currentUser;
+}
+
+export function useSession(): AdminSession | null {
+    return useContextOrThrow().session;
 }
 
 export function useAdminUserSwitcher(): {
-    currentUser: AdminUser;
-    setCurrentUser: (user: AdminUser) => void;
+    currentUser: AdminUser | null;
     availableUsers: readonly AdminUser[];
+    switchTo: (user: AdminUser) => Promise<void>;
 } {
-    const ctx = useContext(CurrentUserContext);
-    if (!ctx) throw new Error('useAdminUserSwitcher must be used inside <AdminUserProvider>.');
-    return ctx;
+    const ctx = useContextOrThrow();
+    return {
+        currentUser: ctx.currentUser,
+        availableUsers: ctx.availableUsers,
+        switchTo: async (user: AdminUser) => {
+            await auth.signIn(user.email, '__dev__', true);
+        },
+    };
 }

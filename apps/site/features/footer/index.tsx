@@ -23,7 +23,8 @@ export function Footer() {
                             <span className="text-foreground text-base font-semibold tracking-tight">LUMIRIS</span>
                         </Link>
                         <p className="text-muted-foreground text-sm leading-relaxed">
-                            Le passeport numérique du textile artisanal français. Un scan, une histoire, un score Iris.
+                            Le passeport numérique du textile artisanal français, et le scanner universel des DPP
+                            européens. Un scan, une histoire, un score Iris.
                         </p>
                     </div>
 

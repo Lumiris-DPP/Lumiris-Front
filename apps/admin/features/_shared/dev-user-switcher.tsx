@@ -29,9 +29,11 @@ const ROLE_TONE: Record<AdminUserRole, string> = {
     dpo: 'text-lumiris-rose',
 };
 
-// Dev-only — wrapper sous `process.env.NODE_ENV` côté intégration pour ne pas leaker en prod.
+// Dev-only — le gating `process.env.NODE_ENV !== 'production'` est appliqué dans la topbar.
 export function DevUserSwitcher() {
-    const { currentUser, setCurrentUser, availableUsers } = useAdminUserSwitcher();
+    const { currentUser, switchTo, availableUsers } = useAdminUserSwitcher();
+
+    if (!currentUser) return null;
 
     return (
         <DropdownMenu>
@@ -39,7 +41,7 @@ export function DevUserSwitcher() {
                 <button
                     type="button"
                     className={cn(
-                        'border-border bg-background hover:border-lumiris-emerald/40 flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs transition-colors',
+                        'border-muted-foreground/40 bg-background hover:border-muted-foreground/70 flex items-center gap-2 rounded-md border border-dashed px-2.5 py-1.5 text-xs opacity-60 transition-opacity hover:opacity-100',
                     )}
                 >
                     <UserCog className="text-muted-foreground h-3.5 w-3.5" aria-hidden />
@@ -58,7 +60,9 @@ export function DevUserSwitcher() {
                 {availableUsers.map((user) => (
                     <DropdownMenuItem
                         key={user.id}
-                        onSelect={() => setCurrentUser(user)}
+                        onSelect={() => {
+                            void switchTo(user);
+                        }}
                         className="flex items-start gap-2"
                     >
                         <div className="bg-muted text-muted-foreground mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold">

@@ -1,10 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { Clock, History } from 'lucide-react';
-import { IRIS_THRESHOLDS } from '@lumiris/core/scoring';
-import type { AdminAuditLogEntry, IrisAxis, IrisGrade as IrisGradeLetter, Passport, ScoreResult } from '@lumiris/types';
-import { gradeBackground, gradeColor } from '@lumiris/scoring-ui';
+import { useEffect, useState } from 'react';
+import type { AdminAuditLogEntry, IrisGrade as IrisGradeLetter, Passport, ScoreResult } from '@lumiris/types';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -15,9 +12,10 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@lumiris/ui/components/alert-dialog';
+import { Checkbox } from '@lumiris/ui/components/checkbox';
+import { Input } from '@lumiris/ui/components/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@lumiris/ui/components/select';
 import { Textarea } from '@lumiris/ui/components/textarea';
-import { cn } from '@lumiris/ui/lib/cn';
 import { useLogAction } from '@/lib/auth';
 import { useCurationStore } from '../curation-store';
 
@@ -29,62 +27,30 @@ interface OverrideDialogProps {
     onAfterAction: (entry: AdminAuditLogEntry) => void;
 }
 
-const MIN_REASON_LENGTH = 20;
-
-const AXIS_LABEL: Record<IrisAxis, string> = {
-    transparency: 'Transparence',
-    craftsmanship: 'Savoir-faire',
-    impact: 'Impact',
-    repairability: 'Réparabilité',
-};
-
-const AXIS_MAX_POINTS: Record<IrisAxis, number> = {
-    transparency: 40,
-    craftsmanship: 25,
-    impact: 25,
-    repairability: 10,
-};
-
-function gradeTargetTotal(grade: IrisGradeLetter): number {
-    if (grade === 'A') return IRIS_THRESHOLDS.A;
-    if (grade === 'B') return IRIS_THRESHOLDS.B;
-    if (grade === 'C') return IRIS_THRESHOLDS.C;
-    if (grade === 'D') return IRIS_THRESHOLDS.D;
-    return 0;
-}
-
 export function OverrideDialog({ passport, score, open, onOpenChange, onAfterAction }: OverrideDialogProps) {
     const log = useLogAction();
     const { setOverlay } = useCurationStore();
     const grade = score.grade;
     const [overrideGrade, setOverrideGrade] = useState<IrisGradeLetter>(grade);
     const [reason, setReason] = useState('');
+    const [source, setSource] = useState('');
+    const [confirmed, setConfirmed] = useState(false);
 
-    const axisDelta = useMemo(() => {
-        const currentTotal = score.total;
-        const targetTotal = gradeTargetTotal(overrideGrade);
-        const totalGap = targetTotal - currentTotal;
-        const axes: IrisAxis[] = ['transparency', 'craftsmanship', 'impact', 'repairability'];
-        return axes.map((axis) => {
-            const currentWeighted = score.breakdown[axis] * score.weights[axis];
-            const proposedWeighted = currentWeighted + totalGap * score.weights[axis];
-            return {
-                axis,
-                before: currentWeighted,
-                after: proposedWeighted,
-                delta: proposedWeighted - currentWeighted,
-                max: AXIS_MAX_POINTS[axis],
-            };
-        });
-    }, [score, overrideGrade]);
+    useEffect(() => {
+        if (!open) {
+            setOverrideGrade(grade);
+            setReason('');
+            setSource('');
+            setConfirmed(false);
+        }
+    }, [open, grade]);
+
+    const gradeChanged = overrideGrade !== grade;
+    const canSubmit = gradeChanged && confirmed;
 
     const handleOverride = () => {
-        if (reason.trim().length < MIN_REASON_LENGTH) return;
-        if (overrideGrade === grade) return;
-        setOverlay(passport.id, {
-            overrideGrade,
-            overrideReason: reason,
-        });
+        if (!canSubmit) return;
+        setOverlay(passport.id, { overrideGrade, overrideReason: reason, overrideSource: source });
         const entry = log({
             action: 'passport.override',
             targetType: 'passport',
@@ -93,130 +59,89 @@ export function OverrideDialog({ passport, score, open, onOpenChange, onAfterAct
                 from: grade,
                 to: overrideGrade,
                 fromScore: +score.total.toFixed(1),
-                toScore: +gradeTargetTotal(overrideGrade).toFixed(1),
                 reason,
+                source,
                 artisanId: passport.artisanId,
             },
         });
-        setReason('');
         onOpenChange(false);
         onAfterAction(entry);
     };
 
-    const reasonTrimmed = reason.trim();
-    const reasonOk = reasonTrimmed.length >= MIN_REASON_LENGTH;
-
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
-            <AlertDialogContent className="max-w-2xl">
+            <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle className="text-lumiris-cyan">
-                        Override de score - gouvernance sensible
-                    </AlertDialogTitle>
+                    <AlertDialogTitle className="text-lumiris-rose">Override de grade</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Vous remplacez visuellement le grade calculé par l&apos;algorithme. Cette action est tracée
-                        publiquement dans la timeline gouvernance. <strong>Personne n&apos;achète son score</strong> -
-                        la raison doit justifier formellement (audit ré-vérifié, certif re-validée…).
+                        Vous remplacez le grade calculé par l&apos;algorithme. Action tracée publiquement dans la
+                        timeline gouvernance.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <div className="space-y-3">
-                    <div className="border-border bg-muted/30 flex items-center justify-around rounded-xl border p-3">
-                        <div className="text-center">
-                            <p className="text-muted-foreground text-[10px] uppercase tracking-wider">Grade calculé</p>
-                            <span
-                                className={cn(
-                                    'mt-1 inline-flex h-10 w-10 items-center justify-center rounded-full font-mono text-base font-bold',
-                                    gradeBackground(grade),
-                                    gradeColor(grade),
-                                )}
-                            >
-                                {grade}
-                            </span>
-                            <p className="text-muted-foreground mt-1 font-mono text-[10px]">
-                                {score.total.toFixed(1)} pts
-                            </p>
-                        </div>
-                        <Clock className="text-muted-foreground h-4 w-4" />
-                        <div className="text-center">
-                            <p className="text-muted-foreground text-[10px] uppercase tracking-wider">Nouveau grade</p>
-                            <span
-                                className={cn(
-                                    'mt-1 inline-flex h-10 w-10 items-center justify-center rounded-full font-mono text-base font-bold',
-                                    gradeBackground(overrideGrade),
-                                    gradeColor(overrideGrade),
-                                )}
-                            >
-                                {overrideGrade}
-                            </span>
-                            <p className="text-muted-foreground mt-1 font-mono text-[10px]">
-                                {gradeTargetTotal(overrideGrade).toFixed(1)} pts (seuil)
-                            </p>
-                        </div>
+                    <div className="space-y-1.5">
+                        <p className="text-muted-foreground text-[10px] uppercase tracking-wider">Nouveau grade</p>
+                        <Select value={overrideGrade} onValueChange={(v) => setOverrideGrade(v as IrisGradeLetter)}>
+                            <SelectTrigger className="w-full" aria-label="Nouveau grade">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {(['A', 'B', 'C', 'D', 'E'] as const).map((g) => (
+                                    <SelectItem key={g} value={g}>
+                                        Grade {g} {g === grade ? '(actuel)' : ''}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
-                    <Select value={overrideGrade} onValueChange={(v) => setOverrideGrade(v as IrisGradeLetter)}>
-                        <SelectTrigger className="w-full">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {(['A', 'B', 'C', 'D', 'E'] as const).map((g) => (
-                                <SelectItem key={g} value={g}>
-                                    Grade {g}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    {overrideGrade !== grade ? (
-                        <div className="border-border bg-card rounded-xl border p-3">
-                            <p className="text-muted-foreground mb-2 text-[10px] uppercase tracking-wider">
-                                Delta par axe (réparti au prorata des poids canoniques)
-                            </p>
-                            <ul className="space-y-1.5 text-xs">
-                                {axisDelta.map((d) => {
-                                    const tone =
-                                        d.delta > 0.05
-                                            ? 'text-lumiris-emerald'
-                                            : d.delta < -0.05
-                                              ? 'text-lumiris-rose'
-                                              : 'text-muted-foreground';
-                                    return (
-                                        <li key={d.axis} className="flex items-center justify-between">
-                                            <span className="text-foreground">{AXIS_LABEL[d.axis]}</span>
-                                            <span className="font-mono">
-                                                {d.before.toFixed(1)} → {d.after.toFixed(1)} / {d.max}{' '}
-                                                <span className={tone}>
-                                                    ({d.delta > 0 ? '+' : ''}
-                                                    {d.delta.toFixed(1)})
-                                                </span>
-                                            </span>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        </div>
-                    ) : null}
-                    <Textarea
-                        value={reason}
-                        onChange={(e) => setReason(e.target.value)}
-                        placeholder={`Justification (${MIN_REASON_LENGTH}+ caractères) : audit ré-effectué, certif re-validée, etc.`}
-                        className="min-h-24"
-                    />
-                    <p
-                        className={cn(
-                            'text-right font-mono text-[10px]',
-                            reasonOk ? 'text-lumiris-emerald' : 'text-muted-foreground',
-                        )}
-                    >
-                        {reasonTrimmed.length} / {MIN_REASON_LENGTH}
-                    </p>
+                    <div className="space-y-1.5">
+                        <label
+                            htmlFor="override-reason"
+                            className="text-muted-foreground text-[10px] uppercase tracking-wider"
+                        >
+                            Motif
+                        </label>
+                        <Textarea
+                            id="override-reason"
+                            value={reason}
+                            onChange={(e) => setReason(e.target.value)}
+                            placeholder="Audit ré-effectué le 12/05/2026, certif fibre re-validée par GOTS…"
+                            className="min-h-24"
+                        />
+                    </div>
+                    <div className="space-y-1.5">
+                        <label
+                            htmlFor="override-source"
+                            className="text-muted-foreground text-[10px] uppercase tracking-wider"
+                        >
+                            Source
+                        </label>
+                        <Input
+                            id="override-source"
+                            value={source}
+                            onChange={(e) => setSource(e.target.value)}
+                            placeholder="Réclamation client #123, ticket audit #45…"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                        <Checkbox
+                            id="override-confirm"
+                            checked={confirmed}
+                            onCheckedChange={(v) => setConfirmed(v === true)}
+                        />
+                        <label htmlFor="override-confirm" className="text-foreground cursor-pointer">
+                            Je confirme l&apos;override de grade
+                        </label>
+                    </div>
                 </div>
                 <AlertDialogFooter>
                     <AlertDialogCancel>Annuler</AlertDialogCancel>
                     <AlertDialogAction
                         onClick={handleOverride}
-                        disabled={!reasonOk || overrideGrade === grade}
-                        className="bg-lumiris-cyan hover:bg-lumiris-cyan/90"
+                        disabled={!canSubmit}
+                        className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                     >
-                        <History className="mr-1 h-3.5 w-3.5" /> Confirmer override
+                        Confirmer override
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

@@ -40,6 +40,7 @@ export function usePassportRows(passports: readonly Passport[]): readonly Passpo
                 passport,
                 status: deriveEffectiveStatus(passport, overlay?.status),
                 ageHours,
+                grade: overlay?.overrideGrade ?? score.grade,
                 capApplied: score.cap?.applied === true,
                 hasMissingRegulatoryField: score.cap?.applied === true && (score.cap.reason ?? '').includes('champ '),
                 isAtelierPlus: artisan?.plus === true,

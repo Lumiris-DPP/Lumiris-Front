@@ -4,6 +4,7 @@ import { ApiProvider } from '@lumiris/api-client/react';
 import { env } from '@/env';
 import { Header } from '@/features/header';
 import { Footer } from '@/features/footer';
+import { MotionProvider } from '@/features/motion-provider';
 import { WebVitals } from './web-vitals';
 import './globals.css';
 
@@ -18,9 +19,9 @@ const geistMono = Geist_Mono({
 });
 
 const SITE_URL = 'https://lumiris.fr';
-const TITLE_DEFAULT = 'LUMIRIS - Le passeport numérique du textile artisanal français';
+const TITLE_DEFAULT = 'LUMIRIS — Le passeport numérique de la consommation européenne';
 const DESCRIPTION =
-    "LUMIRIS publie le passeport numérique de chaque pièce d'artisan textile français : matières, étapes, lieu, score Iris. Aucun acteur n'achète son score.";
+    "LUMIRIS aide les artisans textile français à créer leurs passeports DPP et permet à tout client de scanner n'importe quel DPP européen (textile, tech, électroménager, mobilier). Garde-Robe globale, score Iris, aucun acteur ne paye son score.";
 
 export const metadata: Metadata = {
     metadataBase: new URL(SITE_URL),
@@ -62,10 +63,12 @@ export default function RootLayout({
         <html lang="fr" className={`${inter.variable} ${geistMono.variable} bg-background`}>
             <body className="font-sans antialiased">
                 <ApiProvider baseUrl={env.NEXT_PUBLIC_API_BASE_URL}>
-                    <WebVitals />
-                    <Header />
-                    <main>{children}</main>
-                    <Footer />
+                    <MotionProvider>
+                        <WebVitals />
+                        <Header />
+                        <main>{children}</main>
+                        <Footer />
+                    </MotionProvider>
                 </ApiProvider>
             </body>
         </html>

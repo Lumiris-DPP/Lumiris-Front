@@ -149,7 +149,3 @@ export function publishedThisWeek(passports: readonly Passport[], now: Date): nu
         return Number.isFinite(t) && t >= weekAgo;
     }).length;
 }
-
-export function greeting(now: Date): 'Bonjour' | 'Bonsoir' {
-    return now.getHours() >= 18 ? 'Bonsoir' : 'Bonjour';
-}

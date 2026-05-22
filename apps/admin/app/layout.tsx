@@ -6,8 +6,6 @@ import { Analytics } from '@vercel/analytics/next';
 import { ApiProvider } from '@lumiris/api-client/react';
 import { env } from '@/env';
 import { AdminUserProvider, AuditLogProvider } from '@/lib/auth';
-import { Sidebar } from '@/features/sidebar';
-import { TopBar } from '@/features/top-bar';
 import { WebVitals } from './web-vitals';
 import './globals.css';
 
@@ -22,8 +20,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: 'LUMIRIS | Console ATELIER',
-    description: 'Console interne LUMIRIS — audit, curation et gouvernance des passeports produits numériques (DPP).',
+    title: 'LUMIRIS | Console',
+    description: 'Console LUMIRIS · audit, curation, gouvernance.',
 };
 
 export const viewport: Viewport = {
@@ -43,15 +41,7 @@ export default function RootLayout({
                 <ApiProvider baseUrl={env.NEXT_PUBLIC_API_BASE_URL}>
                     <WebVitals />
                     <AdminUserProvider>
-                        <AuditLogProvider>
-                            <div className="bg-background min-h-screen">
-                                <Sidebar />
-                                <TopBar />
-                                <main className="ml-60 pt-14">
-                                    <div className="p-6 lg:p-8">{children}</div>
-                                </main>
-                            </div>
-                        </AuditLogProvider>
+                        <AuditLogProvider>{children}</AuditLogProvider>
                     </AdminUserProvider>
                 </ApiProvider>
                 {process.env.NODE_ENV === 'production' && <Analytics />}

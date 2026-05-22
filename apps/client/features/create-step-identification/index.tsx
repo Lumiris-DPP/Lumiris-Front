@@ -71,8 +71,6 @@ export function CreateStepIdentification({ draftId }: { draftId: string }) {
         <WizardStepFrame
             draftId={draftId}
             step="identification"
-            title="Identifier la pièce"
-            subtitle="Type, référence interne, photo et caractéristiques physiques. Les dimensions sont optionnelles."
             onNext={handleNext}
             nextMissing={nextMissing}
             contentClassName="grid gap-4 md:grid-cols-2"
