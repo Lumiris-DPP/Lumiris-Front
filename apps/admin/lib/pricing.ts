@@ -46,7 +46,7 @@ export const PRICE_LINES = {
         shortLabel: 'ATELIER+',
         monthlyEur: 19,
         yearlyEur: 190,
-        color: 'var(--lumiris-orange)',
+        color: 'var(--lumiris-iris)',
         kind: 'addon',
     },
     local: {

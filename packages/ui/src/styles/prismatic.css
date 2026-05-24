@@ -5,14 +5,13 @@
 @variant dark (&:is(.dark *));
 
 :root {
-    /* LUMIRIS White - Clinical Minimalism */
     --background: oklch(98% 0.002 260deg);
     --foreground: oklch(15% 0.01 260deg);
     --card: oklch(100% 0 0deg);
     --card-foreground: oklch(15% 0.01 260deg);
     --popover: oklch(100% 0 0deg);
     --popover-foreground: oklch(15% 0.01 260deg);
-    --primary: oklch(55% 0.18 160deg);
+    --primary: oklch(50% 0.094 220deg);
     --primary-foreground: oklch(100% 0 0deg);
     --secondary: oklch(97% 0.002 260deg);
     --secondary-foreground: oklch(40% 0.01 260deg);
@@ -20,41 +19,37 @@
     --muted-foreground: oklch(50% 0.01 260deg);
     --accent: oklch(97% 0.002 260deg);
     --accent-foreground: oklch(15% 0.01 260deg);
-    --destructive: oklch(55% 0.22 25deg);
+    --destructive: oklch(50% 0.192 1deg);
     --destructive-foreground: oklch(100% 0 0deg);
     --border: oklch(90% 0.002 260deg);
     --input: oklch(92% 0.002 260deg);
-    --ring: oklch(55% 0.18 160deg);
-    --chart-1: oklch(55% 0.18 160deg);
-    --chart-2: oklch(65% 0.15 195deg);
-    --chart-3: oklch(72% 0.16 85deg);
-    --chart-4: oklch(55% 0.22 25deg);
-    --chart-5: oklch(60% 0.12 260deg);
+    --ring: oklch(50% 0.094 220deg);
+    --chart-1: oklch(50% 0.094 220deg);
+    --chart-2: oklch(54% 0.247 294deg);
+    --chart-3: oklch(50% 0.192 1deg);
+    --chart-4: oklch(51% 0.127 145deg);
+    --chart-5: oklch(65% 0.16 50deg);
     --radius: 0.625rem;
-    --sidebar: oklch(100% 0 0deg);
+    --sidebar: oklch(98.5% 0.008 220deg);
     --sidebar-foreground: oklch(40% 0.01 260deg);
-    --sidebar-primary: oklch(55% 0.18 160deg);
+    --sidebar-primary: oklch(50% 0.094 220deg);
     --sidebar-primary-foreground: oklch(100% 0 0deg);
-    --sidebar-accent: oklch(96% 0.01 160deg);
+    --sidebar-accent: oklch(96% 0.002 260deg);
     --sidebar-accent-foreground: oklch(15% 0.01 260deg);
-    --sidebar-border: oklch(92% 0.002 260deg);
-    --sidebar-ring: oklch(55% 0.18 160deg);
-
-    /* Iris accent palette */
-    --lumiris-emerald: oklch(55% 0.18 160deg);
-    --lumiris-cyan: oklch(60% 0.13 195deg);
-    --lumiris-amber: oklch(72% 0.16 85deg);
-    --lumiris-orange: oklch(62% 0.18 50deg);
-    --lumiris-rose: oklch(55% 0.2 15deg);
+    --sidebar-border: oklch(91% 0.012 220deg);
+    --sidebar-ring: oklch(50% 0.094 220deg);
+    --lumiris-cyan: oklch(50% 0.094 220deg);
+    --lumiris-iris: oklch(54% 0.247 294deg);
+    --lumiris-rose: oklch(50% 0.192 1deg);
+    --lumiris-emerald: oklch(51% 0.127 145deg);
+    --lumiris-amber: oklch(65% 0.16 50deg);
     --lumiris-surface: oklch(100% 0 0deg);
     --lumiris-surface-raised: oklch(98% 0.002 260deg);
-
-    /* Iris Grade A→E - accès via <IrisGrade>/<ScoreBreakdown> ou utilitaires `text-iris-grade-*` */
-    --iris-grade-a: oklch(55% 0.18 160deg);
-    --iris-grade-b: oklch(60% 0.13 195deg);
-    --iris-grade-c: oklch(72% 0.16 85deg);
-    --iris-grade-d: oklch(62% 0.18 50deg);
-    --iris-grade-e: oklch(55% 0.2 15deg);
+    --iris-grade-a: var(--lumiris-emerald);
+    --iris-grade-b: var(--lumiris-cyan);
+    --iris-grade-c: var(--lumiris-iris);
+    --iris-grade-d: var(--lumiris-amber);
+    --iris-grade-e: var(--lumiris-rose);
 }
 
 @theme {
@@ -96,11 +91,11 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
-    --color-lumiris-emerald: var(--lumiris-emerald);
     --color-lumiris-cyan: var(--lumiris-cyan);
-    --color-lumiris-amber: var(--lumiris-amber);
-    --color-lumiris-orange: var(--lumiris-orange);
+    --color-lumiris-iris: var(--lumiris-iris);
     --color-lumiris-rose: var(--lumiris-rose);
+    --color-lumiris-emerald: var(--lumiris-emerald);
+    --color-lumiris-amber: var(--lumiris-amber);
     --color-lumiris-surface: var(--lumiris-surface);
     --color-lumiris-surface-raised: var(--lumiris-surface-raised);
     --color-iris-grade-a: var(--iris-grade-a);
@@ -157,21 +152,22 @@
     }
 }
 
-/* Prismatic gradient - surface brand partagée mobile/web ; shimmer hérité par admin/mobile sans dommage */
+/* Prismatic gradient — triade brand (cyan primaire → iris secondaire → rose tertiaire).
+   Utilisée en surface marketing/hero. Shimmer hérité par admin/mobile sans dommage. */
 .prismatic-bg {
     background: linear-gradient(
         135deg,
-        var(--lumiris-emerald),
         var(--lumiris-cyan),
-        var(--lumiris-amber),
-        var(--lumiris-emerald)
+        var(--lumiris-iris),
+        var(--lumiris-rose),
+        var(--lumiris-cyan)
     );
     background-size: 300% 300%;
     animation: prismatic-shift 8s ease-in-out infinite;
 }
 
 .prismatic-text {
-    background: linear-gradient(135deg, var(--lumiris-emerald), var(--lumiris-cyan), var(--lumiris-amber));
+    background: linear-gradient(135deg, var(--lumiris-cyan), var(--lumiris-iris), var(--lumiris-rose));
     background-size: 200% 200%;
     animation: prismatic-shift 6s ease-in-out infinite;
     background-clip: text;
@@ -236,16 +232,16 @@ html {
     0%,
     100% {
         box-shadow:
-            0 4px 24px oklch(60% 0.13 195deg / 12%),
-            0 8px 48px oklch(55% 0.18 160deg / 6%),
+            0 4px 24px oklch(50% 0.094 220deg / 12%),
+            0 8px 48px oklch(54% 0.247 294deg / 6%),
             inset 0 0 24px oklch(100% 0 0deg / 15%);
         transform: scale(1);
     }
 
     50% {
         box-shadow:
-            0 8px 40px oklch(60% 0.13 195deg / 20%),
-            0 12px 72px oklch(55% 0.18 160deg / 10%),
+            0 8px 40px oklch(50% 0.094 220deg / 20%),
+            0 12px 72px oklch(54% 0.247 294deg / 10%),
             inset 0 0 40px oklch(100% 0 0deg / 20%);
         transform: scale(1.015);
     }
@@ -254,10 +250,10 @@ html {
 @keyframes iris-grade-a-glow {
     0%,
     100% {
-        box-shadow: 0 0 0 0 oklch(55% 0.18 160deg / 0%);
+        box-shadow: 0 0 0 0 oklch(51% 0.127 145deg / 0%);
     }
 
     50% {
-        box-shadow: 0 0 16px 0 oklch(55% 0.18 160deg / 18%);
+        box-shadow: 0 0 16px 0 oklch(51% 0.127 145deg / 18%);
     }
 }

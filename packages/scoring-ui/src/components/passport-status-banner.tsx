@@ -25,7 +25,7 @@ export function PassportStatusBanner({ passport, score, className, ...rest }: Pa
         <div
             role="status"
             className={cn(
-                'border-lumiris-orange/30 bg-lumiris-orange/10 text-lumiris-orange flex items-start gap-3 rounded-2xl border p-3',
+                'border-lumiris-amber/30 bg-lumiris-amber/10 text-lumiris-amber flex items-start gap-3 rounded-2xl border p-3',
                 className,
             )}
             {...rest}

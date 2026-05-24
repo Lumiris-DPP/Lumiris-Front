@@ -98,7 +98,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     return (
         <div className="flex h-full flex-col">
             <div className="border-border flex items-center gap-3 border-b px-5 py-5">
-                <div className="bg-lumiris-emerald flex h-9 w-9 items-center justify-center rounded-lg">
+                <div className="bg-lumiris-cyan flex h-9 w-9 items-center justify-center rounded-lg">
                     <Sparkles className="text-primary-foreground h-4 w-4" />
                 </div>
                 <div>
@@ -124,8 +124,8 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                                         href={item.href}
                                         onClick={onNavigate}
                                         className={cn(
-                                            'bg-lumiris-emerald hover:bg-lumiris-emerald/90 my-2 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white shadow-sm transition-opacity',
-                                            isActive && 'ring-lumiris-emerald/30 ring-2 ring-offset-1',
+                                            'bg-lumiris-cyan hover:bg-lumiris-cyan/90 my-2 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white shadow-sm transition-opacity',
+                                            isActive && 'ring-lumiris-cyan/30 ring-2 ring-offset-1',
                                         )}
                                     >
                                         <Icon className="h-4 w-4" />
@@ -143,7 +143,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                                     className={cn(
                                         'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
                                         isActive
-                                            ? 'bg-lumiris-emerald/10 text-lumiris-emerald font-medium'
+                                            ? 'bg-lumiris-cyan/10 text-lumiris-cyan font-medium'
                                             : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                                     )}
                                 >
@@ -169,7 +169,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                         {artisan.tier}
                     </span>
                     {hasAtelierPlus && (
-                        <span className="bg-lumiris-amber/10 text-lumiris-amber rounded-md px-2 py-0.5 font-mono text-[10px] font-semibold">
+                        <span className="bg-lumiris-iris/10 text-lumiris-iris rounded-md px-2 py-0.5 font-mono text-[10px] font-semibold">
                             ATELIER+
                         </span>
                     )}

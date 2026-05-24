@@ -25,7 +25,7 @@ const ROLE_TONE: Record<AdminUserRole, string> = {
     platform_admin: 'text-lumiris-emerald',
     lead_curator: 'text-lumiris-emerald',
     curator: 'text-lumiris-cyan',
-    billing_ops: 'text-lumiris-orange',
+    billing_ops: 'text-lumiris-amber',
     dpo: 'text-lumiris-rose',
 };
 

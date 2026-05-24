@@ -7,7 +7,7 @@ export const ACTION_TONE: Record<AdminAction, string> = {
     'passport.validate': 'text-lumiris-emerald',
     'passport.flag': 'text-lumiris-rose',
     'passport.request_changes': 'text-lumiris-amber',
-    'passport.override': 'text-lumiris-orange',
+    'passport.override': 'text-lumiris-amber',
     'artisan.read': 'text-muted-foreground',
     'artisan.suspend': 'text-lumiris-rose',
     'artisan.contact': 'text-lumiris-cyan',
@@ -25,7 +25,7 @@ export const ACTION_TONE: Record<AdminAction, string> = {
     'billing.export': 'text-muted-foreground',
     'billing.invoice_issue': 'text-lumiris-cyan',
     'affiliation.read': 'text-muted-foreground',
-    'affiliation.prepare_payout': 'text-lumiris-orange',
+    'affiliation.prepare_payout': 'text-lumiris-amber',
     'affiliation.rate_change': 'text-lumiris-amber',
     'affiliation.payout_reconcile': 'text-lumiris-emerald',
     'governance.read_audit_log': 'text-muted-foreground',
@@ -41,7 +41,7 @@ export const ROLE_TONE: Record<AdminUserRole, string> = {
     platform_admin: 'text-lumiris-emerald',
     lead_curator: 'text-lumiris-emerald',
     curator: 'text-lumiris-cyan',
-    billing_ops: 'text-lumiris-orange',
+    billing_ops: 'text-lumiris-amber',
     dpo: 'text-lumiris-rose',
 };
 

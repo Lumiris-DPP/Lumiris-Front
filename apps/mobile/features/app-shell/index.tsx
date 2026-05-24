@@ -107,14 +107,14 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
                                         prefetch
                                         aria-current={active ? 'page' : undefined}
                                         className={`relative flex flex-col items-center gap-0.5 px-2 py-1.5 transition-colors ${
-                                            active ? 'text-foreground' : 'text-muted-foreground'
+                                            active ? 'text-lumiris-cyan' : 'text-muted-foreground'
                                         }`}
                                     >
                                         <Icon className="h-5 w-5" />
                                         <span className="text-[10px] font-semibold tracking-tight">{label}</span>
                                         {active ? (
                                             <motion.span
-                                                className="bg-foreground absolute -top-2 h-0.5 w-8 rounded-full"
+                                                className="bg-lumiris-cyan absolute -top-2 h-0.5 w-8 rounded-full"
                                                 layoutId="tab-indicator"
                                                 transition={SPRING_INDICATOR}
                                             />

@@ -1,14 +1,7 @@
 @import '@lumiris/ui/styles/prismatic.css';
 
-/* Tailwind v4 walks from this file to find class usages but skips node_modules,
- * so symlinked workspace packages (@lumiris/ui, @lumiris/scoring-ui) live
- * outside the scanned tree. Point the scanner at their sources explicitly. */
 @source "../../../packages/ui/src/**/*.{ts,tsx}";
 @source "../../../packages/scoring-ui/src/**/*.{ts,tsx}";
-
-/* gradeBackground/gradeBorder in @lumiris/scoring-ui build classes via template
- * literals (`bg-${token}/10`) the scanner cannot resolve. Force-emit the
- * four-grade triad so IrisGrade pastilles always render their colored halo. */
-@source inline("text-lumiris-emerald text-lumiris-cyan text-lumiris-amber text-lumiris-rose");
-@source inline("bg-lumiris-emerald/10 bg-lumiris-cyan/10 bg-lumiris-amber/10 bg-lumiris-rose/10");
-@source inline("border-lumiris-emerald/30 border-lumiris-cyan/30 border-lumiris-amber/30 border-lumiris-rose/30");
+@source inline("text-lumiris-cyan text-lumiris-iris text-lumiris-rose text-lumiris-emerald text-lumiris-amber");
+@source inline("bg-lumiris-cyan/10 bg-lumiris-iris/10 bg-lumiris-rose/10 bg-lumiris-emerald/10 bg-lumiris-amber/10");
+@source inline("border-lumiris-cyan/30 border-lumiris-iris/30 border-lumiris-rose/30 border-lumiris-emerald/30 border-lumiris-amber/30");

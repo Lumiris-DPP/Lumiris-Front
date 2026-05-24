@@ -1,12 +1,12 @@
 import type { IrisAxis, IrisGrade } from '@lumiris/types';
 
-export type GradeColorToken = 'lumiris-emerald' | 'lumiris-cyan' | 'lumiris-amber' | 'lumiris-orange' | 'lumiris-rose';
+export type GradeColorToken = 'lumiris-emerald' | 'lumiris-cyan' | 'lumiris-iris' | 'lumiris-amber' | 'lumiris-rose';
 
 export const GRADE_COLOR: Record<IrisGrade, GradeColorToken> = {
     A: 'lumiris-emerald',
     B: 'lumiris-cyan',
-    C: 'lumiris-amber',
-    D: 'lumiris-orange',
+    C: 'lumiris-iris',
+    D: 'lumiris-amber',
     E: 'lumiris-rose',
 };
 
@@ -46,7 +46,7 @@ export const AXIS_COLOR: Record<IrisAxis, GradeColorToken> = {
     transparency: 'lumiris-emerald',
     craftsmanship: 'lumiris-cyan',
     impact: 'lumiris-amber',
-    repairability: 'lumiris-orange',
+    repairability: 'lumiris-iris',
 };
 
 export const AXIS_LABEL: Record<IrisAxis, string> = {

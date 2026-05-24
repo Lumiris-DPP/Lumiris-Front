@@ -11,7 +11,7 @@ interface TrajectoryChartProps {
 const TRAJECTORY_CONFIG = {
     arrAtelier: { label: 'ATELIER (B2B)', color: 'var(--lumiris-emerald)' },
     arrAffiliation: { label: 'Affiliation B2C', color: 'var(--lumiris-cyan)' },
-    arrLocal: { label: 'LUMIRIS Local', color: 'var(--lumiris-orange)' },
+    arrLocal: { label: 'LUMIRIS Local', color: 'var(--lumiris-iris)' },
     chargesAnnualized: { label: 'Charges annualisées', color: 'var(--lumiris-rose)' },
 } satisfies ChartConfig;
 

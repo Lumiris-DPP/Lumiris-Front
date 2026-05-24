@@ -32,7 +32,7 @@ const PILLARS: readonly ScorePillar[] = [
         weight: LUMIRIS_WEIGHTS.repairability,
         label: 'Réparabilité',
         description: 'Retoucheurs proches, fibres réparables, garantie longue.',
-        accent: 'text-lumiris-orange',
+        accent: 'text-lumiris-iris',
     },
 ];
 

@@ -23,7 +23,7 @@
 @source inline("bg-grade-a/8 bg-grade-b/8 bg-grade-c/8 bg-grade-d/8 bg-grade-e/8");
 @source inline("bg-grade-a/10 bg-grade-b/10 bg-grade-c/10 bg-grade-d/10 bg-grade-e/10");
 @source inline("border-grade-a/20 border-grade-b/20 border-grade-c/20 border-grade-d/20 border-grade-e/20");
-@source inline("text-lumiris-emerald text-lumiris-cyan text-lumiris-amber text-lumiris-orange text-lumiris-rose");
-@source inline("bg-lumiris-emerald bg-lumiris-cyan bg-lumiris-amber bg-lumiris-orange bg-lumiris-rose");
+@source inline("text-lumiris-cyan text-lumiris-iris text-lumiris-rose text-lumiris-emerald text-lumiris-amber");
+@source inline("bg-lumiris-cyan bg-lumiris-iris bg-lumiris-rose bg-lumiris-emerald bg-lumiris-amber");
 @source inline("text-tier-solo text-tier-studio text-tier-maison");
 @source inline("bg-tier-solo/15 bg-tier-studio/15 bg-tier-maison/15");

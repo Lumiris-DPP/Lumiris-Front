@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation';
 
 const navLinks = [
     { label: 'Accueil', href: '/' },
-    { label: 'Passeports', href: '/artisans' },
+    { label: 'Passeports', href: '/passeports' },
     { label: 'Artisans', href: '/artisans' },
     { label: 'Journal', href: '/journal' },
     { label: 'Réglementation', href: '/reglementation' },
@@ -62,7 +62,7 @@ export function Header() {
                                     href={link.href}
                                     className={`relative rounded-lg px-3 py-1.5 text-sm transition-colors duration-200 ${
                                         active
-                                            ? 'text-foreground font-medium'
+                                            ? 'text-lumiris-cyan font-medium'
                                             : 'text-muted-foreground hover:text-foreground'
                                     }`}
                                 >
@@ -70,7 +70,7 @@ export function Header() {
                                     {active && (
                                         <motion.div
                                             layoutId="nav-active"
-                                            className="bg-secondary absolute inset-0 rounded-lg"
+                                            className="bg-lumiris-cyan/10 absolute inset-0 rounded-lg"
                                             style={{ zIndex: -1 }}
                                             transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
                                         />
@@ -117,7 +117,7 @@ export function Header() {
                                         href={link.href}
                                         className={`rounded-lg px-3 py-2 text-sm transition-colors ${
                                             active
-                                                ? 'text-foreground bg-secondary font-medium'
+                                                ? 'bg-lumiris-cyan/10 text-lumiris-cyan font-medium'
                                                 : 'text-muted-foreground hover:text-foreground'
                                         }`}
                                     >

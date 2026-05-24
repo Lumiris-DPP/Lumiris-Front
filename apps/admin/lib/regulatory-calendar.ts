@@ -136,9 +136,9 @@ export const SECTOR_TONE: Record<RegulatorySector, { dot: string; text: string; 
         chip: 'border-lumiris-amber/40 text-lumiris-amber bg-lumiris-amber/10',
     },
     furniture: {
-        dot: 'bg-lumiris-orange',
-        text: 'text-lumiris-orange',
-        chip: 'border-lumiris-orange/40 text-lumiris-orange bg-lumiris-orange/10',
+        dot: 'bg-lumiris-iris',
+        text: 'text-lumiris-iris',
+        chip: 'border-lumiris-iris/40 text-lumiris-iris bg-lumiris-iris/10',
     },
     cross: {
         dot: 'bg-lumiris-rose',

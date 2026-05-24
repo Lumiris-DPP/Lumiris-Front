@@ -13,14 +13,14 @@ const AXIS_BAR_BG: Record<IrisAxis, string> = {
     transparency: 'bg-lumiris-emerald',
     craftsmanship: 'bg-lumiris-cyan',
     impact: 'bg-lumiris-amber',
-    repairability: 'bg-lumiris-orange',
+    repairability: 'bg-lumiris-iris',
 };
 
 const AXIS_TEXT: Record<IrisAxis, string> = {
     transparency: 'text-lumiris-emerald',
     craftsmanship: 'text-lumiris-cyan',
     impact: 'text-lumiris-amber',
-    repairability: 'text-lumiris-orange',
+    repairability: 'text-lumiris-iris',
 };
 
 interface ScoreSheetProps {

@@ -136,7 +136,7 @@ function SubscriptionRow({ sub, onSelect }: { sub: Subscription; onSelect: (s: S
                     {sub.plus ? (
                         <Badge
                             variant="outline"
-                            className="border-lumiris-orange/40 text-lumiris-orange font-mono text-[10px]"
+                            className="border-lumiris-iris/40 text-lumiris-iris font-mono text-[10px]"
                         >
                             ATELIER+
                         </Badge>
