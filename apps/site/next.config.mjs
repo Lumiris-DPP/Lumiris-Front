@@ -8,6 +8,7 @@ const withMDX = createMDX({
     extension: /\.mdx?$/,
 });
 
+// Force rebuild - routes: vision, methode
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,

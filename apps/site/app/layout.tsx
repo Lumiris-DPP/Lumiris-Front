@@ -8,6 +8,8 @@ import { MotionProvider } from '@/features/motion-provider';
 import { WebVitals } from './web-vitals';
 import './globals.css';
 
+// Force recompile
+
 const inter = Inter({
     subsets: ['latin'],
     variable: '--font-inter',
