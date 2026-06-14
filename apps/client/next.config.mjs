@@ -31,6 +31,7 @@ const nextConfig = {
             { protocol: 'https', hostname: 'cdn.lumiris.local' },
             { protocol: 'https', hostname: 'cdn.lumiris.eu' },
             { protocol: 'http', hostname: 'localhost', port: '9000' },
+            { protocol: 'https', hostname: 'placehold.co' },
         ],
     },
 };
