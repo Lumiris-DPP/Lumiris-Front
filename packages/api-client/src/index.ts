@@ -19,7 +19,7 @@ export type LumirisClient = ReturnType<typeof createClient>;
 export { CACHE_TIMES, type QueryPreset } from './cache';
 export { createKeys, type QueryKeys } from './keys';
 
-export type { LoginRequest, LoginResponse } from './auth';
+export type { LoginRequest, RegisterRequest, AuthResponse, LoginResponse, RegisterResponse } from './auth';
 export type { AppName, WebVitalName, WebVitalPayload, WebVitalRating } from './telemetry';
 export type {
     DownloadUrlRequest,

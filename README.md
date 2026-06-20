@@ -21,7 +21,7 @@ cd ../Lumiris-Infra && make all-up
 cd ../Lumiris-Front && bun dev
 ```
 
-Chaque app pointe par defaut vers `https://api.lumiris.local` (backend Spring Boot via Traefik) et envoie ses traces vers `http://localhost:4318` (OTel collector). Les valeurs par defaut conviennent au dev local — voir [packages/utils/src/env.ts](packages/utils/src/env.ts) pour le schema complet.
+Chaque app pointe par defaut vers `localhost:8080`
 
 URLs once the stack is up (see `../Lumiris-Infra/docs/SERVICES.md`):
 
@@ -31,7 +31,7 @@ URLs once the stack is up (see `../Lumiris-Infra/docs/SERVICES.md`):
 | Admin   | https://admin.lumiris.local  |
 | Mobile  | https://mobile.lumiris.local |
 | Client  | https://client.lumiris.local |
-| API     | https://api.lumiris.local    |
+| API     | http://localhost:8080        |
 
 ## Surfaces
 

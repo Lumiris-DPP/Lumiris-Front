@@ -5,7 +5,7 @@ export { useApiClient } from './client-context';
 export { useListQuery, useDetailQuery, useStaticQuery, useRealtimeQuery } from './queries';
 export { createSubResourceMutations, type EntityApi, type SubResourceKeys, type IdField } from './mutations';
 
-export { authKeys, useLogin } from './auth';
+export { authKeys, useLogin, useRegister, useMe } from './auth';
 export { storageKeys, useUploadUrl, useDownloadUrl } from './storage';
 export { useWebVital } from './telemetry';
 
