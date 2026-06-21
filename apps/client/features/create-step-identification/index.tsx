@@ -10,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { WizardStepFrame } from '@/features/wizard-shell/step-frame';
 import { useStepNavigation } from '@/features/wizard-shell/use-step-navigation';
 import { useDraftStore } from '@/lib/draft-store';
+import { useAuthStore } from '@/lib/auth-store';
+import { patchDppForm } from '@/lib/dpp-api';
 import { readFileAsDataUrl } from '@lumiris/utils';
 import { validateStep } from './schema';
 
@@ -26,11 +28,13 @@ const PRODUCT_KINDS: ReadonlyArray<{ value: GarmentKind; label: string }> = [
 export function CreateStepIdentification({ draftId }: { draftId: string }) {
     const draft = useDraftStore((s) => s.drafts[draftId]);
     const setGarment = useDraftStore((s) => s.setGarment);
+    const token = useAuthStore((s) => s.token);
     const { goNext } = useStepNavigation(draftId);
 
     const [form, setForm] = useState<GarmentInfo>(
         draft?.garment ?? {
             kind: 'sweater',
+            name: '',
             reference: '',
             mainPhotoUrl: '',
             dimensions: {},
@@ -58,6 +62,17 @@ export function CreateStepIdentification({ draftId }: { draftId: string }) {
 
     const handleNext = () => {
         setGarment(draftId, form);
+
+        if (token) {
+            void patchDppForm(token, draftId, {
+                productName: form.name ?? null,
+                productType: form.kind,
+                internalReference: form.reference || null,
+                retailPrice: form.retailPrice > 0 ? form.retailPrice : null,
+                currency: form.currency,
+            }).catch(() => {});
+        }
+
         goNext('identification', 'composition');
     };
 
@@ -75,6 +90,17 @@ export function CreateStepIdentification({ draftId }: { draftId: string }) {
             nextMissing={nextMissing}
             contentClassName="grid gap-4 md:grid-cols-2"
         >
+            <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="name">Nom du produit</Label>
+                <Input
+                    id="name"
+                    value={form.name ?? ''}
+                    maxLength={255}
+                    onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                    placeholder="Pull Merino Col Roulé"
+                />
+            </div>
+
             <div className="space-y-2">
                 <Label htmlFor="kind">Type produit</Label>
                 <Select value={form.kind} onValueChange={(v) => setForm((f) => ({ ...f, kind: v as GarmentKind }))}>

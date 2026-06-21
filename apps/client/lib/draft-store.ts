@@ -1,7 +1,6 @@
 'use client';
 
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 import type {
     Passport,
     CertificationRef,
@@ -42,7 +41,7 @@ interface DraftPassport {
 
 interface DraftStoreState {
     drafts: Record<string, DraftPassport>;
-    createDraft: (artisanId: string) => string;
+    createDraft: (artisanId: string, id?: string) => string;
     getDraft: (id: string) => DraftPassport | undefined;
     setDraft: (id: string, patch: Partial<DraftPassport>) => void;
     setGarment: (id: string, garment: GarmentInfo) => void;
@@ -74,28 +73,26 @@ function emptyWarranty(): PassportWarranty {
     return { durationMonths: 0, terms: '' };
 }
 
-export const useDraftStore = create<DraftStoreState>()(
-    persist(
-        (set, get) => ({
+export const useDraftStore = create<DraftStoreState>()((set, get) => ({
             drafts: {},
-            createDraft: (artisanId) => {
-                const id = newId();
+            createDraft: (artisanId, id) => {
+                const draftId = id ?? newId();
                 const now = new Date().toISOString();
                 const draft: DraftPassport = {
-                    id,
+                    id: draftId,
                     status: 'Draft',
                     artisanId,
                     createdAt: now,
                     updatedAt: now,
-                    gs1: buildGS1Identifier('0000000000000', id),
+                    gs1: buildGS1Identifier('0000000000000', draftId),
                     garment: emptyGarment(),
                     materials: [],
                     steps: [],
                     certifications: [],
                     warranty: emptyWarranty(),
                 };
-                set((s) => ({ drafts: { ...s.drafts, [id]: draft } }));
-                return id;
+                set((s) => ({ drafts: { ...s.drafts, [draftId]: draft } }));
+                return draftId;
             },
             getDraft: (id) => get().drafts[id],
             setDraft: (id, patch) => {
@@ -120,20 +117,7 @@ export const useDraftStore = create<DraftStoreState>()(
                 delete next[id];
                 set({ drafts: next });
             },
-        }),
-        {
-            name: 'atelier-drafts',
-            storage: createJSONStorage(() => (typeof window === 'undefined' ? noopStorage : localStorage)),
-            version: 1,
-        },
-    ),
-);
-
-const noopStorage = {
-    getItem: () => null,
-    setItem: () => undefined,
-    removeItem: () => undefined,
-};
+        }));
 
 export function draftToPassport(draft: DraftPassport): Passport {
     return {
