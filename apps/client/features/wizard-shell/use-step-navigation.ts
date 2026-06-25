@@ -2,15 +2,23 @@
 
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
-import type { GarmentInfo, Material, ProductionStep, PassportWarranty, CertificationRef } from '@lumiris/types';
+import type {
+    GarmentInfo,
+    DppMaterial,
+    CareInstructionCode,
+    DppCertification,
+    TraceabilityInfo,
+    EcoInfo,
+} from '@lumiris/types';
 import { useDraftStore, type WizardStep } from '@/lib/draft-store';
 
 export interface DraftLike {
     garment: GarmentInfo;
-    materials: readonly Material[];
-    steps: readonly ProductionStep[];
-    certifications: readonly CertificationRef[];
-    warranty: PassportWarranty;
+    materials: readonly DppMaterial[];
+    careInstructions: readonly CareInstructionCode[];
+    certifications: readonly DppCertification[];
+    traceability: TraceabilityInfo;
+    eco: EcoInfo;
 }
 
 export type ValidateStepResult = { ok: true } | { ok: false; missing: string[] };

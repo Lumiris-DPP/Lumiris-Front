@@ -13,6 +13,7 @@ interface WizardStepFrameProps {
     nextLabel?: string;
     nextMissing?: string[];
     contentClassName?: string;
+    hideNav?: boolean;
     children: React.ReactNode;
 }
 
@@ -24,6 +25,7 @@ export function WizardStepFrame({
     nextLabel,
     nextMissing,
     contentClassName,
+    hideNav,
     children,
 }: WizardStepFrameProps) {
     return (
@@ -34,6 +36,7 @@ export function WizardStepFrame({
             onNext={onNext}
             nextLabel={nextLabel}
             nextMissing={nextMissing}
+            hideNav={hideNav}
         >
             <Card>
                 <CardContent className={cn('pt-6', contentClassName)}>{children}</CardContent>

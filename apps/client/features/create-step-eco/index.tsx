@@ -1,0 +1,175 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { QrCode } from 'lucide-react';
+import type { EcoInfo } from '@lumiris/types';
+import { Input } from '@lumiris/ui/components/input';
+import { Label } from '@lumiris/ui/components/label';
+import { Textarea } from '@lumiris/ui/components/textarea';
+import { Switch } from '@lumiris/ui/components/switch';
+import { Button } from '@lumiris/ui/components/button';
+import { WizardStepFrame } from '@/features/wizard-shell/step-frame';
+import { useStepNavigation } from '@/features/wizard-shell/use-step-navigation';
+import { useDraftStore } from '@/lib/draft-store';
+import { useAuthStore } from '@/lib/auth-store';
+import { submitDppForm } from '@/lib/dpp-api';
+import { useRouter } from 'next/navigation';
+
+export function CreateStepEco({ draftId }: { draftId: string }) {
+    const draft = useDraftStore((s) => s.drafts[draftId]);
+    const setEco = useDraftStore((s) => s.setEco);
+    const deleteDraft = useDraftStore((s) => s.deleteDraft);
+    const token = useAuthStore((s) => s.token);
+    const { goTo } = useStepNavigation(draftId);
+    const router = useRouter();
+
+    const [form, setForm] = useState<EcoInfo>(draft?.eco ?? {});
+    const [publishing, setPublishing] = useState(false);
+
+    useEffect(() => {
+        if (draft) setForm(draft.eco);
+    }, [draft]);
+
+    const handlePrev = () => {
+        setEco(draftId, form);
+        goTo('traceability');
+    };
+
+    const handlePublish = async () => {
+        if (!draft) return;
+        setEco(draftId, form);
+        setPublishing(true);
+
+        const payload = {
+            productName: draft.garment.name ?? null,
+            productDescription: draft.garment.description ?? null,
+            productCategory: draft.garment.category ?? null,
+            originCountry: draft.garment.originCountry ?? null,
+            availableSizes: draft.garment.availableSizes ?? null,
+            colors: draft.garment.colors ?? null,
+            mainPhotoUrl: draft.garment.mainPhotoUrl || null,
+            materials: draft.materials.map((m) => ({
+                fiber: m.fiber,
+                percentage: m.percentage,
+                originCountry: m.originCountry,
+            })),
+            careInstructions: draft.careInstructions,
+            certifications: draft.certifications.map((c) => ({
+                name: c.name,
+                customName: c.customName ?? null,
+                licenseNumber: c.licenseNumber ?? null,
+            })),
+            manufacturedAt: draft.traceability.manufacturedAt,
+            batchNumber: draft.traceability.batchNumber ?? null,
+            gtin: draft.traceability.gtin ?? null,
+            sku: draft.traceability.sku ?? null,
+            reachCompliant: draft.traceability.reachCompliant,
+            recycledPct: form.recycledPct ?? null,
+            warrantyDescription: form.warrantyDescription ?? null,
+            isRepairable: form.isRepairable ?? null,
+            endOfLifeInstructions: form.endOfLifeInstructions ?? null,
+        };
+
+        try {
+            if (token) {
+                await submitDppForm(token, payload);
+            }
+            deleteDraft(draftId);
+            router.push('/passports');
+        } catch {
+            setPublishing(false);
+        }
+    };
+
+    return (
+        <WizardStepFrame
+            draftId={draftId}
+            step="eco"
+            onPrev={handlePrev}
+            hideNav
+            contentClassName="space-y-6"
+        >
+            {/* Section optionnelle */}
+            <p className="text-muted-foreground text-sm">
+                Ces champs sont optionnels mais valorisants pour votre score Iris et pour les consommateurs
+                soucieux de l'environnement.
+            </p>
+
+            {/* % matières recyclées */}
+            <div className="space-y-2">
+                <Label htmlFor="recycled">Part de matières recyclées (%)</Label>
+                <div className="relative w-40">
+                    <Input
+                        id="recycled"
+                        type="number"
+                        min={0}
+                        max={100}
+                        value={form.recycledPct ?? ''}
+                        onChange={(e) =>
+                            setForm((f) => ({ ...f, recycledPct: e.target.value ? Number(e.target.value) : undefined }))
+                        }
+                        className="pr-8"
+                    />
+                    <span className="text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 text-sm">%</span>
+                </div>
+            </div>
+
+            {/* Durée de vie / Garantie */}
+            <div className="space-y-2">
+                <Label htmlFor="warranty">Durée de vie estimée ou garantie étendue</Label>
+                <Input
+                    id="warranty"
+                    value={form.warrantyDescription ?? ''}
+                    placeholder="2 ans, garantie à vie sur les coutures…"
+                    onChange={(e) => setForm((f) => ({ ...f, warrantyDescription: e.target.value }))}
+                />
+            </div>
+
+            {/* Réparabilité */}
+            <div className="flex items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                    <Label htmlFor="repairable" className="cursor-pointer">
+                        Facilement réparable
+                    </Label>
+                    <p className="text-muted-foreground text-[11px]">
+                        Bouton d'origine fourni, coutures accessibles, pièces détachées disponibles.
+                    </p>
+                </div>
+                <Switch
+                    id="repairable"
+                    checked={form.isRepairable ?? false}
+                    onCheckedChange={(v) => setForm((f) => ({ ...f, isRepairable: v }))}
+                />
+            </div>
+
+            {/* Consignes de fin de vie */}
+            <div className="space-y-2">
+                <Label htmlFor="end-of-life">Consignes de fin de vie</Label>
+                <Textarea
+                    id="end-of-life"
+                    value={form.endOfLifeInstructions ?? ''}
+                    rows={3}
+                    placeholder="Rapportez ce vêtement en boutique pour le programme de reprise…"
+                    onChange={(e) => setForm((f) => ({ ...f, endOfLifeInstructions: e.target.value }))}
+                />
+            </div>
+
+            {/* Bouton publier */}
+            <div className="border-border border-t pt-4">
+                <div className="flex items-center justify-between gap-4">
+                    <Button variant="outline" onClick={handlePrev}>
+                        Précédent
+                    </Button>
+                    <Button
+                        onClick={handlePublish}
+                        disabled={publishing}
+                        className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 gap-2 text-white"
+                    >
+                        <QrCode className="h-4 w-4" />
+                        {publishing ? 'Publication…' : 'Publier et générer le QR Code'}
+                    </Button>
+                </div>
+            </div>
+        </WizardStepFrame>
+    );
+}

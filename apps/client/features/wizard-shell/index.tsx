@@ -2,13 +2,10 @@
 
 import Link from 'next/link';
 import { AlertTriangle } from 'lucide-react';
-import { computeScore } from '@lumiris/core/scoring';
-import { mockCertificates } from '@lumiris/mock-data';
 import { Alert, AlertDescription, AlertTitle } from '@lumiris/ui/components/alert';
 import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
-import { useCurrentArtisan } from '@/lib/current-artisan';
-import { draftToPassport, useDraftStore, type WizardStep } from '@/lib/draft-store';
+import { useDraftStore, type WizardStep } from '@/lib/draft-store';
 import { ScoreSidebar } from './score-sidebar';
 import { Stepper } from './stepper';
 
@@ -36,12 +33,9 @@ export function WizardShell({
     hideNav = false,
 }: WizardShellProps) {
     const draft = useDraftStore((s) => s.drafts[draftId]);
-    const artisan = useCurrentArtisan();
 
     if (!draft) return <DraftNotFound />;
 
-    const passport = draftToPassport(draft);
-    const score = computeScore(passport, { artisan, certificates: mockCertificates, now: new Date() });
     const nextDisabled = nextMissing.length > 0;
 
     return (
@@ -71,7 +65,7 @@ export function WizardShell({
                     </div>
                 )}
             </div>
-            <ScoreSidebar passport={passport} score={score} />
+            <ScoreSidebar />
         </div>
     );
 }
@@ -80,7 +74,7 @@ function MissingAlert({ missing }: { missing: string[] }) {
     return (
         <Alert className="border-lumiris-amber/30 bg-lumiris-amber/5 text-lumiris-amber">
             <AlertTriangle aria-hidden />
-            <AlertTitle>Champs requis avant l’étape suivante</AlertTitle>
+            <AlertTitle>Champs requis avant l'étape suivante</AlertTitle>
             <AlertDescription className="text-foreground/80">{missing.join(' · ')}</AlertDescription>
         </Alert>
     );
@@ -95,7 +89,7 @@ function DraftNotFound() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                     <p className="text-muted-foreground text-sm">
-                        Ce brouillon n’existe pas ou a été supprimé. Vous pouvez en démarrer un nouveau.
+                        Ce brouillon n'existe pas ou a été supprimé. Vous pouvez en démarrer un nouveau.
                     </p>
                     <Button asChild>
                         <Link href="/create">Créer un nouveau passeport</Link>

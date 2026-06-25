@@ -1,7 +1,6 @@
 'use client';
 
 import type { HTMLAttributes } from 'react';
-import { Droplets, Flame, Sparkles, Wind } from 'lucide-react';
 import type { CareInstructions, PassportWarranty } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
 
@@ -10,22 +9,23 @@ export interface CareGuideProps extends HTMLAttributes<HTMLDivElement> {
     warranty?: PassportWarranty;
 }
 
-const ITEMS: ReadonlyArray<{ key: keyof CareInstructions; label: string; Icon: typeof Droplets }> = [
-    { key: 'washing', label: 'Lavage', Icon: Droplets },
-    { key: 'drying', label: 'Séchage', Icon: Wind },
-    { key: 'ironing', label: 'Repassage', Icon: Flame },
-    { key: 'storage', label: 'Stockage', Icon: Sparkles },
+const ITEMS: ReadonlyArray<{ key: keyof CareInstructions; label: string; svgPath: string }> = [
+    { key: 'washing', label: 'Lavage', svgPath: '/ginetex/ginetex--washing.svg' },
+    { key: 'drying', label: 'Séchage', svgPath: '/ginetex/ginetex--drying.svg' },
+    { key: 'ironing', label: 'Repassage', svgPath: '/ginetex/ginetex--ironing.svg' },
+    { key: 'storage', label: 'Stockage', svgPath: '/ginetex/ginetex--flat-drying.svg' },
 ];
 
 export function CareGuide({ care, warranty, className, ...rest }: CareGuideProps) {
     return (
         <section className={cn('flex flex-col gap-4', className)} {...rest}>
             <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {ITEMS.map(({ key, label, Icon }) => {
+                {ITEMS.map(({ key, label, svgPath }) => {
                     const value = care?.[key];
                     return (
                         <li key={key} className="border-border/60 bg-card flex gap-3 rounded-2xl border p-3">
-                            <Icon className="text-lumiris-cyan mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={svgPath} alt="" aria-hidden className="mt-0.5 h-4 w-4 shrink-0" />
                             <div className="min-w-0">
                                 <p className="text-foreground text-xs font-semibold uppercase tracking-wider">
                                     {label}
