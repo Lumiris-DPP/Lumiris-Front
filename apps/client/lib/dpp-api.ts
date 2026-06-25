@@ -38,9 +38,21 @@ export interface DppFormPayload {
     endOfLifeInstructions?: string | null;
 }
 
+export type DppStatus = 'VALID' | 'INVALID';
+
 export interface DppFormDto extends DppFormPayload {
     id: string;
     createdAt: string;
+    status: DppStatus;
+}
+
+export interface DppFormSummaryDto {
+    id: string;
+    createdAt: string;
+    status: DppStatus;
+    productName: string | null;
+    productCategory: string | null;
+    sku: string | null;
 }
 
 function authHeaders(token: string) {
@@ -54,5 +66,21 @@ export async function submitDppForm(token: string, payload: DppFormPayload): Pro
         body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error(`POST /api/dpp-forms → ${res.status}`);
+    return res.json() as Promise<DppFormDto>;
+}
+
+export async function fetchDppForms(token: string): Promise<DppFormSummaryDto[]> {
+    const res = await fetch(`${BASE}/api/dpp-forms`, {
+        headers: authHeaders(token),
+    });
+    if (!res.ok) throw new Error(`GET /api/dpp-forms → ${res.status}`);
+    return res.json() as Promise<DppFormSummaryDto[]>;
+}
+
+export async function fetchDppForm(token: string, id: string): Promise<DppFormDto> {
+    const res = await fetch(`${BASE}/api/dpp-forms/${id}`, {
+        headers: authHeaders(token),
+    });
+    if (!res.ok) throw new Error(`GET /api/dpp-forms/${id} → ${res.status}`);
     return res.json() as Promise<DppFormDto>;
 }
