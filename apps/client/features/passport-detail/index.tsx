@@ -3,12 +3,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ArrowLeft, Copy, ExternalLink, FileText, Printer, Trash2 } from 'lucide-react';
 import { computeScore } from '@lumiris/core/scoring';
 import { mockCertificates, mockPassportById } from '@lumiris/mock-data';
 import type { Passport } from '@lumiris/types';
-import { buildGS1Identifier } from '@lumiris/types';
 import {
     IrisGrade,
     MissingFieldsBadge,
@@ -32,50 +31,30 @@ import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components
 import { Toaster, toast } from '@lumiris/ui/components/sonner';
 import { useCurrentArtisan } from '@/lib/current-artisan';
 import { draftToPassport, useDraftStore } from '@/lib/draft-store';
-import { useAuthStore } from '@/lib/auth-store';
-import { fetchDppForm } from '@/lib/dpp-api';
-import { dppFormToPassport } from '@/lib/passports-source';
 
 const PLACEHOLDER_PHOTO = '/default_product_picture.webp';
 
 export function PassportDetail({ passportId }: { passportId: string }) {
     const router = useRouter();
     const artisan = useCurrentArtisan();
-    const token = useAuthStore((s) => s.token);
     const drafts = useDraftStore((s) => s.drafts);
     const draft = drafts[passportId];
     const createDraft = useDraftStore((s) => s.createDraft);
-    const setDraft = useDraftStore((s) => s.setDraft);
     const deleteDraft = useDraftStore((s) => s.deleteDraft);
-
-    const [backendPassport, setBackendPassport] = useState<Passport | null>(null);
-
-    useEffect(() => {
-        const isBackendId = token && !passportId.startsWith('draft-');
-        if (!isBackendId) return;
-        fetchDppForm(token, passportId)
-            .then((dto) => setBackendPassport(dppFormToPassport(dto)))
-            .catch(() => {});
-    }, [token, passportId]);
 
     const [confirmDelete, setConfirmDelete] = useState(false);
 
     const fixed = useMemo(() => mockPassportById(passportId), [passportId]);
     const passport = useMemo<Passport | null>(() => {
-        if (backendPassport) return backendPassport;
         if (draft) return draftToPassport(draft);
         return fixed ?? null;
-    }, [backendPassport, draft, fixed]);
+    }, [draft, fixed]);
 
     const now = useMemo(() => new Date(), []);
     const score = useMemo(
         () =>
             passport
-                ? computeScore(passport, {
-                      artisan,
-                      certificates: mockCertificates,
-                      now,
-                  })
+                ? computeScore(passport, { artisan, certificates: mockCertificates, now })
                 : null,
         [artisan, passport, now],
     );
@@ -104,20 +83,15 @@ export function PassportDetail({ passportId }: { passportId: string }) {
 
     const handleDuplicate = () => {
         const newId = createDraft(artisan.id);
-        setDraft(newId, {
-            status: 'Draft',
-            garment: { ...passport.garment, reference: '' },
-            materials: [...passport.materials],
-            steps: [...passport.steps],
-            certifications: [...passport.certifications],
-            warranty: { ...passport.warranty },
-            gs1: buildGS1Identifier('0000000000000', newId),
-            lastStep: undefined,
-        });
+        if (draft) {
+            const { setGarment, setMaterials } = useDraftStore.getState();
+            setGarment(newId, { ...draft.garment, reference: '' });
+            setMaterials(newId, [...draft.materials]);
+        }
         toast.success('Passeport dupliqué', {
             description: `Brouillon créé à partir de "${passport.garment.reference || passport.id}".`,
         });
-        router.push(`/create/${newId}/identification`);
+        router.push(`/create/${newId}/product`);
     };
 
     const handleDelete = () => {
@@ -175,22 +149,7 @@ export function PassportDetail({ passportId }: { passportId: string }) {
                         {passport.materials.length === 0 && <p className="text-muted-foreground">-</p>}
                         {passport.materials.map((m, i) => (
                             <p key={i} className="text-foreground">
-                                <span className="font-mono">{m.percentage}%</span> {m.fiber} · {m.originCountry} ·{' '}
-                                {m.supplierId || 'fournisseur manquant'}
-                            </p>
-                        ))}
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Étapes ({passport.steps.length})</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-1 text-sm">
-                        {passport.steps.length === 0 && <p className="text-muted-foreground">-</p>}
-                        {passport.steps.map((s) => (
-                            <p key={s.id} className="text-foreground">
-                                {s.kind} - {s.label || '(sans libellé)'} · {s.locationCity}
+                                <span className="font-mono">{m.percentage}%</span> {m.fiber} · {m.originCountry}
                             </p>
                         ))}
                     </CardContent>

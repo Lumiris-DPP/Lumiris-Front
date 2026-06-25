@@ -1,17 +1,13 @@
 import type { WizardStep } from '@/lib/draft-store';
-import { validateStep as validateIdentification } from '@/features/create-step-identification/schema';
-import { validateStep as validateComposition } from '@/features/create-step-composition/schema';
-import { validateStep as validateInvoice } from '@/features/create-step-invoice-scan/schema';
-import { validateStep as validateManufacturing } from '@/features/create-step-manufacturing/schema';
-import { validateStep as validateCertifications } from '@/features/create-step-certifications/schema';
-import { validateStep as validatePublish } from '@/features/create-step-publish/schema';
+import { validateStep as validateProduct } from '@/features/create-step-product/schema';
+import { validateStep as validateCare } from '@/features/create-step-care/schema';
+import { validateStep as validateTraceability } from '@/features/create-step-traceability/schema';
+import { validateStep as validateEco } from '@/features/create-step-eco/schema';
 import type { DraftLike, ValidateStepResult } from './use-step-navigation';
 
 export const STEP_VALIDATORS: Record<WizardStep, (d: DraftLike) => ValidateStepResult> = {
-    identification: validateIdentification,
-    composition: validateComposition,
-    invoice: validateInvoice,
-    manufacturing: validateManufacturing,
-    certifications: validateCertifications,
-    publish: validatePublish,
+    product: validateProduct,
+    care: validateCare,
+    traceability: validateTraceability,
+    eco: validateEco,
 };

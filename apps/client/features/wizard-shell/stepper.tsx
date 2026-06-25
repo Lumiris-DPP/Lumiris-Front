@@ -1,22 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import { AlertTriangle, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { cn } from '@lumiris/ui/lib/cn';
 import { WIZARD_STEPS, type WizardStep } from '@/lib/draft-store';
 import { STEP_VALIDATORS } from './step-validators';
 import type { DraftLike } from './use-step-navigation';
 
 const STEP_LABELS: Record<WizardStep, string> = {
-    identification: 'Identification',
-    composition: 'Composition',
-    invoice: 'Factures',
-    manufacturing: 'Fabrication',
-    certifications: 'Certifications',
-    publish: 'Publication',
+    product: 'Produit',
+    care: 'Composition',
+    traceability: 'Traçabilité',
+    eco: 'Éco & Publication',
 };
 
-type StepState = 'done' | 'current' | 'todo' | 'error';
+type StepState = 'done' | 'current' | 'todo';
 
 interface StepperProps {
     draftId: string;
@@ -31,9 +29,7 @@ export function Stepper({ draftId, currentStep, draft }: StepperProps) {
     return (
         <ol className="flex w-full items-start gap-1 sm:gap-2" aria-label="Étapes du wizard">
             {WIZARD_STEPS.map((s, i) => {
-                const validation = STEP_VALIDATORS[s](draft);
-                const state: StepState =
-                    i === currentIndex ? 'current' : i < currentIndex ? (validation.ok ? 'done' : 'error') : 'todo';
+                const state: StepState = i === currentIndex ? 'current' : i < currentIndex ? 'done' : 'todo';
                 const canClick = i <= currentIndex || currentValid;
                 const isLast = i === WIZARD_STEPS.length - 1;
                 const connectorPast = i < currentIndex;
@@ -67,13 +63,7 @@ export function Stepper({ draftId, currentStep, draft }: StepperProps) {
                                     !canClick && 'cursor-not-allowed opacity-60',
                                 )}
                             >
-                                {state === 'done' ? (
-                                    <Check className="h-4 w-4" />
-                                ) : state === 'error' ? (
-                                    <AlertTriangle className="h-3.5 w-3.5" />
-                                ) : (
-                                    i + 1
-                                )}
+                                {state === 'done' ? <Check className="h-4 w-4" /> : i + 1}
                             </Link>
                             <span
                                 className={cn(
@@ -103,8 +93,6 @@ function badgeClass(state: StepState): string {
             return 'border-lumiris-emerald bg-lumiris-emerald text-white';
         case 'current':
             return 'border-lumiris-emerald bg-background text-lumiris-emerald';
-        case 'error':
-            return 'border-lumiris-amber bg-lumiris-amber/10 text-lumiris-amber';
         default:
             return 'border-border bg-muted text-muted-foreground';
     }

@@ -81,6 +81,12 @@ export interface GarmentInfo {
     dimensions: GarmentDimensions;
     retailPrice: number;
     currency: 'EUR';
+    // Nouveaux champs DPP form (optionnels pour compatibilité)
+    description?: string;
+    category?: GarmentCategory;
+    originCountry?: string;
+    availableSizes?: string[];
+    colors?: string[];
 }
 /** @deprecated utiliser {@link GarmentInfo}. */
 export type ProductInfo = GarmentInfo;
@@ -127,6 +133,45 @@ export interface Passport {
     recycledPct?: number;
     transportKm?: number;
 }
+
+// ─── Nouveaux types pour le formulaire DPP 4 étapes ───────────────────────────
+
+export type GarmentCategory = 'top' | 'bottom' | 'dress' | 'outerwear' | 'shoe' | 'accessory' | 'other';
+
+export type CareInstructionCode =
+    | 'wash-30' | 'wash-40' | 'wash-60' | 'no-wash'
+    | 'dry-clean' | 'no-dry-clean'
+    | 'tumble-dry' | 'no-tumble'
+    | 'iron-low' | 'iron-med' | 'iron-high' | 'no-iron';
+
+export interface DppCertification {
+    name: 'GOTS' | 'OEKO-TEX' | 'Fair-Trade' | 'other';
+    customName?: string;
+    licenseNumber?: string;
+}
+
+export interface DppMaterial {
+    fiber: Fiber;
+    percentage: number;
+    originCountry: CountryCode;
+}
+
+export interface TraceabilityInfo {
+    manufacturedAt: string;
+    batchNumber?: string;
+    gtin?: string;
+    sku?: string;
+    reachCompliant: boolean;
+}
+
+export interface EcoInfo {
+    recycledPct?: number;
+    warrantyDescription?: string;
+    isRepairable?: boolean;
+    endOfLifeInstructions?: string;
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
 
 export function buildGS1DigitalLink(gtin: string, serial: string): GS1DigitalLink {
     return `https://id.lumiris.fr/01/${gtin}/21/${serial}`;
