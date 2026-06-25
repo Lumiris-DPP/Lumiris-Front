@@ -3,10 +3,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Copy, ExternalLink, FileText, Printer, Trash2 } from 'lucide-react';
 import { computeScore } from '@lumiris/core/scoring';
 import { mockCertificates, mockPassportById } from '@lumiris/mock-data';
+import type { Passport } from '@lumiris/types';
 import { buildGS1Identifier } from '@lumiris/types';
 import {
     IrisGrade,
@@ -31,20 +32,40 @@ import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components
 import { Toaster, toast } from '@lumiris/ui/components/sonner';
 import { useCurrentArtisan } from '@/lib/current-artisan';
 import { draftToPassport, useDraftStore } from '@/lib/draft-store';
+import { useAuthStore } from '@/lib/auth-store';
+import { fetchDppForm } from '@/lib/dpp-api';
+import { dppFormToPassport } from '@/lib/passports-source';
+
+const PLACEHOLDER_PHOTO = '/default_product_picture.webp';
 
 export function PassportDetail({ passportId }: { passportId: string }) {
     const router = useRouter();
     const artisan = useCurrentArtisan();
+    const token = useAuthStore((s) => s.token);
     const drafts = useDraftStore((s) => s.drafts);
     const draft = drafts[passportId];
     const createDraft = useDraftStore((s) => s.createDraft);
     const setDraft = useDraftStore((s) => s.setDraft);
     const deleteDraft = useDraftStore((s) => s.deleteDraft);
 
-    const fixed = useMemo(() => mockPassportById(passportId), [passportId]);
-    const passport = useMemo(() => (draft ? draftToPassport(draft) : (fixed ?? null)), [draft, fixed]);
+    const [backendPassport, setBackendPassport] = useState<Passport | null>(null);
+
+    useEffect(() => {
+        const isBackendId = token && !passportId.startsWith('draft-');
+        if (!isBackendId) return;
+        fetchDppForm(token, passportId)
+            .then((dto) => setBackendPassport(dppFormToPassport(dto)))
+            .catch(() => {});
+    }, [token, passportId]);
 
     const [confirmDelete, setConfirmDelete] = useState(false);
+
+    const fixed = useMemo(() => mockPassportById(passportId), [passportId]);
+    const passport = useMemo<Passport | null>(() => {
+        if (backendPassport) return backendPassport;
+        if (draft) return draftToPassport(draft);
+        return fixed ?? null;
+    }, [backendPassport, draft, fixed]);
 
     const now = useMemo(() => new Date(), []);
     const score = useMemo(
@@ -79,6 +100,7 @@ export function PassportDetail({ passportId }: { passportId: string }) {
     }
 
     const isDraft = passport.status !== 'Published';
+    const displayPhoto = passport.garment.mainPhotoUrl || PLACEHOLDER_PHOTO;
 
     const handleDuplicate = () => {
         const newId = createDraft(artisan.id);
@@ -122,23 +144,23 @@ export function PassportDetail({ passportId }: { passportId: string }) {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>{passport.garment.reference || 'Sans référence'}</CardTitle>
+                        <CardTitle>
+                            {passport.garment.name || passport.garment.reference || 'Sans nom'}
+                        </CardTitle>
                         <p className="text-muted-foreground text-sm capitalize">
                             {passport.garment.kind} · modifié le{' '}
                             {new Date(passport.updatedAt).toLocaleDateString('fr-FR')}
                         </p>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        {passport.garment.mainPhotoUrl && (
-                            <Image
-                                src={passport.garment.mainPhotoUrl}
-                                alt={`Visuel principal du passeport ${passport.garment.reference}`}
-                                width={640}
-                                height={288}
-                                unoptimized
-                                className="border-border max-h-72 w-auto rounded-xl border object-contain"
-                            />
-                        )}
+                        <Image
+                            src={displayPhoto}
+                            alt={`Visuel principal du passeport ${passport.garment.reference}`}
+                            width={640}
+                            height={288}
+                            unoptimized
+                            className="border-border max-h-72 w-auto rounded-xl border object-contain"
+                        />
                         <p className="text-muted-foreground break-all font-mono text-xs">
                             {passport.gs1.verificationUrl}
                         </p>

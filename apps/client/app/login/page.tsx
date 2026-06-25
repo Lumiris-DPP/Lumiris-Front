@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ShieldCheck, Sparkles } from 'lucide-react';
 import { z } from 'zod';
@@ -13,7 +14,8 @@ import { Label } from '@lumiris/ui/components/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@lumiris/ui/components/popover';
 import { toast } from '@lumiris/ui/components/sonner';
 import { cn } from '@lumiris/ui/lib/cn';
-import { signIn } from '@/lib/auth-store';
+import { useLogin } from '@lumiris/api-client/react';
+import { signIn, signInWithToken } from '@/lib/auth-store';
 import { ESPR_TEXTILE_TIMELINE } from '@/lib/regulatory';
 import { useAuthArtisanId, useAuthHydrated } from '@/lib/use-auth';
 import { DEMO_CREDENTIALS, findArtisanByEmail, MOCK_PASSWORD } from '@/lib/mock-auth';
@@ -35,6 +37,7 @@ export default function LoginPage() {
     const router = useRouter();
     const hydrated = useAuthHydrated();
     const artisanId = useAuthArtisanId();
+    const loginMutation = useLogin();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -57,37 +60,50 @@ export default function LoginPage() {
 
     if (!hydrated || artisanId) return null;
 
-    function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         const parsed = LoginSchema.safeParse({ email, password });
         if (!parsed.success) {
             const next: FieldErrors = {};
             for (const issue of parsed.error.issues) {
                 const key = issue.path[0];
-                if (key === 'email' || key === 'password') {
-                    next[key] = issue.message;
-                }
+                if (key === 'email' || key === 'password') next[key] = issue.message;
             }
             setErrors(next);
             return;
         }
 
-        const artisan = findArtisanByEmail(parsed.data.email);
-        if (!artisan) {
-            setErrors({});
-            toast.error('Aucun atelier ne correspond à cet e-mail');
+        setErrors({});
+        const normalizedEmail = parsed.data.email.trim().toLowerCase();
+
+        // Demo mode: email matches a mock artisan → no API call
+        const demoArtisan = findArtisanByEmail(normalizedEmail);
+        if (demoArtisan) {
+            signIn(demoArtisan.id);
+            const firstName = demoArtisan.displayName.split(' ')[0] ?? demoArtisan.displayName;
+            toast.success(`Bienvenue ${firstName}`, { description: demoArtisan.atelierName });
+            router.push('/dashboard');
             return;
         }
 
-        setErrors({});
-        signIn(artisan.id);
-        const firstName = artisan.displayName.split(' ')[0] ?? artisan.displayName;
-        toast.success(`Bienvenue ${firstName}`, { description: artisan.atelierName });
-        router.push('/dashboard');
+        // Real mode: call the API
+        try {
+            const { token, user } = await loginMutation.mutateAsync({
+                email: normalizedEmail,
+                password: parsed.data.password,
+            });
+            const artisanProfileId = 'artisanId' in user ? ((user.artisanId as string | undefined) ?? null) : null;
+            signInWithToken(artisanProfileId, token, user.name ?? null);
+            const firstName = user.name?.split(' ')[0] ?? 'vous';
+            toast.success(`Bienvenue ${firstName}`);
+            router.push('/dashboard');
+        } catch {
+            toast.error('Email ou mot de passe incorrect');
+        }
     }
 
     function handleForgot() {
-        toast.info('Mode démo — fonctionnalité non disponible');
+        toast.info('Fonctionnalité non disponible pour le moment');
     }
 
     function handlePickDemo(demoEmail: string) {
@@ -178,20 +194,24 @@ export default function LoginPage() {
 
                         <Button
                             type="submit"
+                            disabled={loginMutation.isPending}
                             className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 mt-1 h-10 w-full text-white"
                         >
-                            Se connecter
+                            {loginMutation.isPending ? 'Connexion…' : 'Se connecter'}
                         </Button>
 
                         <p className="text-muted-foreground text-center text-[11px]">
-                            Mode démo · password = «{MOCK_PASSWORD}» · {mockArtisans.length} ateliers disponibles
+                            Pas encore de compte ?{' '}
+                            <Link href="/register" className="text-lumiris-emerald hover:underline">
+                                Créer un compte
+                            </Link>
                         </p>
                     </form>
                 </Card>
 
                 <details className="text-muted-foreground group mt-6 text-xs">
                     <summary className="hover:text-foreground cursor-pointer list-none text-center underline-offset-4 hover:underline">
-                        Tester un autre atelier
+                        Tester un atelier démo · password = «{MOCK_PASSWORD}»
                     </summary>
                     <ul className="border-border bg-card/60 mt-3 divide-y rounded-lg border">
                         {DEMO_CREDENTIALS.map(({ artisan, email: demoEmail }) => (

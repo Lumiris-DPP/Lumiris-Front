@@ -75,6 +75,7 @@ export type ProductDimensions = GarmentDimensions;
 
 export interface GarmentInfo {
     kind: GarmentKind;
+    name?: string;
     reference: string;
     mainPhotoUrl: string;
     dimensions: GarmentDimensions;

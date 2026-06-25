@@ -36,7 +36,7 @@ export const NEXT_APP_BASE_ENV_SCHEMA = {
     NEXT_PUBLIC_API_BASE_URL: {
         kind: 'string',
         required: false,
-        default: 'https://api.lumiris.local',
+        default: 'http://localhost:8080',
         description: 'Base URL du backend Spring Boot',
     },
     NEXT_PUBLIC_WEB_VITALS_SAMPLE_RATE: {

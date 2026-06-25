@@ -19,6 +19,8 @@ import { useStepNavigation } from '@/features/wizard-shell/use-step-navigation';
 import { useBilling } from '@/lib/billing-store';
 import { useCurrentArtisan } from '@/lib/current-artisan';
 import { draftToPassport, useDraftStore } from '@/lib/draft-store';
+import { useAuthStore } from '@/lib/auth-store';
+import { patchDppForm } from '@/lib/dpp-api';
 import { usePassports } from '@/lib/passports-source';
 import { activePassportCount, isQuotaReached } from '@/lib/quota';
 import { CompletenessSection } from './completeness-section';
@@ -28,6 +30,7 @@ import { PublishDialog } from './publish-dialog';
 export function CreateStepPublish({ draftId }: { draftId: string }) {
     const router = useRouter();
     const artisan = useCurrentArtisan();
+    const token = useAuthStore((s) => s.token);
     const draft = useDraftStore((s) => s.drafts[draftId]);
     const publish = useDraftStore((s) => s.publish);
     const { goTo } = useStepNavigation(draftId);
@@ -66,6 +69,9 @@ export function CreateStepPublish({ draftId }: { draftId: string }) {
         const gs1 = buildGS1Identifier(gtin, serial, draftId);
         const status: 'Published' | 'InCompletion' = incomplete ? 'InCompletion' : 'Published';
         publish(draftId, { gs1, status });
+        if (token) {
+            void patchDppForm(token, draftId, { status }).catch(() => {});
+        }
         toast.success(incomplete ? 'Sauvegardé en complétion' : 'Passeport publié', {
             description: incomplete
                 ? 'Vous pouvez compléter les champs manquants depuis le détail.'

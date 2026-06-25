@@ -12,6 +12,8 @@ export interface WebVitalsProps {
 }
 
 export function WebVitals({ app, endpoint, sampleRate }: WebVitalsProps) {
+    /*
+    FIXME: réactiver ceci quand la route sera vraiment implémenter
     const route = usePathname() ?? '/';
     const reporter = initWebVitals({
         endpoint,
@@ -19,6 +21,6 @@ export function WebVitals({ app, endpoint, sampleRate }: WebVitalsProps) {
         route,
         ...(sampleRate !== undefined ? { sampleRate } : {}),
     });
-    useReportWebVitals(reporter);
+    useReportWebVitals(reporter);*/
     return null;
 }
