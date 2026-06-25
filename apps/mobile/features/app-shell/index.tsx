@@ -4,12 +4,13 @@ import { useEffect, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scan, Archive, MapPin, Sparkles, User } from 'lucide-react';
+import { Scan, Archive, MapPin, ShoppingBag, User } from 'lucide-react';
 import { fadeInOut, SPRING_INDICATOR, SPRING_TAB } from '@/lib/motion';
 import { migrateLegacyKeys } from '@/lib/migrate-legacy-keys';
+import { useCartCount } from '@/lib/marketplace';
 import { OfflineBanner } from './offline-banner';
 
-type Tab = 'scan' | 'vault' | 'local' | 'discover' | 'me';
+type Tab = 'scan' | 'boutique' | 'garde-robe' | 'local' | 'me';
 
 interface TabConfig {
     id: Tab;
@@ -20,26 +21,39 @@ interface TabConfig {
 
 const TABS: readonly TabConfig[] = [
     { id: 'scan', href: '/', label: 'Scan', Icon: Scan },
-    { id: 'vault', href: '/vault', label: 'Vault', Icon: Archive },
+    { id: 'boutique', href: '/boutique', label: 'Boutique', Icon: ShoppingBag },
+    { id: 'garde-robe', href: '/garde-robe', label: 'Garde-Robe', Icon: Archive },
     { id: 'local', href: '/local', label: 'Local', Icon: MapPin },
-    { id: 'discover', href: '/discover', label: 'Discover', Icon: Sparkles },
-    { id: 'me', href: '/me', label: 'Me', Icon: User },
+    { id: 'me', href: '/me', label: 'Moi', Icon: User },
 ];
 
 function activeTabFor(pathname: string): Tab | null {
     if (pathname === '/') return 'scan';
-    if (pathname === '/vault' || pathname.startsWith('/vault/')) return 'vault';
+    if (
+        pathname === '/boutique' ||
+        pathname.startsWith('/boutique/') ||
+        pathname.startsWith('/shop') ||
+        pathname === '/panier' ||
+        pathname === '/checkout' ||
+        pathname.startsWith('/commande/')
+    ) {
+        return 'boutique';
+    }
+    if (
+        pathname === '/garde-robe' ||
+        pathname.startsWith('/garde-robe/') ||
+        pathname === '/vault' ||
+        pathname.startsWith('/vault/')
+    ) {
+        return 'garde-robe';
+    }
     if (
         pathname === '/local' ||
         pathname.startsWith('/local/') ||
-        pathname.startsWith('/shop') ||
         pathname.startsWith('/artisans/') ||
         pathname.startsWith('/retoucheurs')
     ) {
         return 'local';
-    }
-    if (pathname === '/discover' || pathname.startsWith('/discover/') || pathname.startsWith('/journal/')) {
-        return 'discover';
     }
     if (pathname === '/me' || pathname.startsWith('/me/') || pathname === '/about' || pathname === '/help') {
         return 'me';
@@ -51,6 +65,8 @@ function shouldHideTabBar(pathname: string): boolean {
     if (pathname === '/auth' || pathname.startsWith('/auth/')) return true;
     if (pathname === '/onboarding' || pathname.startsWith('/onboarding/')) return true;
     if (pathname.startsWith('/passeport/')) return true;
+    if (pathname.startsWith('/boutique/')) return true;
+    if (pathname === '/panier' || pathname === '/checkout' || pathname.startsWith('/commande/')) return true;
     return false;
 }
 
@@ -63,6 +79,7 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
     const pathname = usePathname() ?? '/';
     const activeTab = activeTabFor(pathname);
     const tabBarHidden = hideTabBar || shouldHideTabBar(pathname);
+    const cartCount = useCartCount();
 
     useEffect(() => {
         migrateLegacyKeys();
@@ -110,7 +127,17 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
                                             active ? 'text-lumiris-cyan' : 'text-muted-foreground'
                                         }`}
                                     >
-                                        <Icon className="h-5 w-5" />
+                                        <span className="relative">
+                                            <Icon className="h-5 w-5" />
+                                            {id === 'boutique' && cartCount > 0 ? (
+                                                <span
+                                                    aria-label={`${cartCount} article${cartCount > 1 ? 's' : ''} dans le panier`}
+                                                    className="bg-lumiris-cyan text-background absolute -right-2 -top-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold tabular-nums"
+                                                >
+                                                    {cartCount > 9 ? '9+' : cartCount}
+                                                </span>
+                                            ) : null}
+                                        </span>
                                         <span className="text-[10px] font-semibold tracking-tight">{label}</span>
                                         {active ? (
                                             <motion.span

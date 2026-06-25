@@ -148,7 +148,7 @@ function Empty() {
                 </p>
             </div>
             <Link
-                href="/retoucheurs"
+                href="/local"
                 className="bg-foreground text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
             >
                 <Wrench className="h-4 w-4" />

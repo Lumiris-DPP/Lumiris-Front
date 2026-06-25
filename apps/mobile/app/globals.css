@@ -17,6 +17,13 @@
     --color-grade-e: var(--iris-grade-e);
 }
 
+/* Ombre douce "opal-glow" — deux couches très subtiles, jamais de bordure dure. */
+.opal-shadow {
+    box-shadow:
+        0 1px 3px oklch(50% 0.01 260deg / 4%),
+        0 4px 12px oklch(50% 0.01 260deg / 3%);
+}
+
 @keyframes grade-a-glow {
     0%,
     100% {

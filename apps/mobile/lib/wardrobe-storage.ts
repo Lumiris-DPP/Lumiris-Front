@@ -336,7 +336,8 @@ export function removeLumirisPassport(passportId: string): void {
 }
 
 // Snapshot stable — `useSyncExternalStore` ne re-render que si la référence change.
-let snapshotCache: readonly WardrobeItem[] = [];
+const EMPTY: readonly WardrobeItem[] = [];
+let snapshotCache: readonly WardrobeItem[] = EMPTY;
 let snapshotSerialized = '';
 
 function getSnapshot(): readonly WardrobeItem[] {
@@ -350,7 +351,7 @@ function getSnapshot(): readonly WardrobeItem[] {
 }
 
 function getServerSnapshot(): readonly WardrobeItem[] {
-    return [];
+    return EMPTY;
 }
 
 function subscribe(cb: () => void): () => void {

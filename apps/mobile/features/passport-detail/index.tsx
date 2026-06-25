@@ -20,6 +20,8 @@ import { ImpactStats } from './impact-stats';
 import { JourneyTimeline } from './journey-timeline';
 import { ActionBar } from './action-bar';
 import { ScoreSheet } from './score-sheet';
+import { PurchaseBlock } from './purchase-block';
+import { isForSale } from '@/lib/marketplace';
 
 const LAYER_DELAYS = {
     identity: 0.25,
@@ -76,6 +78,7 @@ export function PassportDetail({ passport }: PassportDetailProps) {
     const certificates = useUniqueCertificates(passport);
 
     const isOpaque = score.grade === 'E';
+    const forSale = isForSale(passport.id);
 
     const alternativeItems = useMemo<readonly ShopItem[]>(() => {
         if (score.grade !== 'E') return [];
@@ -94,7 +97,12 @@ export function PassportDetail({ passport }: PassportDetailProps) {
     }).format(now);
 
     return (
-        <div className="bg-background relative flex h-full w-full flex-col overflow-y-auto pb-28">
+        <div
+            className={cn(
+                'bg-background relative flex h-full w-full flex-col overflow-y-auto',
+                forSale ? 'pb-52' : 'pb-28',
+            )}
+        >
             <ScoreHero
                 grade={score.grade}
                 productName={productName}
@@ -203,6 +211,8 @@ export function PassportDetail({ passport }: PassportDetailProps) {
                     ID : {passport.id.toUpperCase()} / Scanné : {scannedDateLabel} / Grade {score.grade} / {brand}
                 </p>
             </div>
+
+            {forSale ? <PurchaseBlock passport={passport} artisanName={brand} /> : null}
 
             <ActionBar passport={passport} artisan={artisan ?? null} isSaved={isSaved} documents={documents} />
 

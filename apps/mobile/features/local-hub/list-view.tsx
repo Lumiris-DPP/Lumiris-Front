@@ -1,43 +1,26 @@
 'use client';
 
-import { useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { MapPinOff } from 'lucide-react';
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@lumiris/ui/components/empty';
 import type { LocalPoint } from './types';
-import { FilterPills, type LocalFilter } from './filter-pills';
+import { ListSkeleton } from './list-skeleton';
 import { MarketplaceBanner } from './marketplace-banner';
 import { PointCard } from './point-card';
 
 interface ListViewProps {
     points: readonly LocalPoint[];
+    loading: boolean;
+    showMarketplaceBanner: boolean;
 }
 
-export function ListView({ points }: ListViewProps) {
+export function ListView({ points, loading, showMarketplaceBanner }: ListViewProps) {
     const prefersReduced = useReducedMotion();
-    const [filter, setFilter] = useState<LocalFilter>('all');
-
-    const counts = useMemo<Record<LocalFilter, number>>(
-        () => ({
-            all: points.length,
-            buy: points.filter((p) => p.kind === 'artisan').length,
-            repair: points.filter((p) => p.kind === 'repairer').length,
-        }),
-        [points],
-    );
-
-    const filtered = useMemo(() => {
-        if (filter === 'buy') return points.filter((p) => p.kind === 'artisan');
-        if (filter === 'repair') return points.filter((p) => p.kind === 'repairer');
-        return points;
-    }, [points, filter]);
 
     return (
-        <div className="flex flex-col gap-4 px-4 pb-24">
-            <div className="bg-background/85 sticky top-0 z-10 -mx-4 px-4 py-3 backdrop-blur-xl">
-                <FilterPills value={filter} onChange={setFilter} counts={counts} />
-            </div>
-
+        <div className="flex flex-col gap-4 px-4 pb-24 pt-3">
             <AnimatePresence initial={false}>
-                {filter === 'buy' ? (
+                {showMarketplaceBanner && !loading ? (
                     <motion.div
                         key="marketplace-banner"
                         initial={prefersReduced ? false : { opacity: 0, height: 0 }}
@@ -51,13 +34,23 @@ export function ListView({ points }: ListViewProps) {
                 ) : null}
             </AnimatePresence>
 
-            {filtered.length === 0 ? (
-                <p className="text-muted-foreground py-12 text-center text-sm">
-                    Aucun point partenaire pour ce filtre.
-                </p>
+            {loading ? (
+                <ListSkeleton />
+            ) : points.length === 0 ? (
+                <Empty className="mt-8 border-0">
+                    <EmptyHeader>
+                        <EmptyMedia variant="icon">
+                            <MapPinOff className="h-6 w-6" strokeWidth={1.5} aria-hidden />
+                        </EmptyMedia>
+                        <EmptyTitle>Aucun résultat près de toi</EmptyTitle>
+                        <EmptyDescription>
+                            Élargis la distance ou retire des filtres pour voir plus de partenaires.
+                        </EmptyDescription>
+                    </EmptyHeader>
+                </Empty>
             ) : (
                 <ul className="flex flex-col gap-4">
-                    {filtered.map((point, index) => (
+                    {points.map((point, index) => (
                         <li key={`${point.kind}-${point.id}`}>
                             <PointCard point={point} index={index} />
                         </li>

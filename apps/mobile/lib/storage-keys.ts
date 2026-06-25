@@ -17,6 +17,8 @@ export const USER_KEYS = {
     settings: 'settings.v1',
     affiliateClicks: 'affiliate.clicks.v1',
     repairs: 'repairs.v1',
+    cart: 'cart.v1',
+    orders: 'orders.v1',
 } as const;
 
 /** `lumiris.users.{userId}.{suffix}` ou `lumiris.anon.{suffix}` (tampon avant signIn). */

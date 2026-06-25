@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, HelpCircle } from 'lucide-react';
+import { ArrowLeft, HelpCircle, Keyboard } from 'lucide-react';
 import { mockArtisanById } from '@lumiris/mock-data';
 import type { Passport } from '@lumiris/types';
 import { usePassportScore } from '@/lib/iris/use-passport-score';
@@ -200,21 +200,22 @@ export function ScanPassport() {
                 <IrisRing status={status} />
             </div>
 
-            <div className="absolute inset-x-0 bottom-0 z-20 flex justify-center pb-[max(env(safe-area-inset-bottom),1.5rem)]">
+            <div className="absolute inset-x-0 bottom-0 z-20 flex justify-center px-6 pb-[calc(env(safe-area-inset-bottom)+6.5rem)]">
                 <button
                     type="button"
                     onClick={openManualEntry}
-                    className="text-foreground/80 hover:text-foreground inline-flex h-11 items-center px-4 text-sm underline-offset-4 hover:underline"
+                    className="bg-card/70 text-foreground hover:bg-card/90 inline-flex h-12 items-center gap-2 rounded-full border border-white/30 px-5 text-sm font-semibold backdrop-blur-md active:scale-[0.98]"
                 >
-                    Saisir manuellement
+                    <Keyboard className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                    Saisir un code à la main
                 </button>
             </div>
 
             {phase === 'pre-prompt' ? <PermissionPrompt onActivate={onAcceptPrompt} /> : null}
 
-            {status === 'denied' ? <CameraDeniedState onManualEntry={openManualEntry} /> : null}
-            {status === 'unreadable' ? <QrUnreadableState onRetry={restart} /> : null}
-            {status === 'unknown' ? <NonLumirisQrState onRetry={restart} /> : null}
+            {status === 'denied' ? <CameraDeniedState onAllow={startCamera} onManualEntry={openManualEntry} /> : null}
+            {status === 'unreadable' ? <QrUnreadableState onRetry={restart} onManualEntry={openManualEntry} /> : null}
+            {status === 'unknown' ? <NonLumirisQrState onRetry={restart} onManualEntry={openManualEntry} /> : null}
 
             {match && matchScore ? (
                 <ScanResultModal

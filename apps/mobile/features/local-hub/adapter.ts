@@ -62,6 +62,7 @@ export function toLocalPoints(
             rating: r.avgRating,
             reviewCount: r.reviewCount,
             avgDelayDays: r.avgDelayDays,
+            priceRange: { min: r.priceRange.min, max: r.priceRange.max },
             specialties: r.specialities.map((s) => REPAIRER_SPECIALTY_LABEL[s]),
             sector: firstSpecialty ? SPECIALTY_TO_SECTOR[firstSpecialty] : undefined,
         });

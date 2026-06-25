@@ -1,8 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowUpRight, MapPin, Store, Wrench } from 'lucide-react';
+import { Clock, MapPin, Star, Store, Wrench } from 'lucide-react';
+import { IrisGrade } from '@lumiris/scoring-ui';
 import { cn } from '@lumiris/ui/lib/cn';
 import type { LocalPoint } from './types';
 
@@ -13,141 +16,156 @@ interface PointCardProps {
 
 export function PointCard({ point, index }: PointCardProps) {
     const prefersReduced = useReducedMotion();
+    const searchParams = useSearchParams();
     const isArtisan = point.kind === 'artisan';
-    const href = isArtisan ? `/artisans/${point.slug}` : `/retoucheurs/${point.slug}`;
-    const ariaLabel = `${isArtisan ? 'Atelier' : 'Retoucheur'} ${point.name}, ${point.city}, ${point.region}${point.distanceKm !== undefined ? `, a ${formatDistance(point.distanceKm)}` : ''}`;
+    // Conserve le contexte "réparer ce passeport" (?for=) jusqu'au profil retoucheur.
+    const forParam = searchParams.get('for');
+    const forQuery = !isArtisan && forParam ? `?for=${encodeURIComponent(forParam)}` : '';
+    const href = isArtisan ? `/artisans/${point.slug}` : `/retoucheurs/${point.slug}${forQuery}`;
+    const typeLabel = isArtisan ? 'Atelier' : 'Retoucheur';
+    const chips = point.specialties?.slice(0, 3) ?? [];
+    const extraChips = (point.specialties?.length ?? 0) - chips.length;
+    const ariaLabel = `${typeLabel} ${point.name}, ${point.city}${point.distanceKm !== undefined ? `, à ${formatDistance(point.distanceKm)}` : ''}`;
 
     return (
         <motion.div
             initial={prefersReduced ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.05 * index }}
+            transition={{ duration: 0.3, delay: Math.min(0.04 * index, 0.2) }}
         >
             <Link
                 href={href}
                 aria-label={ariaLabel}
                 className={cn(
-                    'bg-card border-border/40 group relative block overflow-hidden rounded-3xl border shadow-sm',
-                    'transition-all duration-200 active:scale-[0.985]',
+                    'bg-card border-border/60 opal-shadow group relative flex gap-3 rounded-2xl border p-3.5',
+                    'transition-colors active:scale-[0.99]',
                     'focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-                    'hover:shadow-md',
+                    'hover:border-border',
                 )}
             >
-                <article className="relative">
-                    <div className="aspect-16/10 relative w-full overflow-hidden">
-                        <HeroBackdrop isArtisan={isArtisan} prefersReduced={prefersReduced ?? false} />
+                <Thumb point={point} isArtisan={isArtisan} />
 
-                        <div
-                            aria-hidden
-                            className="bg-linear-to-t absolute inset-0 from-black/60 via-black/5 to-transparent"
-                        />
-
-                        <div className="absolute inset-x-3 top-3 flex items-start justify-between gap-2">
-                            <span
-                                className={cn(
-                                    'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold',
-                                    'text-foreground bg-white/85 shadow-sm backdrop-blur-md',
-                                )}
-                            >
-                                {isArtisan ? (
-                                    <Store className="text-lumiris-emerald h-3 w-3" aria-hidden />
-                                ) : (
-                                    <Wrench className="text-lumiris-cyan h-3 w-3" aria-hidden />
-                                )}
-                                {isArtisan ? 'Atelier' : 'Retoucheur'}
-                            </span>
-
-                            {point.distanceKm !== undefined ? (
-                                <span className="text-foreground inline-flex items-center gap-1 rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-semibold shadow-sm backdrop-blur-md">
-                                    <MapPin className="h-3 w-3" aria-hidden />
-                                    {formatDistance(point.distanceKm)}
-                                </span>
-                            ) : null}
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 px-4 py-3.5">
-                        <div className="min-w-0 flex-1">
-                            <h3 className="text-foreground line-clamp-1 text-[15px] font-semibold leading-tight tracking-tight">
+                <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                    <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                            <h3 className="text-foreground line-clamp-1 text-[15px] font-semibold leading-tight">
                                 {point.name}
                             </h3>
                             <p className="text-muted-foreground mt-0.5 line-clamp-1 text-xs">
-                                {formatSpecialties(point.specialties) ?? `${point.city}, ${point.region}`}
+                                {typeLabel} · {point.city}
                             </p>
                         </div>
-                        <span
-                            aria-hidden
-                            className={cn(
-                                'border-border/60 text-muted-foreground inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-all',
-                                'group-hover:border-foreground group-hover:text-foreground group-hover:bg-foreground/[0.04]',
-                                prefersReduced ? '' : 'group-hover:rotate-12',
-                            )}
-                        >
-                            <ArrowUpRight className="h-4 w-4" aria-hidden />
-                        </span>
+                        {point.distanceKm !== undefined ? (
+                            <span className="text-muted-foreground inline-flex shrink-0 items-center gap-1 text-[11px] font-medium">
+                                <MapPin className="h-3 w-3" strokeWidth={1.5} aria-hidden />
+                                <span className="font-mono tabular-nums">{formatDistance(point.distanceKm)}</span>
+                            </span>
+                        ) : null}
                     </div>
-                </article>
+
+                    {chips.length > 0 ? (
+                        <ul className="flex flex-wrap gap-1">
+                            {chips.map((chip) => (
+                                <li
+                                    key={chip}
+                                    className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-medium"
+                                >
+                                    {chip}
+                                </li>
+                            ))}
+                            {extraChips > 0 ? (
+                                <li className="text-muted-foreground/70 px-1 py-0.5 text-[10px] font-medium">
+                                    +{extraChips}
+                                </li>
+                            ) : null}
+                        </ul>
+                    ) : null}
+
+                    <KpiRow point={point} isArtisan={isArtisan} />
+                </div>
             </Link>
         </motion.div>
     );
 }
 
-function HeroBackdrop({ isArtisan, prefersReduced }: { isArtisan: boolean; prefersReduced: boolean }) {
+function Thumb({ point, isArtisan }: { point: LocalPoint; isArtisan: boolean }) {
+    if (isArtisan && point.photoUrl) {
+        return (
+            <div className="bg-muted relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
+                <Image
+                    src={point.photoUrl}
+                    alt={`Atelier ${point.name}`}
+                    fill
+                    unoptimized
+                    sizes="64px"
+                    className="object-cover"
+                />
+            </div>
+        );
+    }
+    const Icon = isArtisan ? Store : Wrench;
+    return (
+        <div
+            className={cn(
+                'flex h-16 w-16 shrink-0 items-center justify-center rounded-xl',
+                isArtisan ? 'bg-lumiris-emerald/10 text-lumiris-emerald' : 'bg-lumiris-cyan/10 text-lumiris-cyan',
+            )}
+            role="img"
+            aria-label={`${isArtisan ? 'Atelier' : 'Retoucheur'} ${point.name}`}
+        >
+            <Icon className="h-6 w-6" strokeWidth={1.5} aria-hidden />
+        </div>
+    );
+}
+
+function KpiRow({ point, isArtisan }: { point: LocalPoint; isArtisan: boolean }) {
     if (isArtisan) {
         return (
-            <div aria-hidden className="absolute inset-0 overflow-hidden bg-[#0a0f14]">
-                <div
-                    className="absolute -left-1/4 -top-1/3 h-[150%] w-[80%] rounded-full opacity-80 blur-3xl"
-                    style={{ background: 'radial-gradient(circle, var(--lumiris-emerald), transparent 65%)' }}
-                />
-                <div
-                    className="absolute -bottom-1/3 -right-1/4 h-[140%] w-[75%] rounded-full opacity-70 blur-3xl"
-                    style={{ background: 'radial-gradient(circle, var(--lumiris-amber), transparent 65%)' }}
-                />
-                <div
-                    className="absolute left-1/3 top-1/4 h-[60%] w-[60%] rounded-full opacity-50 blur-2xl"
-                    style={{ background: 'radial-gradient(circle, var(--lumiris-cyan), transparent 60%)' }}
-                />
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,#0a0f14_120%)]" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <Store
-                        className={cn(
-                            'h-16 w-16 text-white/90 drop-shadow-2xl',
-                            prefersReduced ? '' : 'transition-transform duration-500 group-hover:scale-110',
-                        )}
-                        strokeWidth={1.4}
-                        aria-hidden
-                    />
-                </div>
+            <div className="mt-0.5 flex items-center gap-3 text-[11px]">
+                {point.averageGrade ? (
+                    <span className="inline-flex items-center gap-1.5">
+                        <IrisGrade grade={point.averageGrade} size="sm" tone="solid" />
+                        <span className="text-muted-foreground">moyenne</span>
+                    </span>
+                ) : null}
+                {point.publishedPassports ? (
+                    <span className="text-muted-foreground inline-flex items-center gap-1">
+                        <span className="text-foreground font-mono font-semibold tabular-nums">
+                            {point.publishedPassports}
+                        </span>
+                        passeport{point.publishedPassports > 1 ? 's' : ''}
+                    </span>
+                ) : null}
             </div>
         );
     }
 
     return (
-        <div
-            aria-hidden
-            className="absolute inset-0 flex items-center justify-center overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, var(--lumiris-cyan), var(--lumiris-amber))' }}
-        >
-            <div className="absolute inset-0 opacity-50 mix-blend-overlay [background:radial-gradient(circle_at_30%_20%,white,transparent_55%)]" />
-            <div className="absolute inset-0 opacity-30 mix-blend-soft-light [background:radial-gradient(circle_at_80%_85%,white,transparent_55%)]" />
-            <Wrench
-                className={cn(
-                    'relative h-14 w-14 text-white/95 drop-shadow-md',
-                    prefersReduced ? '' : 'transition-transform duration-500 group-hover:scale-110',
-                )}
-                strokeWidth={1.5}
-                aria-hidden
-            />
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
+            {point.rating !== undefined ? (
+                <span className="inline-flex items-center gap-1">
+                    <Star className="text-lumiris-amber h-3.5 w-3.5 fill-current" strokeWidth={1.5} aria-hidden />
+                    <span className="text-foreground font-mono font-semibold tabular-nums">
+                        {point.rating.toFixed(1)}
+                    </span>
+                    {point.reviewCount !== undefined ? (
+                        <span className="text-muted-foreground font-mono tabular-nums">({point.reviewCount})</span>
+                    ) : null}
+                </span>
+            ) : null}
+            {point.avgDelayDays !== undefined ? (
+                <span className="text-muted-foreground inline-flex items-center gap-1">
+                    <Clock className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+                    <span className="font-mono tabular-nums">~{point.avgDelayDays} j</span>
+                </span>
+            ) : null}
+            {point.priceRange ? (
+                <span className="text-foreground ml-auto font-mono text-xs font-semibold tabular-nums">
+                    {point.priceRange.min}–{point.priceRange.max} €
+                </span>
+            ) : null}
         </div>
     );
-}
-
-function formatSpecialties(specialties?: readonly string[]): string | null {
-    if (!specialties || specialties.length === 0) return null;
-    const first = specialties.slice(0, 3);
-    const extra = specialties.length - first.length;
-    return extra > 0 ? `${first.join(' · ')} · +${extra}` : first.join(' · ');
 }
 
 function formatDistance(km: number): string {

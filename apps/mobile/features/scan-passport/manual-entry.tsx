@@ -37,7 +37,7 @@ export function ManualEntrySheet({ open, onOpenChange }: ManualEntrySheetProps) 
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent
                 side="bottom"
-                className="rounded-t-3xl px-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] pt-8"
+                className="mx-auto max-w-md rounded-t-3xl px-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] pt-8"
             >
                 <SheetTitle className="sr-only">Saisir un code passeport</SheetTitle>
                 <input

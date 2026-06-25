@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Scan } from 'lucide-react';
 
 export type IrisRingStatus = 'idle' | 'scanning' | 'denied' | 'unreadable' | 'unknown' | 'matched';
@@ -12,12 +12,14 @@ interface IrisRingProps {
 
 // memo : parent boucle en rAF, un re-render casserait l'animation de pulsation.
 function IrisRingImpl({ status }: IrisRingProps) {
+    const prefersReduced = useReducedMotion() ?? false;
     const isMatched = status === 'matched';
     const isScanning = status === 'scanning';
+    const animate = !prefersReduced;
 
     return (
         <div className="relative flex items-center justify-center">
-            {/* Outer prismatic conic ring (rotates slowly) */}
+            {/* Anneau prismatique externe (rotation lente) — figé en reduced-motion */}
             <motion.div
                 aria-hidden
                 className="absolute h-[min(58vmin,17rem)] w-[min(58vmin,17rem)] rounded-full"
@@ -25,11 +27,11 @@ function IrisRingImpl({ status }: IrisRingProps) {
                     background:
                         'conic-gradient(from 0deg, oklch(50% 0.094 220deg / 14%), oklch(54% 0.247 294deg / 10%), oklch(50% 0.192 1deg / 6%), transparent, oklch(50% 0.094 220deg / 14%))',
                 }}
-                animate={{ rotate: 360 }}
-                transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+                animate={animate ? { rotate: 360 } : undefined}
+                transition={animate ? { duration: 10, repeat: Infinity, ease: 'linear' } : undefined}
             />
 
-            {/* Main iris — quasi-transparent disc so the camera shows through, breathing animation */}
+            {/* Iris principal — disque quasi-transparent (caméra visible au travers), respiration */}
             <motion.div
                 aria-hidden
                 className={`relative flex h-[min(52vmin,15rem)] w-[min(52vmin,15rem)] items-center justify-center rounded-full border-2 ${
@@ -38,10 +40,16 @@ function IrisRingImpl({ status }: IrisRingProps) {
                 style={{
                     background: 'oklch(100% 0 0deg / 6%)',
                     backdropFilter: 'blur(2px)',
-                    animation: isScanning || isMatched ? 'none' : 'iris-breathe 4s ease-in-out infinite',
+                    animation: animate && !isScanning && !isMatched ? 'iris-breathe 4s ease-in-out infinite' : 'none',
                 }}
                 animate={
-                    isMatched ? { scale: [1, 0.88, 1.06, 1] } : isScanning ? { scale: [1, 1.02, 0.99, 1.01, 1] } : {}
+                    !animate
+                        ? {}
+                        : isMatched
+                          ? { scale: [1, 0.88, 1.06, 1] }
+                          : isScanning
+                            ? { scale: [1, 1.02, 0.99, 1.01, 1] }
+                            : {}
                 }
                 transition={
                     isMatched
@@ -54,9 +62,9 @@ function IrisRingImpl({ status }: IrisRingProps) {
                 <div className="absolute h-[min(32vmin,9rem)] w-[min(32vmin,9rem)] rounded-full border border-white/15" />
                 <div className="absolute h-[min(22vmin,6rem)] w-[min(22vmin,6rem)] rounded-full border border-white/10" />
 
-                {/* Scanline sweep (only while scanning) */}
+                {/* Ligne de scan (uniquement en mode scanning, figée en reduced-motion) */}
                 <AnimatePresence>
-                    {isScanning ? (
+                    {isScanning && animate ? (
                         <motion.div
                             className="absolute inset-4 overflow-hidden rounded-full"
                             initial={{ opacity: 0 }}

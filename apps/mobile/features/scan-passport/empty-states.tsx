@@ -1,70 +1,100 @@
 'use client';
 
-import { CameraOff, ScanSearch } from 'lucide-react';
-import type { ComponentType, ReactNode, SVGProps } from 'react';
+import { CameraOff, ScanLine, FileQuestion } from 'lucide-react';
+import type { ComponentType, SVGProps } from 'react';
 
 type LucideIcon = ComponentType<SVGProps<SVGSVGElement>>;
 
 interface EmptyShellProps {
     Icon: LucideIcon;
+    title: string;
     message: string;
-    children: ReactNode;
+    primary: { label: string; onClick: () => void };
+    secondary?: { label: string; onClick: () => void };
 }
 
-function EmptyShell({ Icon, message, children }: EmptyShellProps) {
+function EmptyShell({ Icon, title, message, primary, secondary }: EmptyShellProps) {
     return (
-        <div className="bg-background absolute inset-0 z-30 flex flex-col items-center justify-center gap-6 px-8 text-center">
-            <Icon className="text-foreground/70 h-10 w-10" aria-hidden />
-            <p className="text-foreground max-w-xs text-base font-medium leading-snug">{message}</p>
-            {children}
+        <div
+            role="alert"
+            className="bg-background absolute inset-0 z-30 flex flex-col items-center justify-center gap-5 px-8 text-center"
+        >
+            <span className="bg-muted text-foreground inline-flex h-14 w-14 items-center justify-center rounded-2xl">
+                <Icon className="h-6 w-6" strokeWidth={1.5} aria-hidden />
+            </span>
+            <div className="flex flex-col gap-1.5">
+                <h2 className="text-foreground text-lg font-semibold tracking-tight">{title}</h2>
+                <p className="text-muted-foreground mx-auto max-w-xs text-pretty text-sm leading-relaxed">{message}</p>
+            </div>
+            <div className="flex w-full max-w-xs flex-col gap-2">
+                <button
+                    type="button"
+                    onClick={primary.onClick}
+                    className="bg-foreground text-background inline-flex h-14 w-full items-center justify-center rounded-full px-6 text-sm font-semibold active:scale-[0.98]"
+                >
+                    {primary.label}
+                </button>
+                {secondary ? (
+                    <button
+                        type="button"
+                        onClick={secondary.onClick}
+                        className="text-muted-foreground hover:text-foreground inline-flex h-11 w-full items-center justify-center text-sm font-medium"
+                    >
+                        {secondary.label}
+                    </button>
+                ) : null}
+            </div>
         </div>
     );
 }
 
-function PrimaryButton({ onClick, label }: { onClick: () => void; label: string }) {
-    return (
-        <button
-            type="button"
-            onClick={onClick}
-            className="bg-foreground text-background inline-flex h-14 w-full max-w-xs items-center justify-center rounded-full px-6 text-sm font-semibold"
-        >
-            {label}
-        </button>
-    );
-}
-
 interface CameraDeniedStateProps {
+    onAllow: () => void;
     onManualEntry: () => void;
 }
 
-export function CameraDeniedState({ onManualEntry }: CameraDeniedStateProps) {
+export function CameraDeniedState({ onAllow, onManualEntry }: CameraDeniedStateProps) {
     return (
-        <EmptyShell Icon={CameraOff} message="Caméra non disponible.">
-            <PrimaryButton onClick={onManualEntry} label="Saisir un code à la main" />
-        </EmptyShell>
+        <EmptyShell
+            Icon={CameraOff}
+            title="Caméra non disponible"
+            message="Autorise l'accès à la caméra pour scanner un QR code, ou saisis le code à la main."
+            primary={{ label: 'Autoriser la caméra', onClick: onAllow }}
+            secondary={{ label: 'Saisir un code à la main', onClick: onManualEntry }}
+        />
     );
 }
 
 interface QrUnreadableStateProps {
     onRetry: () => void;
+    onManualEntry: () => void;
 }
 
-export function QrUnreadableState({ onRetry }: QrUnreadableStateProps) {
+export function QrUnreadableState({ onRetry, onManualEntry }: QrUnreadableStateProps) {
     return (
-        <EmptyShell Icon={ScanSearch} message="QR illisible. Réessaye avec plus de lumière.">
-            <PrimaryButton onClick={onRetry} label="Réessayer" />
-        </EmptyShell>
+        <EmptyShell
+            Icon={ScanLine}
+            title="QR illisible"
+            message="Rapproche-toi du QR code et assure-toi d'avoir assez de lumière."
+            primary={{ label: 'Réessayer', onClick: onRetry }}
+            secondary={{ label: 'Saisir un code à la main', onClick: onManualEntry }}
+        />
     );
 }
 
 interface NonLumirisQrStateProps {
     onRetry: () => void;
+    onManualEntry: () => void;
 }
 
-export function NonLumirisQrState({ onRetry }: NonLumirisQrStateProps) {
+export function NonLumirisQrState({ onRetry, onManualEntry }: NonLumirisQrStateProps) {
     return (
-        <EmptyShell Icon={ScanSearch} message="Ce QR ne pointe pas vers un passeport Lumiris.">
-            <PrimaryButton onClick={onRetry} label="Réessayer" />
-        </EmptyShell>
+        <EmptyShell
+            Icon={FileQuestion}
+            title="Passeport introuvable"
+            message="Ce QR code ne pointe pas vers un passeport Lumiris connu."
+            primary={{ label: 'Saisir un code à la main', onClick: onManualEntry }}
+            secondary={{ label: 'Réessayer', onClick: onRetry }}
+        />
     );
 }

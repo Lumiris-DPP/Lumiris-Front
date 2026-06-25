@@ -86,7 +86,8 @@ export function updateRepairRequest(id: string, patch: Partial<Omit<RepairReques
     write(next);
 }
 
-let snapshotCache: readonly RepairRequest[] = [];
+const EMPTY: readonly RepairRequest[] = [];
+let snapshotCache: readonly RepairRequest[] = EMPTY;
 let snapshotSerialized = '';
 
 function getSnapshot(): readonly RepairRequest[] {
@@ -100,7 +101,7 @@ function getSnapshot(): readonly RepairRequest[] {
 }
 
 function getServerSnapshot(): readonly RepairRequest[] {
-    return [];
+    return EMPTY;
 }
 
 function subscribe(cb: () => void): () => void {

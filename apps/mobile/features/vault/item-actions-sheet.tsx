@@ -59,7 +59,7 @@ export function ItemActionsSheet({ open, onOpenChange, target }: ItemActionsShee
     const onFindRetoucheur = () => {
         if (!target.passport) return;
         close();
-        router.push(`/retoucheurs?for=${encodeURIComponent(target.passport.id)}`);
+        router.push(`/local?for=${encodeURIComponent(target.passport.id)}`);
     };
 
     const Icon = SECTOR_ICON[target.sector];

@@ -17,6 +17,7 @@ export interface LocalPoint {
     rating?: number;
     reviewCount?: number;
     avgDelayDays?: number;
+    priceRange?: { min: number; max: number };
     specialties?: readonly string[];
     sector?: RepairerSector;
 }

@@ -1,14 +1,15 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Award, Clock, Mail, MapPin, Phone, Star, Wrench } from 'lucide-react';
+import { ArrowLeft, Award, CalendarCheck, Clock, Mail, MapPin, Phone, Star, Wrench } from 'lucide-react';
 import { Badge } from '@lumiris/ui/components/badge';
 import type { Repairer, RepairerSpecialty } from '@lumiris/types';
 import { isLumirisLocal, repairerSlug } from '@/lib/repairers/badge';
 import { RepairersMap } from './repairers-map';
+import { BookingSheet } from './booking-sheet';
 
 const SPECIALITY_LABEL: Record<RepairerSpecialty, string> = {
     alteration: 'Retouche',
@@ -34,6 +35,7 @@ export function RepairerProfile({ repairer }: RepairerProfileProps) {
     const forParam = searchParams.get('for');
     const isLocal = isLumirisLocal(repairer);
     const slug = repairerSlug(repairer);
+    const [bookingOpen, setBookingOpen] = useState(false);
 
     const requestHref = useMemo(() => {
         const base = `/retoucheurs/${slug}/request`;
@@ -49,9 +51,7 @@ export function RepairerProfile({ repairer }: RepairerProfileProps) {
             >
                 <button
                     type="button"
-                    onClick={() =>
-                        router.push(forParam ? `/retoucheurs?for=${encodeURIComponent(forParam)}` : '/retoucheurs')
-                    }
+                    onClick={() => router.push(forParam ? `/local?for=${encodeURIComponent(forParam)}` : '/local')}
                     aria-label="Retour"
                     className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full border"
                 >
@@ -126,12 +126,20 @@ export function RepairerProfile({ repairer }: RepairerProfileProps) {
                 </section>
 
                 <section className="flex flex-col gap-2">
+                    <button
+                        type="button"
+                        onClick={() => setBookingOpen(true)}
+                        className="bg-foreground text-background inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold active:scale-95"
+                    >
+                        <CalendarCheck className="h-4 w-4" />
+                        Prendre rendez-vous
+                    </button>
                     <Link
                         href={requestHref}
-                        className="bg-foreground text-primary-foreground inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold active:scale-95"
+                        className="border-border bg-card text-foreground inline-flex items-center justify-center gap-2 rounded-full border px-5 py-2.5 text-xs font-medium active:scale-95"
                     >
-                        <Wrench className="h-4 w-4" />
-                        Demander une retouche
+                        <Wrench className="h-3.5 w-3.5" />
+                        Demande détaillée avec photos
                     </Link>
 
                     {repairer.phone || repairer.email ? (
@@ -162,6 +170,8 @@ export function RepairerProfile({ repairer }: RepairerProfileProps) {
                     </p>
                 </section>
             </div>
+
+            <BookingSheet repairer={repairer} open={bookingOpen} onOpenChange={setBookingOpen} />
         </div>
     );
 }
