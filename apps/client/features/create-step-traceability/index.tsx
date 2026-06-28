@@ -8,6 +8,7 @@ import { Checkbox } from '@lumiris/ui/components/checkbox';
 import { WizardStepFrame } from '@/features/wizard-shell/step-frame';
 import { useStepNavigation } from '@/features/wizard-shell/use-step-navigation';
 import { useDraftStore } from '@/lib/draft-store';
+import { draftToValidationInput } from '@/features/wizard-shell/validation-input';
 import { validateStep } from './schema';
 
 function generateId(prefix: string): string {
@@ -31,22 +32,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
     }, [draft]);
 
     const validation = useMemo(
-        () =>
-            validateStep({
-                garment: draft?.garment ?? {
-                    kind: 'sweater',
-                    reference: '',
-                    mainPhotoUrl: '',
-                    dimensions: {},
-                    retailPrice: 0,
-                    currency: 'EUR',
-                },
-                materials: draft?.materials ?? [],
-                careInstructions: draft?.careInstructions ?? [],
-                certifications: draft?.certifications ?? [],
-                traceability: form,
-                eco: draft?.eco ?? {},
-            }),
+        () => validateStep(draftToValidationInput(draft, { traceability: form })),
         [form, draft],
     );
 
@@ -153,11 +139,12 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
                     <div className="space-y-1">
                         <label htmlFor="reach" className="cursor-pointer text-sm font-medium leading-snug">
                             Je certifie que ce produit respecte les réglementations européennes REACH (absence de
-                            colorants azoïques interdits et substances toxiques). <span className="text-destructive">*</span>
+                            colorants azoïques interdits et substances toxiques).{' '}
+                            <span className="text-destructive">*</span>
                         </label>
                         <p className="text-muted-foreground text-[11px]">
-                            Obligatoire pour vendre en Europe. Vos fournisseurs de tissus doivent vous fournir
-                            cette garantie.
+                            Obligatoire pour vendre en Europe. Vos fournisseurs de tissus doivent vous fournir cette
+                            garantie.
                         </p>
                     </div>
                 </div>

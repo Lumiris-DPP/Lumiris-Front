@@ -22,6 +22,7 @@ import { useWardrobe } from '@/lib/wardrobe-storage';
 import { useSettings } from '@/lib/settings';
 import { USER_KEYS, userScopedKey } from '@/lib/storage-keys';
 import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
+import { SectionLabel } from '@/lib/section';
 
 const APP_VERSION = '0.1.0';
 const DPO_EMAIL = 'contact@lumiris.example';
@@ -78,10 +79,7 @@ function Header() {
 function Section({ title, Icon, children }: { title: string; Icon?: typeof ShieldCheck; children: React.ReactNode }) {
     return (
         <section className="flex flex-col gap-3">
-            <h2 className="text-muted-foreground inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider">
-                {Icon ? <Icon className="h-3 w-3" /> : null}
-                {title}
-            </h2>
+            <SectionLabel title={title} Icon={Icon} />
             <GlassCard intensity="subtle" className="flex flex-col p-4">
                 {children}
             </GlassCard>

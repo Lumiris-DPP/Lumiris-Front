@@ -1,49 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { use, useEffect, useMemo } from 'react';
+import { use } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
-import { computeScore } from '@lumiris/core/scoring';
-import { mockArtisanById, mockCertificates, mockPassportById, mockSuppliers } from '@lumiris/mock-data';
-import type { Artisan, CountryCode, IrisGrade, Material, Passport, ProductionStep } from '@lumiris/types';
-import { draftToPassport, useDraftStore } from '@/lib/draft-store';
+import { mockSuppliers } from '@lumiris/mock-data';
+import { FIBER_LABEL, GARMENT_KIND_LABEL, STAGE_LABEL } from '@lumiris/scoring-ui';
+import type { Artisan, IrisGrade, Material, Passport, ProductionStep } from '@lumiris/types';
+import { flagEmoji, formatDateFr } from '@lumiris/utils';
+import { usePassportSource } from '@/lib/use-passport-source';
+import { useAutoPrint } from '@/lib/use-auto-print';
 
 interface PageProps {
     params: Promise<{ id: string }>;
 }
-
-const FIBER_LABEL_FR: Partial<Record<Material['fiber'], string>> = {
-    wool: 'Laine',
-    linen: 'Lin',
-    cotton: 'Coton',
-    silk: 'Soie',
-    hemp: 'Chanvre',
-    cashmere: 'Cachemire',
-    'recycled-polyester': 'Polyester recyclé',
-    other: 'Autre',
-};
-
-const KIND_LABEL_FR: Record<Passport['garment']['kind'], string> = {
-    sweater: 'Pull',
-    shirt: 'Chemise',
-    shoe: 'Chaussures',
-    jacket: 'Veste',
-    trouser: 'Pantalon',
-    accessory: 'Accessoire',
-    other: 'Pièce',
-};
-
-const STAGE_LABEL_FR: Record<ProductionStep['kind'], string> = {
-    weaving: 'Tissage',
-    dyeing: 'Teinture',
-    cutting: 'Coupe',
-    sewing: 'Couture',
-    finishing: 'Finition',
-    embroidery: 'Broderie',
-    assembly: 'Assemblage',
-    'quality-check': 'Contrôle qualité',
-    other: 'Étape',
-};
 
 const GRADE_HEX: Record<IrisGrade, string> = {
     A: '#10a37f',
@@ -53,43 +22,12 @@ const GRADE_HEX: Record<IrisGrade, string> = {
     E: '#e11d48',
 };
 
-function flagEmoji(code: CountryCode | undefined): string {
-    if (!code || code.length !== 2) return '';
-    return String.fromCodePoint(
-        ...code
-            .toUpperCase()
-            .split('')
-            .map((c) => 127397 + c.charCodeAt(0)),
-    );
-}
-
 export default function PrintPassportSheetPage({ params }: PageProps) {
     const { id } = use(params);
-    const draft = useDraftStore((s) => s.drafts[id]);
-    const fixed = useMemo(() => mockPassportById(id), [id]);
-    const passport = draft ? draftToPassport(draft) : (fixed ?? null);
-    const artisan: Artisan | null = useMemo(
-        () => (passport ? (mockArtisanById(passport.artisanId) ?? null) : null),
-        [passport],
-    );
-    const score = useMemo(() => {
-        if (!passport || !artisan) return null;
-        return computeScore(passport, {
-            artisan,
-            certificates: mockCertificates,
-            now: new Date(),
-        });
-    }, [passport, artisan]);
+    const { passport, artisan, score } = usePassportSource(id);
 
-    const printable = passport && passport.status !== 'Draft';
-
-    useEffect(() => {
-        if (printable) {
-            const t = window.setTimeout(() => window.print(), 350);
-            return () => window.clearTimeout(t);
-        }
-        return undefined;
-    }, [printable]);
+    const printable = Boolean(passport) && passport?.status !== 'Draft';
+    useAutoPrint(printable);
 
     if (!passport || !artisan || !score) {
         return (
@@ -127,7 +65,7 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
         );
     }
 
-    const kindLabel = KIND_LABEL_FR[passport.garment.kind] ?? KIND_LABEL_FR.other;
+    const kindLabel = GARMENT_KIND_LABEL[passport.garment.kind];
     const issuedAt = new Date(passport.publishedAt ?? passport.updatedAt);
     const gradeHex = GRADE_HEX[score.grade];
 
@@ -187,7 +125,7 @@ function Header({ artisan, issuedAt }: { artisan: Artisan; issuedAt: Date }) {
             </div>
             <div className="text-right">
                 <p className="font-mono text-[10px] uppercase tracking-wider text-neutral-500">Émis le</p>
-                <p className="font-mono text-xs">{issuedAt.toLocaleDateString('fr-FR')}</p>
+                <p className="font-mono text-xs">{formatDateFr(issuedAt)}</p>
             </div>
         </header>
     );
@@ -285,7 +223,7 @@ function CompositionBlock({ materials }: { materials: readonly Material[] }) {
                         const flag = flagEmoji(m.originCountry);
                         return (
                             <tr key={i} className="border-b border-neutral-100 align-top">
-                                <td className="py-1.5 pr-2 font-medium">{FIBER_LABEL_FR[m.fiber] ?? '—'}</td>
+                                <td className="py-1.5 pr-2 font-medium">{FIBER_LABEL[m.fiber]}</td>
                                 <td className="py-1.5 pr-2 font-mono">{m.percentage}%</td>
                                 <td className="py-1.5 pr-2">
                                     {flag ? `${flag} ` : ''}
@@ -334,7 +272,7 @@ function StepsBlock({ steps }: { steps: readonly ProductionStep[] }) {
                             {i + 1}
                         </span>
                         <span className="min-w-0 flex-1">
-                            <span className="font-medium">{STAGE_LABEL_FR[s.kind] ?? s.kind}</span>
+                            <span className="font-medium">{STAGE_LABEL[s.kind]}</span>
                             {s.label && <span className="text-neutral-700"> — {s.label}</span>}
                             <span className="block text-neutral-500">
                                 {s.performedBy ? `${s.performedBy} · ` : ''}

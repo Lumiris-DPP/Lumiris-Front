@@ -21,6 +21,8 @@ export interface EmptyStateProps {
     cta?: EmptyStateAction;
     tone?: EmptyStateTone;
     className?: string;
+    /** Custom action node rendered in the CTA slot (takes precedence over `cta`). */
+    children?: React.ReactNode;
 }
 
 const TONE_CLASSES: Record<EmptyStateTone, string> = {
@@ -33,7 +35,15 @@ const CTA_CLASSES: Record<EmptyStateTone, string> = {
     amber: 'bg-lumiris-amber hover:bg-lumiris-amber/90 text-white',
 };
 
-export function EmptyState({ icon: Icon, title, description, cta, tone = 'emerald', className }: EmptyStateProps) {
+export function EmptyState({
+    icon: Icon,
+    title,
+    description,
+    cta,
+    tone = 'emerald',
+    className,
+    children,
+}: EmptyStateProps) {
     return (
         <Card className={cn('mx-auto max-w-2xl', className)}>
             <CardContent className="flex flex-col items-center gap-4 p-12 text-center">
@@ -44,7 +54,7 @@ export function EmptyState({ icon: Icon, title, description, cta, tone = 'emeral
                     <h2 className="text-foreground text-lg font-semibold">{title}</h2>
                     <p className="text-muted-foreground max-w-md text-sm">{description}</p>
                 </div>
-                {cta && <EmptyStateCta cta={cta} tone={tone} />}
+                {children ?? (cta && <EmptyStateCta cta={cta} tone={tone} />)}
             </CardContent>
         </Card>
     );

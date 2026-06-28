@@ -10,6 +10,7 @@ import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { toast } from '@lumiris/ui/components/sonner';
 import { signInWithToken } from '@/lib/auth-store';
+import { zodFieldErrors } from '@/lib/form-errors';
 
 const CredentialsSchema = z
     .object({
@@ -52,12 +53,7 @@ export function StepCredentials({ role, onBack, onSuccess }: StepCredentialsProp
         e.preventDefault();
         const parsed = CredentialsSchema.safeParse(fields);
         if (!parsed.success) {
-            const next: FieldErrors = {};
-            for (const issue of parsed.error.issues) {
-                const key = issue.path[0] as keyof FieldErrors;
-                if (!next[key]) next[key] = issue.message;
-            }
-            setErrors(next);
+            setErrors(zodFieldErrors<typeof fields>(parsed.error));
             return;
         }
 

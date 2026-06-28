@@ -2,7 +2,9 @@
 
 import { useMemo } from 'react';
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
+import { safeJSONStorage } from './persist-storage';
+import { prependToArtisan, updateAllArtisans } from './artisan-list';
 import { mockInvoices, mockPassports, mockPassportById, mockSuppliers } from '@lumiris/mock-data';
 import type { Fiber, SupplierInvoice } from '@lumiris/types';
 import { useDraftStore, draftToPassport } from './draft-store';
@@ -55,45 +57,28 @@ interface InvoicesStoreState {
     removeInvoice: (id: string) => void;
 }
 
-const noopStorage = {
-    getItem: () => null,
-    setItem: () => undefined,
-    removeItem: () => undefined,
-};
-
 export const useInvoicesStore = create<InvoicesStoreState>()(
     persist(
-        (set, get) => ({
+        (set) => ({
             byArtisan: {},
-            addInvoice: (invoice) => {
-                const list = get().byArtisan[invoice.artisanId] ?? [];
-                set({
-                    byArtisan: {
-                        ...get().byArtisan,
-                        [invoice.artisanId]: [invoice, ...list],
-                    },
-                });
-            },
-            updateExtraction: (id, fields) => {
-                const next: Record<string, LocalInvoice[]> = {};
-                for (const [aid, list] of Object.entries(get().byArtisan)) {
-                    next[aid] = list.map((inv) =>
-                        inv.id === id ? { ...inv, extraction: { ...inv.extraction, ...fields } } : inv,
-                    );
-                }
-                set({ byArtisan: next });
-            },
-            removeInvoice: (id) => {
-                const next: Record<string, LocalInvoice[]> = {};
-                for (const [aid, list] of Object.entries(get().byArtisan)) {
-                    next[aid] = list.filter((inv) => inv.id !== id);
-                }
-                set({ byArtisan: next });
-            },
+            addInvoice: (invoice) =>
+                set((s) => ({ byArtisan: prependToArtisan(s.byArtisan, invoice.artisanId, invoice) })),
+            updateExtraction: (id, fields) =>
+                set((s) => ({
+                    byArtisan: updateAllArtisans(s.byArtisan, (list) =>
+                        list.map((inv) =>
+                            inv.id === id ? { ...inv, extraction: { ...inv.extraction, ...fields } } : inv,
+                        ),
+                    ),
+                })),
+            removeInvoice: (id) =>
+                set((s) => ({
+                    byArtisan: updateAllArtisans(s.byArtisan, (list) => list.filter((inv) => inv.id !== id)),
+                })),
         }),
         {
             name: 'atelier-invoices',
-            storage: createJSONStorage(() => (typeof window === 'undefined' ? noopStorage : localStorage)),
+            storage: safeJSONStorage,
             version: 1,
         },
     ),

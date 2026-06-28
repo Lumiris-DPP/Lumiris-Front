@@ -5,6 +5,7 @@ import type { Passport, ScoreResult } from '@lumiris/types';
 import { Card, CardContent } from '@lumiris/ui/components/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
 import { AtelierStatusBadge, IrisGrade } from '@lumiris/scoring-ui';
+import { formatDateFr } from '@lumiris/utils';
 import { RowActions } from './row-actions';
 
 export interface ScoredRow {
@@ -62,7 +63,7 @@ export function PassportTable({ rows, onShowQr, onDuplicate, onPreview, onDelete
                                     <AtelierStatusBadge status={passport.status} />
                                 </TableCell>
                                 <TableCell className="text-muted-foreground text-xs">
-                                    {new Date(passport.updatedAt).toLocaleDateString('fr-FR')}
+                                    {formatDateFr(passport.updatedAt)}
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <RowActions

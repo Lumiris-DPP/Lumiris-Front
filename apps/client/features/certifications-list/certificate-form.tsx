@@ -11,11 +11,12 @@ import { Label } from '@lumiris/ui/components/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@lumiris/ui/components/select';
 import { Textarea } from '@lumiris/ui/components/textarea';
 import { cn } from '@lumiris/ui/lib/cn';
-import { readFileAsDataUrl } from '@lumiris/utils';
 import { CERTIFICATION_KINDS } from '@/lib/certificates-store';
+import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL } from '@/lib/file-upload';
+import { zodFieldErrors } from '@/lib/form-errors';
+import { useFileUpload } from '@/lib/use-file-upload';
 import { KIND_LABEL } from './certification-status';
 
-const MAX_FILE_BYTES = 5 * 1024 * 1024;
 const ACCEPTED_MIME = 'application/pdf,image/png,image/jpeg,image/webp';
 const KIND_TUPLE = [...CERTIFICATION_KINDS] as [CertificationKind, ...CertificationKind[]];
 
@@ -28,6 +29,9 @@ export interface CertificateFormValues {
     expiresAt: string;
     fileDataUri: string;
 }
+
+/** The text/select fields of the form; the attached document is managed separately by {@link useFileUpload}. */
+type CertificateFields = Omit<CertificateFormValues, 'fileDataUri'>;
 
 const formSchema = z
     .object({
@@ -67,50 +71,29 @@ interface Props {
 }
 
 export function CertificateForm({ initial, submitLabel, onSubmit, onCancel, lockKind }: Props) {
-    const [kind, setKind] = useState<CertificationKind>(initial?.kind ?? 'GOTS');
-    const [customName, setCustomName] = useState(initial?.customName ?? '');
-    const [issuer, setIssuer] = useState(initial?.issuer ?? '');
-    const [scope, setScope] = useState(initial?.scope ?? '');
-    const [issuedAt, setIssuedAt] = useState(initial?.issuedAt ?? defaultIssued());
-    const [expiresAt, setExpiresAt] = useState(initial?.expiresAt ?? defaultExpires());
-    const [fileDataUri, setFileDataUri] = useState(initial?.fileDataUri ?? '');
-    const [fileName, setFileName] = useState('');
-    const [fileError, setFileError] = useState('');
-    const [reading, setReading] = useState(false);
+    const [fields, setFields] = useState<CertificateFields>({
+        kind: initial?.kind ?? 'GOTS',
+        customName: initial?.customName ?? '',
+        issuer: initial?.issuer ?? '',
+        scope: initial?.scope ?? '',
+        issuedAt: initial?.issuedAt ?? defaultIssued(),
+        expiresAt: initial?.expiresAt ?? defaultExpires(),
+    });
     const [errors, setErrors] = useState<Partial<Record<keyof CertificateFormValues, string>>>({});
+    const file = useFileUpload({
+        maxBytes: MAX_UPLOAD_BYTES,
+        maxLabel: MAX_UPLOAD_LABEL,
+        initialDataUri: initial?.fileDataUri ?? '',
+    });
 
-    async function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-        const file = event.target.files?.[0];
-        event.target.value = '';
-        if (!file) return;
-        if (file.size > MAX_FILE_BYTES) {
-            setFileError('Fichier trop volumineux (5 Mo max).');
-            return;
-        }
-        setFileError('');
-        setReading(true);
-        try {
-            const dataUri = await readFileAsDataUrl(file);
-            setFileDataUri(dataUri);
-            setFileName(file.name);
-        } catch {
-            setFileError('Impossible de lire le fichier.');
-        } finally {
-            setReading(false);
-        }
-    }
+    const setField = <K extends keyof CertificateFields>(key: K, value: CertificateFields[K]) =>
+        setFields((f) => ({ ...f, [key]: value }));
 
     function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        const result = formSchema.safeParse({ kind, customName, issuer, scope, issuedAt, expiresAt, fileDataUri });
+        const result = formSchema.safeParse({ ...fields, fileDataUri: file.dataUri });
         if (!result.success) {
-            const flat = result.error.flatten().fieldErrors;
-            setErrors({
-                customName: flat.customName?.[0],
-                issuer: flat.issuer?.[0],
-                issuedAt: flat.issuedAt?.[0],
-                expiresAt: flat.expiresAt?.[0],
-            });
+            setErrors(zodFieldErrors<CertificateFormValues>(result.error));
             return;
         }
         setErrors({});
@@ -121,7 +104,11 @@ export function CertificateForm({ initial, submitLabel, onSubmit, onCancel, lock
         <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid gap-2">
                 <Label htmlFor="cert-kind">Type</Label>
-                <Select value={kind} onValueChange={(v) => setKind(v as CertificationKind)} disabled={lockKind}>
+                <Select
+                    value={fields.kind}
+                    onValueChange={(v) => setField('kind', v as CertificationKind)}
+                    disabled={lockKind}
+                >
                     <SelectTrigger id="cert-kind" className="w-full">
                         <SelectValue />
                     </SelectTrigger>
@@ -135,13 +122,13 @@ export function CertificateForm({ initial, submitLabel, onSubmit, onCancel, lock
                 </Select>
             </div>
 
-            {kind === 'CUSTOM' ? (
+            {fields.kind === 'CUSTOM' ? (
                 <div className="grid gap-2">
                     <Label htmlFor="cert-custom">Nom</Label>
                     <Input
                         id="cert-custom"
-                        value={customName}
-                        onChange={(e) => setCustomName(e.target.value)}
+                        value={fields.customName}
+                        onChange={(e) => setField('customName', e.target.value)}
                         placeholder="Ex. Maître Brodeur des Compagnons"
                         aria-invalid={!!errors.customName}
                     />
@@ -153,8 +140,8 @@ export function CertificateForm({ initial, submitLabel, onSubmit, onCancel, lock
                 <Label htmlFor="cert-issuer">Émetteur</Label>
                 <Input
                     id="cert-issuer"
-                    value={issuer}
-                    onChange={(e) => setIssuer(e.target.value)}
+                    value={fields.issuer}
+                    onChange={(e) => setField('issuer', e.target.value)}
                     placeholder="Ex. Ecocert, AFNOR, OEKO-TEX Standard 100…"
                     aria-invalid={!!errors.issuer}
                 />
@@ -165,8 +152,8 @@ export function CertificateForm({ initial, submitLabel, onSubmit, onCancel, lock
                 <Label htmlFor="cert-scope">Portée</Label>
                 <Textarea
                     id="cert-scope"
-                    value={scope}
-                    onChange={(e) => setScope(e.target.value)}
+                    value={fields.scope}
+                    onChange={(e) => setField('scope', e.target.value)}
                     placeholder="Ex. Lin breton — filature de Quimper"
                     rows={2}
                 />
@@ -178,8 +165,8 @@ export function CertificateForm({ initial, submitLabel, onSubmit, onCancel, lock
                     <Input
                         id="cert-issued"
                         type="date"
-                        value={issuedAt}
-                        onChange={(e) => setIssuedAt(e.target.value)}
+                        value={fields.issuedAt}
+                        onChange={(e) => setField('issuedAt', e.target.value)}
                     />
                 </div>
                 <div className="grid gap-2">
@@ -187,8 +174,8 @@ export function CertificateForm({ initial, submitLabel, onSubmit, onCancel, lock
                     <Input
                         id="cert-expires"
                         type="date"
-                        value={expiresAt}
-                        onChange={(e) => setExpiresAt(e.target.value)}
+                        value={fields.expiresAt}
+                        onChange={(e) => setField('expiresAt', e.target.value)}
                         aria-invalid={!!errors.expiresAt}
                     />
                     {errors.expiresAt ? <p className="text-destructive text-xs">{errors.expiresAt}</p> : null}
@@ -200,39 +187,40 @@ export function CertificateForm({ initial, submitLabel, onSubmit, onCancel, lock
                 <label
                     className={cn(
                         'border-input bg-background hover:bg-accent/50 flex cursor-pointer items-center justify-between gap-3 rounded-md border border-dashed px-3 py-2.5 text-sm transition',
-                        reading && 'pointer-events-none opacity-60',
+                        file.reading && 'pointer-events-none opacity-60',
                     )}
                 >
                     <span className="text-muted-foreground inline-flex items-center gap-2">
-                        {reading ? (
+                        {file.reading ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : fileDataUri ? (
+                        ) : file.dataUri ? (
                             <Paperclip className="h-4 w-4" />
                         ) : (
                             <Upload className="h-4 w-4" />
                         )}
                         <span className="truncate">
-                            {reading
+                            {file.reading
                                 ? 'Lecture…'
-                                : fileName || (fileDataUri ? 'Document attaché' : 'PDF ou image (max 5 Mo)')}
+                                : file.name ||
+                                  (file.dataUri ? 'Document attaché' : `PDF ou image (max ${MAX_UPLOAD_LABEL})`)}
                         </span>
                     </span>
                     <input
                         type="file"
                         accept={ACCEPTED_MIME}
                         className="hidden"
-                        aria-label="Document du certificat (PDF ou image, max 5 Mo)"
-                        onChange={onFileChange}
+                        aria-label={`Document du certificat (PDF ou image, max ${MAX_UPLOAD_LABEL})`}
+                        onChange={file.onChange}
                     />
                 </label>
-                {fileError ? <p className="text-destructive text-xs">{fileError}</p> : null}
+                {file.error ? <p className="text-destructive text-xs">{file.error}</p> : null}
             </div>
 
             <DialogFooter className="pt-2">
                 <Button type="button" variant="outline" onClick={onCancel}>
                     Annuler
                 </Button>
-                <Button type="submit" disabled={reading}>
+                <Button type="submit" disabled={file.reading}>
                     {submitLabel}
                 </Button>
             </DialogFooter>

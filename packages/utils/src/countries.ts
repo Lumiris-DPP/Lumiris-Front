@@ -32,3 +32,14 @@ export function findCountry(code: string | undefined | null): Country | undefine
     if (!code) return undefined;
     return COUNTRY_BY_CODE.get(code.toUpperCase());
 }
+
+/** Drapeau emoji depuis un code pays ISO 3166-1 alpha-2 (chaîne vide si invalide). */
+export function flagEmoji(code: string | undefined | null): string {
+    if (!code || code.length !== 2) return '';
+    return String.fromCodePoint(
+        ...code
+            .toUpperCase()
+            .split('')
+            .map((c) => 127397 + c.charCodeAt(0)),
+    );
+}

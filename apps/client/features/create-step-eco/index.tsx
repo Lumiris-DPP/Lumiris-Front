@@ -12,7 +12,9 @@ import { WizardStepFrame } from '@/features/wizard-shell/step-frame';
 import { useStepNavigation } from '@/features/wizard-shell/use-step-navigation';
 import { useDraftStore } from '@/lib/draft-store';
 import { useAuthStore } from '@/lib/auth-store';
-import { submitDppForm } from '@/lib/dpp-api';
+import { useCreateDppForm } from '@lumiris/api-client/react';
+import { isApiError } from '@lumiris/api-client';
+import { toast } from '@lumiris/ui/components/sonner';
 import { useRouter } from 'next/navigation';
 
 export function CreateStepEco({ draftId }: { draftId: string }) {
@@ -20,6 +22,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
     const setEco = useDraftStore((s) => s.setEco);
     const deleteDraft = useDraftStore((s) => s.deleteDraft);
     const token = useAuthStore((s) => s.token);
+    const createDpp = useCreateDppForm();
     const { goTo } = useStepNavigation(draftId);
     const router = useRouter();
 
@@ -72,30 +75,30 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
 
         try {
             if (token) {
-                await submitDppForm(token, payload);
+                await createDpp.mutateAsync(payload);
             }
             deleteDraft(draftId);
             router.push('/passports');
-        } catch {
+        } catch (err) {
             setPublishing(false);
+            if (isApiError(err) && (err.code === 'FORBIDDEN' || err.status === 403)) {
+                toast.error('Quota atteint ou abonnement requis', {
+                    description: 'Vérifiez votre abonnement avant de publier.',
+                });
+                router.push('/subscription');
+            } else {
+                toast.error('La publication a échoué. Réessayez.');
+            }
         }
     };
 
     return (
-        <WizardStepFrame
-            draftId={draftId}
-            step="eco"
-            onPrev={handlePrev}
-            hideNav
-            contentClassName="space-y-6"
-        >
-            {/* Section optionnelle */}
+        <WizardStepFrame draftId={draftId} step="eco" onPrev={handlePrev} hideNav contentClassName="space-y-6">
             <p className="text-muted-foreground text-sm">
-                Ces champs sont optionnels mais valorisants pour votre score Iris et pour les consommateurs
-                soucieux de l'environnement.
+                Ces champs sont optionnels mais valorisants pour votre score Iris et pour les consommateurs soucieux de
+                l’environnement.
             </p>
 
-            {/* % matières recyclées */}
             <div className="space-y-2">
                 <Label htmlFor="recycled">Part de matières recyclées (%)</Label>
                 <div className="relative w-40">
@@ -114,7 +117,6 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                 </div>
             </div>
 
-            {/* Durée de vie / Garantie */}
             <div className="space-y-2">
                 <Label htmlFor="warranty">Durée de vie estimée ou garantie étendue</Label>
                 <Input
@@ -125,14 +127,13 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                 />
             </div>
 
-            {/* Réparabilité */}
             <div className="flex items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
                     <Label htmlFor="repairable" className="cursor-pointer">
                         Facilement réparable
                     </Label>
                     <p className="text-muted-foreground text-[11px]">
-                        Bouton d'origine fourni, coutures accessibles, pièces détachées disponibles.
+                        Bouton d’origine fourni, coutures accessibles, pièces détachées disponibles.
                     </p>
                 </div>
                 <Switch
@@ -142,7 +143,6 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                 />
             </div>
 
-            {/* Consignes de fin de vie */}
             <div className="space-y-2">
                 <Label htmlFor="end-of-life">Consignes de fin de vie</Label>
                 <Textarea
@@ -154,7 +154,6 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                 />
             </div>
 
-            {/* Bouton publier */}
             <div className="border-border border-t pt-4">
                 <div className="flex items-center justify-between gap-4">
                     <Button variant="outline" onClick={handlePrev}>

@@ -1,33 +1,11 @@
 import type { Material, ProductionStep } from '@lumiris/types';
 import { findCountry } from '@lumiris/utils';
+import { FIBER_LABEL, STAGE_LABEL } from '@lumiris/scoring-ui';
 
 interface OriginsMapProps {
     materials: readonly Material[];
     steps: readonly ProductionStep[];
 }
-
-const FIBER_LABEL: Partial<Record<Material['fiber'], string>> = {
-    wool: 'Laine',
-    linen: 'Lin',
-    cotton: 'Coton',
-    silk: 'Soie',
-    hemp: 'Chanvre',
-    cashmere: 'Cachemire',
-    'recycled-polyester': 'Polyester recyclé',
-    other: 'Autre',
-};
-
-const STAGE_LABEL: Record<ProductionStep['kind'], string> = {
-    weaving: 'Tissage',
-    dyeing: 'Teinture',
-    cutting: 'Coupe',
-    sewing: 'Couture',
-    finishing: 'Finition',
-    embroidery: 'Broderie',
-    assembly: 'Assemblage',
-    'quality-check': 'Contrôle qualité',
-    other: 'Étape',
-};
 
 const VIEW_W = 800;
 const VIEW_H = 400;
@@ -77,7 +55,7 @@ function aggregate(materials: readonly Material[], steps: readonly ProductionSte
         const agg = upsert(m.originCountry);
         if (!agg) continue;
         agg.materials.push({
-            fiberLabel: FIBER_LABEL[m.fiber] ?? m.fiber,
+            fiberLabel: FIBER_LABEL[m.fiber],
             pct: m.percentage,
         });
     }
@@ -86,7 +64,7 @@ function aggregate(materials: readonly Material[], steps: readonly ProductionSte
         const agg = upsert(s.locationCountry);
         if (!agg) continue;
         agg.steps.push({
-            stageLabel: STAGE_LABEL[s.kind] ?? s.kind,
+            stageLabel: STAGE_LABEL[s.kind],
             city: s.locationCity,
         });
     }

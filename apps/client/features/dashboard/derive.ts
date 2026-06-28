@@ -132,14 +132,6 @@ export function quotaUsage(passports: readonly Passport[], tier: ArtisanTier): Q
     return { used, total, percent };
 }
 
-export function resumeHref(passport: Passport): string {
-    if (passport.status === 'Published') return `/passports/${passport.id}`;
-    if (passport.materials.length === 0) return `/create/${passport.id}/identification`;
-    if (passport.steps.length === 0) return `/create/${passport.id}/composition`;
-    if (passport.warranty.durationMonths === 0) return `/create/${passport.id}/manufacturing`;
-    return `/create/${passport.id}/publish`;
-}
-
 export function publishedThisWeek(passports: readonly Passport[], now: Date): number {
     const weekAgo = now.getTime() - 7 * 24 * 60 * 60 * 1000;
     return passports.filter((p) => {

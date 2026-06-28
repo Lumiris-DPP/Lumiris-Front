@@ -1,7 +1,8 @@
 'use client';
 
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
+import { safeJSONStorage } from './persist-storage';
 import { mockArtisanById } from '@lumiris/mock-data';
 import type { Artisan, FrenchRegion } from '@lumiris/types';
 
@@ -31,12 +32,6 @@ interface ProfileStoreState {
     resetOverride: (artisanId: string) => void;
 }
 
-const noopStorage = {
-    getItem: () => null,
-    setItem: () => undefined,
-    removeItem: () => undefined,
-};
-
 export const useProfileStore = create<ProfileStoreState>()(
     persist(
         (set) => ({
@@ -58,7 +53,7 @@ export const useProfileStore = create<ProfileStoreState>()(
         {
             name: 'atelier-profile',
             version: 1,
-            storage: createJSONStorage(() => (typeof window === 'undefined' ? noopStorage : localStorage)),
+            storage: safeJSONStorage,
         },
     ),
 );

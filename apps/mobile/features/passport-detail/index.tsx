@@ -12,6 +12,7 @@ import { cn } from '@lumiris/ui/lib/cn';
 import { findAlternatives } from '@/lib/iris/alternatives';
 import { usePassportScore } from '@/lib/iris/use-passport-score';
 import { useWardrobe } from '@/lib/wardrobe-storage';
+import { SectionHeading } from '@/lib/section';
 import { ShopCard } from '@/features/shop/card';
 import type { ShopItem } from '@/lib/shop';
 import { ScoreHero } from './score-hero';
@@ -232,10 +233,6 @@ function Layer({ delay, children }: { delay: number; children: React.ReactNode }
             {children}
         </motion.section>
     );
-}
-
-function SectionHeading({ children }: { children: React.ReactNode }) {
-    return <h2 className="text-foreground text-xs font-semibold uppercase tracking-[0.18em]">{children}</h2>;
 }
 
 interface RatioCardProps {
