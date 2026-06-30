@@ -66,7 +66,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
             reachCompliant: draft.traceability.reachCompliant,
             recycledPct: form.recycledPct ?? null,
             warrantyDescription: form.warrantyDescription ?? null,
-            isRepairable: form.isRepairable ?? null,
+            isRepairable: form.isRepairable ?? false,
             endOfLifeInstructions: form.endOfLifeInstructions ?? null,
         };
 
