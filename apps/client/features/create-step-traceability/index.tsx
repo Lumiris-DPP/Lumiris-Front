@@ -42,7 +42,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
 
     useEffect(() => {
         if (draft) setForm(draft.traceability);
-    }, [draft]);
+    }, [draft?.traceability]);
 
     const validation = useMemo(
         () =>

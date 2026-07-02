@@ -38,7 +38,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
 
     useEffect(() => {
         if (draft) setForm(draft.eco);
-    }, [draft]);
+    }, [draft?.eco]);
 
     const handlePrev = () => {
         setEco(draftId, form);

@@ -76,11 +76,15 @@ function authHeaders(token: string) {
     return { Authorization: `Bearer ${token}` };
 }
 
+export interface DppFormCreatedDto {
+    id: string;
+}
+
 export async function submitDppForm(
     token: string,
     payload: DppFormPayload,
     files: Partial<Record<string, File>>,
-): Promise<DppFormDto> {
+): Promise<DppFormCreatedDto> {
     const form = new FormData();
     // Blob avec Content-Type application/json pour que Spring désérialise via @RequestPart
     form.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
@@ -96,7 +100,7 @@ export async function submitDppForm(
         body: form,
     });
     if (!res.ok) throw new Error(`POST /api/dpp-forms → ${res.status}`);
-    return res.json() as Promise<DppFormDto>;
+    return res.json() as Promise<DppFormCreatedDto>;
 }
 
 export async function fetchDppForms(token: string): Promise<DppFormSummaryDto[]> {
