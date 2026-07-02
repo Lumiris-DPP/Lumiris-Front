@@ -3,11 +3,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { Plus, Trash2 } from 'lucide-react';
-import type { DppMaterial, DppCertification, CareInstructionCode, Fiber } from '@lumiris/types';
+import type { DppMaterial, CareInstructionCode, Fiber } from '@lumiris/types';
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
+import { Textarea } from '@lumiris/ui/components/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@lumiris/ui/components/select';
-import { Checkbox } from '@lumiris/ui/components/checkbox';
 import { WizardStepFrame } from '@/features/wizard-shell/step-frame';
 import { useStepNavigation } from '@/features/wizard-shell/use-step-navigation';
 import { useDraftStore } from '@/lib/draft-store';
@@ -40,24 +40,22 @@ const CARE_SYMBOLS: ReadonlyArray<{ code: CareInstructionCode; label: string; sv
     { code: 'no-iron', label: 'Ne pas repasser', svgPath: '/ginetex/ginetex--do-not-iron.svg' },
 ];
 
-const CERT_NAMES: ReadonlyArray<DppCertification['name']> = ['GOTS', 'OEKO-TEX', 'Fair-Trade', 'other'];
-
 export function CreateStepCare({ draftId }: { draftId: string }) {
     const draft = useDraftStore((s) => s.drafts[draftId]);
     const setMaterials = useDraftStore((s) => s.setMaterials);
     const setCareInstructions = useDraftStore((s) => s.setCareInstructions);
-    const setCertifications = useDraftStore((s) => s.setCertifications);
+    const setCareNotes = useDraftStore((s) => s.setCareNotes);
     const { goNext, goTo } = useStepNavigation(draftId);
 
     const [materials, setLocalMaterials] = useState<DppMaterial[]>(draft?.materials ?? []);
     const [care, setLocalCare] = useState<CareInstructionCode[]>(draft?.careInstructions ?? []);
-    const [certs, setLocalCerts] = useState<DppCertification[]>(draft?.certifications ?? []);
+    const [careNotes, setLocalCareNotes] = useState<string>(draft?.careNotes ?? '');
 
     useEffect(() => {
         if (draft) {
             setLocalMaterials(draft.materials);
             setLocalCare(draft.careInstructions);
-            setLocalCerts(draft.certifications);
+            setLocalCareNotes(draft.careNotes);
         }
     }, [draft]);
 
@@ -76,24 +74,24 @@ export function CreateStepCare({ draftId }: { draftId: string }) {
                 },
                 materials,
                 careInstructions: care,
-                certifications: certs,
+                careNotes,
                 traceability: draft?.traceability ?? { manufacturedAt: '', reachCompliant: false },
                 eco: draft?.eco ?? {},
             }),
-        [materials, care, certs, draft],
+        [materials, care, careNotes, draft],
     );
 
     const handleNext = () => {
         setMaterials(draftId, materials);
         setCareInstructions(draftId, care);
-        setCertifications(draftId, certs);
+        setCareNotes(draftId, careNotes);
         goNext('care', 'traceability');
     };
 
     const handlePrev = () => {
         setMaterials(draftId, materials);
         setCareInstructions(draftId, care);
-        setCertifications(draftId, certs);
+        setCareNotes(draftId, careNotes);
         goTo('product');
     };
 
@@ -111,17 +109,6 @@ export function CreateStepCare({ draftId }: { draftId: string }) {
 
     const toggleCare = (code: CareInstructionCode) => {
         setLocalCare((prev) => (prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]));
-    };
-
-    const toggleCert = (name: DppCertification['name']) => {
-        setLocalCerts((prev) => {
-            const exists = prev.find((c) => c.name === name);
-            return exists ? prev.filter((c) => c.name !== name) : [...prev, { name }];
-        });
-    };
-
-    const updateCertLicense = (name: DppCertification['name'], licenseNumber: string) => {
-        setLocalCerts((prev) => prev.map((c) => (c.name === name ? { ...c, licenseNumber } : c)));
     };
 
     return (
@@ -232,40 +219,18 @@ export function CreateStepCare({ draftId }: { draftId: string }) {
                 </div>
             </section>
 
-            {/* Certifications */}
-            <section className="space-y-3">
-                <Label className="text-base font-semibold">Certifications</Label>
-                <div className="space-y-3">
-                    {CERT_NAMES.map((name) => {
-                        const cert = certs.find((c) => c.name === name);
-                        const checked = !!cert;
-                        return (
-                            <div key={name} className="space-y-2">
-                                <div className="flex items-center gap-2">
-                                    <Checkbox
-                                        id={`cert-${name}`}
-                                        checked={checked}
-                                        onCheckedChange={() => toggleCert(name)}
-                                    />
-                                    <label
-                                        htmlFor={`cert-${name}`}
-                                        className="cursor-pointer text-sm font-medium"
-                                    >
-                                        {name === 'other' ? 'Autre certification' : name}
-                                    </label>
-                                </div>
-                                {checked && (
-                                    <Input
-                                        className="ml-6"
-                                        placeholder="Numéro de certificat / licence"
-                                        value={cert?.licenseNumber ?? ''}
-                                        onChange={(e) => updateCertLicense(name, e.target.value)}
-                                    />
-                                )}
-                            </div>
-                        );
-                    })}
-                </div>
+            {/* Notes d'entretien */}
+            <section className="space-y-2">
+                <Label htmlFor="care-notes" className="text-base font-semibold">
+                    Notes d'entretien
+                </Label>
+                <Textarea
+                    id="care-notes"
+                    value={careNotes}
+                    rows={4}
+                    placeholder="Conseils spécifiques d'entretien, précautions particulières, recommandations du fabricant…"
+                    onChange={(e) => setLocalCareNotes(e.target.value)}
+                />
             </section>
         </WizardStepFrame>
     );

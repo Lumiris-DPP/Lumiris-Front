@@ -6,7 +6,6 @@ import type {
     GarmentInfo,
     DppMaterial,
     CareInstructionCode,
-    DppCertification,
     TraceabilityInfo,
     EcoInfo,
 } from '@lumiris/types';
@@ -16,7 +15,7 @@ export interface DraftLike {
     garment: GarmentInfo;
     materials: readonly DppMaterial[];
     careInstructions: readonly CareInstructionCode[];
-    certifications: readonly DppCertification[];
+    careNotes: string;
     traceability: TraceabilityInfo;
     eco: EcoInfo;
 }
