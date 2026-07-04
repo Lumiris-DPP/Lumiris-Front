@@ -7,6 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from '@lumiris/ui/components/aler
 import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import { IrisScoreCard } from '@lumiris/scoring-ui';
+import type { DppScoreInput } from '@lumiris/types';
 import { useDraftStore, type WizardStep } from '@/lib/draft-store';
 import { Stepper } from './stepper';
 
@@ -36,14 +37,14 @@ export function WizardShell({
     const draft = useDraftStore((s) => s.drafts[draftId]);
     const navigatingRef = useRef(false);
 
-    const draftPayload = useMemo(() => ({
-        garment: draft?.garment,
-        materials: draft?.materials,
-        careInstructions: draft?.careInstructions,
-        careNotes: draft?.careNotes,
-        traceability: draft?.traceability,
-        eco: draft?.eco,
-    }), [draft?.garment, draft?.materials, draft?.careInstructions, draft?.careNotes, draft?.traceability, draft?.eco]);
+    const draftPayload = useMemo((): DppScoreInput => ({
+        originCountry: draft?.garment?.originCountry,
+        repairable: draft?.eco?.isRepairable,
+        reachCompliant: draft?.traceability?.reachCompliant,
+        endOfLifeInstructions: draft?.eco?.endOfLifeInstructions,
+        materialOriginCountries: draft?.materials?.map((m) => m.originCountry) ?? [],
+        presentDocuments: Object.keys(draft?.files ?? {}),
+    }), [draft?.garment?.originCountry, draft?.traceability?.reachCompliant, draft?.eco, draft?.materials, draft?.files]);
 
     if (!draft) return <DraftNotFound />;
 

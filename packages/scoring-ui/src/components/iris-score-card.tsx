@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, type HTMLAttributes } from 'react';
-import type { ScoreResult } from '@lumiris/types';
+import type { DppScoreInput, ScoreResult } from '@lumiris/types';
 import { useApiClient } from '@lumiris/api-client/react';
 import { cn } from '@lumiris/ui/lib/cn';
 import { GRADE_LABEL } from '../theme/grade-color';
@@ -84,7 +84,7 @@ function IrisScoreCardDisplay({ score, muted = false, variant = 'card', classNam
 
 export interface IrisScoreCardProps extends HTMLAttributes<HTMLDivElement> {
     dppId?: string | null;
-    draft?: Record<string, unknown>;
+    draft?: DppScoreInput;
     muted?: boolean;
     variant?: 'card' | 'strip' | 'responsive';
 }

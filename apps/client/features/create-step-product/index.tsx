@@ -186,7 +186,7 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
             {/* Photo principale */}
             <div className="space-y-2 md:col-span-2">
                 <Label>Photo principale</Label>
-                <label className="border-border bg-muted/40 hover:bg-muted relative flex aspect-square w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed text-center transition-colors">
+                <label className="border-border bg-muted/40 hover:bg-muted relative flex aspect-square w-full max-w-48 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed text-center transition-colors">
                     {photoPreviewUrl ? (
                         <>
                             <Image

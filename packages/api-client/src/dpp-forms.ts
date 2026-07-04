@@ -1,4 +1,4 @@
-import type { ScoreResult } from '@lumiris/types';
+import type { DppScoreInput, ScoreResult } from '@lumiris/types';
 import type { Http } from './http';
 
 export function dppFormsApi(http: Http) {
@@ -6,7 +6,7 @@ export function dppFormsApi(http: Http) {
         getIrisScore(id: string): Promise<ScoreResult> {
             return http.request<ScoreResult>(`/api/dpp-forms/${id}/iris_score`);
         },
-        computeIrisScore(draft: Record<string, unknown>): Promise<ScoreResult> {
+        computeIrisScore(draft: DppScoreInput): Promise<ScoreResult> {
             return http.request<ScoreResult>('/api/dpp-forms/compute_iris_score', { method: 'POST', body: draft });
         },
     };

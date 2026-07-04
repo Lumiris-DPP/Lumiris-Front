@@ -20,7 +20,7 @@ export function ScoreBreakdown({ breakdown, weights = LUMIRIS_WEIGHTS, className
         <div className={cn('space-y-2', className)} {...rest}>
             {AXES_ORDER.map((axis) => {
                 const disabled = DISABLED_AXES.has(axis);
-                const score = disabled ? 0 : breakdown[axis];
+                const score =  breakdown[axis];
                 const weight = weights[axis];
                 const cap = weight * 100;
                 const weighted = (score * weight).toFixed(1);
@@ -57,7 +57,7 @@ export function ScoreBreakdown({ breakdown, weights = LUMIRIS_WEIGHTS, className
                         <TooltipTrigger asChild>
                             <div className="cursor-default">{row}</div>
                         </TooltipTrigger>
-                        <TooltipContent>À venir</TooltipContent>
+                        <TooltipContent>Element en cours d'implémentation</TooltipContent>
                     </Tooltip>
                 );
             })}
