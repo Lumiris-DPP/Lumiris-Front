@@ -38,6 +38,7 @@
         "clean": "rimraf dist .turbo"
     },
     "dependencies": {
+        "@lumiris/api-client": "workspace:*",
         "@lumiris/core": "workspace:*",
         "@lumiris/types": "workspace:*",
         "@lumiris/ui": "workspace:*",
