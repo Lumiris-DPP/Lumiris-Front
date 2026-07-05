@@ -2,13 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
-import type {
-    GarmentInfo,
-    DppMaterial,
-    CareInstructionCode,
-    TraceabilityInfo,
-    EcoInfo,
-} from '@lumiris/types';
+import type { GarmentInfo, DppMaterial, CareInstructionCode, TraceabilityInfo, EcoInfo } from '@lumiris/types';
 import { useDraftStore, type WizardStep } from '@/lib/draft-store';
 
 export interface DraftLike {

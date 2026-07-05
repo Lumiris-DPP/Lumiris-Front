@@ -37,23 +37,34 @@ export function WizardShell({
     const draft = useDraftStore((s) => s.drafts[draftId]);
     const navigatingRef = useRef(false);
 
-    const draftPayload = useMemo((): DppScoreInput => ({
-        originCountry: draft?.garment?.originCountry,
-        repairable: draft?.eco?.isRepairable,
-        reachCompliant: draft?.traceability?.reachCompliant,
-        endOfLifeInstructions: draft?.eco?.endOfLifeInstructions,
-        materialOriginCountries: draft?.materials?.map((m) => m.originCountry) ?? [],
-        presentDocuments: Object.keys(draft?.files ?? {}),
-    }), [draft?.garment?.originCountry, draft?.traceability?.reachCompliant, draft?.eco, draft?.materials, draft?.files]);
+    const draftPayload = useMemo(
+        (): DppScoreInput => ({
+            originCountry: draft?.garment?.originCountry,
+            repairable: draft?.eco?.isRepairable,
+            reachCompliant: draft?.traceability?.reachCompliant,
+            endOfLifeInstructions: draft?.eco?.endOfLifeInstructions,
+            materialOriginCountries: draft?.materials?.map((m) => m.originCountry) ?? [],
+            presentDocuments: Object.keys(draft?.files ?? {}),
+        }),
+        [
+            draft?.garment?.originCountry,
+            draft?.traceability?.reachCompliant,
+            draft?.eco,
+            draft?.materials,
+            draft?.files,
+        ],
+    );
 
     if (!draft) return <DraftNotFound />;
 
     const nextDisabled = nextMissing.length > 0;
 
-    const handleNext = onNext ? () => {
-        navigatingRef.current = true;
-        onNext();
-    } : undefined;
+    const handleNext = onNext
+        ? () => {
+              navigatingRef.current = true;
+              onNext();
+          }
+        : undefined;
 
     return (
         <div className="grid gap-6 p-6 lg:grid-cols-[1fr_280px] lg:p-8">
@@ -83,10 +94,7 @@ export function WizardShell({
                 )}
             </div>
             <div className="lg:sticky lg:top-20 lg:self-start">
-                <IrisScoreCard
-                    draft={navigatingRef.current ? undefined : draftPayload}
-                    variant="responsive"
-                />
+                <IrisScoreCard draft={navigatingRef.current ? undefined : draftPayload} variant="responsive" />
             </div>
         </div>
     );
@@ -96,7 +104,7 @@ function MissingAlert({ missing }: { missing: string[] }) {
     return (
         <Alert className="border-lumiris-amber/30 bg-lumiris-amber/5 text-lumiris-amber">
             <AlertTriangle aria-hidden />
-            <AlertTitle>Champs requis avant l'étape suivante</AlertTitle>
+            <AlertTitle>Champs requis avant l&apos;étape suivante</AlertTitle>
             <AlertDescription className="text-foreground/80">{missing.join(' · ')}</AlertDescription>
         </Alert>
     );
@@ -111,7 +119,7 @@ function DraftNotFound() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                     <p className="text-muted-foreground text-sm">
-                        Ce brouillon n'existe pas ou a été supprimé. Vous pouvez en démarrer un nouveau.
+                        Ce brouillon n&apos;existe pas ou a été supprimé. Vous pouvez en démarrer un nouveau.
                     </p>
                     <Button asChild>
                         <Link href="/create">Créer un nouveau passeport</Link>

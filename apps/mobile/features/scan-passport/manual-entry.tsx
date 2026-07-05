@@ -9,10 +9,7 @@ const PASSPORT_URL_RE = /lumiris\.(?:fr|com)\/passeport\/([\w-]+)/i;
 const PUBLIC_CODE_RE = /^[A-Z0-9]{8}$/i;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-type Destination =
-    | { route: '/p/[code]'; code: string }
-    | { route: '/passeport/[id]'; id: string }
-    | null;
+type Destination = { route: '/p/[code]'; code: string } | { route: '/passeport/[id]'; id: string } | null;
 
 function resolveDestination(input: string): Destination {
     const trimmed = input.trim();

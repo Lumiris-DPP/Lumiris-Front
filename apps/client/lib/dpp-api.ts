@@ -1,17 +1,17 @@
 const BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
 
 const PART_NAMES: Record<string, string> = {
-    PRODUCT_PHOTO:           'productPhoto',
-    REACH_COMPLIANCE:        'reachCompliance',
-    EU_DOC_OF_CONFORMITY:    'euDeclaration',
-    TEST_REPORTS:            'testReports',
-    TRANSACTION_CERTIFICATES:'transactionCerts',
-    ORIGIN_CERTIFICATES:     'originCerts',
-    REPAIR_MANUAL:           'repairManual',
-    CARE_GUIDE:              'careGuide',
-    END_OF_LIFE_GUIDE:       'endOfLifeGuide',
-    SALE_INVOICE:            'saleInvoice',
-    CREATION_PASSPORT:       'creationPassport',
+    PRODUCT_PHOTO: 'productPhoto',
+    REACH_COMPLIANCE: 'reachCompliance',
+    EU_DOC_OF_CONFORMITY: 'euDeclaration',
+    TEST_REPORTS: 'testReports',
+    TRANSACTION_CERTIFICATES: 'transactionCerts',
+    ORIGIN_CERTIFICATES: 'originCerts',
+    REPAIR_MANUAL: 'repairManual',
+    CARE_GUIDE: 'careGuide',
+    END_OF_LIFE_GUIDE: 'endOfLifeGuide',
+    SALE_INVOICE: 'saleInvoice',
+    CREATION_PASSPORT: 'creationPassport',
 };
 
 export interface DppMaterialPayload {

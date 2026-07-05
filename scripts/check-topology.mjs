@@ -61,7 +61,7 @@ function main() {
 
     if (issues.length > 0) {
         console.error('[topo] cross-app dependency detected:');
-        for (const i of issues) console.error(`  - ${  i}`);
+        for (const i of issues) console.error(`  - ${i}`);
         process.exit(1);
     }
 

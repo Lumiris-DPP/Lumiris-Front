@@ -191,8 +191,8 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
                             <span className="text-destructive">*</span>
                         </label>
                         <p className="text-muted-foreground text-[11px]">
-                            Obligatoire pour vendre en Europe. Vos fournisseurs de tissus doivent vous fournir
-                            cette garantie.
+                            Obligatoire pour vendre en Europe. Vos fournisseurs de tissus doivent vous fournir cette
+                            garantie.
                         </p>
                     </div>
                 </div>

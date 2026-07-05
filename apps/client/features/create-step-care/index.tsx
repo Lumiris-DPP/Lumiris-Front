@@ -125,7 +125,7 @@ export function CreateStepCare({ draftId }: { draftId: string }) {
                 <div className="flex items-center justify-between">
                     <Label className="text-base font-semibold">Composition des fibres</Label>
                     <span
-                        className={`text-sm font-mono font-semibold ${total === 100 ? 'text-lumiris-emerald' : total > 100 ? 'text-destructive' : 'text-lumiris-amber'}`}
+                        className={`font-mono text-sm font-semibold ${total === 100 ? 'text-lumiris-emerald' : total > 100 ? 'text-destructive' : 'text-lumiris-amber'}`}
                     >
                         {total}% / 100%
                     </span>
@@ -134,10 +134,7 @@ export function CreateStepCare({ draftId }: { draftId: string }) {
                 <div className="space-y-2">
                     {materials.map((m, i) => (
                         <div key={i} className="flex items-center gap-2">
-                            <Select
-                                value={m.fiber}
-                                onValueChange={(v) => updateMaterial(i, { fiber: v as Fiber })}
-                            >
+                            <Select value={m.fiber} onValueChange={(v) => updateMaterial(i, { fiber: v as Fiber })}>
                                 <SelectTrigger className="w-44">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -158,7 +155,9 @@ export function CreateStepCare({ draftId }: { draftId: string }) {
                                     onChange={(e) => updateMaterial(i, { percentage: Number(e.target.value) || 0 })}
                                     className="pr-7"
                                 />
-                                <span className="text-muted-foreground absolute right-2 top-1/2 -translate-y-1/2 text-sm">%</span>
+                                <span className="text-muted-foreground absolute right-2 top-1/2 -translate-y-1/2 text-sm">
+                                    %
+                                </span>
                             </div>
                             <Input
                                 value={m.originCountry}
@@ -189,7 +188,7 @@ export function CreateStepCare({ draftId }: { draftId: string }) {
 
             {/* Instructions d'entretien */}
             <section className="space-y-3">
-                <Label className="text-base font-semibold">Instructions d'entretien (GINETEX)</Label>
+                <Label className="text-base font-semibold">Instructions d&apos;entretien (GINETEX)</Label>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                     {CARE_SYMBOLS.map((s) => {
                         const checked = care.includes(s.code);
@@ -222,7 +221,7 @@ export function CreateStepCare({ draftId }: { draftId: string }) {
             {/* Notes d'entretien */}
             <section className="space-y-2">
                 <Label htmlFor="care-notes" className="text-base font-semibold">
-                    Notes d'entretien
+                    Notes d&apos;entretien
                 </Label>
                 <Textarea
                     id="care-notes"

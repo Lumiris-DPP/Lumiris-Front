@@ -24,7 +24,6 @@ export function CareGuide({ care, warranty, className, ...rest }: CareGuideProps
                     const value = care?.[key];
                     return (
                         <li key={key} className="border-border/60 bg-card flex gap-3 rounded-2xl border p-3">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={svgPath} alt="" aria-hidden className="mt-0.5 h-4 w-4 shrink-0" />
                             <div className="min-w-0">
                                 <p className="text-foreground text-xs font-semibold uppercase tracking-wider">

@@ -22,12 +22,18 @@ const GRADE_HEX: Record<IrisGrade, string> = {
 };
 
 const FIBER_LABEL_FR: Record<string, string> = {
-    cotton: 'Coton', wool: 'Laine', linen: 'Lin', silk: 'Soie',
-    hemp: 'Chanvre', cashmere: 'Cachemire', leather: 'Cuir',
-    'recycled-polyester': 'Polyester recyclé', other: 'Autre',
+    cotton: 'Coton',
+    wool: 'Laine',
+    linen: 'Lin',
+    silk: 'Soie',
+    hemp: 'Chanvre',
+    cashmere: 'Cachemire',
+    leather: 'Cuir',
+    'recycled-polyester': 'Polyester recyclé',
+    other: 'Autre',
 };
 
-const CARE_SYMBOLS: { code: string; label: string; svgPath: string }[] = [
+const CARE_SYMBOLS: Array<{ code: string; label: string; svgPath: string }> = [
     { code: 'wash-30', label: 'Lavage 30°', svgPath: '/ginetex/ginetex--30c-fine-wash.svg' },
     { code: 'wash-40', label: 'Lavage 40°', svgPath: '/ginetex/ginetex--40c-mild-wash.svg' },
     { code: 'wash-60', label: 'Lavage 60°', svgPath: '/ginetex/ginetex--60c-coloured-wash.svg' },
@@ -126,7 +132,9 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                     <header className="flex items-start justify-between border-b border-neutral-300 pb-3">
                         <div className="space-y-0.5">
                             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-500">LUMIRIS</p>
-                            <p className="text-base font-semibold leading-tight">{dpp.productName ?? 'Produit sans nom'}</p>
+                            <p className="text-base font-semibold leading-tight">
+                                {dpp.productName ?? 'Produit sans nom'}
+                            </p>
                             {dpp.sku && <p className="text-xs text-neutral-600">Réf. {dpp.sku}</p>}
                         </div>
                         <div className="text-right">
@@ -140,16 +148,28 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                         <div className="h-[50mm] w-[50mm] shrink-0 overflow-hidden rounded-md border border-neutral-300 bg-neutral-100">
                             {dpp.mainPhotoUrl ? (
                                 // eslint-disable-next-line @next/next/no-img-element
-                                <img src={dpp.mainPhotoUrl} alt={dpp.productName ?? ''} className="h-full w-full object-cover" />
+                                <img
+                                    src={dpp.mainPhotoUrl}
+                                    alt={dpp.productName ?? ''}
+                                    className="h-full w-full object-cover"
+                                />
                             ) : (
-                                <div className="flex h-full w-full items-center justify-center text-[10px] text-neutral-400">Photo manquante</div>
+                                <div className="flex h-full w-full items-center justify-center text-[10px] text-neutral-400">
+                                    Photo manquante
+                                </div>
                             )}
                         </div>
                         <div className="flex min-w-0 flex-1 flex-col justify-between">
                             <div className="space-y-1">
-                                <h1 className="text-2xl font-semibold leading-tight">{dpp.productName ?? 'Sans nom'}</h1>
-                                {dpp.productDescription && <p className="text-sm text-neutral-600">{dpp.productDescription}</p>}
-                                {dpp.originCountry && <p className="text-xs text-neutral-500">Origine : {dpp.originCountry}</p>}
+                                <h1 className="text-2xl font-semibold leading-tight">
+                                    {dpp.productName ?? 'Sans nom'}
+                                </h1>
+                                {dpp.productDescription && (
+                                    <p className="text-sm text-neutral-600">{dpp.productDescription}</p>
+                                )}
+                                {dpp.originCountry && (
+                                    <p className="text-xs text-neutral-500">Origine : {dpp.originCountry}</p>
+                                )}
                             </div>
                             {score && (
                                 <div className="flex items-center gap-4 pt-2">
@@ -160,7 +180,9 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                                         {score.grade}
                                     </div>
                                     <div className="space-y-0.5">
-                                        <p className="font-mono text-[10px] uppercase tracking-wider text-neutral-500">Score Iris</p>
+                                        <p className="font-mono text-[10px] uppercase tracking-wider text-neutral-500">
+                                            Score Iris
+                                        </p>
                                         <p className="font-mono text-3xl font-semibold leading-none">
                                             {score.total.toFixed(1)}
                                             <span className="ml-0.5 text-sm font-normal text-neutral-500">/ 100</span>
@@ -174,7 +196,9 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                     {/* Composition */}
                     {(dpp.materials ?? []).length > 0 && (
                         <section className="space-y-2">
-                            <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-700">Composition</h2>
+                            <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-700">
+                                Composition
+                            </h2>
                             <table className="w-full border-collapse text-xs">
                                 <thead>
                                     <tr className="border-b border-neutral-300 text-left font-mono text-[10px] uppercase tracking-wider text-neutral-500">
@@ -186,7 +210,9 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                                 <tbody>
                                     {(dpp.materials ?? []).map((m, i) => (
                                         <tr key={i} className="border-b border-neutral-100">
-                                            <td className="py-1.5 pr-2 font-medium">{FIBER_LABEL_FR[m.fiber] ?? m.fiber}</td>
+                                            <td className="py-1.5 pr-2 font-medium">
+                                                {FIBER_LABEL_FR[m.fiber] ?? m.fiber}
+                                            </td>
                                             <td className="py-1.5 pr-2 font-mono">{m.percentage}%</td>
                                             <td className="py-1.5">{m.originCountry || '—'}</td>
                                         </tr>
@@ -199,11 +225,23 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                     {/* Entretien */}
                     {(dpp.careInstructions ?? []).length > 0 && (
                         <section className="space-y-2">
-                            <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-700">Entretien</h2>
+                            <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-700">
+                                Entretien
+                            </h2>
                             <div className="flex flex-wrap gap-2">
                                 {CARE_SYMBOLS.filter((s) => (dpp.careInstructions ?? []).includes(s.code)).map((s) => (
-                                    <div key={s.code} className="flex items-center gap-1.5 rounded border border-neutral-200 px-2 py-1 text-[11px]">
-                                        <Image src={s.svgPath} alt="" aria-hidden width={16} height={16} className="h-4 w-4 shrink-0" />
+                                    <div
+                                        key={s.code}
+                                        className="flex items-center gap-1.5 rounded border border-neutral-200 px-2 py-1 text-[11px]"
+                                    >
+                                        <Image
+                                            src={s.svgPath}
+                                            alt=""
+                                            aria-hidden
+                                            width={16}
+                                            height={16}
+                                            className="h-4 w-4 shrink-0"
+                                        />
                                         {s.label}
                                     </div>
                                 ))}
@@ -214,19 +252,47 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
 
                     {/* Traçabilité */}
                     <section className="space-y-2">
-                        <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-700">Traçabilité</h2>
+                        <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-700">
+                            Traçabilité
+                        </h2>
                         <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs">
-                            {dpp.manufacturedAt && <><dt className="text-neutral-500">Date de fabrication</dt><dd>{dpp.manufacturedAt}</dd></>}
-                            {dpp.batchNumber && <><dt className="text-neutral-500">Numéro de lot</dt><dd className="font-mono">{dpp.batchNumber}</dd></>}
-                            {dpp.gtin && <><dt className="text-neutral-500">GTIN</dt><dd className="font-mono">{dpp.gtin}</dd></>}
-                            {dpp.sku && <><dt className="text-neutral-500">SKU</dt><dd className="font-mono">{dpp.sku}</dd></>}
+                            {dpp.manufacturedAt && (
+                                <>
+                                    <dt className="text-neutral-500">Date de fabrication</dt>
+                                    <dd>{dpp.manufacturedAt}</dd>
+                                </>
+                            )}
+                            {dpp.batchNumber && (
+                                <>
+                                    <dt className="text-neutral-500">Numéro de lot</dt>
+                                    <dd className="font-mono">{dpp.batchNumber}</dd>
+                                </>
+                            )}
+                            {dpp.gtin && (
+                                <>
+                                    <dt className="text-neutral-500">GTIN</dt>
+                                    <dd className="font-mono">{dpp.gtin}</dd>
+                                </>
+                            )}
+                            {dpp.sku && (
+                                <>
+                                    <dt className="text-neutral-500">SKU</dt>
+                                    <dd className="font-mono">{dpp.sku}</dd>
+                                </>
+                            )}
                             {dpp.reachCompliant != null && (
                                 <>
                                     <dt className="text-neutral-500">Conformité REACH</dt>
                                     <dd className="flex items-center gap-1">
-                                        {dpp.reachCompliant
-                                            ? <><CheckCircle className="h-3 w-3 text-green-600" /> Oui</>
-                                            : <><XCircle className="h-3 w-3 text-red-500" /> Non</>}
+                                        {dpp.reachCompliant ? (
+                                            <>
+                                                <CheckCircle className="h-3 w-3 text-green-600" /> Oui
+                                            </>
+                                        ) : (
+                                            <>
+                                                <XCircle className="h-3 w-3 text-red-500" /> Non
+                                            </>
+                                        )}
                                     </dd>
                                 </>
                             )}
@@ -235,33 +301,60 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
 
                     {/* Durabilité */}
                     <section className="space-y-2">
-                        <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-700">Durabilité & Fin de vie</h2>
+                        <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-700">
+                            Durabilité & Fin de vie
+                        </h2>
                         <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs">
-                            {dpp.recycledPct != null && <><dt className="text-neutral-500">Matières recyclées</dt><dd>{dpp.recycledPct} %</dd></>}
-                            {dpp.warrantyDescription && <><dt className="text-neutral-500">Garantie</dt><dd>{dpp.warrantyDescription}</dd></>}
+                            {dpp.recycledPct != null && (
+                                <>
+                                    <dt className="text-neutral-500">Matières recyclées</dt>
+                                    <dd>{dpp.recycledPct} %</dd>
+                                </>
+                            )}
+                            {dpp.warrantyDescription && (
+                                <>
+                                    <dt className="text-neutral-500">Garantie</dt>
+                                    <dd>{dpp.warrantyDescription}</dd>
+                                </>
+                            )}
                             {dpp.isRepairable != null && (
                                 <>
                                     <dt className="text-neutral-500">Réparable</dt>
                                     <dd className="flex items-center gap-1">
-                                        {dpp.isRepairable
-                                            ? <><CheckCircle className="h-3 w-3 text-green-600" /> Oui</>
-                                            : <><XCircle className="h-3 w-3 text-red-500" /> Non</>}
+                                        {dpp.isRepairable ? (
+                                            <>
+                                                <CheckCircle className="h-3 w-3 text-green-600" /> Oui
+                                            </>
+                                        ) : (
+                                            <>
+                                                <XCircle className="h-3 w-3 text-red-500" /> Non
+                                            </>
+                                        )}
                                     </dd>
                                 </>
                             )}
-                            {dpp.endOfLifeInstructions && <><dt className="text-neutral-500">Fin de vie</dt><dd>{dpp.endOfLifeInstructions}</dd></>}
+                            {dpp.endOfLifeInstructions && (
+                                <>
+                                    <dt className="text-neutral-500">Fin de vie</dt>
+                                    <dd>{dpp.endOfLifeInstructions}</dd>
+                                </>
+                            )}
                         </dl>
                     </section>
 
                     {/* Documents publics */}
                     {(dpp.documents ?? []).filter((d) => d.visibility === 'PUBLIC_USERS').length > 0 && (
                         <section className="space-y-2">
-                            <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-700">Documents</h2>
+                            <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-700">
+                                Documents
+                            </h2>
                             <ul className="space-y-0.5 text-xs">
                                 {(dpp.documents ?? [])
                                     .filter((d) => d.visibility === 'PUBLIC_USERS')
                                     .map((d) => (
-                                        <li key={d.fileId}>{DOC_TYPE_LABELS[d.documentType] ?? d.documentType} — {d.filename}</li>
+                                        <li key={d.fileId}>
+                                            {DOC_TYPE_LABELS[d.documentType] ?? d.documentType} — {d.filename}
+                                        </li>
                                     ))}
                             </ul>
                         </section>
@@ -270,9 +363,13 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                     {/* Pied de page — QR code */}
                     <footer className="mt-auto flex items-end justify-between gap-4 border-t border-neutral-300 pt-4">
                         <div className="min-w-0 flex-1 space-y-1">
-                            <p className="text-[10px] italic text-neutral-600">Passeport conforme ESPR. Vérifiable sur lumiris.fr.</p>
+                            <p className="text-[10px] italic text-neutral-600">
+                                Passeport conforme ESPR. Vérifiable sur lumiris.fr.
+                            </p>
                             <p className="font-mono text-[9px] text-neutral-700">{dppUrl}</p>
-                            <p className="font-mono text-[10px] font-semibold text-neutral-800">Code : {dpp.publicCode}</p>
+                            <p className="font-mono text-[10px] font-semibold text-neutral-800">
+                                Code : {dpp.publicCode}
+                            </p>
                         </div>
                         <div className="shrink-0 rounded-md border border-neutral-300 bg-white p-1.5">
                             <QRCodeCanvas value={dppUrl} size={96} includeMargin={false} level="M" />
@@ -284,7 +381,7 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
     );
 }
 
-function MockPrintSheet({ passportId, productName }: { passportId: string; productName: string }) {
+function MockPrintSheet({ passportId: _passportId, productName }: { passportId: string; productName: string }) {
     return (
         <div className="flex min-h-screen items-center justify-center bg-white p-12">
             <div className="space-y-3 text-center">

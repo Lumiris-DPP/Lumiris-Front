@@ -31,11 +31,9 @@ export function DocUploadField({ label, description, accept = 'application/pdf',
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Info className="text-muted-foreground h-3.5 w-3.5 cursor-help shrink-0" />
+                                <Info className="text-muted-foreground h-3.5 w-3.5 shrink-0 cursor-help" />
                             </TooltipTrigger>
-                            <TooltipContent className="max-w-xs text-xs leading-relaxed">
-                                {description}
-                            </TooltipContent>
+                            <TooltipContent className="max-w-xs text-xs leading-relaxed">{description}</TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
                 )}

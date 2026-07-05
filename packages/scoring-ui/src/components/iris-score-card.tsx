@@ -30,7 +30,13 @@ function IrisScoreCardDisplay({ score, muted = false, variant = 'card', classNam
                 <IrisScoreCardDisplay score={score} muted={muted} className={cn('hidden lg:flex', className)} {...rest}>
                     {children}
                 </IrisScoreCardDisplay>
-                <IrisScoreCardDisplay score={score} muted={muted} variant="strip" className={cn('lg:hidden', className)} {...rest} />
+                <IrisScoreCardDisplay
+                    score={score}
+                    muted={muted}
+                    variant="strip"
+                    className={cn('lg:hidden', className)}
+                    {...rest}
+                />
             </>
         );
     }
@@ -97,14 +103,16 @@ export function IrisScoreCard({ dppId, draft, muted, variant, className, childre
             setScore(ZERO_SCORE);
             return;
         }
-        api.dppForms.getIrisScore(dppId)
+        api.dppForms
+            .getIrisScore(dppId)
             .then(setScore)
             .catch(() => setScore(ZERO_SCORE));
     }, [dppId, api]);
 
     useEffect(() => {
         if (!draft) return;
-        api.dppForms.computeIrisScore(draft)
+        api.dppForms
+            .computeIrisScore(draft)
             .then(setScore)
             .catch(() => null);
     }, [draft, api]);

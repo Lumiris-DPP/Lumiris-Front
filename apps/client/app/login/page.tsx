@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ShieldCheck, Sparkles } from 'lucide-react';
 import { z } from 'zod';
-import { mockArtisans } from '@lumiris/mock-data';
 import { Button } from '@lumiris/ui/components/button';
 import { Card } from '@lumiris/ui/components/card';
 import { Input } from '@lumiris/ui/components/input';

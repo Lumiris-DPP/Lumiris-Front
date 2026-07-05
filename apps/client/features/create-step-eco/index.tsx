@@ -32,9 +32,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
         () => draft?.files?.['REPAIR_MANUAL'] ?? null,
     );
     const [careGuideFile, setCareGuideFile] = useState<File | null>(() => draft?.files?.['CARE_GUIDE'] ?? null);
-    const [endOfLifeFile, setEndOfLifeFile] = useState<File | null>(
-        () => draft?.files?.['END_OF_LIFE_GUIDE'] ?? null,
-    );
+    const [endOfLifeFile, setEndOfLifeFile] = useState<File | null>(() => draft?.files?.['END_OF_LIFE_GUIDE'] ?? null);
 
     useEffect(() => {
         if (draft) setForm(draft.eco);
@@ -98,16 +96,10 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
     };
 
     return (
-        <WizardStepFrame
-            draftId={draftId}
-            step="eco"
-            onPrev={handlePrev}
-            hideNav
-            contentClassName="space-y-6"
-        >
+        <WizardStepFrame draftId={draftId} step="eco" onPrev={handlePrev} hideNav contentClassName="space-y-6">
             <p className="text-muted-foreground text-sm">
-                Ces champs sont optionnels mais valorisants pour votre score Iris et pour les consommateurs
-                soucieux de l'environnement.
+                Ces champs sont optionnels mais valorisants pour votre score Iris et pour les consommateurs soucieux de
+                l&apos;environnement.
             </p>
 
             {/* % matières recyclées */}
@@ -150,7 +142,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                         Facilement réparable
                     </Label>
                     <p className="text-muted-foreground text-[11px]">
-                        Bouton d'origine fourni, coutures accessibles, pièces détachées disponibles.
+                        Bouton d&apos;origine fourni, coutures accessibles, pièces détachées disponibles.
                     </p>
                 </div>
                 <Switch

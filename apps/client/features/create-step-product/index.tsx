@@ -169,7 +169,7 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
             {/* Pays d'origine */}
             <div className="space-y-2">
                 <Label htmlFor="origin">
-                    Pays d'origine <span className="text-destructive">*</span>
+                    Pays d&apos;origine <span className="text-destructive">*</span>
                 </Label>
                 <Input
                     id="origin"

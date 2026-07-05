@@ -11,17 +11,28 @@ import type { DppFormDto, IrisScoreDto } from '@/lib/public-dpp-api';
 import { GRADE_TEXT, GRADE_BORDER, GRADE_BG_SOFT, GRADE_CSS_VAR } from '@/features/passport-detail/grade-classes';
 
 const FIBER_LABELS: Record<string, string> = {
-    cotton: 'Coton', wool: 'Laine', linen: 'Lin', silk: 'Soie',
-    hemp: 'Chanvre', cashmere: 'Cachemire', leather: 'Cuir',
-    'recycled-polyester': 'Polyester recyclé', other: 'Autre',
+    cotton: 'Coton',
+    wool: 'Laine',
+    linen: 'Lin',
+    silk: 'Soie',
+    hemp: 'Chanvre',
+    cashmere: 'Cachemire',
+    leather: 'Cuir',
+    'recycled-polyester': 'Polyester recyclé',
+    other: 'Autre',
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
-    top: 'Haut', bottom: 'Bas', dress: 'Robe / Combinaison',
-    outerwear: 'Veste / Manteau', shoe: 'Chaussure', accessory: 'Accessoire', other: 'Autre',
+    top: 'Haut',
+    bottom: 'Bas',
+    dress: 'Robe / Combinaison',
+    outerwear: 'Veste / Manteau',
+    shoe: 'Chaussure',
+    accessory: 'Accessoire',
+    other: 'Autre',
 };
 
-const CARE_SYMBOLS: { code: string; label: string; svgPath: string }[] = [
+const CARE_SYMBOLS: Array<{ code: string; label: string; svgPath: string }> = [
     { code: 'wash-30', label: 'Lavage 30°', svgPath: '/ginetex/ginetex--30c-fine-wash.svg' },
     { code: 'wash-40', label: 'Lavage 40°', svgPath: '/ginetex/ginetex--40c-mild-wash.svg' },
     { code: 'wash-60', label: 'Lavage 60°', svgPath: '/ginetex/ginetex--60c-coloured-wash.svg' },
@@ -145,7 +156,10 @@ export function PublicPassportDetail({ dpp, irisScore }: PublicPassportDetailPro
                         {dpp.productDescription && (
                             <InfoRow label="Description" value={dpp.productDescription} fullWidth />
                         )}
-                        <InfoRow label="Catégorie" value={CATEGORY_LABELS[dpp.productCategory ?? ''] ?? dpp.productCategory} />
+                        <InfoRow
+                            label="Catégorie"
+                            value={CATEGORY_LABELS[dpp.productCategory ?? ''] ?? dpp.productCategory}
+                        />
                         <InfoRow label="Pays d'origine" value={dpp.originCountry} />
                         {(dpp.availableSizes ?? []).length > 0 && (
                             <InfoRow
@@ -153,7 +167,12 @@ export function PublicPassportDetail({ dpp, irisScore }: PublicPassportDetailPro
                                 value={
                                     <div className="flex flex-wrap gap-1 pt-0.5">
                                         {(dpp.availableSizes ?? []).map((s) => (
-                                            <span key={s} className="bg-secondary text-secondary-foreground rounded px-1.5 py-0.5 text-xs">{s}</span>
+                                            <span
+                                                key={s}
+                                                className="bg-secondary text-secondary-foreground rounded px-1.5 py-0.5 text-xs"
+                                            >
+                                                {s}
+                                            </span>
                                         ))}
                                     </div>
                                 }
@@ -165,7 +184,12 @@ export function PublicPassportDetail({ dpp, irisScore }: PublicPassportDetailPro
                                 value={
                                     <div className="flex flex-wrap gap-1 pt-0.5">
                                         {(dpp.colors ?? []).map((c) => (
-                                            <span key={c} className="border-border rounded border px-1.5 py-0.5 text-xs">{c}</span>
+                                            <span
+                                                key={c}
+                                                className="border-border rounded border px-1.5 py-0.5 text-xs"
+                                            >
+                                                {c}
+                                            </span>
                                         ))}
                                     </div>
                                 }
@@ -184,7 +208,9 @@ export function PublicPassportDetail({ dpp, irisScore }: PublicPassportDetailPro
                                     <p key={i} className="text-foreground text-sm">
                                         <span className="font-mono">{m.percentage}%</span>{' '}
                                         {FIBER_LABELS[m.fiber] ?? m.fiber}
-                                        {m.originCountry && <span className="text-muted-foreground"> · {m.originCountry}</span>}
+                                        {m.originCountry && (
+                                            <span className="text-muted-foreground"> · {m.originCountry}</span>
+                                        )}
                                     </p>
                                 ))}
                             </div>
@@ -193,12 +219,24 @@ export function PublicPassportDetail({ dpp, irisScore }: PublicPassportDetailPro
                             <div className="space-y-1.5">
                                 <Label>Instructions d'entretien</Label>
                                 <div className="grid grid-cols-2 gap-1.5">
-                                    {CARE_SYMBOLS.filter((s) => (dpp.careInstructions ?? []).includes(s.code)).map((s) => (
-                                        <div key={s.code} className="border-border flex items-center gap-2 rounded-lg border px-2.5 py-2">
-                                            <Image src={s.svgPath} alt="" aria-hidden width={20} height={20} className="h-5 w-5 shrink-0" />
-                                            <span className="text-foreground truncate text-xs">{s.label}</span>
-                                        </div>
-                                    ))}
+                                    {CARE_SYMBOLS.filter((s) => (dpp.careInstructions ?? []).includes(s.code)).map(
+                                        (s) => (
+                                            <div
+                                                key={s.code}
+                                                className="border-border flex items-center gap-2 rounded-lg border px-2.5 py-2"
+                                            >
+                                                <Image
+                                                    src={s.svgPath}
+                                                    alt=""
+                                                    aria-hidden
+                                                    width={20}
+                                                    height={20}
+                                                    className="h-5 w-5 shrink-0"
+                                                />
+                                                <span className="text-foreground truncate text-xs">{s.label}</span>
+                                            </div>
+                                        ),
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -227,7 +265,10 @@ export function PublicPassportDetail({ dpp, irisScore }: PublicPassportDetailPro
                 {/* Durabilité */}
                 <Section delay={LAYER_DELAY * 4} title="Durabilité & Fin de vie">
                     <div className="grid gap-2.5 sm:grid-cols-2">
-                        <InfoRow label="Matières recyclées" value={dpp.recycledPct != null ? `${dpp.recycledPct} %` : null} />
+                        <InfoRow
+                            label="Matières recyclées"
+                            value={dpp.recycledPct != null ? `${dpp.recycledPct} %` : null}
+                        />
                         <InfoRow label="Garantie" value={dpp.warrantyDescription} />
                         {dpp.isRepairable != null && (
                             <InfoRow label="Réparable" value={<BooleanField value={dpp.isRepairable} />} />
@@ -298,7 +339,13 @@ function InfoRow({ label, value, fullWidth }: { label: string; value: ReactNode;
 }
 
 function BooleanField({ value }: { value: boolean }) {
-    return value
-        ? <span className="flex items-center gap-1 text-sm text-green-600"><CheckCircle className="h-3.5 w-3.5" /> Oui</span>
-        : <span className="flex items-center gap-1 text-sm text-red-500"><XCircle className="h-3.5 w-3.5" /> Non</span>;
+    return value ? (
+        <span className="flex items-center gap-1 text-sm text-green-600">
+            <CheckCircle className="h-3.5 w-3.5" /> Oui
+        </span>
+    ) : (
+        <span className="flex items-center gap-1 text-sm text-red-500">
+            <XCircle className="h-3.5 w-3.5" /> Non
+        </span>
+    );
 }
