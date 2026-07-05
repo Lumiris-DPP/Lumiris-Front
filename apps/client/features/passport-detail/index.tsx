@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components
 import { Badge } from '@lumiris/ui/components/badge';
 import { Toaster } from '@lumiris/ui/components/sonner';
 import { fetchDppForm, type DppFormDto, type DppFormDocumentDto } from '@/lib/dpp-api';
+import { QrCodeCard } from './QrCodeCard';
 import { useAuthStore } from '@/lib/auth-store';
 import { useCurrentArtisan } from '@/lib/current-artisan';
 import { draftToPassport, useDraftStore } from '@/lib/draft-store';
@@ -438,6 +439,9 @@ export function PassportDetail({ passportId }: { passportId: string }) {
 
             <aside className="lg:sticky lg:top-24 lg:self-start">
                 <IrisScoreCard dppId={!draft && !fixed ? passportId : undefined} />
+                {dpp?.publicCode && (
+                    <QrCodeCard publicCode={dpp.publicCode} />
+                )}
             </aside>
         </div>
         </>

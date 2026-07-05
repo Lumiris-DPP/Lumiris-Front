@@ -57,6 +57,7 @@ export type DppStatus = 'VALID' | 'INVALID';
 
 export interface DppFormDto extends DppFormPayload {
     id: string;
+    publicCode: string;
     createdAt: string;
     status: DppStatus;
     mainPhotoUrl: string | null;
@@ -70,6 +71,24 @@ export interface DppFormSummaryDto {
     productName: string | null;
     productCategory: string | null;
     sku: string | null;
+}
+
+export interface IrisScoreBreakdownDto {
+    transparency: number;
+    craftsmanship: number;
+    impact: number;
+    repairability: number;
+}
+
+export interface IrisScoreDto {
+    total: number;
+    grade: string;
+    breakdown: IrisScoreBreakdownDto;
+}
+
+export interface DppFormPublicDto {
+    dpp: DppFormDto;
+    irisScore: IrisScoreDto | null;
 }
 
 function authHeaders(token: string) {
@@ -117,4 +136,10 @@ export async function fetchDppForm(token: string, id: string): Promise<DppFormDt
     });
     if (!res.ok) throw new Error(`GET /api/dpp-forms/${id} → ${res.status}`);
     return res.json() as Promise<DppFormDto>;
+}
+
+export async function fetchPublicDppForm(code: string): Promise<DppFormPublicDto> {
+    const res = await fetch(`${BASE}/public/dpp_forms/${code}`);
+    if (!res.ok) throw new Error(`GET /public/dpp_forms/${code} → ${res.status}`);
+    return res.json() as Promise<DppFormPublicDto>;
 }
