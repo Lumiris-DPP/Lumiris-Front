@@ -6,13 +6,11 @@ import { Button } from '@lumiris/ui/components/button';
 import { Card } from '@lumiris/ui/components/card';
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
-import { DEMO_CREDENTIALS, MOCK_PASSWORD } from '@/lib/mock-auth';
-import { DemoCredentials } from './demo-credentials';
 import { useLoginForm } from './use-login-form';
 
-const PLACEHOLDER_EMAIL = DEMO_CREDENTIALS[0]?.email ?? 'prenom.nom@atelier.fr';
+const PLACEHOLDER_EMAIL = 'artisan@lumiris.com';
 
-/** The login card (form + demo credentials). Owns its form state via {@link useLoginForm}. */
+/** The login card. Owns its form state via {@link useLoginForm}. */
 export function LoginCard() {
     const form = useLoginForm();
 
@@ -61,7 +59,7 @@ export function LoginCard() {
                             autoComplete="current-password"
                             aria-label="Mot de passe"
                             aria-invalid={form.errors.password ? true : undefined}
-                            placeholder={MOCK_PASSWORD}
+                            placeholder="••••••••"
                             value={form.password}
                             onChange={(e) => form.setPassword(e.target.value)}
                         />
@@ -98,8 +96,6 @@ export function LoginCard() {
                     </p>
                 </form>
             </Card>
-
-            <DemoCredentials onPick={form.pickDemo} />
         </>
     );
 }

@@ -254,6 +254,7 @@
       "name": "@lumiris/scoring-ui",
       "version": "0.1.0",
       "dependencies": {
+        "@lumiris/api-client": "workspace:*",
         "@lumiris/core": "workspace:*",
         "@lumiris/types": "workspace:*",
         "@lumiris/ui": "workspace:*",

@@ -74,7 +74,7 @@ function MissingAlert({ missing }: { missing: string[] }) {
     return (
         <Alert className="border-lumiris-amber/30 bg-lumiris-amber/5 text-lumiris-amber">
             <AlertTriangle aria-hidden />
-            <AlertTitle>Champs requis avant l'étape suivante</AlertTitle>
+            <AlertTitle>Champs requis avant l&apos;étape suivante</AlertTitle>
             <AlertDescription className="text-foreground/80">{missing.join(' · ')}</AlertDescription>
         </Alert>
     );
@@ -89,7 +89,7 @@ function DraftNotFound() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                     <p className="text-muted-foreground text-sm">
-                        Ce brouillon n'existe pas ou a été supprimé. Vous pouvez en démarrer un nouveau.
+                        Ce brouillon n&apos;existe pas ou a été supprimé. Vous pouvez en démarrer un nouveau.
                     </p>
                     <Button asChild>
                         <Link href="/create">Créer un nouveau passeport</Link>

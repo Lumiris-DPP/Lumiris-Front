@@ -15,7 +15,11 @@ const dppFormSummaryListSchema = z.array(dppFormSummaryDtoSchema);
 export function dppApi(http: Http) {
     return {
         async list(): Promise<DppFormSummaryDto[]> {
-            return parseOr(dppFormSummaryListSchema, await http.request('/api/dpp-forms'));
+            // GET /api/dpp-forms is paginated (Spring `Page`): unwrap `.content`.
+            // Stay tolerant of a bare-array response in case the contract changes.
+            const res = await http.request<unknown>('/api/dpp-forms');
+            const items = Array.isArray(res) ? res : ((res as { content?: unknown[] })?.content ?? []);
+            return parseOr(dppFormSummaryListSchema, items);
         },
         async get(id: string): Promise<DppFormDto> {
             return parseOr(dppFormDtoSchema, await http.request(`/api/dpp-forms/${id}`));
