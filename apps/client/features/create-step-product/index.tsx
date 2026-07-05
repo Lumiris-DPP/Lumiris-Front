@@ -11,8 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@lumiris/ui/components/badge';
 import { WizardStepFrame } from '@/features/wizard-shell/step-frame';
 import { useStepNavigation } from '@/features/wizard-shell/use-step-navigation';
+import { DocUploadField } from '@/features/wizard-shell/doc-upload-field';
 import { useDraftStore } from '@/lib/draft-store';
-import { readFileAsDataUrl } from '@lumiris/utils';
 import { validateStep } from './schema';
 
 const CATEGORIES: ReadonlyArray<{ value: GarmentCategory; label: string }> = [
@@ -30,6 +30,7 @@ const SIZES = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', 'Unique'];
 export function CreateStepProduct({ draftId }: { draftId: string }) {
     const draft = useDraftStore((s) => s.drafts[draftId]);
     const setGarment = useDraftStore((s) => s.setGarment);
+    const setFile = useDraftStore((s) => s.setFile);
     const { goNext } = useStepNavigation(draftId);
 
     const [form, setForm] = useState<GarmentInfo>(
@@ -45,6 +46,22 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
     );
     const [colorInput, setColorInput] = useState('');
 
+    const [photoFile, setPhotoFile] = useState<File | null>(() => draft?.files?.['PRODUCT_PHOTO'] ?? null);
+    const [saleInvoiceFile, setSaleInvoiceFile] = useState<File | null>(() => draft?.files?.['SALE_INVOICE'] ?? null);
+    const [creationPassportFile, setCreationPassportFile] = useState<File | null>(
+        () => draft?.files?.['CREATION_PASSPORT'] ?? null,
+    );
+
+    const photoPreviewUrl = useMemo(() => {
+        return photoFile ? URL.createObjectURL(photoFile) : null;
+    }, [photoFile]);
+
+    useEffect(() => {
+        return () => {
+            if (photoPreviewUrl) URL.revokeObjectURL(photoPreviewUrl);
+        };
+    }, [photoPreviewUrl]);
+
     useEffect(() => {
         if (draft) setForm(draft.garment);
     }, [draft]);
@@ -55,7 +72,7 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
                 garment: form,
                 materials: draft?.materials ?? [],
                 careInstructions: draft?.careInstructions ?? [],
-                certifications: draft?.certifications ?? [],
+                careNotes: draft?.careNotes ?? '',
                 traceability: draft?.traceability ?? { manufacturedAt: '', reachCompliant: false },
                 eco: draft?.eco ?? {},
             }),
@@ -63,14 +80,11 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
     );
 
     const handleNext = () => {
-        setGarment(draftId, form);
+        setGarment(draftId, { ...form, mainPhotoUrl: '' });
+        setFile(draftId, 'PRODUCT_PHOTO', photoFile);
+        setFile(draftId, 'SALE_INVOICE', saleInvoiceFile);
+        setFile(draftId, 'CREATION_PASSPORT', creationPassportFile);
         goNext('product', 'care');
-    };
-
-    const handlePhoto = async (file: File | undefined) => {
-        if (!file) return;
-        const dataUrl = await readFileAsDataUrl(file);
-        setForm((f) => ({ ...f, mainPhotoUrl: dataUrl }));
     };
 
     const toggleSize = (size: string) => {
@@ -155,7 +169,7 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
             {/* Pays d'origine */}
             <div className="space-y-2">
                 <Label htmlFor="origin">
-                    Pays d'origine <span className="text-destructive">*</span>
+                    Pays d&apos;origine <span className="text-destructive">*</span>
                 </Label>
                 <Input
                     id="origin"
@@ -172,16 +186,29 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
             {/* Photo principale */}
             <div className="space-y-2 md:col-span-2">
                 <Label>Photo principale</Label>
-                <label className="border-border bg-muted/40 hover:bg-muted relative flex h-44 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed text-center transition-colors">
-                    {form.mainPhotoUrl ? (
-                        <Image
-                            src={form.mainPhotoUrl}
-                            alt="Visuel principal"
-                            fill
-                            sizes="(min-width: 768px) 50vw, 100vw"
-                            unoptimized
-                            className="rounded-xl object-cover"
-                        />
+                <label className="border-border bg-muted/40 hover:bg-muted relative flex aspect-square w-full max-w-48 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed text-center transition-colors">
+                    {photoPreviewUrl ? (
+                        <>
+                            <Image
+                                src={photoPreviewUrl}
+                                alt="Visuel principal"
+                                fill
+                                sizes="(min-width: 768px) 50vw, 100vw"
+                                unoptimized
+                                className="rounded-xl object-contain"
+                            />
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setPhotoFile(null);
+                                }}
+                                className="bg-background/80 absolute right-2 top-2 rounded-full p-1"
+                                aria-label="Supprimer la photo"
+                            >
+                                <X className="h-4 w-4" />
+                            </button>
+                        </>
                     ) : (
                         <>
                             <ImagePlus className="text-muted-foreground mb-2 h-6 w-6" />
@@ -193,7 +220,7 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
                         accept="image/*"
                         aria-label="Importer la photo principale du produit"
                         className="absolute inset-0 cursor-pointer opacity-0"
-                        onChange={(e) => handlePhoto(e.target.files?.[0])}
+                        onChange={(e) => setPhotoFile(e.target.files?.[0] ?? null)}
                     />
                 </label>
             </div>
@@ -262,6 +289,23 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
                         ))}
                     </div>
                 )}
+            </div>
+
+            {/* Documents */}
+            <div className="border-border space-y-4 rounded-lg border p-4 md:col-span-2">
+                <p className="text-sm font-medium">Documents de la pièce</p>
+                <DocUploadField
+                    label="Facture d'Origine ou Certificat de Vente"
+                    description="Un PDF sécurisé servant d'acte de propriété."
+                    value={saleInvoiceFile}
+                    onChange={setSaleInvoiceFile}
+                />
+                <DocUploadField
+                    label="Fiche d'Identité / Carnet de Création"
+                    description="Un document PDF qui immortalise les croquis d'intention du designer, le nombre d'heures de travail passées dans l'atelier, et le nom des artisans ayant façonné la pièce."
+                    value={creationPassportFile}
+                    onChange={setCreationPassportFile}
+                />
             </div>
         </WizardStepFrame>
     );

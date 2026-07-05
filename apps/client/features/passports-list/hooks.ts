@@ -13,11 +13,14 @@ export function useDuplicatePassport(artisanId: string) {
     return (source: Passport) => {
         const newId = createDraft(artisanId);
         setGarment(newId, { ...source.garment, reference: '' });
-        setMaterials(newId, source.materials.map((m) => ({
-            fiber: m.fiber,
-            percentage: m.percentage,
-            originCountry: m.originCountry,
-        })));
+        setMaterials(
+            newId,
+            source.materials.map((m) => ({
+                fiber: m.fiber,
+                percentage: m.percentage,
+                originCountry: m.originCountry,
+            })),
+        );
         toast.success('Passeport dupliqué', {
             description: `Brouillon créé à partir de "${source.garment.reference || source.id}".`,
         });

@@ -7,6 +7,7 @@ import { Label } from '@lumiris/ui/components/label';
 import { Checkbox } from '@lumiris/ui/components/checkbox';
 import { WizardStepFrame } from '@/features/wizard-shell/step-frame';
 import { useStepNavigation } from '@/features/wizard-shell/use-step-navigation';
+import { DocUploadField } from '@/features/wizard-shell/doc-upload-field';
 import { useDraftStore } from '@/lib/draft-store';
 import { validateStep } from './schema';
 
@@ -17,6 +18,7 @@ function generateId(prefix: string): string {
 export function CreateStepTraceability({ draftId }: { draftId: string }) {
     const draft = useDraftStore((s) => s.drafts[draftId]);
     const setTraceability = useDraftStore((s) => s.setTraceability);
+    const setFile = useDraftStore((s) => s.setFile);
     const { goNext, goTo } = useStepNavigation(draftId);
 
     const [form, setForm] = useState<TraceabilityInfo>(
@@ -26,9 +28,21 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
         },
     );
 
+    const [reachFile, setReachFile] = useState<File | null>(() => draft?.files?.['REACH_COMPLIANCE'] ?? null);
+    const [euDeclarationFile, setEuDeclarationFile] = useState<File | null>(
+        () => draft?.files?.['EU_DOC_OF_CONFORMITY'] ?? null,
+    );
+    const [testReportsFile, setTestReportsFile] = useState<File | null>(() => draft?.files?.['TEST_REPORTS'] ?? null);
+    const [transactionCertsFile, setTransactionCertsFile] = useState<File | null>(
+        () => draft?.files?.['TRANSACTION_CERTIFICATES'] ?? null,
+    );
+    const [originCertsFile, setOriginCertsFile] = useState<File | null>(
+        () => draft?.files?.['ORIGIN_CERTIFICATES'] ?? null,
+    );
+
     useEffect(() => {
         if (draft) setForm(draft.traceability);
-    }, [draft]);
+    }, [draft?.traceability]);
 
     const validation = useMemo(
         () =>
@@ -43,21 +57,41 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
                 },
                 materials: draft?.materials ?? [],
                 careInstructions: draft?.careInstructions ?? [],
-                certifications: draft?.certifications ?? [],
+                careNotes: draft?.careNotes ?? '',
                 traceability: form,
                 eco: draft?.eco ?? {},
             }),
         [form, draft],
     );
 
+    const saveFiles = () => {
+        setFile(draftId, 'REACH_COMPLIANCE', form.reachCompliant ? reachFile : null);
+        setFile(draftId, 'EU_DOC_OF_CONFORMITY', euDeclarationFile);
+        setFile(draftId, 'TEST_REPORTS', testReportsFile);
+        setFile(draftId, 'TRANSACTION_CERTIFICATES', transactionCertsFile);
+        setFile(draftId, 'ORIGIN_CERTIFICATES', originCertsFile);
+    };
+
     const handleNext = () => {
         setTraceability(draftId, form);
+        saveFiles();
         goNext('traceability', 'eco');
     };
 
     const handlePrev = () => {
         setTraceability(draftId, form);
+        saveFiles();
         goTo('care');
+    };
+
+    const handleReachChange = (checked: boolean) => {
+        const updated = { ...form, reachCompliant: checked };
+        setForm(updated);
+        setTraceability(draftId, updated);
+        if (!checked) {
+            setReachFile(null);
+            setFile(draftId, 'REACH_COMPLIANCE', null);
+        }
     };
 
     return (
@@ -142,25 +176,84 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
             </div>
 
             {/* Conformité REACH */}
-            <div className="border-border bg-muted/30 space-y-2 rounded-lg border p-4 md:col-span-2">
+            <div className="border-border bg-muted/30 space-y-3 rounded-lg border p-4 md:col-span-2">
                 <div className="flex items-start gap-3">
                     <Checkbox
                         id="reach"
                         checked={form.reachCompliant}
-                        onCheckedChange={(v) => setForm((f) => ({ ...f, reachCompliant: v === true }))}
+                        onCheckedChange={(v) => handleReachChange(v === true)}
                         className="mt-0.5"
                     />
                     <div className="space-y-1">
                         <label htmlFor="reach" className="cursor-pointer text-sm font-medium leading-snug">
                             Je certifie que ce produit respecte les réglementations européennes REACH (absence de
-                            colorants azoïques interdits et substances toxiques). <span className="text-destructive">*</span>
+                            colorants azoïques interdits et substances toxiques).{' '}
+                            <span className="text-destructive">*</span>
                         </label>
                         <p className="text-muted-foreground text-[11px]">
-                            Obligatoire pour vendre en Europe. Vos fournisseurs de tissus doivent vous fournir
-                            cette garantie.
+                            Obligatoire pour vendre en Europe. Vos fournisseurs de tissus doivent vous fournir cette
+                            garantie.
                         </p>
                     </div>
                 </div>
+
+                {form.reachCompliant && (
+                    <DocUploadField
+                        label="Fiches de Conformité Chimique (REACH / OEKO-TEX)"
+                        description="Les documents PDF prouvant l'absence de substances interdites ou dangereuses (colorants azoïques, métaux lourds dans les boutons/zips)."
+                        value={reachFile}
+                        onChange={(file) => {
+                            setReachFile(file);
+                            setFile(draftId, 'REACH_COMPLIANCE', file);
+                        }}
+                    />
+                )}
+            </div>
+
+            {/* Documents techniques */}
+            <div className="border-border space-y-4 rounded-lg border p-4 md:col-span-2">
+                <p className="text-sm font-medium">Documents de conformité & traçabilité</p>
+
+                <DocUploadField
+                    label="Déclaration UE de Conformité (DoC)"
+                    description="Le document officiel attestant que le vêtement respecte les normes européennes."
+                    advisory="Obligation légale"
+                    value={euDeclarationFile}
+                    onChange={(file) => {
+                        setEuDeclarationFile(file);
+                        setFile(draftId, 'EU_DOC_OF_CONFORMITY', file);
+                    }}
+                />
+
+                <DocUploadField
+                    label="Rapports de Tests d'Atelier / Laboratoire"
+                    description="Les certificats de tests physiques ou mécaniques (tests de résistance à la traction, boulochage, stabilité dimensionnelle selon les normes ISO)."
+                    value={testReportsFile}
+                    onChange={(file) => {
+                        setTestReportsFile(file);
+                        setFile(draftId, 'TEST_REPORTS', file);
+                    }}
+                />
+
+                <DocUploadField
+                    label="Certificats de Transaction (TC)"
+                    description="Délivrés par des organismes comme GOTS ou RWS. Ils prouvent l'origine de la fibre depuis la ferme jusqu'à votre atelier."
+                    value={transactionCertsFile}
+                    onChange={(file) => {
+                        setTransactionCertsFile(file);
+                        setFile(draftId, 'TRANSACTION_CERTIFICATES', file);
+                    }}
+                />
+
+                <DocUploadField
+                    label="Certificats d'Origine Géographique"
+                    description="Pour la haute couture ou l'artisanat : labels officiels comme l'Indication Géographique Protégée (ex : Dentelle de Calais-Caudry) ou Appellation d'Origine."
+                    value={originCertsFile}
+                    onChange={(file) => {
+                        setOriginCertsFile(file);
+                        setFile(draftId, 'ORIGIN_CERTIFICATES', file);
+                    }}
+                />
             </div>
         </WizardStepFrame>
     );

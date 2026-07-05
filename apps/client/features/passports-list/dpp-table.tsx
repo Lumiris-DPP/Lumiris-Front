@@ -51,9 +51,7 @@ export function DppTable({ rows }: DppTableProps) {
                             >
                                 <TableCell>
                                     <p className="font-medium">{dpp.productName ?? 'Sans nom'}</p>
-                                    {dpp.sku && (
-                                        <p className="text-muted-foreground font-mono text-xs">{dpp.sku}</p>
-                                    )}
+                                    {dpp.sku && <p className="text-muted-foreground font-mono text-xs">{dpp.sku}</p>}
                                 </TableCell>
                                 <TableCell className="text-muted-foreground text-sm">
                                     {CATEGORY_LABELS[dpp.productCategory ?? ''] ?? dpp.productCategory ?? '—'}

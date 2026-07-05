@@ -5,17 +5,24 @@ import type { ExternalDpp, Passport } from '@lumiris/types';
 
 type DecodedScan =
     | { kind: 'passport-id'; id: string }
+    | { kind: 'public-code'; code: string }
     | { kind: 'gs1-gtin'; gtin: string; serial?: string }
     | { kind: 'unknown'; raw: string };
 
 type ScanResult =
     | { kind: 'lumiris-passport'; passport: Passport }
+    | { kind: 'lumiris-public-code'; code: string }
     | { kind: 'external-dpp'; dpp: ExternalDpp }
     | { kind: 'unknown'; raw: string };
 
 export function decodeQrPayload(payload: string): DecodedScan {
     const trimmed = payload.trim();
     if (!trimmed) return { kind: 'unknown', raw: payload };
+
+    const publicCodeUrlMatch = trimmed.match(/\/p\/([\w-]{8})\b/i);
+    if (publicCodeUrlMatch?.[1]) {
+        return { kind: 'public-code', code: publicCodeUrlMatch[1].toUpperCase() };
+    }
 
     const passportUrlMatch = trimmed.match(/lumiris\.fr\/passeport\/([\w-]+)/i);
     if (passportUrlMatch?.[1]) {
@@ -43,6 +50,9 @@ export function decodeQrPayload(payload: string): DecodedScan {
 
 /** Ordre volontaire : GTIN LUMIRIS prime toujours sur la branche externe. */
 export function resolvePassportFromScan(decoded: DecodedScan): ScanResult {
+    if (decoded.kind === 'public-code') {
+        return { kind: 'lumiris-public-code', code: decoded.code };
+    }
     if (decoded.kind === 'passport-id') {
         const passport = mockPassportById(decoded.id);
         if (passport) return { kind: 'lumiris-passport', passport };

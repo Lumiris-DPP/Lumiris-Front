@@ -1,8 +1,6 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { PlusCircle } from 'lucide-react';
-import Link from 'next/link';
 import type { DppStatus } from '@/lib/dpp-api';
 import { useDppForms } from '@/lib/use-dpp-forms';
 import { Button } from '@lumiris/ui/components/button';
@@ -23,21 +21,16 @@ export function PassportsList() {
         return dppForms.filter((dpp) => {
             if (statusFilter !== 'all' && dpp.status !== statusFilter) return false;
             if (!term) return true;
-            return (dpp.productName ?? '').toLowerCase().includes(term) ||
-                   (dpp.sku ?? '').toLowerCase().includes(term);
+            return (dpp.productName ?? '').toLowerCase().includes(term) || (dpp.sku ?? '').toLowerCase().includes(term);
         });
     }, [dppForms, search, statusFilter]);
 
     if (loading) {
-        return (
-            <div className="text-muted-foreground p-8 text-sm">Chargement…</div>
-        );
+        return <div className="text-muted-foreground p-8 text-sm">Chargement…</div>;
     }
 
     if (error) {
-        return (
-            <div className="text-destructive p-8 text-sm">Erreur : {error}</div>
-        );
+        return <div className="text-destructive p-8 text-sm">Erreur : {error}</div>;
     }
 
     if (dppForms.length === 0) {
@@ -68,7 +61,14 @@ export function PassportsList() {
                     </SelectContent>
                 </Select>
                 {(search || statusFilter !== 'all') && (
-                    <Button variant="ghost" size="sm" onClick={() => { setSearch(''); setStatusFilter('all'); }}>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                            setSearch('');
+                            setStatusFilter('all');
+                        }}
+                    >
                         Réinitialiser
                     </Button>
                 )}
