@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import type { BillingCycle, PlanDto } from '@lumiris/api-client';
-import { useBillingPortal, usePlans } from '@lumiris/api-client/react';
+import { useBillingPortal, useChangePlan, usePlans } from '@lumiris/api-client/react';
 import { toast } from '@lumiris/ui/components/sonner';
 import { useAuthStore } from '@/lib/auth-store';
 import { useSubscription } from '@/lib/use-subscription';
@@ -14,16 +14,12 @@ export interface CheckoutTarget {
     amountLabel: string;
 }
 
-/**
- * Aggregates everything the subscription page needs: the subscription/plans/portal
- * queries, billing-cycle and checkout state, derived plans, and the
- * choose/manage handlers. Keeps the page component purely presentational.
- */
 export function useSubscriptionPage() {
     const isRealMode = useAuthStore((s) => s.token != null);
     const { subscription, quota, hasActiveSubscription, isLoading, isError, refetch } = useSubscription();
     const plansQuery = usePlans({ enabled: isRealMode });
     const portal = useBillingPortal();
+    const changePlan = useChangePlan();
 
     const [cycle, setCycle] = useState<BillingCycle>('monthly');
     const [checkout, setCheckout] = useState<CheckoutTarget | null>(null);
@@ -41,8 +37,20 @@ export function useSubscriptionPage() {
 
     function onChoose(plan: PlanDto) {
         if (hasActiveSubscription) {
-            // Plan changes go through the Stripe Customer Portal.
-            openPortal();
+            if (changePlan.isPending) return;
+            changePlan.mutate(
+                { tier: plan.tier, cycle },
+                {
+                    onSuccess: () =>
+                        toast.success('Plan mis à jour', {
+                            description: `Vous êtes maintenant sur ${plan.label} (${cycle === 'annual' ? 'annuel' : 'mensuel'}).`,
+                        }),
+                    onError: (err) =>
+                        toast.error('Le changement de plan a échoué', {
+                            description: err instanceof Error ? err.message : undefined,
+                        }),
+                },
+            );
             return;
         }
         const amount = cycle === 'annual' ? plan.annualAmountCents : plan.monthlyAmountCents;
@@ -68,6 +76,7 @@ export function useSubscriptionPage() {
         checkout,
         setCheckout,
         portal,
+        changePlan,
         openPortal,
         onChoose,
         retry: () => {

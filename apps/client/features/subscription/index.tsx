@@ -65,10 +65,14 @@ export function Subscription() {
                         <PlanCard
                             key={plan.tier}
                             plan={plan}
-                            isCurrent={Boolean(sub.subscription?.tier === plan.tier && sub.subscription?.active)}
+                            isCurrent={Boolean(
+                                sub.subscription?.tier === plan.tier &&
+                                sub.subscription?.billingCycle === sub.cycle &&
+                                sub.subscription?.active,
+                            )}
                             isAnnual={sub.isAnnual}
                             hasActiveSubscription={sub.hasActiveSubscription}
-                            disabled={sub.portal.isPending}
+                            disabled={sub.portal.isPending || sub.changePlan.isPending}
                             onChoose={sub.onChoose}
                         />
                     ))}

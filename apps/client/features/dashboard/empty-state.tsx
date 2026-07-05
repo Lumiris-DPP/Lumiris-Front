@@ -30,15 +30,19 @@ export function EmptyState({ artisan, items }: EmptyStateProps) {
     return (
         <Card className="mx-auto max-w-2xl">
             <CardContent className="space-y-6 p-8 text-center">
-                <div className="border-border mx-auto h-20 w-20 overflow-hidden rounded-full border">
-                    <Image
-                        src={artisan.photoUrl}
-                        alt={artisan.displayName}
-                        width={80}
-                        height={80}
-                        className="h-full w-full object-cover"
-                        unoptimized
-                    />
+                <div className="border-border bg-muted text-muted-foreground mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border text-xl font-semibold">
+                    {artisan.photoUrl ? (
+                        <Image
+                            src={artisan.photoUrl}
+                            alt={artisan.displayName}
+                            width={80}
+                            height={80}
+                            className="h-full w-full object-cover"
+                            unoptimized
+                        />
+                    ) : (
+                        <span aria-hidden>{artisan.displayName.charAt(0).toUpperCase()}</span>
+                    )}
                 </div>
 
                 <div>

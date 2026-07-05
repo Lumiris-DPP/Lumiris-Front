@@ -37,6 +37,12 @@ export function subscriptionApi(http: Http) {
                 }),
             );
         },
+        async changePlan(req: CreateSetupIntentRequest): Promise<SubscriptionStateDto> {
+            return parseOr(
+                subscriptionStateDtoSchema,
+                await http.request('/api/subscription/change', { method: 'POST', body: req }),
+            );
+        },
         async openPortal(): Promise<PortalDto> {
             return parseOr(portalDtoSchema, await http.request('/api/subscription/portal', { method: 'POST' }));
         },

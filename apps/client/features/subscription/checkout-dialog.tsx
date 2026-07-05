@@ -129,7 +129,7 @@ function CheckoutForm({ amountLabel, onConfirmed }: { amountLabel: string; onCon
 
     return (
         <div className="space-y-4">
-            <PaymentElement options={{ layout: 'tabs' }} />
+            <PaymentElement options={{ layout: 'tabs', wallets: { applePay: 'never', googlePay: 'never' } }} />
             {error && (
                 <p className="text-destructive text-xs" role="alert">
                     {error}

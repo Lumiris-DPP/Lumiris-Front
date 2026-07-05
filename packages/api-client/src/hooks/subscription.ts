@@ -76,6 +76,22 @@ export function useConfirmSubscription(
     });
 }
 
+export function useChangePlan(
+    options?: Omit<UseMutationOptions<SubscriptionStateDto, Error, CreateSetupIntentRequest>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<SubscriptionStateDto, Error, CreateSetupIntentRequest>({
+        mutationFn: (req) => client.subscription.changePlan(req),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.setQueryData(subscriptionKeys.state(), args[0]);
+            void queryClient.invalidateQueries({ queryKey: subscriptionKeys.state() });
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
 export function useBillingPortal(options?: Omit<UseMutationOptions<PortalDto, Error, void>, 'mutationFn'>) {
     const client = useApiClient();
     return useMutation<PortalDto, Error, void>({
