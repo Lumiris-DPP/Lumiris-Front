@@ -217,7 +217,7 @@ export function PublicPassportDetail({ dpp, irisScore }: PublicPassportDetailPro
                         )}
                         {(dpp.careInstructions ?? []).length > 0 && (
                             <div className="space-y-1.5">
-                                <Label>Instructions d'entretien</Label>
+                                <Label>Instructions d&apos;entretien</Label>
                                 <div className="grid grid-cols-2 gap-1.5">
                                     {CARE_SYMBOLS.filter((s) => (dpp.careInstructions ?? []).includes(s.code)).map(
                                         (s) => (

@@ -204,7 +204,6 @@ export function PassportDetail({ passportId }: { passportId: string }) {
             .finally(() => setLoading(false));
     }, [passportId, token, draft, fixed, artisan.id]);
 
-
     if (loading) {
         return <div className="text-muted-foreground p-8 text-sm">Chargement…</div>;
     }
