@@ -9,6 +9,8 @@ export function ClientApiProvider({ children }: { children: React.ReactNode }) {
         <ApiProvider
             baseUrl={env.NEXT_PUBLIC_API_BASE_URL}
             getToken={() => useAuthStore.getState().token ?? undefined}
+            getRefreshToken={() => useAuthStore.getState().refreshToken ?? undefined}
+            onTokensRefreshed={({ token, refreshToken }) => useAuthStore.getState().updateTokens(token, refreshToken)}
             onUnauthorized={signOut}
         >
             {children}

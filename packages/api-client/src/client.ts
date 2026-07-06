@@ -4,6 +4,8 @@ import { telemetryApi } from './modules/telemetry';
 import { storageApi } from './modules/storage';
 import { subscriptionApi } from './modules/subscription';
 import { dppApi } from './modules/dpp';
+import { artisansApi } from './modules/artisans';
+import { adminArtisansApi } from './modules/admin-artisans';
 
 export type ClientOptions = HttpOptions;
 
@@ -15,6 +17,8 @@ export function createClient(opts: ClientOptions) {
         storage: storageApi(http),
         subscription: subscriptionApi(http),
         dpp: dppApi(http),
+        artisans: artisansApi(http),
+        adminArtisans: adminArtisansApi(http),
     };
 }
 

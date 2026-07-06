@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import { AlertTriangle, Coins, FileText, LayoutDashboard, ScrollText, Store, Users } from 'lucide-react';
+import { AlertTriangle, Coins, FileText, LayoutDashboard, ScrollText, ShieldCheck, Store, Users } from 'lucide-react';
 import type { AdminAction } from '@lumiris/types';
 
 export interface NavRoute {
@@ -60,6 +60,13 @@ export const NAV_GROUPS: readonly NavGroup[] = [
                 icon: Store,
                 requires: 'artisan.read',
                 shortcut: ['g', 'a'],
+            },
+            {
+                href: '/validation',
+                label: 'Validation',
+                icon: ShieldCheck,
+                requires: 'artisan.kyc_verify',
+                shortcut: ['g', 'k'],
             },
         ],
     },
