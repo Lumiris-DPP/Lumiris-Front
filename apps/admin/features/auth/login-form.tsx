@@ -14,6 +14,7 @@ import { DemoAccountsHelper } from './demo-accounts';
 const ERROR_LABELS: Record<SignInError, string> = {
     invalid_credentials: 'Identifiants invalides.',
     unknown_email: 'Aucun compte trouvé pour cet email.',
+    not_admin: "Ce compte n'a pas les droits d'administration.",
 };
 
 function isSafeNext(value: string | null): value is string {

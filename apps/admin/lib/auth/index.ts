@@ -10,4 +10,12 @@ export {
 } from './audit';
 export { RequirePermission } from './require-permission';
 export { RequireSession } from './require-session';
-export { auth, type AdminSession, type SignInError, type SignInResult } from './session';
+export {
+    auth,
+    getSessionToken,
+    getSessionRefreshToken,
+    updateSessionTokens,
+    type AdminSession,
+    type SignInError,
+    type SignInResult,
+} from './session';

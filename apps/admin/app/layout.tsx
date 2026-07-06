@@ -3,9 +3,8 @@ import { Inter } from 'next/font/google';
 import { Geist_Mono } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 
-import { ApiProvider } from '@lumiris/api-client/react';
-import { env } from '@/env';
 import { AdminUserProvider, AuditLogProvider } from '@/lib/auth';
+import { ClientApiProvider } from './api-provider';
 import { WebVitals } from './web-vitals';
 import './globals.css';
 
@@ -38,12 +37,12 @@ export default function RootLayout({
     return (
         <html lang="fr" className={`${inter.variable} ${geistMono.variable} bg-background`}>
             <body className="font-sans antialiased">
-                <ApiProvider baseUrl={env.NEXT_PUBLIC_API_BASE_URL}>
+                <ClientApiProvider>
                     <WebVitals />
                     <AdminUserProvider>
                         <AuditLogProvider>{children}</AuditLogProvider>
                     </AdminUserProvider>
-                </ApiProvider>
+                </ClientApiProvider>
                 {process.env.NODE_ENV === 'production' && <Analytics />}
             </body>
         </html>

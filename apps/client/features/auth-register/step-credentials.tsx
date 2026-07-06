@@ -58,14 +58,13 @@ export function StepCredentials({ role, onBack, onSuccess }: StepCredentialsProp
         }
 
         try {
-            const { token, user } = await registerMutation.mutateAsync({
+            const { token, refreshToken, user } = await registerMutation.mutateAsync({
                 email: parsed.data.email.trim().toLowerCase(),
                 password: parsed.data.password,
                 name: parsed.data.name.trim(),
                 role,
             });
-            const artisanProfileId = 'artisanId' in user ? ((user.artisanId as string | undefined) ?? null) : null;
-            signInWithToken(artisanProfileId, token, user.name ?? null);
+            signInWithToken(user.id, user.artisanId ?? null, user.role, token, refreshToken, user.name ?? null);
             onSuccess(user.name ?? parsed.data.name);
         } catch (err: unknown) {
             const status = (err as { status?: number })?.status;

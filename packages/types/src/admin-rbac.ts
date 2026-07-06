@@ -8,6 +8,8 @@ export type AdminAction =
     | 'passport.request_changes'
     | 'passport.override'
     | 'artisan.read'
+    | 'artisan.kyc_verify'
+    | 'artisan.kyc_reject'
     | 'artisan.suspend'
     | 'artisan.contact'
     | 'retoucheur.read'

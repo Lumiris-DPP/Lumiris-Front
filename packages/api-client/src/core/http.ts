@@ -1,8 +1,16 @@
 import { NetworkError, TimeoutError, createApiError, isApiError } from './errors';
 
+export interface RefreshedTokens {
+    token: string;
+    refreshToken: string;
+}
+
 export interface HttpOptions {
     baseUrl: string;
     getToken?: () => string | undefined;
+    /** Enables transparent refresh-and-retry on 401/403: provide alongside onTokensRefreshed. */
+    getRefreshToken?: () => string | undefined;
+    onTokensRefreshed?: (tokens: RefreshedTokens) => void;
     onUnauthorized?: () => void;
     timeoutMs?: number;
     maxRetries?: number;
@@ -46,6 +54,36 @@ export function createHttp(options: HttpOptions): Http {
     const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
     const defaultMaxRetries = options.maxRetries ?? DEFAULT_MAX_RETRIES;
 
+    // Concurrent 401/403s (e.g. several queries in flight when the access token expires)
+    // dedupe onto a single in-flight refresh instead of each firing their own.
+    let refreshPromise: Promise<boolean> | null = null;
+
+    async function refreshAccessToken(): Promise<boolean> {
+        if (refreshPromise) return refreshPromise;
+        refreshPromise = (async () => {
+            const rt = options.getRefreshToken?.();
+            if (!rt) return false;
+            try {
+                const res = await fetch(`${baseUrl}/api/auth/refresh`, {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({ refreshToken: rt }),
+                });
+                if (!res.ok) return false;
+                const tokens = (await res.json()) as RefreshedTokens;
+                options.onTokensRefreshed?.(tokens);
+                return true;
+            } catch {
+                return false;
+            }
+        })();
+        try {
+            return await refreshPromise;
+        } finally {
+            refreshPromise = null;
+        }
+    }
+
     async function executeOnce<T>(
         url: string,
         init: RequestInit,
@@ -74,12 +112,6 @@ export function createHttp(options: HttpOptions): Http {
             externalSignal?.removeEventListener('abort', onExternalAbort);
         }
 
-        if (response.status === 401) {
-            const body = await safeJson(response);
-            options.onUnauthorized?.();
-            throw createApiError(401, extractMessage(body) ?? 'Unauthorized', body);
-        }
-
         if (!response.ok) {
             const body = await safeJson(response);
             const retryAfterHeader = response.headers.get('retry-after');
@@ -99,42 +131,60 @@ export function createHttp(options: HttpOptions): Http {
     async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
         const url = buildUrl(baseUrl, path, opts.query);
         const method = opts.method ?? (opts.body !== undefined ? 'POST' : 'GET');
-
-        const isFormData = typeof FormData !== 'undefined' && opts.body instanceof FormData;
-
-        const headers: Record<string, string> = {
-            accept: 'application/json',
-            ...(opts.body !== undefined && !isFormData ? { 'content-type': 'application/json' } : {}),
-            ...(opts.headers ?? {}),
-        };
-        const token = options.getToken?.();
-        if (token) headers['authorization'] = `Bearer ${token}`;
-
-        const init: RequestInit = {
-            method,
-            headers,
-            body:
-                opts.body === undefined ? undefined : isFormData ? (opts.body as FormData) : JSON.stringify(opts.body),
-        };
-
         const skipJson = opts.skipJson ?? false;
         const maxRetries = opts.retries ?? (method === 'GET' ? defaultMaxRetries : 0);
+        const isFormData = typeof FormData !== 'undefined' && opts.body instanceof FormData;
 
-        let lastError: unknown;
-        for (let attempt = 0; attempt <= maxRetries; attempt++) {
-            try {
-                return await executeOnce<T>(url, init, skipJson, opts.signal);
-            } catch (err) {
-                lastError = err;
-                if (attempt >= maxRetries || !shouldRetry(err)) break;
-                const delay =
-                    isApiError(err) && err.code === 'RATE_LIMITED' && typeof err.retryAfter === 'number'
-                        ? err.retryAfter * 1000
-                        : calculateRetryDelay(attempt);
-                await sleep(delay);
-            }
+        function buildInit(): RequestInit {
+            const headers: Record<string, string> = {
+                accept: 'application/json',
+                ...(opts.body !== undefined && !isFormData ? { 'content-type': 'application/json' } : {}),
+                ...(opts.headers ?? {}),
+            };
+            const token = options.getToken?.();
+            if (token) headers['authorization'] = `Bearer ${token}`;
+            return {
+                method,
+                headers,
+                body:
+                    opts.body === undefined
+                        ? undefined
+                        : isFormData
+                          ? (opts.body as FormData)
+                          : JSON.stringify(opts.body),
+            };
         }
-        throw lastError;
+
+        async function attempt(): Promise<T> {
+            let lastError: unknown;
+            for (let i = 0; i <= maxRetries; i++) {
+                try {
+                    return await executeOnce<T>(url, buildInit(), skipJson, opts.signal);
+                } catch (err) {
+                    lastError = err;
+                    if (i >= maxRetries || !shouldRetry(err)) break;
+                    const delay =
+                        isApiError(err) && err.code === 'RATE_LIMITED' && typeof err.retryAfter === 'number'
+                            ? err.retryAfter * 1000
+                            : calculateRetryDelay(i);
+                    await sleep(delay);
+                }
+            }
+            throw lastError;
+        }
+
+        try {
+            return await attempt();
+        } catch (err) {
+            const isAuthFailure = isApiError(err) && (err.code === 'AUTH_ERROR' || err.code === 'FORBIDDEN');
+            if (isAuthFailure && options.getRefreshToken) {
+                if (await refreshAccessToken()) return await attempt();
+                options.onUnauthorized?.();
+            } else if (isAuthFailure) {
+                options.onUnauthorized?.();
+            }
+            throw err;
+        }
     }
 
     return { request, baseUrl };
