@@ -50,18 +50,13 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
             originCountry: draft.garment.originCountry ?? null,
             availableSizes: draft.garment.availableSizes ?? null,
             colors: draft.garment.colors ?? null,
-            mainPhotoUrl: draft.garment.mainPhotoUrl || null,
             materials: draft.materials.map((m) => ({
                 fiber: m.fiber,
                 percentage: m.percentage,
                 originCountry: m.originCountry,
             })),
             careInstructions: draft.careInstructions,
-            certifications: draft.certifications.map((c) => ({
-                name: c.name,
-                customName: c.customName ?? null,
-                licenseNumber: c.licenseNumber ?? null,
-            })),
+            careNotes: draft.careNotes || null,
             manufacturedAt: draft.traceability.manufacturedAt,
             batchNumber: draft.traceability.batchNumber ?? null,
             gtin: draft.traceability.gtin ?? null,
@@ -75,7 +70,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
 
         try {
             if (token) {
-                await createDpp.mutateAsync(payload);
+                await createDpp.mutateAsync({ payload, files: draft.files });
             }
             deleteDraft(draftId);
             router.push('/passports');

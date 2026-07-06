@@ -10,7 +10,7 @@ import {
 
 import { createKeys } from '../core/keys';
 import { CACHE_TIMES } from '../core/cache';
-import type { DppFormDto, DppFormPayload, DppFormSummaryDto } from '../types/dpp';
+import type { DppFilePart, DppFormCreatedDto, DppFormDto, DppFormPayload, DppFormSummaryDto } from '../types/dpp';
 
 import { useApiClient } from '../core/provider';
 import { subscriptionKeys } from './subscription';
@@ -37,11 +37,18 @@ export function useDppForm(id: string, options?: Omit<UseQueryOptions<DppFormDto
     });
 }
 
-export function useCreateDppForm(options?: Omit<UseMutationOptions<DppFormDto, Error, DppFormPayload>, 'mutationFn'>) {
+export interface CreateDppFormVars {
+    payload: DppFormPayload;
+    files?: Partial<Record<DppFilePart, File>>;
+}
+
+export function useCreateDppForm(
+    options?: Omit<UseMutationOptions<DppFormCreatedDto, Error, CreateDppFormVars>, 'mutationFn'>,
+) {
     const client = useApiClient();
     const queryClient = useQueryClient();
-    return useMutation<DppFormDto, Error, DppFormPayload>({
-        mutationFn: (payload) => client.dpp.create(payload),
+    return useMutation<DppFormCreatedDto, Error, CreateDppFormVars>({
+        mutationFn: ({ payload, files }) => client.dpp.create(payload, files),
         ...options,
         onSuccess: (...args) => {
             void queryClient.invalidateQueries({ queryKey: dppKeys.all });

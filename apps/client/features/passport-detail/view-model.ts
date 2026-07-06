@@ -58,11 +58,7 @@ export function buildDetailView(passport: Passport, dpp: DppFormDto | null): Det
             originCountry: m.originCountry ?? null,
         })),
         careInstructions: [...(dpp?.careInstructions ?? [])],
-        certifications: (dpp?.certifications ?? []).map((c) => ({
-            name: c.name,
-            customName: c.customName ?? null,
-            licenseNumber: c.licenseNumber ?? null,
-        })),
+        certifications: [],
 
         manufacturedAt: dpp?.manufacturedAt ?? null,
         batchNumber: dpp?.batchNumber ?? null,

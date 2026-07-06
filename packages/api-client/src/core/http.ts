@@ -100,9 +100,11 @@ export function createHttp(options: HttpOptions): Http {
         const url = buildUrl(baseUrl, path, opts.query);
         const method = opts.method ?? (opts.body !== undefined ? 'POST' : 'GET');
 
+        const isFormData = typeof FormData !== 'undefined' && opts.body instanceof FormData;
+
         const headers: Record<string, string> = {
             accept: 'application/json',
-            ...(opts.body !== undefined ? { 'content-type': 'application/json' } : {}),
+            ...(opts.body !== undefined && !isFormData ? { 'content-type': 'application/json' } : {}),
             ...(opts.headers ?? {}),
         };
         const token = options.getToken?.();
@@ -111,7 +113,8 @@ export function createHttp(options: HttpOptions): Http {
         const init: RequestInit = {
             method,
             headers,
-            body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+            body:
+                opts.body === undefined ? undefined : isFormData ? (opts.body as FormData) : JSON.stringify(opts.body),
         };
 
         const skipJson = opts.skipJson ?? false;

@@ -26,8 +26,10 @@ export interface DraftPassport {
     materials: DppMaterial[];
     careInstructions: CareInstructionCode[];
     certifications: DppCertification[];
+    careNotes: string;
     traceability: TraceabilityInfo;
     eco: EcoInfo;
+    files: Partial<Record<string, File>>;
     lastStep?: WizardStep;
 }
 
@@ -40,8 +42,10 @@ interface DraftStoreState {
     setMaterials: (id: string, materials: DppMaterial[]) => void;
     setCareInstructions: (id: string, careInstructions: CareInstructionCode[]) => void;
     setCertifications: (id: string, certifications: DppCertification[]) => void;
+    setCareNotes: (id: string, careNotes: string) => void;
     setTraceability: (id: string, traceability: TraceabilityInfo) => void;
     setEco: (id: string, eco: EcoInfo) => void;
+    setFile: (id: string, docType: string, file: File | null) => void;
     setLastStep: (id: string, step: WizardStep) => void;
     deleteDraft: (id: string) => void;
 }
@@ -95,8 +99,10 @@ export const useDraftStore = create<DraftStoreState>()((set, get) => ({
             materials: [],
             careInstructions: [],
             certifications: [],
+            careNotes: '',
             traceability: emptyTraceability(),
             eco: {},
+            files: {},
         };
         set((s) => ({ ...s, drafts: { ...s.drafts, [draftId]: draft } }));
         return draftId;
@@ -109,8 +115,18 @@ export const useDraftStore = create<DraftStoreState>()((set, get) => ({
     setMaterials: (id, materials) => set((s) => patch(s, id, { materials })),
     setCareInstructions: (id, careInstructions) => set((s) => patch(s, id, { careInstructions })),
     setCertifications: (id, certifications) => set((s) => patch(s, id, { certifications })),
+    setCareNotes: (id, careNotes) => set((s) => patch(s, id, { careNotes })),
     setTraceability: (id, traceability) => set((s) => patch(s, id, { traceability })),
     setEco: (id, eco) => set((s) => patch(s, id, { eco })),
+    setFile: (id, docType, file) =>
+        set((s) => {
+            const draft = s.drafts[id];
+            if (!draft) return s;
+            const files = { ...draft.files };
+            if (file === null) delete files[docType];
+            else files[docType] = file;
+            return { ...s, drafts: { ...s.drafts, [id]: { ...draft, files, updatedAt: new Date().toISOString() } } };
+        }),
     setLastStep: (id, step) => set((s) => patch(s, id, { lastStep: step })),
 
     deleteDraft: (id) => {

@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { CareInstructionCode, DppCertification, DppMaterial } from '@lumiris/types';
+import { Label } from '@lumiris/ui/components/label';
+import { Textarea } from '@lumiris/ui/components/textarea';
 import { WizardStepFrame } from '@/features/wizard-shell/step-frame';
 import { useStepNavigation } from '@/features/wizard-shell/use-step-navigation';
 import { useDraftStore } from '@/lib/draft-store';
@@ -14,17 +16,20 @@ export function CreateStepCare({ draftId }: { draftId: string }) {
     const setMaterials = useDraftStore((s) => s.setMaterials);
     const setCareInstructions = useDraftStore((s) => s.setCareInstructions);
     const setCertifications = useDraftStore((s) => s.setCertifications);
+    const setCareNotes = useDraftStore((s) => s.setCareNotes);
     const { goNext, goTo } = useStepNavigation(draftId);
 
     const [materials, setLocalMaterials] = useState<DppMaterial[]>(draft?.materials ?? []);
     const [care, setLocalCare] = useState<CareInstructionCode[]>(draft?.careInstructions ?? []);
     const [certs, setLocalCerts] = useState<DppCertification[]>(draft?.certifications ?? []);
+    const [careNotes, setLocalCareNotes] = useState<string>(draft?.careNotes ?? '');
 
     useEffect(() => {
         if (draft) {
             setLocalMaterials(draft.materials);
             setLocalCare(draft.careInstructions);
             setLocalCerts(draft.certifications);
+            setLocalCareNotes(draft.careNotes);
         }
     }, [draft]);
 
@@ -37,6 +42,7 @@ export function CreateStepCare({ draftId }: { draftId: string }) {
         setMaterials(draftId, materials);
         setCareInstructions(draftId, care);
         setCertifications(draftId, certs);
+        setCareNotes(draftId, careNotes);
     };
 
     const handleNext = () => {
@@ -93,6 +99,19 @@ export function CreateStepCare({ draftId }: { draftId: string }) {
             />
             <CareSymbolsSection care={care} onToggle={toggleCare} />
             <CertificationsSection certs={certs} onToggle={toggleCert} onUpdateLicense={updateCertLicense} />
+
+            <section className="space-y-2">
+                <Label htmlFor="care-notes" className="text-base font-semibold">
+                    Notes d&apos;entretien
+                </Label>
+                <Textarea
+                    id="care-notes"
+                    value={careNotes}
+                    rows={4}
+                    placeholder="Conseils spécifiques d'entretien, précautions particulières, recommandations du fabricant…"
+                    onChange={(e) => setLocalCareNotes(e.target.value)}
+                />
+            </section>
         </WizardStepFrame>
     );
 }
