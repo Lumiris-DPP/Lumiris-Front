@@ -85,3 +85,23 @@ export function slugify(input: string): string {
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '');
 }
+
+/** Date courte FR (jj/mm/aaaa). Accepte un ISO ou un Date ; « — » si vide/invalide. */
+export function formatDateFr(value: string | Date | undefined | null): string {
+    if (!value) return '—';
+    const d = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(d.getTime())) return typeof value === 'string' ? value : '—';
+    return d.toLocaleDateString('fr-FR');
+}
+
+/** Montant en euros, sans décimales (locale FR). */
+export function formatEur(n: number): string {
+    return n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+}
+
+/** Taille de fichier lisible (B / KB / MB). */
+export function formatBytes(n: number): string {
+    if (n < 1024) return `${n} B`;
+    if (n < 1024 * 1024) return `${(n / 1024).toFixed(0)} KB`;
+    return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}

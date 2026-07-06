@@ -7,6 +7,7 @@ import { ArrowLeft, ExternalLink, LifeBuoy, Mail, Send } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@lumiris/ui/components/accordion';
 import { Textarea } from '@lumiris/ui/components/textarea';
 import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
+import { SectionLabel } from '@/lib/section';
 
 interface FaqEntry {
     q: string;
@@ -160,7 +161,7 @@ function Header() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <section className="flex flex-col gap-3">
-            <h2 className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">{title}</h2>
+            <SectionLabel title={title} />
             <GlassCard intensity="subtle" className="flex flex-col p-4">
                 {children}
             </GlassCard>

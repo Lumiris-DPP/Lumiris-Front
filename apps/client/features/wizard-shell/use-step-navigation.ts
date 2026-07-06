@@ -2,14 +2,21 @@
 
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
-import type { GarmentInfo, DppMaterial, CareInstructionCode, TraceabilityInfo, EcoInfo } from '@lumiris/types';
+import type {
+    GarmentInfo,
+    DppMaterial,
+    CareInstructionCode,
+    DppCertification,
+    TraceabilityInfo,
+    EcoInfo,
+} from '@lumiris/types';
 import { useDraftStore, type WizardStep } from '@/lib/draft-store';
 
 export interface DraftLike {
     garment: GarmentInfo;
     materials: readonly DppMaterial[];
     careInstructions: readonly CareInstructionCode[];
-    careNotes: string;
+    certifications: readonly DppCertification[];
     traceability: TraceabilityInfo;
     eco: EcoInfo;
 }

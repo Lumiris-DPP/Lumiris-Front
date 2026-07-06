@@ -1,18 +1,22 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import type { DppStatus } from '@/lib/dpp-api';
-import { useDppForms } from '@/lib/use-dpp-forms';
+import { QrCode } from 'lucide-react';
+import type { DppStatus } from '@lumiris/api-client';
+import { useDppForms } from '@lumiris/api-client/react';
 import { Button } from '@lumiris/ui/components/button';
 import { Input } from '@lumiris/ui/components/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@lumiris/ui/components/select';
+import { useAuthStore } from '@/lib/auth-store';
+import { EmptyState } from '@/features/empty-state';
+import { CreatePassportCta } from '@/features/quota-upsell/create-passport-cta';
 import { DppTable } from './dpp-table';
-import { EmptyState } from './empty-state';
 
 type StatusFilter = DppStatus | 'all';
 
 export function PassportsList() {
-    const { dppForms, loading, error } = useDppForms();
+    const token = useAuthStore((s) => s.token);
+    const { data: dppForms = [], isLoading: loading, error } = useDppForms({ enabled: Boolean(token) });
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
@@ -30,13 +34,21 @@ export function PassportsList() {
     }
 
     if (error) {
-        return <div className="text-destructive p-8 text-sm">Erreur : {error}</div>;
+        return <div className="text-destructive p-8 text-sm">Erreur : {error.message}</div>;
     }
 
     if (dppForms.length === 0) {
         return (
             <div className="space-y-6 p-8">
-                <EmptyState />
+                <EmptyState
+                    icon={QrCode}
+                    title="Vous n'avez pas encore de passeport"
+                    description="Créez votre premier passeport numérique produit pour documenter une pièce textile et générer son QR."
+                >
+                    <CreatePassportCta className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 text-white">
+                        Créer mon premier passeport
+                    </CreatePassportCta>
+                </EmptyState>
             </div>
         );
     }

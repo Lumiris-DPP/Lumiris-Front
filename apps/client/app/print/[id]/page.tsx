@@ -1,10 +1,9 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
 import { use } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
-import { mockPassportById } from '@lumiris/mock-data';
-import { useDraftStore, draftToPassport } from '@/lib/draft-store';
+import { usePassportSource } from '@/lib/use-passport-source';
+import { useAutoPrint } from '@/lib/use-auto-print';
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -12,17 +11,9 @@ interface PageProps {
 
 export default function PrintLabelPage({ params }: PageProps) {
     const { id } = use(params);
-    const draft = useDraftStore((s) => s.drafts[id]);
-    const fixed = useMemo(() => mockPassportById(id), [id]);
-    const passport = draft ? draftToPassport(draft) : fixed;
+    const { passport } = usePassportSource(id);
 
-    useEffect(() => {
-        if (passport) {
-            const t = window.setTimeout(() => window.print(), 250);
-            return () => window.clearTimeout(t);
-        }
-        return undefined;
-    }, [passport]);
+    useAutoPrint(Boolean(passport));
 
     if (!passport) {
         return <p className="p-12 text-center font-mono text-sm">Passeport introuvable.</p>;

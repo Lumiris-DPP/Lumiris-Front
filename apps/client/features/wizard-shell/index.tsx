@@ -1,14 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useRef } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@lumiris/ui/components/alert';
 import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
-import { IrisScoreCard } from '@lumiris/scoring-ui';
-import type { DppScoreInput } from '@lumiris/types';
 import { useDraftStore, type WizardStep } from '@/lib/draft-store';
+import { ScoreSidebar } from './score-sidebar';
 import { Stepper } from './stepper';
 
 export { STEP_VALIDATORS } from './step-validators';
@@ -35,36 +33,10 @@ export function WizardShell({
     hideNav = false,
 }: WizardShellProps) {
     const draft = useDraftStore((s) => s.drafts[draftId]);
-    const navigatingRef = useRef(false);
-
-    const draftPayload = useMemo(
-        (): DppScoreInput => ({
-            originCountry: draft?.garment?.originCountry,
-            repairable: draft?.eco?.isRepairable,
-            reachCompliant: draft?.traceability?.reachCompliant,
-            endOfLifeInstructions: draft?.eco?.endOfLifeInstructions,
-            materialOriginCountries: draft?.materials?.map((m) => m.originCountry) ?? [],
-            presentDocuments: Object.keys(draft?.files ?? {}),
-        }),
-        [
-            draft?.garment?.originCountry,
-            draft?.traceability?.reachCompliant,
-            draft?.eco,
-            draft?.materials,
-            draft?.files,
-        ],
-    );
 
     if (!draft) return <DraftNotFound />;
 
     const nextDisabled = nextMissing.length > 0;
-
-    const handleNext = onNext
-        ? () => {
-              navigatingRef.current = true;
-              onNext();
-          }
-        : undefined;
 
     return (
         <div className="grid gap-6 p-6 lg:grid-cols-[1fr_280px] lg:p-8">
@@ -72,7 +44,7 @@ export function WizardShell({
                 <Stepper draftId={draftId} currentStep={step} draft={draft} />
                 {nextMissing.length > 0 && <MissingAlert missing={nextMissing} />}
                 <div>{children}</div>
-                {!hideNav && (onPrev || handleNext) && (
+                {!hideNav && (onPrev || onNext) && (
                     <div className="flex items-center justify-between gap-3 pt-2">
                         {onPrev ? (
                             <Button variant="outline" onClick={onPrev}>
@@ -81,9 +53,9 @@ export function WizardShell({
                         ) : (
                             <span />
                         )}
-                        {handleNext && (
+                        {onNext && (
                             <Button
-                                onClick={handleNext}
+                                onClick={onNext}
                                 disabled={nextDisabled}
                                 className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 text-white"
                             >
@@ -93,9 +65,7 @@ export function WizardShell({
                     </div>
                 )}
             </div>
-            <div className="lg:sticky lg:top-20 lg:self-start">
-                <IrisScoreCard draft={navigatingRef.current ? undefined : draftPayload} variant="responsive" />
-            </div>
+            <ScoreSidebar />
         </div>
     );
 }

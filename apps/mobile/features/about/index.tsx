@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowLeft, FileText, LifeBuoy, Mail, ShieldCheck, Sparkles } from 'lucide-react';
 import { LUMIRIS_WEIGHTS } from '@lumiris/core/scoring';
+import { SectionLabel } from '@/lib/section';
 
 interface ScorePillar {
     weight: number;
@@ -173,7 +174,7 @@ export function About() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <section className="flex flex-col gap-3">
-            <h2 className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">{title}</h2>
+            <SectionLabel title={title} />
             <div className="border-border/60 bg-card/60 rounded-2xl border p-4 backdrop-blur-md">{children}</div>
         </section>
     );

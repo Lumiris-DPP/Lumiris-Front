@@ -2,7 +2,9 @@
 
 import { useMemo } from 'react';
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
+import { safeJSONStorage } from './persist-storage';
+import { appendToArtisan, removeFromArtisan } from './artisan-list';
 import { mockCertificates } from '@lumiris/mock-data';
 import type { CertificationKind, CertificationRef } from '@lumiris/types';
 
@@ -48,39 +50,22 @@ interface CertificatesStoreState {
     removeCertificate: (artisanId: string, id: string) => void;
 }
 
-const noopStorage = {
-    getItem: () => null,
-    setItem: () => undefined,
-    removeItem: () => undefined,
-};
-
 export const useCertificatesStore = create<CertificatesStoreState>()(
     persist(
         (set) => ({
             byArtisan: {},
             expiredOverrides: {},
-            addCertificate: (cert) =>
-                set((s) => ({
-                    byArtisan: {
-                        ...s.byArtisan,
-                        [cert.artisanId]: [...(s.byArtisan[cert.artisanId] ?? []), cert],
-                    },
-                })),
+            addCertificate: (cert) => set((s) => ({ byArtisan: appendToArtisan(s.byArtisan, cert.artisanId, cert) })),
             markExpired: (id) =>
                 set((s) => ({
                     expiredOverrides: { ...s.expiredOverrides, [id]: true },
                 })),
             removeCertificate: (artisanId, id) =>
-                set((s) => ({
-                    byArtisan: {
-                        ...s.byArtisan,
-                        [artisanId]: (s.byArtisan[artisanId] ?? []).filter((c) => c.id !== id),
-                    },
-                })),
+                set((s) => ({ byArtisan: removeFromArtisan(s.byArtisan, artisanId, id) })),
         }),
         {
             name: 'atelier-certs',
-            storage: createJSONStorage(() => (typeof window === 'undefined' ? noopStorage : localStorage)),
+            storage: safeJSONStorage,
             version: 1,
         },
     ),

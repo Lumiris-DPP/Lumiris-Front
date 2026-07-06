@@ -10,6 +10,7 @@ import { Label } from '@lumiris/ui/components/label';
 import { Switch } from '@lumiris/ui/components/switch';
 import { Tabs, TabsList, TabsTrigger } from '@lumiris/ui/components/tabs';
 import { useUser } from '@/lib/auth';
+import { SectionLabel } from '@/lib/section';
 import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
 import { updateSettings, useSettings, type Settings, type ThemePref } from '@/lib/settings';
 
@@ -80,7 +81,7 @@ function NotConnectedNotice() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <section className="flex flex-col gap-3">
-            <h2 className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">{title}</h2>
+            <SectionLabel title={title} />
             <GlassCard intensity="subtle" className="flex flex-col">
                 {children}
             </GlassCard>

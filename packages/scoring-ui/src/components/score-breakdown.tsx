@@ -4,7 +4,6 @@ import type { HTMLAttributes } from 'react';
 import { LUMIRIS_WEIGHTS } from '@lumiris/core/scoring';
 import type { IrisAxis, ScoreBreakdown as ScoreBreakdownData, ScoreWeights } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@lumiris/ui/components/tooltip';
 import { AXIS_COLOR, AXIS_LABEL } from '../theme/grade-color';
 
 export interface ScoreBreakdownProps extends HTMLAttributes<HTMLDivElement> {
@@ -13,21 +12,18 @@ export interface ScoreBreakdownProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const AXES_ORDER: readonly IrisAxis[] = ['transparency', 'craftsmanship', 'impact', 'repairability'];
-const DISABLED_AXES = new Set<IrisAxis>(['impact']);
 
 export function ScoreBreakdown({ breakdown, weights = LUMIRIS_WEIGHTS, className, ...rest }: ScoreBreakdownProps) {
     return (
         <div className={cn('space-y-2', className)} {...rest}>
             {AXES_ORDER.map((axis) => {
-                const disabled = DISABLED_AXES.has(axis);
                 const score = breakdown[axis];
                 const weight = weights[axis];
                 const cap = weight * 100;
                 const weighted = (score * weight).toFixed(1);
                 const tone = `bg-${AXIS_COLOR[axis]}`;
-
-                const row = (
-                    <div key={axis} className={cn('space-y-1', disabled && 'select-none opacity-40')}>
+                return (
+                    <div key={axis} className="space-y-1">
                         <div className="flex items-baseline justify-between text-xs">
                             <span className="text-foreground font-medium">{AXIS_LABEL[axis]}</span>
                             <span className="text-muted-foreground font-mono">
@@ -48,17 +44,6 @@ export function ScoreBreakdown({ breakdown, weights = LUMIRIS_WEIGHTS, className
                             />
                         </div>
                     </div>
-                );
-
-                if (!disabled) return row;
-
-                return (
-                    <Tooltip key={axis}>
-                        <TooltipTrigger asChild>
-                            <div className="cursor-default">{row}</div>
-                        </TooltipTrigger>
-                        <TooltipContent>Element en cours d&apos;implémentation</TooltipContent>
-                    </Tooltip>
                 );
             })}
         </div>

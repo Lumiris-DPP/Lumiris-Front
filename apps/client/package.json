@@ -20,6 +20,8 @@
         "@lumiris/types": "workspace:*",
         "@lumiris/ui": "workspace:*",
         "@lumiris/utils": "workspace:*",
+        "@stripe/react-stripe-js": "^6.6.0",
+        "@stripe/stripe-js": "^9.8.0",
         "lucide-react": "^0.564.0",
         "next": "^16.2.4",
         "qrcode.react": "^4.2.0",

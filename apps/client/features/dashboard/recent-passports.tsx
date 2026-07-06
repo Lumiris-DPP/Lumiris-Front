@@ -5,6 +5,7 @@ import { ArrowRight, FileText } from 'lucide-react';
 import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import { AtelierStatusBadge, IrisGrade, MissingFieldsBadge } from '@lumiris/scoring-ui';
+import { formatDateFr } from '@lumiris/utils';
 import type { ScoredPassport } from './derive';
 
 export function RecentPassports({ items }: { items: readonly ScoredPassport[] }) {
@@ -40,8 +41,7 @@ export function RecentPassports({ items }: { items: readonly ScoredPassport[] })
                                     {passport.garment.reference || 'Brouillon sans référence'}
                                 </p>
                                 <p className="text-muted-foreground text-xs">
-                                    {passport.garment.kind} · modifié le{' '}
-                                    {new Date(passport.updatedAt).toLocaleDateString('fr-FR')}
+                                    {passport.garment.kind} · modifié le {formatDateFr(passport.updatedAt)}
                                 </p>
                             </div>
                             <AtelierStatusBadge status={passport.status} />

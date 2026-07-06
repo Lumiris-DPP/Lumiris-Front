@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { computeExternalScore } from '@/lib/iris/external-score';
 import { addExternalDpp, removeFromWardrobe, useWardrobe } from '@/lib/wardrobe-storage';
 import { toast } from '@/lib/toast';
+import { SectionHeading } from '@/lib/section';
 import { ScoreHero } from '@/features/passport-detail/score-hero';
 import { ScoreSheet } from '@/features/passport-detail/score-sheet';
 
@@ -195,10 +196,6 @@ function Layer({ delay, children }: { delay: number; children: React.ReactNode }
             {children}
         </motion.section>
     );
-}
-
-function SectionHeading({ children }: { children: React.ReactNode }) {
-    return <h2 className="text-foreground text-xs font-semibold uppercase tracking-[0.18em]">{children}</h2>;
 }
 
 interface ExternalMaterialRowProps {

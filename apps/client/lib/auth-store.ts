@@ -1,7 +1,8 @@
 'use client';
 
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
+import { safeJSONStorage } from './persist-storage';
 
 const ATELIER_AUTH_STORAGE_KEY = 'atelier-auth';
 
@@ -10,18 +11,10 @@ interface AuthState {
     token: string | null;
     userName: string | null;
     signedInAt: number | null;
-    /** Demo mode: sign in with a mock artisan ID (no token) */
-    signIn: (id: string) => void;
-    /** Real mode: sign in with JWT token and user data from the API */
+    /** Sign in with the JWT token and user data returned by `POST /api/auth/login`. */
     signInWithToken: (artisanId: string | null, token: string, userName: string | null) => void;
     signOut: () => void;
 }
-
-const noopStorage = {
-    getItem: () => null,
-    setItem: () => undefined,
-    removeItem: () => undefined,
-};
 
 export const useAuthStore = create<AuthState>()(
     persist(
@@ -30,7 +23,6 @@ export const useAuthStore = create<AuthState>()(
             token: null,
             userName: null,
             signedInAt: null,
-            signIn: (id) => set({ artisanId: id, token: null, userName: null, signedInAt: Date.now() }),
             signInWithToken: (artisanId, token, userName) =>
                 set({ artisanId, token, userName, signedInAt: Date.now() }),
             signOut: () => {
@@ -40,7 +32,7 @@ export const useAuthStore = create<AuthState>()(
         }),
         {
             name: ATELIER_AUTH_STORAGE_KEY,
-            storage: createJSONStorage(() => (typeof window === 'undefined' ? noopStorage : localStorage)),
+            storage: safeJSONStorage,
             version: 2,
             partialize: (s) => ({
                 artisanId: s.artisanId,
@@ -52,7 +44,6 @@ export const useAuthStore = create<AuthState>()(
     ),
 );
 
-export const signIn = (id: string) => useAuthStore.getState().signIn(id);
 export const signInWithToken = (artisanId: string | null, token: string, userName: string | null) =>
     useAuthStore.getState().signInWithToken(artisanId, token, userName);
 export const signOut = () => useAuthStore.getState().signOut();

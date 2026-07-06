@@ -1,7 +1,8 @@
 'use client';
 
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
+import { safeJSONStorage } from './persist-storage';
 import { generateInitialTeam, type TeamMember, type TeamMemberRole } from '@lumiris/mock-data';
 
 export { TIER_SEATS } from '@lumiris/mock-data';
@@ -14,12 +15,6 @@ interface TeamStoreState {
     changeRole: (artisanId: string, memberId: string, role: TeamMemberRole) => void;
     remove: (artisanId: string, memberId: string) => void;
 }
-
-const noopStorage = {
-    getItem: () => null,
-    setItem: () => undefined,
-    removeItem: () => undefined,
-};
 
 function newMemberId(): string {
     return `mbr-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
@@ -75,7 +70,7 @@ export const useTeamStore = create<TeamStoreState>()(
         {
             name: 'atelier-team',
             version: 1,
-            storage: createJSONStorage(() => (typeof window === 'undefined' ? noopStorage : localStorage)),
+            storage: safeJSONStorage,
         },
     ),
 );

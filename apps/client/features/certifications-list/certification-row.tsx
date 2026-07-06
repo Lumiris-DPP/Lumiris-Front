@@ -13,8 +13,8 @@ import {
     DropdownMenuTrigger,
 } from '@lumiris/ui/components/dropdown-menu';
 import { TableCell, TableRow } from '@lumiris/ui/components/table';
+import { formatDateFr } from '@lumiris/utils';
 import { isMockCertificate, type ArtisanCertificate } from '@/lib/certificates-store';
-import { formatDateFr } from '@/lib/list-helpers';
 import { certLabel, isExpiringSoon } from './certification-status';
 
 interface Props {

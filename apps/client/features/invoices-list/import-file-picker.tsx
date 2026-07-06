@@ -4,8 +4,9 @@ import { useId, useRef } from 'react';
 import { FileText, Upload, X } from 'lucide-react';
 import { Button } from '@lumiris/ui/components/button';
 import { Input } from '@lumiris/ui/components/input';
+import { formatBytes } from '@lumiris/utils';
 import { cn } from '@lumiris/ui/lib/cn';
-import { formatBytes } from '@/lib/list-helpers';
+import { MAX_UPLOAD_LABEL, isImageMime } from '@/lib/file-upload';
 
 export interface PickedFile {
     name: string;
@@ -28,7 +29,7 @@ export function ImportFilePicker({ file, dragActive, onDragActiveChange, onFiles
     const inputId = useId();
 
     if (file) {
-        const isImage = file.type.startsWith('image/');
+        const isImage = isImageMime(file.type);
         return (
             <div className="border-border bg-card flex items-center gap-3 rounded-lg border p-3">
                 {isImage ? (
@@ -74,7 +75,7 @@ export function ImportFilePicker({ file, dragActive, onDragActiveChange, onFiles
         >
             <Upload className="text-muted-foreground h-6 w-6" />
             <p className="text-foreground text-sm font-medium">Glissez une facture ou cliquez ici</p>
-            <p className="text-muted-foreground text-xs">PDF · JPG · PNG · 5 MB max</p>
+            <p className="text-muted-foreground text-xs">PDF · JPG · PNG · {MAX_UPLOAD_LABEL} max</p>
             <Input
                 id={inputId}
                 ref={inputRef}

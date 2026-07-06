@@ -8,6 +8,7 @@ import { cn } from '@lumiris/ui/lib/cn';
 import type { GarmentKind } from '@lumiris/types';
 import { KIND_LABEL_FR } from '@lumiris/utils';
 import { SECTOR_LABEL_FR, type WardrobeSector } from '@/lib/wardrobe-storage';
+import { SectionLabel } from '@/lib/section';
 
 export type VaultSort = 'recent' | 'oldest' | 'grade-desc' | 'price-asc' | 'price-desc';
 
@@ -223,7 +224,7 @@ export function FiltersSheet({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <section className="flex flex-col gap-3">
-            <h3 className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">{title}</h3>
+            <SectionLabel title={title} />
             {children}
         </section>
     );

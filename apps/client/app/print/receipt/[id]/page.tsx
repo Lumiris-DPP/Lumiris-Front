@@ -1,8 +1,10 @@
 'use client';
 
-import { use, useEffect, useMemo } from 'react';
+import { use, useMemo } from 'react';
+import { formatDateFr } from '@lumiris/utils';
 import { useBilling, useBillingHydrated } from '@/lib/billing-store';
 import { useCurrentArtisan } from '@/lib/current-artisan';
+import { useAutoPrint } from '@/lib/use-auto-print';
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -16,14 +18,7 @@ export default function PrintReceiptPage({ params }: PageProps) {
 
     const entry = useMemo(() => billing.invoiceHistory.find((e) => e.id === id), [billing.invoiceHistory, id]);
 
-    useEffect(() => {
-        if (!hydrated) return;
-        if (entry) {
-            const t = window.setTimeout(() => window.print(), 250);
-            return () => window.clearTimeout(t);
-        }
-        return undefined;
-    }, [hydrated, entry]);
+    useAutoPrint(hydrated && Boolean(entry));
 
     if (!hydrated) {
         return <p className="p-12 text-center font-mono text-sm text-neutral-700">Chargement…</p>;
@@ -47,7 +42,7 @@ export default function PrintReceiptPage({ params }: PageProps) {
                 </header>
 
                 <section className="space-y-1.5 text-sm">
-                    <Row label="Émis le">{date.toLocaleDateString('fr-FR')}</Row>
+                    <Row label="Émis le">{formatDateFr(date)}</Row>
                     <Row label="Atelier">{artisan.atelierName}</Row>
                     <Row label="Plan">{entry.plan}</Row>
                     <Row label="Statut">payé</Row>

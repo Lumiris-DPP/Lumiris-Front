@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useAuthStore } from './auth-store';
+import { makeHydratedHook } from './use-store-hydrated';
 
 export function useAuthArtisanId(): string | null {
     return useAuthStore((s) => s.artisanId);
@@ -15,17 +15,4 @@ export function useAuthUserName(): string | null {
     return useAuthStore((s) => s.userName);
 }
 
-export function useAuthHydrated(): boolean {
-    const [hydrated, setHydrated] = useState(() => useAuthStore.persist.hasHydrated());
-
-    useEffect(() => {
-        if (useAuthStore.persist.hasHydrated()) {
-            setHydrated(true);
-            return;
-        }
-        const unsub = useAuthStore.persist.onFinishHydration(() => setHydrated(true));
-        return unsub;
-    }, []);
-
-    return hydrated;
-}
+export const useAuthHydrated = makeHydratedHook(useAuthStore);
