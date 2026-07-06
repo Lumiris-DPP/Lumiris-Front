@@ -43,6 +43,8 @@ const ROLE_FAMILY: Record<AdminAction, AdminUserRole | null> = {
     'passport.request_changes': 'curator',
     'passport.override': 'lead_curator',
     'artisan.read': null,
+    'artisan.kyc_verify': 'curator',
+    'artisan.kyc_reject': 'curator',
     'artisan.suspend': 'platform_admin',
     'artisan.contact': 'curator',
     'retoucheur.read': null,

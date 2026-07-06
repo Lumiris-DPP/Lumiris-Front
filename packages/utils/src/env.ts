@@ -192,6 +192,17 @@ function parseOne(key: string, spec: EnvSpec, raw: string | undefined): { value:
 }
 
 function readProcessEnv(): EnvSource {
-    const g = globalThis as { process?: { env?: Record<string, string | undefined> } };
-    return g.process?.env ?? {};
+    // Next.js only inlines `process.env.NEXT_PUBLIC_X` as a literal expression per key —
+    // a dynamic object grab like `globalThis.process.env` is invisible to that static
+    // replacement, so every NEXT_PUBLIC_* var would silently fall back to its schema
+    // default in the browser bundle. Each key must be spelled out here.
+    return {
+        NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
+        NEXT_PUBLIC_WEB_VITALS_SAMPLE_RATE: process.env.NEXT_PUBLIC_WEB_VITALS_SAMPLE_RATE,
+        NEXT_PUBLIC_OTEL_EXPORTER_OTLP_ENDPOINT: process.env.NEXT_PUBLIC_OTEL_EXPORTER_OTLP_ENDPOINT,
+        NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
+        NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+        NEXT_PUBLIC_TAURI: process.env.NEXT_PUBLIC_TAURI,
+        NODE_ENV: process.env.NODE_ENV,
+    };
 }

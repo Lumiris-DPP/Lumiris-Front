@@ -14,6 +14,8 @@ export interface ApiProviderProps extends Omit<QueryProviderProps, 'client'>, Om
 export function ApiProvider({
     baseUrl,
     getToken,
+    getRefreshToken,
+    onTokensRefreshed,
     onUnauthorized,
     timeoutMs,
     maxRetries,
@@ -24,6 +26,8 @@ export function ApiProvider({
         createClient({
             baseUrl,
             ...(getToken !== undefined ? { getToken } : {}),
+            ...(getRefreshToken !== undefined ? { getRefreshToken } : {}),
+            ...(onTokensRefreshed !== undefined ? { onTokensRefreshed } : {}),
             ...(onUnauthorized !== undefined ? { onUnauthorized } : {}),
             ...(timeoutMs !== undefined ? { timeoutMs } : {}),
             ...(maxRetries !== undefined ? { maxRetries } : {}),

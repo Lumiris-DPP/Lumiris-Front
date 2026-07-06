@@ -6,6 +6,8 @@ export { useListQuery, useDetailQuery, useStaticQuery, useRealtimeQuery } from '
 export { createSubResourceMutations, type EntityApi, type SubResourceKeys, type IdField } from './mutations';
 
 export { authKeys, useLogin, useRegister, useMe } from './auth';
+export { artisanKeys, useArtisanMe, useArtisanRegister, useSignDeclaration } from './artisans';
+export { adminArtisanKeys, useAdminArtisansList, useVerifyArtisan, useRejectArtisan } from './admin-artisans';
 export { storageKeys, useUploadUrl, useDownloadUrl } from './storage';
 export { useWebVital } from './telemetry';
 

@@ -9,6 +9,8 @@ export interface User {
     anon?: boolean;
     createdAt: string;
     lastSeenAt?: string;
+    /** Backend artisan-profile id — present once the artisan has completed KYB onboarding. */
+    artisanId?: string;
 }
 
 export interface ConsumerProfile extends User {

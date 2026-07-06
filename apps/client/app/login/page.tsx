@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ShieldCheck, Sparkles } from 'lucide-react';
 import { z } from 'zod';
-import { mockArtisans } from '@lumiris/mock-data';
 import { Button } from '@lumiris/ui/components/button';
 import { Card } from '@lumiris/ui/components/card';
 import { Input } from '@lumiris/ui/components/input';
@@ -88,12 +87,11 @@ export default function LoginPage() {
 
         // Real mode: call the API
         try {
-            const { token, user } = await loginMutation.mutateAsync({
+            const { token, refreshToken, user } = await loginMutation.mutateAsync({
                 email: normalizedEmail,
                 password: parsed.data.password,
             });
-            const artisanProfileId = 'artisanId' in user ? ((user.artisanId as string | undefined) ?? null) : null;
-            signInWithToken(artisanProfileId, token, user.name ?? null);
+            signInWithToken(user.id, user.artisanId ?? null, user.role, token, refreshToken, user.name ?? null);
             const firstName = user.name?.split(' ')[0] ?? 'vous';
             toast.success(`Bienvenue ${firstName}`);
             router.push('/dashboard');

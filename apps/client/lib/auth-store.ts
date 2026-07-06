@@ -2,18 +2,34 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import type { UserRole } from '@lumiris/types';
 
 const ATELIER_AUTH_STORAGE_KEY = 'atelier-auth';
 
 interface AuthState {
+    /** Stable per-account id, always set once logged in (demo or real). Used to gate/key onboarding state. */
+    userId: string | null;
+    /** Backend artisan-profile id — null until KYB onboarding creates the profile. */
     artisanId: string | null;
+    /** Only 'artisan' accounts go through KYB onboarding — other roles skip it entirely. */
+    role: UserRole | null;
     token: string | null;
+    refreshToken: string | null;
     userName: string | null;
     signedInAt: number | null;
     /** Demo mode: sign in with a mock artisan ID (no token) */
     signIn: (id: string) => void;
     /** Real mode: sign in with JWT token and user data from the API */
-    signInWithToken: (artisanId: string | null, token: string, userName: string | null) => void;
+    signInWithToken: (
+        userId: string,
+        artisanId: string | null,
+        role: UserRole,
+        token: string,
+        refreshToken: string,
+        userName: string | null,
+    ) => void;
+    /** Called by the api-client after a transparent token refresh. */
+    updateTokens: (token: string, refreshToken: string) => void;
     signOut: () => void;
 }
 
@@ -26,25 +42,49 @@ const noopStorage = {
 export const useAuthStore = create<AuthState>()(
     persist(
         (set) => ({
+            userId: null,
             artisanId: null,
+            role: null,
             token: null,
+            refreshToken: null,
             userName: null,
             signedInAt: null,
-            signIn: (id) => set({ artisanId: id, token: null, userName: null, signedInAt: Date.now() }),
-            signInWithToken: (artisanId, token, userName) =>
-                set({ artisanId, token, userName, signedInAt: Date.now() }),
+            signIn: (id) =>
+                set({
+                    userId: id,
+                    artisanId: id,
+                    role: 'artisan',
+                    token: null,
+                    refreshToken: null,
+                    userName: null,
+                    signedInAt: Date.now(),
+                }),
+            signInWithToken: (userId, artisanId, role, token, refreshToken, userName) =>
+                set({ userId, artisanId, role, token, refreshToken, userName, signedInAt: Date.now() }),
+            updateTokens: (token, refreshToken) => set({ token, refreshToken }),
             signOut: () => {
-                set({ artisanId: null, token: null, userName: null, signedInAt: null });
+                set({
+                    userId: null,
+                    artisanId: null,
+                    role: null,
+                    token: null,
+                    refreshToken: null,
+                    userName: null,
+                    signedInAt: null,
+                });
                 void useAuthStore.persist.clearStorage();
             },
         }),
         {
             name: ATELIER_AUTH_STORAGE_KEY,
             storage: createJSONStorage(() => (typeof window === 'undefined' ? noopStorage : localStorage)),
-            version: 2,
+            version: 5,
             partialize: (s) => ({
+                userId: s.userId,
                 artisanId: s.artisanId,
+                role: s.role,
                 token: s.token,
+                refreshToken: s.refreshToken,
                 userName: s.userName,
                 signedInAt: s.signedInAt,
             }),
@@ -53,6 +93,12 @@ export const useAuthStore = create<AuthState>()(
 );
 
 export const signIn = (id: string) => useAuthStore.getState().signIn(id);
-export const signInWithToken = (artisanId: string | null, token: string, userName: string | null) =>
-    useAuthStore.getState().signInWithToken(artisanId, token, userName);
+export const signInWithToken = (
+    userId: string,
+    artisanId: string | null,
+    role: UserRole,
+    token: string,
+    refreshToken: string,
+    userName: string | null,
+) => useAuthStore.getState().signInWithToken(userId, artisanId, role, token, refreshToken, userName);
 export const signOut = () => useAuthStore.getState().signOut();

@@ -9,6 +9,8 @@ export const ACTION_TONE: Record<AdminAction, string> = {
     'passport.request_changes': 'text-lumiris-amber',
     'passport.override': 'text-lumiris-amber',
     'artisan.read': 'text-muted-foreground',
+    'artisan.kyc_verify': 'text-lumiris-emerald',
+    'artisan.kyc_reject': 'text-lumiris-rose',
     'artisan.suspend': 'text-lumiris-rose',
     'artisan.contact': 'text-lumiris-cyan',
     'retoucheur.read': 'text-muted-foreground',
