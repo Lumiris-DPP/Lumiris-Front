@@ -70,7 +70,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         if (awaitingLiveCheck) return;
         if (status === 'unregistered') {
             router.replace('/onboarding');
-            
         }
     }, [hydrated, userId, status, router, awaitingLiveCheck]);
 
