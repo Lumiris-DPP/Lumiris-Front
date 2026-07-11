@@ -5,11 +5,13 @@ import { Menu } from 'lucide-react';
 import { Button } from '@lumiris/ui/components/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@lumiris/ui/components/tooltip';
 import { cn } from '@lumiris/ui/lib/cn';
+import type { QuotaDto, SubscriptionDto } from '@lumiris/api-client';
 import { NotificationsBell } from '@/features/notifications-bell';
 import { UserMenu } from '@/features/user-menu';
 import { useWorkspaceShell } from '@/features/workspace-shell';
 import { useWorkspaceNotifications } from '@/features/workspace-shell/hooks';
 import { useCurrentArtisan } from '@/lib/current-artisan';
+import { useSubscription } from '@/lib/use-subscription';
 
 interface WorkspaceHeaderProps {
     title: string;
@@ -21,6 +23,7 @@ export function WorkspaceHeader({ title, description, actions }: WorkspaceHeader
     const { openSidebar } = useWorkspaceShell();
     const artisan = useCurrentArtisan();
     const notifications = useWorkspaceNotifications(artisan);
+    const { subscription, quota, isRealMode } = useSubscription();
 
     return (
         <header className="border-border bg-card sticky top-0 z-20 border-b">
@@ -42,12 +45,45 @@ export function WorkspaceHeader({ title, description, actions }: WorkspaceHeader
 
                 <div className="flex items-center gap-2 md:gap-3">
                     {actions}
-                    <TierBadge tier={artisan.tier} />
+                    {isRealMode ? (
+                        <QuotaBadge subscription={subscription} quota={quota} />
+                    ) : (
+                        <TierBadge tier={artisan.tier} />
+                    )}
                     <NotificationsBell notifications={notifications} />
                     <UserMenu artisan={artisan} />
                 </div>
             </div>
         </header>
+    );
+}
+
+function QuotaBadge({ subscription, quota }: { subscription: SubscriptionDto | null; quota: QuotaDto | null }) {
+    const active = Boolean(subscription?.active && quota?.hasActiveSubscription);
+    const label = active && subscription ? subscription.tierLabel.replace('ATELIER ', '') : 'Sans abo';
+    const usage = quota ? (quota.unlimited ? `${quota.used}/∞` : `${quota.used}/${quota.limit ?? '—'}`) : '';
+    const nearLimit = active && quota && !quota.unlimited && quota.limit ? quota.used / quota.limit >= 0.9 : false;
+
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <Link
+                    href="/subscription"
+                    className={cn(
+                        'flex items-center gap-1 rounded-md px-2 py-1 font-mono text-[10px] font-semibold uppercase',
+                        !active && 'bg-lumiris-amber/15 text-lumiris-amber',
+                        active && !nearLimit && 'bg-lumiris-emerald/15 text-lumiris-emerald',
+                        active && nearLimit && 'bg-lumiris-amber/15 text-lumiris-amber',
+                    )}
+                >
+                    {label}
+                    {active && <span className="font-mono normal-case">{usage}</span>}
+                </Link>
+            </TooltipTrigger>
+            <TooltipContent>
+                {active ? `Passeports : ${usage} — voir l’abonnement` : 'Aucun abonnement actif — souscrire'}
+            </TooltipContent>
+        </Tooltip>
     );
 }
 

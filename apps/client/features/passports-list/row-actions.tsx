@@ -11,7 +11,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@lumiris/ui/components/dropdown-menu';
-import { isDraftLike, resumeHref } from './status';
+import { useDraftStore } from '@/lib/draft-store';
+import { isDraftLike, resumeHref } from '@/lib/passport-status';
 
 interface RowActionsProps {
     passport: Passport;
@@ -24,6 +25,7 @@ interface RowActionsProps {
 export function RowActions({ passport, onShowQr, onDuplicate, onPreview, onDelete }: RowActionsProps) {
     const isPublished = passport.status === 'Published';
     const draftLike = isDraftLike(passport.status);
+    const lastStep = useDraftStore((s) => s.drafts[passport.id]?.lastStep);
     const ref = passport.garment.reference || passport.id;
     return (
         <DropdownMenu>
@@ -35,7 +37,7 @@ export function RowActions({ passport, onShowQr, onDuplicate, onPreview, onDelet
             <DropdownMenuContent align="end" className="w-52">
                 {draftLike && (
                     <DropdownMenuItem asChild>
-                        <Link href={resumeHref(passport)}>
+                        <Link href={resumeHref(passport, lastStep)}>
                             <Pencil className="h-3.5 w-3.5" /> Continuer
                         </Link>
                     </DropdownMenuItem>

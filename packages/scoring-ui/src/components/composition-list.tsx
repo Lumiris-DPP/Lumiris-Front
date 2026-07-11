@@ -3,27 +3,16 @@
 import type { HTMLAttributes } from 'react';
 import { ShieldCheck, ShieldX } from 'lucide-react';
 import { getEffectiveStatus } from '@lumiris/types';
-import type { CertificationRef, Fiber, Material } from '@lumiris/types';
+import type { CertificationRef, Material } from '@lumiris/types';
 import { Badge } from '@lumiris/ui/components/badge';
 import { cn } from '@lumiris/ui/lib/cn';
+import { FIBER_LABEL } from '../theme/dpp-labels';
 
 export interface CompositionListProps extends HTMLAttributes<HTMLDivElement> {
     composition: readonly Material[];
     now: Date;
     resolveSupplier?: (supplierId: string) => string | undefined;
 }
-
-const FIBER_LABEL: Record<Fiber, string> = {
-    wool: 'Laine',
-    linen: 'Lin',
-    cotton: 'Coton',
-    silk: 'Soie',
-    hemp: 'Chanvre',
-    leather: 'Cuir',
-    cashmere: 'Cachemire',
-    'recycled-polyester': 'Polyester recyclé',
-    other: 'Autre',
-};
 
 export function CompositionList({ composition, now, resolveSupplier, className, ...rest }: CompositionListProps) {
     if (composition.length === 0) {

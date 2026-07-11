@@ -96,6 +96,13 @@ export function ScanPassport() {
             setStatus('matched');
             return;
         }
+        if (result.kind === 'public-code') {
+            if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(60);
+            incrementScanCounter();
+            stopCamera();
+            router.push(`/p/${result.code}`);
+            return;
+        }
         if (result.kind === 'external' || result.kind === 'unknown') {
             stopCamera();
             setStatus('unknown');

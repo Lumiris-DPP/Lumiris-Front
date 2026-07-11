@@ -139,10 +139,18 @@ export interface Passport {
 export type GarmentCategory = 'top' | 'bottom' | 'dress' | 'outerwear' | 'shoe' | 'accessory' | 'other';
 
 export type CareInstructionCode =
-    | 'wash-30' | 'wash-40' | 'wash-60' | 'no-wash'
-    | 'dry-clean' | 'no-dry-clean'
-    | 'tumble-dry' | 'no-tumble'
-    | 'iron-low' | 'iron-med' | 'iron-high' | 'no-iron';
+    | 'wash-30'
+    | 'wash-40'
+    | 'wash-60'
+    | 'no-wash'
+    | 'dry-clean'
+    | 'no-dry-clean'
+    | 'tumble-dry'
+    | 'no-tumble'
+    | 'iron-low'
+    | 'iron-med'
+    | 'iron-high'
+    | 'no-iron';
 
 export interface DppCertification {
     name: 'GOTS' | 'OEKO-TEX' | 'Fair-Trade' | 'other';

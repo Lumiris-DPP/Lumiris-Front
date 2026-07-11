@@ -6,6 +6,7 @@ type FrameResult =
     | { kind: 'no-frame' }
     | { kind: 'no-code' }
     | { kind: 'matched'; passport: Passport; raw: string }
+    | { kind: 'public-code'; code: string; raw: string }
     | { kind: 'external'; dpp: ExternalDpp; raw: string }
     | { kind: 'unknown'; raw: string };
 
@@ -30,6 +31,9 @@ export function processVideoFrame(video: HTMLVideoElement, canvas: HTMLCanvasEle
     const resolved = resolvePassportFromScan(decoded);
     if (resolved.kind === 'lumiris-passport') {
         return { kind: 'matched', passport: resolved.passport, raw: code.data };
+    }
+    if (resolved.kind === 'lumiris-public-code') {
+        return { kind: 'public-code', code: resolved.code, raw: code.data };
     }
     if (resolved.kind === 'external-dpp') {
         return { kind: 'external', dpp: resolved.dpp, raw: code.data };

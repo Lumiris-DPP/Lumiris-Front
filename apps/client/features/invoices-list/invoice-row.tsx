@@ -11,8 +11,8 @@ import {
     DropdownMenuTrigger,
 } from '@lumiris/ui/components/dropdown-menu';
 import { TableCell, TableRow } from '@lumiris/ui/components/table';
+import { formatDateFr, formatEur } from '@lumiris/utils';
 import type { InvoiceView } from '@/lib/invoices-store';
-import { formatDateFr, formatEur } from '@/lib/list-helpers';
 import { INVOICE_BADGE_TONE, INVOICE_STATUS_LABELS } from './invoice-status';
 
 interface Props {

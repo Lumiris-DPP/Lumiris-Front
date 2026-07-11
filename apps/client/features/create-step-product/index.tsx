@@ -1,31 +1,16 @@
 'use client';
 
-import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
-import { ImagePlus, X } from 'lucide-react';
-import type { GarmentInfo, GarmentCategory } from '@lumiris/types';
+import type { GarmentInfo } from '@lumiris/types';
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { Textarea } from '@lumiris/ui/components/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@lumiris/ui/components/select';
-import { Badge } from '@lumiris/ui/components/badge';
 import { WizardStepFrame } from '@/features/wizard-shell/step-frame';
 import { useStepNavigation } from '@/features/wizard-shell/use-step-navigation';
 import { useDraftStore } from '@/lib/draft-store';
-import { readFileAsDataUrl } from '@lumiris/utils';
+import { draftToValidationInput } from '@/features/wizard-shell/validation-input';
 import { validateStep } from './schema';
-
-const CATEGORIES: ReadonlyArray<{ value: GarmentCategory; label: string }> = [
-    { value: 'top', label: 'Haut (t-shirt, pull, chemise…)' },
-    { value: 'bottom', label: 'Bas (pantalon, jupe, short…)' },
-    { value: 'dress', label: 'Robe / Combinaison' },
-    { value: 'outerwear', label: 'Veste / Manteau' },
-    { value: 'shoe', label: 'Chaussure' },
-    { value: 'accessory', label: 'Accessoire' },
-    { value: 'other', label: 'Autre' },
-];
-
-const SIZES = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', 'Unique'];
+import { CategoryField, ColorsField, PhotoField, SizesField } from './product-fields';
 
 export function CreateStepProduct({ draftId }: { draftId: string }) {
     const draft = useDraftStore((s) => s.drafts[draftId]);
@@ -43,34 +28,16 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
             currency: 'EUR',
         },
     );
-    const [colorInput, setColorInput] = useState('');
 
     useEffect(() => {
         if (draft) setForm(draft.garment);
     }, [draft]);
 
-    const validation = useMemo(
-        () =>
-            validateStep({
-                garment: form,
-                materials: draft?.materials ?? [],
-                careInstructions: draft?.careInstructions ?? [],
-                certifications: draft?.certifications ?? [],
-                traceability: draft?.traceability ?? { manufacturedAt: '', reachCompliant: false },
-                eco: draft?.eco ?? {},
-            }),
-        [form, draft],
-    );
+    const validation = useMemo(() => validateStep(draftToValidationInput(draft, { garment: form })), [form, draft]);
 
     const handleNext = () => {
         setGarment(draftId, form);
         goNext('product', 'care');
-    };
-
-    const handlePhoto = async (file: File | undefined) => {
-        if (!file) return;
-        const dataUrl = await readFileAsDataUrl(file);
-        setForm((f) => ({ ...f, mainPhotoUrl: dataUrl }));
     };
 
     const toggleSize = (size: string) => {
@@ -81,20 +48,6 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
         }));
     };
 
-    const addColor = () => {
-        const trimmed = colorInput.trim();
-        if (!trimmed) return;
-        const current = form.colors ?? [];
-        if (!current.includes(trimmed)) {
-            setForm((f) => ({ ...f, colors: [...current, trimmed] }));
-        }
-        setColorInput('');
-    };
-
-    const removeColor = (color: string) => {
-        setForm((f) => ({ ...f, colors: (f.colors ?? []).filter((c) => c !== color) }));
-    };
-
     return (
         <WizardStepFrame
             draftId={draftId}
@@ -103,7 +56,6 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
             nextMissing={validation.ok ? [] : validation.missing}
             contentClassName="grid gap-5 md:grid-cols-2"
         >
-            {/* Nom du modèle */}
             <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="name">
                     Nom du modèle <span className="text-destructive">*</span>
@@ -117,7 +69,6 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
                 />
             </div>
 
-            {/* Description commerciale */}
             <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="description">Description commerciale</Label>
                 <Textarea
@@ -130,32 +81,11 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
                 />
             </div>
 
-            {/* Catégorie */}
-            <div className="space-y-2">
-                <Label htmlFor="category">
-                    Catégorie <span className="text-destructive">*</span>
-                </Label>
-                <Select
-                    value={form.category ?? ''}
-                    onValueChange={(v) => setForm((f) => ({ ...f, category: v as GarmentCategory }))}
-                >
-                    <SelectTrigger id="category">
-                        <SelectValue placeholder="Sélectionner…" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {CATEGORIES.map((c) => (
-                            <SelectItem key={c.value} value={c.value}>
-                                {c.label}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
+            <CategoryField value={form.category} onChange={(category) => setForm((f) => ({ ...f, category }))} />
 
-            {/* Pays d'origine */}
             <div className="space-y-2">
                 <Label htmlFor="origin">
-                    Pays d'origine <span className="text-destructive">*</span>
+                    Pays d&apos;origine <span className="text-destructive">*</span>
                 </Label>
                 <Input
                     id="origin"
@@ -169,100 +99,11 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
                 </p>
             </div>
 
-            {/* Photo principale */}
-            <div className="space-y-2 md:col-span-2">
-                <Label>Photo principale</Label>
-                <label className="border-border bg-muted/40 hover:bg-muted relative flex h-44 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed text-center transition-colors">
-                    {form.mainPhotoUrl ? (
-                        <Image
-                            src={form.mainPhotoUrl}
-                            alt="Visuel principal"
-                            fill
-                            sizes="(min-width: 768px) 50vw, 100vw"
-                            unoptimized
-                            className="rounded-xl object-cover"
-                        />
-                    ) : (
-                        <>
-                            <ImagePlus className="text-muted-foreground mb-2 h-6 w-6" />
-                            <p className="text-muted-foreground text-sm">Glissez ou cliquez pour ajouter une photo</p>
-                        </>
-                    )}
-                    <input
-                        type="file"
-                        accept="image/*"
-                        aria-label="Importer la photo principale du produit"
-                        className="absolute inset-0 cursor-pointer opacity-0"
-                        onChange={(e) => handlePhoto(e.target.files?.[0])}
-                    />
-                </label>
-            </div>
+            <PhotoField url={form.mainPhotoUrl} onPick={(url) => setForm((f) => ({ ...f, mainPhotoUrl: url }))} />
 
-            {/* Tailles disponibles */}
-            <div className="space-y-2 md:col-span-2">
-                <Label>Tailles disponibles</Label>
-                <div className="flex flex-wrap gap-2">
-                    {SIZES.map((size) => {
-                        const selected = (form.availableSizes ?? []).includes(size);
-                        return (
-                            <button
-                                key={size}
-                                type="button"
-                                onClick={() => toggleSize(size)}
-                                className={`rounded-md border px-3 py-1 text-sm transition-colors ${
-                                    selected
-                                        ? 'bg-lumiris-emerald border-lumiris-emerald text-white'
-                                        : 'border-border text-muted-foreground hover:border-lumiris-emerald'
-                                }`}
-                            >
-                                {size}
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
+            <SizesField selected={form.availableSizes ?? []} onToggle={toggleSize} />
 
-            {/* Couleurs */}
-            <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="color-input">Couleurs</Label>
-                <div className="flex gap-2">
-                    <Input
-                        id="color-input"
-                        value={colorInput}
-                        placeholder="Écru, Marine, Terracotta…"
-                        onChange={(e) => setColorInput(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                addColor();
-                            }
-                        }}
-                    />
-                    <button
-                        type="button"
-                        onClick={addColor}
-                        className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 rounded-md px-3 text-sm text-white"
-                    >
-                        Ajouter
-                    </button>
-                </div>
-                {(form.colors ?? []).length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                        {(form.colors ?? []).map((color) => (
-                            <Badge key={color} variant="secondary" className="gap-1">
-                                {color}
-                                <button
-                                    type="button"
-                                    onClick={() => removeColor(color)}
-                                    aria-label={`Supprimer ${color}`}
-                                >
-                                    <X className="h-3 w-3" />
-                                </button>
-                            </Badge>
-                        ))}
-                    </div>
-                )}
-            </div>
+            <ColorsField colors={form.colors ?? []} onChange={(colors) => setForm((f) => ({ ...f, colors }))} />
         </WizardStepFrame>
     );
 }

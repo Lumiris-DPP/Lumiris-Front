@@ -36,3 +36,12 @@ export interface ScoreResult {
     reasons: readonly ScoreReason[];
     cap?: ScoreCap;
 }
+
+export interface DppScoreInput {
+    originCountry?: string;
+    repairable?: boolean;
+    reachCompliant?: boolean;
+    endOfLifeInstructions?: string;
+    materialOriginCountries?: string[];
+    presentDocuments?: string[];
+}

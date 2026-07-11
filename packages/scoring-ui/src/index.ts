@@ -45,6 +45,13 @@ export {
     gradeBorder2px,
     type GradeColorToken,
 } from './theme/grade-color';
+export {
+    FIBER_LABEL,
+    GARMENT_KIND_LABEL,
+    STAGE_LABEL,
+    GARMENT_CATEGORY_LABEL,
+    garmentCategoryLabel,
+} from './theme/dpp-labels';
 
 export { useComputeScore } from './hooks/use-compute-score';
 export { useUniqueCertificates } from './hooks/use-unique-certificates';

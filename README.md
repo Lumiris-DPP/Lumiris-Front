@@ -14,14 +14,20 @@ for app in admin site client mobile; do
   cp apps/$app/.env.example apps/$app/.env.local
 done
 
-# 2. Start the local infra + backend + front via the orchestrator
-cd ../Lumiris-Infra && make all-up
+# 2. Start the whole stack (infra + backend + front + stripe) via the orchestrator
+cd ../Lumiris-Infra && make dev
 
-# 3. Or, run only the fronts locally (infra must already be up)
+# 3. Or, run only the fronts locally (infra + backend must already be up)
 cd ../Lumiris-Front && bun dev
 ```
 
-Chaque app pointe par defaut vers `localhost:8080`
+> **Première fois ?** La base doit être migrée **et** seedée, sinon pas de compte
+> pour se connecter. Voir le guide complet (étapes DB + identifiants de démo) dans
+> [`../Lumiris-Infra/README.md`](../Lumiris-Infra/README.md). Comptes seed :
+> `artisan@lumiris.com` / `artisan123` (app **client**, 3003), etc.
+
+Chaque app pointe par défaut vers `localhost:8080` (via `apps/<app>/.env.local` →
+`NEXT_PUBLIC_API_BASE_URL`).
 
 URLs once the stack is up (see `../Lumiris-Infra/docs/SERVICES.md`):
 

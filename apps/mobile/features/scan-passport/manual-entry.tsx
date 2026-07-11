@@ -4,14 +4,27 @@ import { useCallback, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sheet, SheetContent, SheetTitle } from '@lumiris/ui/components/sheet';
 
-const PASSPORT_URL_RE = /lumiris\.(?:fr|com)\/(?:passeport|p)\/([\w-]+)/i;
+const PUBLIC_CODE_URL_RE = /\/p\/([\w-]{8})\b/i;
+const PASSPORT_URL_RE = /lumiris\.(?:fr|com)\/passeport\/([\w-]+)/i;
+const PUBLIC_CODE_RE = /^[A-Z0-9]{8}$/i;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-function extractPassportId(input: string): string | null {
+type Destination = { route: '/p/[code]'; code: string } | { route: '/passeport/[id]'; id: string } | null;
+
+function resolveDestination(input: string): Destination {
     const trimmed = input.trim();
     if (!trimmed) return null;
-    const url = trimmed.match(PASSPORT_URL_RE);
-    if (url?.[1]) return url[1];
-    return trimmed;
+
+    const publicUrlMatch = trimmed.match(PUBLIC_CODE_URL_RE);
+    if (publicUrlMatch?.[1]) return { route: '/p/[code]', code: publicUrlMatch[1].toUpperCase() };
+
+    const passportUrlMatch = trimmed.match(PASSPORT_URL_RE);
+    if (passportUrlMatch?.[1]) return { route: '/passeport/[id]', id: passportUrlMatch[1] };
+
+    if (PUBLIC_CODE_RE.test(trimmed)) return { route: '/p/[code]', code: trimmed.toUpperCase() };
+    if (UUID_RE.test(trimmed)) return { route: '/passeport/[id]', id: trimmed };
+
+    return null;
 }
 
 interface ManualEntrySheetProps {
@@ -26,11 +39,15 @@ export function ManualEntrySheet({ open, onOpenChange }: ManualEntrySheetProps) 
 
     const submit = useCallback(() => {
         if (settledRef.current) return;
-        const id = extractPassportId(value);
-        if (!id) return;
+        const dest = resolveDestination(value);
+        if (!dest) return;
         settledRef.current = true;
         onOpenChange(false);
-        router.push(`/passeport/${id}`);
+        if (dest.route === '/p/[code]') {
+            router.push(`/p/${dest.code}`);
+        } else {
+            router.push(`/passeport/${dest.id}`);
+        }
     }, [router, value, onOpenChange]);
 
     return (
@@ -54,7 +71,7 @@ export function ManualEntrySheet({ open, onOpenChange }: ManualEntrySheetProps) 
                         }
                     }}
                     onBlur={submit}
-                    placeholder="GTIN ou lumiris.com/p/..."
+                    placeholder="Code DPP (ex : ABC12345) ou URL"
                     autoComplete="off"
                     autoCapitalize="off"
                     spellCheck={false}

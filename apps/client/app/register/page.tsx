@@ -6,20 +6,20 @@ import { useRouter } from 'next/navigation';
 import { Sparkles } from 'lucide-react';
 import { Card } from '@lumiris/ui/components/card';
 import { RegisterForm } from '@/features/auth-register';
-import { useAuthArtisanId, useAuthHydrated } from '@/lib/use-auth';
+import { useAuthUserId, useAuthHydrated } from '@/lib/use-auth';
 
 export default function RegisterPage() {
     const router = useRouter();
     const hydrated = useAuthHydrated();
-    const artisanId = useAuthArtisanId();
+    const userId = useAuthUserId();
 
     useEffect(() => {
-        if (hydrated && artisanId) {
+        if (hydrated && userId) {
             router.replace('/dashboard');
         }
-    }, [hydrated, artisanId, router]);
+    }, [hydrated, userId, router]);
 
-    if (!hydrated || artisanId) return null;
+    if (!hydrated || userId) return null;
 
     return (
         <div className="bg-background flex min-h-screen flex-col">

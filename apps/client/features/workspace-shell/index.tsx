@@ -41,6 +41,40 @@ const NAV_ITEMS: readonly NavItem[] = [
     { href: '/subscription', label: 'Abonnement', icon: Wallet },
 ];
 
+function isNavActive(pathname: string, href: string): boolean {
+    return href === '/dashboard'
+        ? pathname === '/' || pathname.startsWith('/dashboard')
+        : pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function NavLink({ item, active, onNavigate }: { item: NavItem; active: boolean; onNavigate?: () => void }) {
+    const Icon = item.icon;
+    return (
+        <li>
+            <Link
+                href={item.href}
+                onClick={onNavigate}
+                className={
+                    item.primary
+                        ? cn(
+                              'bg-lumiris-cyan hover:bg-lumiris-cyan/90 my-2 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white shadow-sm transition-opacity',
+                              active && 'ring-lumiris-cyan/30 ring-2 ring-offset-1',
+                          )
+                        : cn(
+                              'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
+                              active
+                                  ? 'bg-lumiris-cyan/10 text-lumiris-cyan font-medium'
+                                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                          )
+                }
+            >
+                <Icon className="h-4 w-4" />
+                {item.label}
+            </Link>
+        </li>
+    );
+}
+
 interface WorkspaceShellContextValue {
     openSidebar: () => void;
 }
@@ -109,50 +143,16 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
             <nav className="flex-1 overflow-y-auto px-3 py-4">
                 <ul className="space-y-1">
-                    {NAV_ITEMS.map((item) => {
-                        if (item.plusOnly && !hasAtelierPlus) return null;
-                        const isActive =
-                            item.href === '/dashboard'
-                                ? pathname === '/' || pathname.startsWith('/dashboard')
-                                : pathname === item.href || pathname.startsWith(`${item.href}/`);
-                        const Icon = item.icon;
-
-                        if (item.primary) {
-                            return (
-                                <li key={item.href}>
-                                    <Link
-                                        href={item.href}
-                                        onClick={onNavigate}
-                                        className={cn(
-                                            'bg-lumiris-cyan hover:bg-lumiris-cyan/90 my-2 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white shadow-sm transition-opacity',
-                                            isActive && 'ring-lumiris-cyan/30 ring-2 ring-offset-1',
-                                        )}
-                                    >
-                                        <Icon className="h-4 w-4" />
-                                        {item.label}
-                                    </Link>
-                                </li>
-                            );
-                        }
-
-                        return (
-                            <li key={item.href}>
-                                <Link
-                                    href={item.href}
-                                    onClick={onNavigate}
-                                    className={cn(
-                                        'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
-                                        isActive
-                                            ? 'bg-lumiris-cyan/10 text-lumiris-cyan font-medium'
-                                            : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                                    )}
-                                >
-                                    <Icon className="h-4 w-4" />
-                                    {item.label}
-                                </Link>
-                            </li>
-                        );
-                    })}
+                    {NAV_ITEMS.map((item) =>
+                        item.plusOnly && !hasAtelierPlus ? null : (
+                            <NavLink
+                                key={item.href}
+                                item={item}
+                                active={isNavActive(pathname, item.href)}
+                                onNavigate={onNavigate}
+                            />
+                        ),
+                    )}
                 </ul>
             </nav>
 

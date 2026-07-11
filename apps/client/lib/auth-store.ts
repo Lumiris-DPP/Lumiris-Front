@@ -1,8 +1,9 @@
 'use client';
 
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 import type { UserRole } from '@lumiris/types';
+import { safeJSONStorage } from './persist-storage';
 
 const ATELIER_AUTH_STORAGE_KEY = 'atelier-auth';
 
@@ -32,12 +33,6 @@ interface AuthState {
     updateTokens: (token: string, refreshToken: string) => void;
     signOut: () => void;
 }
-
-const noopStorage = {
-    getItem: () => null,
-    setItem: () => undefined,
-    removeItem: () => undefined,
-};
 
 export const useAuthStore = create<AuthState>()(
     persist(
@@ -77,7 +72,7 @@ export const useAuthStore = create<AuthState>()(
         }),
         {
             name: ATELIER_AUTH_STORAGE_KEY,
-            storage: createJSONStorage(() => (typeof window === 'undefined' ? noopStorage : localStorage)),
+            storage: safeJSONStorage,
             version: 5,
             partialize: (s) => ({
                 userId: s.userId,

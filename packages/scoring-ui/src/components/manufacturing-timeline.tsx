@@ -2,24 +2,13 @@
 
 import type { HTMLAttributes } from 'react';
 import { CheckCircle2, MapPin } from 'lucide-react';
-import type { ProductionStep, StageKind } from '@lumiris/types';
+import type { ProductionStep } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
+import { STAGE_LABEL } from '../theme/dpp-labels';
 
 export interface ManufacturingTimelineProps extends HTMLAttributes<HTMLDivElement> {
     steps: readonly ProductionStep[];
 }
-
-const KIND_LABEL: Record<StageKind, string> = {
-    weaving: 'Tissage',
-    dyeing: 'Teinture',
-    cutting: 'Coupe',
-    sewing: 'Couture',
-    finishing: 'Finition',
-    embroidery: 'Broderie',
-    assembly: 'Assemblage',
-    'quality-check': 'Contrôle qualité',
-    other: 'Étape',
-};
 
 export function ManufacturingTimeline({ steps, className, ...rest }: ManufacturingTimelineProps) {
     if (steps.length === 0) {
@@ -44,7 +33,7 @@ export function ManufacturingTimeline({ steps, className, ...rest }: Manufacturi
                             <div className="flex items-baseline justify-between gap-3">
                                 <p className="text-foreground text-sm font-medium">{step.label}</p>
                                 <span className="text-muted-foreground font-mono text-[10px] uppercase tracking-wider">
-                                    {KIND_LABEL[step.kind]}
+                                    {STAGE_LABEL[step.kind]}
                                 </span>
                             </div>
                             <p className="text-muted-foreground mt-0.5 text-xs">

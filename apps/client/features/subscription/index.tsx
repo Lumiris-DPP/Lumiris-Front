@@ -1,116 +1,193 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { Sparkles } from 'lucide-react';
-import { toast } from '@lumiris/ui/components/sonner';
-import type { ArtisanTier } from '@lumiris/types';
-import { ATELIER_PASSPORT_LIMIT_LABEL, usePassportCount } from '@/features/workspace-shell/hooks';
-import { ATELIER_PLUS_LABEL, atelierPlusAmount, planAmount, useBilling, useBillingStore } from '@/lib/billing-store';
-import { useCurrentArtisan } from '@/lib/current-artisan';
-import { BillingHistory } from './billing-history';
-import { ChangePlanDialog } from './change-plan-dialog';
-import { CurrentPlanCard } from './current-plan-card';
-import { ATELIER_PLANS, TIER_TO_PLAN, isDowngrade } from './plans-data';
-import { PlansGrid } from './plans-grid';
+import { lazy, Suspense, type ReactNode } from 'react';
+import { ExternalLink, Loader2, ShieldCheck } from 'lucide-react';
+import { formatDate } from '@lumiris/utils';
+import { Badge } from '@lumiris/ui/components/badge';
+import { Button } from '@lumiris/ui/components/button';
+import { Card, CardContent } from '@lumiris/ui/components/card';
+import { cn } from '@lumiris/ui/lib/cn';
+import { useSubscriptionPage } from './hooks';
+import { PlanCard } from './plan-card';
+
+const CheckoutDialog = lazy(() => import('./checkout-dialog').then((m) => ({ default: m.CheckoutDialog })));
+
+type SubscriptionPage = ReturnType<typeof useSubscriptionPage>;
 
 export function Subscription() {
-    const searchParams = useSearchParams();
-    const upsell = searchParams?.get('upsell');
+    const sub = useSubscriptionPage();
 
-    const artisan = useCurrentArtisan();
-    const billing = useBilling(artisan.id);
-    const setTier = useBillingStore((s) => s.setTier);
-    const setBillingCycle = useBillingStore((s) => s.setBillingCycle);
-    const setAtelierPlus = useBillingStore((s) => s.setAtelierPlus);
+    if (!sub.isRealMode) {
+        return (
+            <Notice>
+                <p className="text-foreground font-medium">Abonnement indisponible en mode démo</p>
+                <p>
+                    Créez un compte ou connectez-vous avec vos identifiants pour gérer votre abonnement ATELIER et
+                    débloquer la création de passeports.
+                </p>
+            </Notice>
+        );
+    }
 
-    const passportCount = usePassportCount(artisan.id);
-    const limitLabel = ATELIER_PASSPORT_LIMIT_LABEL[billing.tier];
-    const currentPlan = ATELIER_PLANS.find((p) => p.tier === TIER_TO_PLAN[billing.tier]);
-
-    const [pendingDowngrade, setPendingDowngrade] = useState<ArtisanTier | null>(null);
-    const plusToggleRef = useRef<HTMLDivElement | null>(null);
-
-    useEffect(() => {
-        if (upsell === 'analytics' && plusToggleRef.current) {
-            plusToggleRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    }, [upsell]);
-
-    const applyTierChange = (targetTier: ArtisanTier) => {
-        const amount = planAmount(targetTier, billing.billingCycle);
-        setTier(artisan.id, targetTier, { amount, cycle: billing.billingCycle });
-        toast.success(`Palier mis à jour : ${targetTier}`, {
-            description: `Cycle ${billing.billingCycle === 'annual' ? 'annuel' : 'mensuel'} — ${amount} €`,
-        });
-    };
-
-    const onChoosePlan = (targetTier: ArtisanTier) => {
-        if (isDowngrade(billing.tier, targetTier)) {
-            setPendingDowngrade(targetTier);
-            return;
-        }
-        applyTierChange(targetTier);
-    };
-
-    const onConfirmDowngrade = () => {
-        if (!pendingDowngrade) return;
-        applyTierChange(pendingDowngrade);
-        setPendingDowngrade(null);
-    };
-
-    const onToggleCycle = (annual: boolean) => {
-        const next = annual ? 'annual' : 'monthly';
-        setBillingCycle(artisan.id, next);
-        toast.success(next === 'annual' ? 'Cycle annuel — 2 mois offerts' : 'Cycle mensuel');
-    };
-
-    const onTogglePlus = (checked: boolean) => {
-        setAtelierPlus(artisan.id, checked);
-        if (checked) {
-            toast.success('ATELIER+ activé', {
-                description: `+${atelierPlusAmount(billing.billingCycle)} € · ${ATELIER_PLUS_LABEL}`,
-            });
-        } else {
-            toast.info('ATELIER+ désactivé');
-        }
-    };
+    if (sub.isError) {
+        return (
+            <Notice>
+                <p className="text-destructive font-medium">Impossible de charger votre abonnement.</p>
+                <Button variant="outline" size="sm" onClick={sub.retry}>
+                    Réessayer
+                </Button>
+            </Notice>
+        );
+    }
 
     return (
         <div className="space-y-6 p-4 md:p-8">
-            {upsell === 'analytics' && (
-                <div className="bg-lumiris-amber/10 text-lumiris-amber border-lumiris-amber/30 flex items-start gap-2 rounded-md border p-3 text-sm">
-                    <Sparkles className="mt-0.5 h-4 w-4 shrink-0" />
-                    <div>
-                        Analytics nécessite l’option <strong>ATELIER+</strong>. Activez-la ci-dessous pour accéder au
-                        tableau de bord d’analyse.
-                    </div>
+            <CurrentSubscriptionCard sub={sub} />
+
+            <div className="flex items-center justify-center">
+                <div className="text-muted-foreground bg-muted inline-flex items-center gap-1 rounded-md p-0.5">
+                    <CycleButton active={!sub.isAnnual} onClick={() => sub.setCycle('monthly')}>
+                        Mensuel
+                    </CycleButton>
+                    <CycleButton active={sub.isAnnual} onClick={() => sub.setCycle('annual')}>
+                        Annuel <span className="text-lumiris-emerald ml-1 font-mono text-[10px]">2 mois offerts</span>
+                    </CycleButton>
                 </div>
+            </div>
+
+            {sub.plansLoading ? (
+                <div className="text-muted-foreground flex items-center gap-2 p-8 text-sm">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Chargement des offres…
+                </div>
+            ) : (
+                <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    {sub.plans.map((plan) => (
+                        <PlanCard
+                            key={plan.tier}
+                            plan={plan}
+                            isCurrent={Boolean(
+                                sub.subscription?.tier === plan.tier &&
+                                sub.subscription?.billingCycle === sub.cycle &&
+                                sub.subscription?.active,
+                            )}
+                            isAnnual={sub.isAnnual}
+                            hasActiveSubscription={sub.hasActiveSubscription}
+                            disabled={sub.portal.isPending || sub.changePlan.isPending}
+                            onChoose={sub.onChoose}
+                        />
+                    ))}
+                </section>
             )}
 
-            <CurrentPlanCard
-                ref={plusToggleRef}
-                plan={currentPlan}
-                tier={billing.tier}
-                cycle={billing.billingCycle}
-                atelierPlus={billing.atelierPlus}
-                passportCount={passportCount}
-                limitLabel={limitLabel}
-                onToggleCycle={onToggleCycle}
-                onTogglePlus={onTogglePlus}
-            />
+            <p className="text-muted-foreground flex items-center justify-center gap-1.5 text-xs">
+                <ShieldCheck className="text-lumiris-emerald h-3.5 w-3.5" />
+                Paiement sécurisé par Stripe · aucun acteur ne peut payer pour influencer son score Iris.
+            </p>
 
-            <PlansGrid currentTier={billing.tier} cycle={billing.billingCycle} onChoose={onChoosePlan} />
-
-            <BillingHistory entries={billing.invoiceHistory} />
-
-            <ChangePlanDialog
-                targetTier={pendingDowngrade}
-                currentTier={billing.tier}
-                cycle={billing.billingCycle}
-                onCancel={() => setPendingDowngrade(null)}
-                onConfirm={onConfirmDowngrade}
-            />
+            {sub.checkout && (
+                <Suspense fallback={null}>
+                    <CheckoutDialog
+                        open
+                        onOpenChange={(o) => !o && sub.setCheckout(null)}
+                        tier={sub.checkout.tier}
+                        cycle={sub.cycle}
+                        planLabel={sub.checkout.label}
+                        amountLabel={sub.checkout.amountLabel}
+                        onConfirmed={() => sub.setCheckout(null)}
+                    />
+                </Suspense>
+            )}
         </div>
+    );
+}
+
+function Notice({ children }: { children: ReactNode }) {
+    return (
+        <div className="p-4 md:p-8">
+            <Card>
+                <CardContent className="text-muted-foreground space-y-3 p-6 text-sm">{children}</CardContent>
+            </Card>
+        </div>
+    );
+}
+
+function CurrentSubscriptionCard({ sub }: { sub: SubscriptionPage }) {
+    const { subscription, quota, hasActiveSubscription, isLoading } = sub;
+    return (
+        <Card>
+            <CardContent className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
+                <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                        <p className="text-foreground text-lg font-semibold">
+                            {subscription ? subscription.tierLabel : 'Aucun abonnement actif'}
+                        </p>
+                        {subscription && (
+                            <Badge
+                                className={cn(
+                                    subscription.active
+                                        ? 'bg-lumiris-emerald/10 text-lumiris-emerald border-lumiris-emerald/30'
+                                        : 'bg-lumiris-amber/10 text-lumiris-amber border-lumiris-amber/30',
+                                )}
+                            >
+                                {subscription.active ? 'Actif' : subscription.status}
+                            </Badge>
+                        )}
+                    </div>
+                    {quota && (
+                        <p className="text-muted-foreground text-sm">
+                            {isLoading ? (
+                                'Chargement…'
+                            ) : quota.unlimited ? (
+                                <>Passeports : {quota.used} (illimité)</>
+                            ) : (
+                                <>
+                                    Passeports : <span className="text-foreground font-mono">{quota.used}</span> /{' '}
+                                    {quota.limit ?? '—'}
+                                </>
+                            )}
+                            {subscription?.cancelAtPeriodEnd && (
+                                <span className="text-lumiris-amber ml-2">· se termine en fin de période</span>
+                            )}
+                        </p>
+                    )}
+                    {subscription?.active && subscription.currentPeriodEnd && !subscription.cancelAtPeriodEnd && (
+                        <p className="text-muted-foreground text-xs">
+                            Prochain renouvellement : {formatDate(subscription.currentPeriodEnd, { locale: 'fr-FR' })}
+                        </p>
+                    )}
+                    {!hasActiveSubscription && (
+                        <p className="text-lumiris-amber text-xs">
+                            Souscrivez un palier ATELIER pour créer vos passeports.
+                        </p>
+                    )}
+                </div>
+
+                {hasActiveSubscription && (
+                    <Button variant="outline" onClick={sub.openPortal} disabled={sub.portal.isPending}>
+                        {sub.portal.isPending ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                            <ExternalLink className="mr-2 h-4 w-4" />
+                        )}
+                        Gérer / facturation
+                    </Button>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
+
+function CycleButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            className={cn(
+                'rounded-sm px-3 py-1 text-xs font-medium',
+                active && 'bg-background text-foreground shadow-sm',
+            )}
+        >
+            {children}
+        </button>
     );
 }

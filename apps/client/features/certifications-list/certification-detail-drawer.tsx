@@ -6,12 +6,12 @@ import { ExternalLink, FileText } from 'lucide-react';
 import { getEffectiveStatus } from '@lumiris/types';
 import { mockPassports } from '@lumiris/mock-data';
 import { AtelierStatusBadge } from '@lumiris/scoring-ui';
+import { formatDateFr } from '@lumiris/utils';
 import { Badge } from '@lumiris/ui/components/badge';
 import { Button } from '@lumiris/ui/components/button';
 import { DetailDrawer } from '@lumiris/ui/components/detail-drawer';
 import type { ArtisanCertificate } from '@/lib/certificates-store';
 import { useDraftStore, draftToPassport } from '@/lib/draft-store';
-import { formatDateFr } from '@/lib/list-helpers';
 import { certLabel } from './certification-status';
 
 interface Props {

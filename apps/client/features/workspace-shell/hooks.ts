@@ -1,9 +1,9 @@
 'use client';
 
 import { useMemo } from 'react';
-import { mockCertificates } from '@lumiris/mock-data';
-import type { Artisan, ArtisanTier, CertificationRef } from '@lumiris/types';
+import type { Artisan, ArtisanTier } from '@lumiris/types';
 import { useBilling } from '@/lib/billing-store';
+import { useCertificatesForArtisan } from '@/lib/certificates-store';
 import { usePassports } from '@/lib/passports-source';
 import { buildNotifications, type AtelierNotification } from '@/lib/notifications-mock';
 
@@ -24,13 +24,6 @@ export function useHasAtelierPlus(artisanId: string): boolean {
 
 export function useWorkspaceNotifications(artisan: Artisan): readonly AtelierNotification[] {
     const passports = usePassports(artisan.id);
-    return useMemo(
-        () =>
-            buildNotifications({
-                artisan,
-                passports,
-                certificates: mockCertificates as readonly CertificationRef[],
-            }),
-        [artisan, passports],
-    );
+    const certificates = useCertificatesForArtisan(artisan.id);
+    return useMemo(() => buildNotifications({ artisan, passports, certificates }), [artisan, passports, certificates]);
 }

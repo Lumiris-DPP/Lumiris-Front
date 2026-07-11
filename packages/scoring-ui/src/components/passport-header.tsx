@@ -3,6 +3,7 @@
 import type { HTMLAttributes } from 'react';
 import type { Artisan, Passport, IrisGrade as IrisGradeLetter } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
+import { GARMENT_KIND_LABEL } from '../theme/dpp-labels';
 import { IrisGrade } from './iris-grade';
 
 export interface PassportHeaderProps extends HTMLAttributes<HTMLElement> {
@@ -11,18 +12,8 @@ export interface PassportHeaderProps extends HTMLAttributes<HTMLElement> {
     grade: IrisGradeLetter;
 }
 
-const KIND_LABEL: Record<string, string> = {
-    sweater: 'Pull',
-    shirt: 'Chemise',
-    shoe: 'Chaussures',
-    jacket: 'Veste',
-    trouser: 'Pantalon',
-    accessory: 'Accessoire',
-    other: 'Pièce',
-};
-
 export function PassportHeader({ passport, artisan, grade, className, ...rest }: PassportHeaderProps) {
-    const kindLabel = KIND_LABEL[passport.garment.kind] ?? KIND_LABEL.other;
+    const kindLabel = GARMENT_KIND_LABEL[passport.garment.kind];
     return (
         <header
             className={cn(

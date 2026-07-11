@@ -6,8 +6,9 @@ import { Badge } from '@lumiris/ui/components/badge';
 import { Button } from '@lumiris/ui/components/button';
 import { DetailDrawer } from '@lumiris/ui/components/detail-drawer';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
+import { formatDateFr, formatEur } from '@lumiris/utils';
+import { isImageSrc } from '@/lib/file-upload';
 import { type InvoiceView, usePassportsLinkedTo } from '@/lib/invoices-store';
-import { formatDateFr, formatEur } from '@/lib/list-helpers';
 import { useRescan } from './rescan-action';
 
 interface Props {
@@ -85,7 +86,7 @@ function DetailTab({ invoice }: { invoice: InvoiceView }) {
 function DocumentPreview({ invoice }: { invoice: InvoiceView }) {
     const src = invoice.fileDataUri || invoice.fileUrl;
     if (!src) return null;
-    const isImage = src.startsWith('data:image/') || /\.(png|jpe?g|webp|gif|avif)$/i.test(src);
+    const isImage = isImageSrc(src);
     return (
         <div className="border-border bg-muted/40 rounded-lg border p-3">
             {isImage ? (

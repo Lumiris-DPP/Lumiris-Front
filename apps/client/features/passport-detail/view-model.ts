@@ -1,0 +1,74 @@
+import type { DppFormDto } from '@lumiris/api-client';
+import type { Passport } from '@lumiris/types';
+
+const PLACEHOLDER_PHOTO = '/default_product_picture.webp';
+
+export interface DetailView {
+    title: string;
+    reference: string;
+    createdAt: string;
+    photo: string;
+    /** Backend validation status, or null when the passport isn't API-sourced. */
+    apiStatus: 'VALID' | 'INVALID' | null;
+
+    description?: string | null;
+    category?: string | null;
+    originCountry?: string | null;
+    sizes: string[];
+    colors: string[];
+
+    materials: Array<{ fiber: string; percentage: number; originCountry?: string | null }>;
+    careInstructions: string[];
+    certifications: Array<{ name: string; customName?: string | null; licenseNumber?: string | null }>;
+
+    manufacturedAt?: string | null;
+    batchNumber?: string | null;
+    gtin?: string | null;
+    sku?: string | null;
+    reachCompliant?: boolean | null;
+
+    recycledPct?: number | null;
+    warranty?: string | null;
+    isRepairable?: boolean | null;
+    endOfLifeInstructions?: string | null;
+}
+
+/**
+ * Flattens a passport (+ optional raw backend DTO) into a single display model.
+ * All `dpp ?? passport` precedence is resolved here, once, so the view never has
+ * to merge field-by-field.
+ */
+export function buildDetailView(passport: Passport, dpp: DppFormDto | null): DetailView {
+    return {
+        title: dpp?.productName || passport.garment.name || 'Sans nom',
+        reference: passport.garment.reference,
+        createdAt: passport.createdAt,
+        photo: dpp?.mainPhotoUrl || passport.garment.mainPhotoUrl || PLACEHOLDER_PHOTO,
+        apiStatus: dpp ? (dpp.status === 'VALID' ? 'VALID' : 'INVALID') : null,
+
+        description: dpp?.productDescription ?? passport.garment.description,
+        category: dpp?.productCategory ?? passport.garment.kind,
+        originCountry: dpp?.originCountry ?? passport.garment.originCountry,
+        sizes: [...(dpp?.availableSizes ?? passport.garment.availableSizes ?? [])],
+        colors: [...(dpp?.colors ?? passport.garment.colors ?? [])],
+
+        materials: (dpp?.materials ?? passport.materials).map((m) => ({
+            fiber: String(m.fiber),
+            percentage: m.percentage,
+            originCountry: m.originCountry ?? null,
+        })),
+        careInstructions: [...(dpp?.careInstructions ?? [])],
+        certifications: [],
+
+        manufacturedAt: dpp?.manufacturedAt ?? null,
+        batchNumber: dpp?.batchNumber ?? null,
+        gtin: dpp?.gtin ?? passport.gs1?.gtin ?? null,
+        sku: dpp?.sku ?? passport.garment.reference,
+        reachCompliant: dpp?.reachCompliant ?? null,
+
+        recycledPct: dpp?.recycledPct ?? passport.recycledPct ?? null,
+        warranty: dpp?.warrantyDescription ?? passport.warranty?.terms ?? null,
+        isRepairable: dpp?.isRepairable ?? null,
+        endOfLifeInstructions: dpp?.endOfLifeInstructions ?? null,
+    };
+}

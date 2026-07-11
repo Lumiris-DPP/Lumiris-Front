@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
+import { safeJSONStorage } from './persist-storage';
+import { makeHydratedHook } from './use-store-hydrated';
 import { ATELIER_ADD_ONS, ATELIER_PLANS, mockArtisanById, mockPaymentHistory } from '@lumiris/mock-data';
 import type { ArtisanTier, AtelierPlanTier } from '@lumiris/types';
 
@@ -32,12 +33,6 @@ interface BillingStoreState {
     setAtelierPlus: (artisanId: string, on: boolean, opts?: { amount?: number }) => void;
     setBillingCycle: (artisanId: string, cycle: BillingCycle) => void;
 }
-
-const noopStorage = {
-    getItem: () => null,
-    setItem: () => undefined,
-    removeItem: () => undefined,
-};
 
 const TIER_TO_PLAN: Record<ArtisanTier, AtelierPlanTier> = {
     Solo: 'solo',
@@ -179,7 +174,7 @@ export const useBillingStore = create<BillingStoreState>()(
         {
             name: 'atelier-billing',
             version: 1,
-            storage: createJSONStorage(() => (typeof window === 'undefined' ? noopStorage : localStorage)),
+            storage: safeJSONStorage,
         },
     ),
 );
@@ -189,12 +184,4 @@ export function useBilling(artisanId: string): BillingState {
     return stored ?? defaultBilling(artisanId);
 }
 
-export function useBillingHydrated(): boolean {
-    const [hydrated, setHydrated] = useState(useBillingStore.persist.hasHydrated());
-    useEffect(() => {
-        const unsub = useBillingStore.persist.onFinishHydration(() => setHydrated(true));
-        if (useBillingStore.persist.hasHydrated()) setHydrated(true);
-        return unsub;
-    }, []);
-    return hydrated;
-}
+export const useBillingHydrated = makeHydratedHook(useBillingStore);

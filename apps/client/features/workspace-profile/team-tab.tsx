@@ -14,6 +14,7 @@ import {
 } from '@lumiris/ui/components/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@lumiris/ui/components/select';
 import { toast } from '@lumiris/ui/components/sonner';
+import { formatDateFr } from '@lumiris/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
 import { cn } from '@lumiris/ui/lib/cn';
 import { useBilling } from '@/lib/billing-store';
@@ -112,9 +113,7 @@ export function TeamTab() {
                                         >
                                             {member.status}
                                         </span>
-                                        <span className="ml-2">
-                                            {new Date(member.joinedAt).toLocaleDateString('fr-FR')}
-                                        </span>
+                                        <span className="ml-2">{formatDateFr(member.joinedAt)}</span>
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <DropdownMenu>

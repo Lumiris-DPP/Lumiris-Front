@@ -1,7 +1,8 @@
 'use client';
 
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
+import { safeJSONStorage } from './persist-storage';
 
 interface NotificationsStoreState {
     dismissedByArtisan: Record<string, string[]>;
@@ -9,12 +10,6 @@ interface NotificationsStoreState {
     dismissAll: (artisanId: string, ids: readonly string[]) => void;
     pruneStale: (artisanId: string, liveIds: readonly string[]) => void;
 }
-
-const noopStorage = {
-    getItem: () => null,
-    setItem: () => undefined,
-    removeItem: () => undefined,
-};
 
 export const useNotificationsStore = create<NotificationsStoreState>()(
     persist(
@@ -47,7 +42,7 @@ export const useNotificationsStore = create<NotificationsStoreState>()(
         {
             name: 'atelier-notifications',
             version: 1,
-            storage: createJSONStorage(() => (typeof window === 'undefined' ? noopStorage : localStorage)),
+            storage: safeJSONStorage,
         },
     ),
 );
