@@ -13,7 +13,7 @@ import { clearCart } from './cart-storage';
 import { getListing, getMarketplaceItem } from './listings';
 import { appendOrder, generateOrderNumber, type Order, type OrderLine, type ShippingAddress } from './order-storage';
 
-export interface CartItemDetail {
+interface CartItemDetail {
     passportId: string;
     passport: Passport;
     reference: string;
@@ -25,7 +25,7 @@ export interface CartItemDetail {
     lineTotal: number;
 }
 
-export interface CartTotals {
+interface CartTotals {
     items: readonly CartItemDetail[];
     subtotal: number;
     shipping: number;
@@ -100,7 +100,7 @@ function buildWarrantyFile(passport: Passport, orderNumber: string): File {
     return new File([body], `garantie-${passport.garment.reference}.txt`, { type: 'image/png' });
 }
 
-export interface CheckoutInput {
+interface CheckoutInput {
     address: ShippingAddress;
     cardLast4: string;
     userId: string | null;
