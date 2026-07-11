@@ -18,9 +18,6 @@ interface AuthState {
     refreshToken: string | null;
     userName: string | null;
     signedInAt: number | null;
-    /** Demo mode: sign in with a mock artisan ID (no token) */
-    signIn: (id: string) => void;
-    /** Real mode: sign in with JWT token and user data from the API */
     signInWithToken: (
         userId: string,
         artisanId: string | null,
@@ -44,16 +41,6 @@ export const useAuthStore = create<AuthState>()(
             refreshToken: null,
             userName: null,
             signedInAt: null,
-            signIn: (id) =>
-                set({
-                    userId: id,
-                    artisanId: id,
-                    role: 'artisan',
-                    token: null,
-                    refreshToken: null,
-                    userName: null,
-                    signedInAt: Date.now(),
-                }),
             signInWithToken: (userId, artisanId, role, token, refreshToken, userName) =>
                 set({ userId, artisanId, role, token, refreshToken, userName, signedInAt: Date.now() }),
             updateTokens: (token, refreshToken) => set({ token, refreshToken }),
@@ -87,7 +74,6 @@ export const useAuthStore = create<AuthState>()(
     ),
 );
 
-export const signIn = (id: string) => useAuthStore.getState().signIn(id);
 export const signInWithToken = (
     userId: string,
     artisanId: string | null,

@@ -53,7 +53,7 @@ export const EMPTY_BOUTIQUE_FILTERS: BoutiqueFiltersState = {
 };
 
 /** Matière dominante d'une pièce (plus fort pourcentage). */
-export function dominantFiber(item: MarketplaceItem): Fiber | null {
+function dominantFiber(item: MarketplaceItem): Fiber | null {
     const materials = item.passport.materials;
     if (materials.length === 0) return null;
     return materials.reduce((top, m) => (m.percentage > top.percentage ? m : top)).fiber;
@@ -95,7 +95,7 @@ export function applyBoutiqueFilters(
     });
 }
 
-export function activeBoutiqueFilterCount(state: BoutiqueFiltersState): number {
+function activeBoutiqueFilterCount(state: BoutiqueFiltersState): number {
     return state.categories.length + state.grades.length + state.fibers.length + (state.priceRange ? 1 : 0);
 }
 
