@@ -30,7 +30,7 @@ const FIBER_LABEL: Record<Fiber, string> = {
     other: 'Autre',
 };
 
-export interface PriceBounds {
+interface PriceBounds {
     min: number;
     max: number;
 }
