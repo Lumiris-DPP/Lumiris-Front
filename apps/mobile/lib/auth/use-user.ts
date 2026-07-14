@@ -1,8 +1,9 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
+import type { User } from '@lumiris/types';
 import { readUser, writeUser } from './storage';
-import type { MockUser } from './types';
+import type { AuthUser } from './types';
 
 const EVENT = 'lumiris:auth-changed';
 // Distinct d'`auth-changed` : signale aux hooks per-user que le scope localStorage a changé.
@@ -16,10 +17,10 @@ function notify(): void {
     subscribers.forEach((cb) => cb());
 }
 
-let snapshot: MockUser | null = null;
+let snapshot: AuthUser | null = null;
 let snapshotSerialized = '';
 
-function getSnapshot(): MockUser | null {
+function getSnapshot(): AuthUser | null {
     const current = readUser();
     const serialized = current ? JSON.stringify(current) : '';
     if (serialized !== snapshotSerialized) {
@@ -29,7 +30,7 @@ function getSnapshot(): MockUser | null {
     return snapshot;
 }
 
-function getServerSnapshot(): MockUser | null {
+function getServerSnapshot(): AuthUser | null {
     return null;
 }
 
@@ -48,17 +49,18 @@ function subscribe(cb: () => void): () => void {
     };
 }
 
-function makeId(email: string): string {
-    const base = email.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    return `vision-${base}-${Date.now().toString(36)}`;
+// Called by the api-client's http layer (outside React) after a 401 it can't recover from.
+export function clearUser(): void {
+    writeUser(null);
+    notify();
 }
 
 interface UseUserResult {
-    user: MockUser | null;
+    user: AuthUser | null;
     isAuthenticated: boolean;
-    signIn: (email: string, displayName: string) => MockUser;
+    signIn: (result: User, token: string, refreshToken: string) => void;
     signOut: () => void;
-    updateUser: (patch: Partial<Omit<MockUser, 'id' | 'email' | 'createdAt'>>) => void;
+    updateUser: (patch: Partial<Omit<AuthUser, 'id' | 'email' | 'createdAt' | 'token' | 'refreshToken'>>) => void;
 }
 
 export function useUser(): UseUserResult {
@@ -67,21 +69,23 @@ export function useUser(): UseUserResult {
     return {
         user,
         isAuthenticated: user !== null,
-        signIn(email, displayName) {
-            const next: MockUser = {
-                id: makeId(email),
-                email,
-                displayName,
-                createdAt: new Date().toISOString(),
+        signIn(result, token, refreshToken) {
+            const existing = readUser();
+            const sameAccount = existing?.id === result.id;
+            const next: AuthUser = {
+                id: result.id,
+                email: result.email ?? '',
+                displayName: result.name ?? result.email ?? '',
+                token,
+                refreshToken,
+                city: sameAccount ? existing.city : undefined,
+                stylePrefs: sameAccount ? existing.stylePrefs : undefined,
+                createdAt: sameAccount ? existing.createdAt : new Date().toISOString(),
             };
             writeUser(next);
             notify();
-            return next;
         },
-        signOut() {
-            writeUser(null);
-            notify();
-        },
+        signOut: clearUser,
         updateUser(patch) {
             const current = readUser();
             if (!current) return;

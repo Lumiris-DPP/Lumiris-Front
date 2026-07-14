@@ -1,1 +1,1 @@
-export { useUser } from './use-user';
+export { useUser, clearUser } from './use-user';
