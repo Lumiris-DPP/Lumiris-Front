@@ -2,8 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Geist_Mono } from 'next/font/google';
 import { Toaster } from '@lumiris/ui/components/sonner';
 
-import { ApiProvider } from '@lumiris/api-client/react';
-import { env } from '@/env';
+import { ClientApiProvider } from '@/lib/api-provider';
 import { AppShell } from '@/features/app-shell';
 import { WebVitals } from './web-vitals';
 import './globals.css';
@@ -40,7 +39,7 @@ export default function RootLayout({
     return (
         <html lang="en" className="bg-background">
             <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased`}>
-                <ApiProvider baseUrl={env.NEXT_PUBLIC_API_BASE_URL}>
+                <ClientApiProvider>
                     <WebVitals />
                     <Toaster
                         position="top-center"
@@ -49,7 +48,7 @@ export default function RootLayout({
                         closeButton={false}
                     />
                     <AppShell>{children}</AppShell>
-                </ApiProvider>
+                </ClientApiProvider>
             </body>
         </html>
     );

@@ -5,36 +5,72 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
+import { useLogin, useRegister } from '@lumiris/api-client/react';
 import { Button } from '@lumiris/ui/components/button';
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
 import { useUser } from '@/lib/auth';
 
+const MIN_SIGNUP_PASSWORD_LENGTH = 8;
+
 function SignInForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { signIn } = useUser();
+    const loginMutation = useLogin();
+    const registerMutation = useRegister();
     const isSignup = searchParams.get('mode') === 'signup';
+    const isPending = loginMutation.isPending || registerMutation.isPending;
 
     const [email, setEmail] = useState('');
     const [displayName, setDisplayName] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
 
-    function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        const trimmedEmail = email.trim();
+        const trimmedEmail = email.trim().toLowerCase();
         const trimmedName = displayName.trim();
         if (!trimmedEmail.includes('@')) {
             setError('Adresse e-mail invalide.');
             return;
         }
-        if (trimmedName.length < 2) {
+        if (isSignup && trimmedName.length < 2) {
             setError('Indique un prénom (2 caractères minimum).');
             return;
         }
-        signIn(trimmedEmail, trimmedName);
-        router.push(isSignup ? '/onboarding/profile' : '/');
+        if (isSignup && password.length < MIN_SIGNUP_PASSWORD_LENGTH) {
+            setError('Le mot de passe doit contenir au moins 8 caractères.');
+            return;
+        }
+        if (!isSignup && password.length < 1) {
+            setError('Mot de passe requis.');
+            return;
+        }
+        setError(null);
+
+        try {
+            const { token, refreshToken, user } = isSignup
+                ? await registerMutation.mutateAsync({
+                      email: trimmedEmail,
+                      password,
+                      name: trimmedName,
+                      role: 'consumer',
+                  })
+                : await loginMutation.mutateAsync({ email: trimmedEmail, password });
+            signIn(user, token, refreshToken);
+            router.push(isSignup ? '/onboarding/profile' : '/');
+        } catch (err: unknown) {
+            const status = (err as { status?: number })?.status;
+            if (isSignup && status === 409) {
+                setError('Un compte existe déjà avec cet e-mail.');
+            } else if (!isSignup) {
+                setError('Email ou mot de passe incorrect.');
+            } else {
+                setError('Erreur lors de la création du compte. Réessaie.');
+            }
+        }
     }
 
     return (
@@ -55,18 +91,35 @@ function SignInForm() {
                     required
                 />
             </div>
+            {isSignup ? (
+                <div className="flex flex-col gap-2">
+                    <Label htmlFor="displayName" className="text-foreground/80 text-xs font-semibold">
+                        Prénom
+                    </Label>
+                    <Input
+                        id="displayName"
+                        type="text"
+                        autoComplete="given-name"
+                        placeholder="Camille"
+                        value={displayName}
+                        onChange={(e) => setDisplayName(e.target.value)}
+                        aria-invalid={error !== null && displayName.trim().length < 2}
+                        required
+                    />
+                </div>
+            ) : null}
             <div className="flex flex-col gap-2">
-                <Label htmlFor="displayName" className="text-foreground/80 text-xs font-semibold">
-                    Prénom
+                <Label htmlFor="password" className="text-foreground/80 text-xs font-semibold">
+                    Mot de passe
                 </Label>
                 <Input
-                    id="displayName"
-                    type="text"
-                    autoComplete="given-name"
-                    placeholder="Camille"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    aria-invalid={error !== null && displayName.trim().length < 2}
+                    id="password"
+                    type="password"
+                    autoComplete={isSignup ? 'new-password' : 'current-password'}
+                    placeholder={isSignup ? '8 caractères minimum' : 'Ton mot de passe'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    aria-invalid={error !== null && password.length < 1}
                     required
                 />
             </div>
@@ -77,14 +130,13 @@ function SignInForm() {
             ) : null}
             <Button
                 type="submit"
+                disabled={isPending}
                 className="bg-foreground text-background hover:bg-foreground/90 h-11 w-full rounded-full text-sm font-semibold"
             >
-                Continuer
+                {isPending ? 'Un instant…' : 'Continuer'}
             </Button>
             <p className="text-muted-foreground text-center text-[11px]">
-                {isSignup
-                    ? 'En continuant, tu crées un compte LUMIRIS local.'
-                    : 'Connecte-toi à ton compte LUMIRIS local.'}
+                {isSignup ? 'En continuant, tu crées un compte LUMIRIS.' : 'Connecte-toi à ton compte LUMIRIS.'}
             </p>
         </form>
     );
@@ -111,9 +163,6 @@ export default function SignInPage() {
             >
                 <GlassCard className="w-full max-w-sm p-7">
                     <h1 className="text-foreground text-xl font-bold tracking-tight">Bienvenue</h1>
-                    <p className="text-muted-foreground mt-1 text-sm">
-                        Pas de mot de passe - c&apos;est un compte local pour la démo.
-                    </p>
                     <div className="mt-6">
                         <Suspense fallback={<p className="text-muted-foreground text-xs">Chargement…</p>}>
                             <SignInForm />
