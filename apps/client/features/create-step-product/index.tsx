@@ -7,6 +7,7 @@ import { Label } from '@lumiris/ui/components/label';
 import { Textarea } from '@lumiris/ui/components/textarea';
 import { WizardStepFrame } from '@/features/wizard-shell/step-frame';
 import { useStepNavigation } from '@/features/wizard-shell/use-step-navigation';
+import { DocUploadField } from '@/features/wizard-shell/doc-upload-field';
 import { useDraftStore } from '@/lib/draft-store';
 import { draftToValidationInput } from '@/features/wizard-shell/validation-input';
 import { validateStep } from './schema';
@@ -15,6 +16,7 @@ import { CategoryField, ColorsField, PhotoField, SizesField } from './product-fi
 export function CreateStepProduct({ draftId }: { draftId: string }) {
     const draft = useDraftStore((s) => s.drafts[draftId]);
     const setGarment = useDraftStore((s) => s.setGarment);
+    const setFile = useDraftStore((s) => s.setFile);
     const { goNext } = useStepNavigation(draftId);
 
     const [form, setForm] = useState<GarmentInfo>(
@@ -29,6 +31,12 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
         },
     );
 
+    const [photoFile, setPhotoFile] = useState<File | null>(() => draft?.files?.['PRODUCT_PHOTO'] ?? null);
+    const [saleInvoiceFile, setSaleInvoiceFile] = useState<File | null>(() => draft?.files?.['SALE_INVOICE'] ?? null);
+    const [creationPassportFile, setCreationPassportFile] = useState<File | null>(
+        () => draft?.files?.['CREATION_PASSPORT'] ?? null,
+    );
+
     useEffect(() => {
         if (draft) setForm(draft.garment);
     }, [draft]);
@@ -36,7 +44,10 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
     const validation = useMemo(() => validateStep(draftToValidationInput(draft, { garment: form })), [form, draft]);
 
     const handleNext = () => {
-        setGarment(draftId, form);
+        setGarment(draftId, { ...form, mainPhotoUrl: '' });
+        setFile(draftId, 'PRODUCT_PHOTO', photoFile);
+        setFile(draftId, 'SALE_INVOICE', saleInvoiceFile);
+        setFile(draftId, 'CREATION_PASSPORT', creationPassportFile);
         goNext('product', 'care');
     };
 
@@ -99,11 +110,27 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
                 </p>
             </div>
 
-            <PhotoField url={form.mainPhotoUrl} onPick={(url) => setForm((f) => ({ ...f, mainPhotoUrl: url }))} />
+            <PhotoField value={photoFile} onChange={setPhotoFile} />
 
             <SizesField selected={form.availableSizes ?? []} onToggle={toggleSize} />
 
             <ColorsField colors={form.colors ?? []} onChange={(colors) => setForm((f) => ({ ...f, colors }))} />
+
+            <div className="border-border space-y-4 rounded-lg border p-4 md:col-span-2">
+                <p className="text-sm font-medium">Documents de la pièce</p>
+                <DocUploadField
+                    label="Facture d'Origine ou Certificat de Vente"
+                    description="Un PDF sécurisé servant d'acte de propriété."
+                    value={saleInvoiceFile}
+                    onChange={setSaleInvoiceFile}
+                />
+                <DocUploadField
+                    label="Fiche d'Identité / Carnet de Création"
+                    description="Un document PDF qui immortalise les croquis d'intention du designer, le nombre d'heures de travail passées dans l'atelier, et le nom des artisans ayant façonné la pièce."
+                    value={creationPassportFile}
+                    onChange={setCreationPassportFile}
+                />
+            </div>
         </WizardStepFrame>
     );
 }

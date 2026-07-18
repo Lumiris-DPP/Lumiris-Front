@@ -1,10 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { ImagePlus, X } from 'lucide-react';
 import type { GarmentCategory } from '@lumiris/types';
-import { readFileAsDataUrl } from '@lumiris/utils';
 import { Badge } from '@lumiris/ui/components/badge';
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
@@ -50,25 +49,41 @@ export function CategoryField({
     );
 }
 
-export function PhotoField({ url, onPick }: { url: string; onPick: (dataUrl: string) => void }) {
-    const handleFile = async (file: File | undefined) => {
-        if (!file) return;
-        onPick(await readFileAsDataUrl(file));
-    };
+export function PhotoField({ value, onChange }: { value: File | null; onChange: (file: File | null) => void }) {
+    const previewUrl = useMemo(() => (value ? URL.createObjectURL(value) : null), [value]);
+
+    useEffect(() => {
+        return () => {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+        };
+    }, [previewUrl]);
 
     return (
         <div className="space-y-2 md:col-span-2">
             <Label>Photo principale</Label>
-            <label className="border-border bg-muted/40 hover:bg-muted relative flex h-44 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed text-center transition-colors">
-                {url ? (
-                    <Image
-                        src={url}
-                        alt="Visuel principal"
-                        fill
-                        sizes="(min-width: 768px) 50vw, 100vw"
-                        unoptimized
-                        className="rounded-xl object-cover"
-                    />
+            <label className="border-border bg-muted/40 hover:bg-muted relative flex aspect-square w-full max-w-48 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed text-center transition-colors">
+                {previewUrl ? (
+                    <>
+                        <Image
+                            src={previewUrl}
+                            alt="Visuel principal"
+                            fill
+                            sizes="(min-width: 768px) 50vw, 100vw"
+                            unoptimized
+                            className="rounded-xl object-contain"
+                        />
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onChange(null);
+                            }}
+                            className="bg-background/80 absolute right-2 top-2 rounded-full p-1"
+                            aria-label="Supprimer la photo"
+                        >
+                            <X className="h-4 w-4" />
+                        </button>
+                    </>
                 ) : (
                     <>
                         <ImagePlus className="text-muted-foreground mb-2 h-6 w-6" />
@@ -80,7 +95,7 @@ export function PhotoField({ url, onPick }: { url: string; onPick: (dataUrl: str
                     accept="image/*"
                     aria-label="Importer la photo principale du produit"
                     className="absolute inset-0 cursor-pointer opacity-0"
-                    onChange={(e) => handleFile(e.target.files?.[0])}
+                    onChange={(e) => onChange(e.target.files?.[0] ?? null)}
                 />
             </label>
         </div>

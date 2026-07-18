@@ -1,7 +1,12 @@
 'use client';
 
 import { use, useEffect, useState } from 'react';
-import { fetchPublicDppForm, type DppFormPublicDto } from '@/lib/public-dpp-api';
+import {
+    fetchPublicDppEvents,
+    fetchPublicDppForm,
+    type DppEventDto,
+    type DppFormPublicDto,
+} from '@/lib/public-dpp-api';
 import { PublicPassportDetail } from '@/features/public-passport-detail';
 
 interface PageProps {
@@ -11,12 +16,16 @@ interface PageProps {
 export default function PublicDppPage({ params }: PageProps) {
     const { code } = use(params);
     const [data, setData] = useState<DppFormPublicDto | null>(null);
+    const [events, setEvents] = useState<DppEventDto[]>([]);
     const [notFound, setNotFound] = useState(false);
 
     useEffect(() => {
         fetchPublicDppForm(code)
             .then(setData)
             .catch(() => setNotFound(true));
+        fetchPublicDppEvents(code)
+            .then(setEvents)
+            .catch(() => setEvents([]));
     }, [code]);
 
     if (notFound) {
@@ -40,7 +49,7 @@ export default function PublicDppPage({ params }: PageProps) {
 
     return (
         <div className="bg-background mx-auto flex h-dvh max-w-md flex-col">
-            <PublicPassportDetail dpp={data.dpp} irisScore={data.irisScore} />
+            <PublicPassportDetail dpp={data.dpp} irisScore={data.irisScore} events={events} />
         </div>
     );
 }

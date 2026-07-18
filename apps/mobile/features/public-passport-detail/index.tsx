@@ -7,7 +7,7 @@ import { CheckCircle, XCircle, FileText, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { IrisGrade } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
-import type { DppFormDto, IrisScoreDto } from '@/lib/public-dpp-api';
+import type { DppEventDto, DppEventActorType, DppFormDto, IrisScoreDto } from '@/lib/public-dpp-api';
 import { GRADE_TEXT, GRADE_BORDER, GRADE_BG_SOFT, GRADE_CSS_VAR } from '@/features/passport-detail/grade-classes';
 
 const FIBER_LABELS: Record<string, string> = {
@@ -60,14 +60,24 @@ const DOC_TYPE_LABELS: Record<string, string> = {
     SALE_INVOICE: 'Facture de vente',
 };
 
+const ACTOR_LABELS: Record<DppEventActorType, string> = {
+    MANUFACTURER: 'Fabricant',
+    DISTRIBUTOR: 'Distributeur',
+    RETAILER: 'Revendeur',
+    CONSUMER: 'Consommateur',
+    REPAIRER: 'Réparateur',
+    RECYCLER: 'Recycleur',
+};
+
 const LAYER_DELAY = 0.12;
 
 interface PublicPassportDetailProps {
     dpp: DppFormDto;
     irisScore: IrisScoreDto | null;
+    events?: DppEventDto[];
 }
 
-export function PublicPassportDetail({ dpp, irisScore }: PublicPassportDetailProps) {
+export function PublicPassportDetail({ dpp, irisScore, events = [] }: PublicPassportDetailProps) {
     const router = useRouter();
     const grade = irisScore?.grade as IrisGrade | undefined;
     const cssVar = grade ? GRADE_CSS_VAR[grade] : 'var(--color-lumiris-iris)';
@@ -299,6 +309,32 @@ export function PublicPassportDetail({ dpp, irisScore }: PublicPassportDetailPro
                                 </a>
                             ))}
                         </div>
+                    </Section>
+                )}
+
+                {events.length > 0 && (
+                    <Section delay={LAYER_DELAY * 6} title="Historique">
+                        <ol className="space-y-0">
+                            {events.map((event, i) => (
+                                <li key={event.id} className="relative flex gap-3 pb-4 last:pb-0">
+                                    <div className="flex flex-col items-center">
+                                        <span className="bg-foreground/70 mt-1.5 h-2 w-2 shrink-0 rounded-full" />
+                                        {i < events.length - 1 && <span className="bg-border w-px flex-1" />}
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-muted-foreground text-[11px] uppercase tracking-wider">
+                                                {new Date(event.occurredAt).toLocaleDateString('fr-FR')}
+                                            </span>
+                                            <span className="bg-secondary text-secondary-foreground rounded px-1.5 py-0.5 text-[10px]">
+                                                {ACTOR_LABELS[event.actorType]}
+                                            </span>
+                                        </div>
+                                        <p className="text-foreground text-sm">{event.description}</p>
+                                    </div>
+                                </li>
+                            ))}
+                        </ol>
                     </Section>
                 )}
 
