@@ -44,12 +44,11 @@ export function useLoginForm() {
         const normalizedEmail = parsed.data.email.trim().toLowerCase();
 
         try {
-            const { token, user } = await loginMutation.mutateAsync({
+            const { token, refreshToken, user } = await loginMutation.mutateAsync({
                 email: normalizedEmail,
                 password: parsed.data.password,
             });
-            const artisanProfileId = 'artisanId' in user ? ((user.artisanId as string | undefined) ?? null) : null;
-            signInWithToken(artisanProfileId, token, user.name ?? null);
+            signInWithToken(user.id, user.artisanId ?? null, user.role, token, refreshToken, user.name ?? null);
             const firstName = user.name?.split(' ')[0] ?? 'vous';
             toast.success(`Bienvenue ${firstName}`);
             router.push('/dashboard');
