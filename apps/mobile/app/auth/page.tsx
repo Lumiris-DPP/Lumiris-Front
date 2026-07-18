@@ -87,6 +87,16 @@ export default function AuthPage() {
                             Continuer sans compte
                         </Button>
                     </div>
+
+                    <p className="text-muted-foreground mt-5 text-center text-xs">
+                        Déjà un compte ?{' '}
+                        <Link
+                            href="/auth/sign-in"
+                            className="text-foreground font-semibold underline-offset-4 hover:underline"
+                        >
+                            Se connecter
+                        </Link>
+                    </p>
                 </GlassCard>
             </motion.div>
 
