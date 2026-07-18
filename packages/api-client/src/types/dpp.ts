@@ -74,6 +74,33 @@ export type DppFormDto = z.infer<typeof dppFormDtoSchema>;
 export const dppFormCreatedDtoSchema = z.object({ id: z.string() });
 export type DppFormCreatedDto = z.infer<typeof dppFormCreatedDtoSchema>;
 
+export const dppEventActorTypeSchema = z.enum([
+    'MANUFACTURER',
+    'DISTRIBUTOR',
+    'RETAILER',
+    'CONSUMER',
+    'REPAIRER',
+    'RECYCLER',
+]);
+export type DppEventActorType = z.infer<typeof dppEventActorTypeSchema>;
+
+// GET /api/dpp-forms/{id}/events — mirrors the backend DppEventResponse.
+export const dppEventDtoSchema = z.object({
+    id: z.string(),
+    occurredAt: z.string(),
+    description: z.string(),
+    actorType: dppEventActorTypeSchema,
+    createdAt: z.string().nullish(),
+});
+export type DppEventDto = z.infer<typeof dppEventDtoSchema>;
+
+export const dppEventPayloadSchema = z.object({
+    occurredAt: z.string(),
+    description: z.string(),
+    actorType: dppEventActorTypeSchema,
+});
+export type DppEventPayload = z.infer<typeof dppEventPayloadSchema>;
+
 export const dppFormSummaryDtoSchema = z.object({
     id: z.string(),
     createdAt: z.string(),

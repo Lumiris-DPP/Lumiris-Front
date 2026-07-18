@@ -17,6 +17,8 @@ import { useCurrentArtisan } from '@/lib/current-artisan';
 import { draftToPassport, useDraftStore } from '@/lib/draft-store';
 import { dppToPassport } from '@/lib/passport-adapter';
 import { CompositionCard, IdentityCard, ScoreAside, SustainabilityCard, TraceabilityCard } from './detail-cards';
+import { EventFormCard } from './event-form-card';
+import { EventHistoryCard } from './event-history-card';
 import { buildDetailView } from './view-model';
 
 export function PassportDetail({ passportId }: { passportId: string }) {
@@ -99,6 +101,12 @@ export function PassportDetail({ passportId }: { passportId: string }) {
                     <CompositionCard view={view} />
                     <TraceabilityCard view={view} />
                     <SustainabilityCard view={view} />
+                    {apiDpp && (
+                        <>
+                            <EventFormCard passportId={passportId} />
+                            <EventHistoryCard passportId={passportId} />
+                        </>
+                    )}
                 </div>
 
                 <ScoreAside score={score} passport={passport} />

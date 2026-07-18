@@ -3,9 +3,12 @@ import { z } from 'zod';
 import type { Http } from '../core/http';
 import { parseOr } from '../core/validate';
 import {
+    dppEventDtoSchema,
     dppFormCreatedDtoSchema,
     dppFormDtoSchema,
     dppFormSummaryDtoSchema,
+    type DppEventDto,
+    type DppEventPayload,
     type DppFilePart,
     type DppFormCreatedDto,
     type DppFormDto,
@@ -14,6 +17,7 @@ import {
 } from '../types/dpp';
 
 const dppFormSummaryListSchema = z.array(dppFormSummaryDtoSchema);
+const dppEventListSchema = z.array(dppEventDtoSchema);
 
 export function dppApi(http: Http) {
     return {
@@ -37,6 +41,15 @@ export function dppApi(http: Http) {
             return parseOr(
                 dppFormCreatedDtoSchema,
                 await http.request('/api/dpp-forms', { method: 'POST', body: form }),
+            );
+        },
+        async listEvents(id: string): Promise<DppEventDto[]> {
+            return parseOr(dppEventListSchema, await http.request(`/api/dpp-forms/${id}/events`));
+        },
+        async createEvent(id: string, payload: DppEventPayload): Promise<DppEventDto> {
+            return parseOr(
+                dppEventDtoSchema,
+                await http.request(`/api/dpp-forms/${id}/events`, { method: 'POST', body: payload }),
             );
         },
     };

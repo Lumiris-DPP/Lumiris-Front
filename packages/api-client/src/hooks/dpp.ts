@@ -10,7 +10,15 @@ import {
 
 import { createKeys } from '../core/keys';
 import { CACHE_TIMES } from '../core/cache';
-import type { DppFilePart, DppFormCreatedDto, DppFormDto, DppFormPayload, DppFormSummaryDto } from '../types/dpp';
+import type {
+    DppEventDto,
+    DppEventPayload,
+    DppFilePart,
+    DppFormCreatedDto,
+    DppFormDto,
+    DppFormPayload,
+    DppFormSummaryDto,
+} from '../types/dpp';
 
 import { useApiClient } from '../core/provider';
 import { subscriptionKeys } from './subscription';
@@ -34,6 +42,35 @@ export function useDppForm(id: string, options?: Omit<UseQueryOptions<DppFormDto
         queryFn: () => client.dpp.get(id),
         staleTime: CACHE_TIMES.DETAIL,
         ...options,
+    });
+}
+
+export function useDppEvents(
+    id: string,
+    options?: Omit<UseQueryOptions<DppEventDto[], Error>, 'queryKey' | 'queryFn'>,
+) {
+    const client = useApiClient();
+    return useQuery<DppEventDto[], Error>({
+        queryKey: dppKeys.custom('events', id),
+        queryFn: () => client.dpp.listEvents(id),
+        staleTime: CACHE_TIMES.DETAIL,
+        ...options,
+    });
+}
+
+export function useCreateDppEvent(
+    id: string,
+    options?: Omit<UseMutationOptions<DppEventDto, Error, DppEventPayload>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<DppEventDto, Error, DppEventPayload>({
+        mutationFn: (payload) => client.dpp.createEvent(id, payload),
+        ...options,
+        onSuccess: (...args) => {
+            void queryClient.invalidateQueries({ queryKey: dppKeys.custom('events', id) });
+            return options?.onSuccess?.(...args);
+        },
     });
 }
 
