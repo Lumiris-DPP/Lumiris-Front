@@ -2,8 +2,7 @@
 
 import Image from 'next/image';
 import { Plus, Trash2 } from 'lucide-react';
-import type { CareInstructionCode, DppCertification, DppMaterial, Fiber } from '@lumiris/types';
-import { Checkbox } from '@lumiris/ui/components/checkbox';
+import type { CareInstructionCode, DppMaterial, Fiber } from '@lumiris/types';
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@lumiris/ui/components/select';
@@ -34,8 +33,6 @@ const CARE_SYMBOLS: ReadonlyArray<{ code: CareInstructionCode; label: string; sv
     { code: 'iron-high', label: 'Repassage fort', svgPath: '/ginetex/ginetex--hot-iron.svg' },
     { code: 'no-iron', label: 'Ne pas repasser', svgPath: '/ginetex/ginetex--do-not-iron.svg' },
 ];
-
-const CERT_NAMES: ReadonlyArray<DppCertification['name']> = ['GOTS', 'OEKO-TEX', 'Fair-Trade', 'other'];
 
 interface CompositionSectionProps {
     materials: DppMaterial[];
@@ -148,48 +145,6 @@ export function CareSymbolsSection({ care, onToggle }: CareSymbolsSectionProps) 
                             />
                             <span className="truncate">{s.label}</span>
                         </button>
-                    );
-                })}
-            </div>
-        </section>
-    );
-}
-
-interface CertificationsSectionProps {
-    certs: DppCertification[];
-    onToggle: (name: DppCertification['name']) => void;
-    onUpdateLicense: (name: DppCertification['name'], licenseNumber: string) => void;
-}
-
-export function CertificationsSection({ certs, onToggle, onUpdateLicense }: CertificationsSectionProps) {
-    return (
-        <section className="space-y-3">
-            <Label className="text-base font-semibold">Certifications</Label>
-            <div className="space-y-3">
-                {CERT_NAMES.map((name) => {
-                    const cert = certs.find((c) => c.name === name);
-                    const checked = !!cert;
-                    return (
-                        <div key={name} className="space-y-2">
-                            <div className="flex items-center gap-2">
-                                <Checkbox
-                                    id={`cert-${name}`}
-                                    checked={checked}
-                                    onCheckedChange={() => onToggle(name)}
-                                />
-                                <label htmlFor={`cert-${name}`} className="cursor-pointer text-sm font-medium">
-                                    {name === 'other' ? 'Autre certification' : name}
-                                </label>
-                            </div>
-                            {checked && (
-                                <Input
-                                    className="ml-6"
-                                    placeholder="Numéro de certificat / licence"
-                                    value={cert?.licenseNumber ?? ''}
-                                    onChange={(e) => onUpdateLicense(name, e.target.value)}
-                                />
-                            )}
-                        </div>
                     );
                 })}
             </div>

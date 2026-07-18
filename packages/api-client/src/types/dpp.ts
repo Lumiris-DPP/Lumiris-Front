@@ -47,11 +47,40 @@ export const DPP_FILE_PARTS = [
 ] as const;
 export type DppFilePart = (typeof DPP_FILE_PARTS)[number];
 
+// Mirrors the backend DocumentType enum → @RequestPart name mapping.
+export const DPP_DOCUMENT_TYPE_TO_PART = {
+    PRODUCT_PHOTO: 'productPhoto',
+    REACH_COMPLIANCE: 'reachCompliance',
+    EU_DOC_OF_CONFORMITY: 'euDeclaration',
+    TEST_REPORTS: 'testReports',
+    TRANSACTION_CERTIFICATES: 'transactionCerts',
+    ORIGIN_CERTIFICATES: 'originCerts',
+    REPAIR_MANUAL: 'repairManual',
+    CARE_GUIDE: 'careGuide',
+    END_OF_LIFE_GUIDE: 'endOfLifeGuide',
+    SALE_INVOICE: 'saleInvoice',
+    CREATION_PASSPORT: 'creationPassport',
+} as const satisfies Record<string, DppFilePart>;
+export type DppDocumentType = keyof typeof DPP_DOCUMENT_TYPE_TO_PART;
+
+/** Converts a record keyed by DocumentType into the part-keyed record expected by `dpp.create`. */
+export function dppFilesToParts(
+    files: Partial<Record<string, File>> | undefined,
+): Partial<Record<DppFilePart, File>> | undefined {
+    if (!files) return undefined;
+    const parts: Partial<Record<DppFilePart, File>> = {};
+    for (const [docType, file] of Object.entries(files)) {
+        const part = DPP_DOCUMENT_TYPE_TO_PART[docType as DppDocumentType];
+        if (part && file) parts[part] = file;
+    }
+    return parts;
+}
+
 export const dppFormDocumentSchema = z.object({
-    id: z.string().nullish(),
+    fileId: z.string().nullish(),
     documentType: z.string().nullish(),
     visibility: z.string().nullish(),
-    fileName: z.string().nullish(),
+    filename: z.string().nullish(),
     url: z.string().nullish(),
 });
 export type DppFormDocument = z.infer<typeof dppFormDocumentSchema>;
@@ -101,6 +130,23 @@ export const dppEventPayloadSchema = z.object({
 });
 export type DppEventPayload = z.infer<typeof dppEventPayloadSchema>;
 
+const irisAxisSchema = z.object({
+    transparency: z.number(),
+    craftsmanship: z.number(),
+    impact: z.number(),
+    repairability: z.number(),
+});
+
+// GET /api/dpp-forms/{id}/iris_score — mirrors the backend IrisScoreResponse.
+export const irisScoreDtoSchema = z.object({
+    total: z.number(),
+    grade: z.string(),
+    breakdown: irisAxisSchema,
+    weights: irisAxisSchema.nullish(),
+    reasons: z.array(z.unknown()).nullish(),
+});
+export type IrisScoreDto = z.infer<typeof irisScoreDtoSchema>;
+
 export const dppFormSummaryDtoSchema = z.object({
     id: z.string(),
     createdAt: z.string(),
@@ -110,3 +156,10 @@ export const dppFormSummaryDtoSchema = z.object({
     sku: z.string().nullable(),
 });
 export type DppFormSummaryDto = z.infer<typeof dppFormSummaryDtoSchema>;
+
+// GET /public/dpp_forms/{code} — public read of a published DPP with its score.
+export const dppFormPublicDtoSchema = z.object({
+    dpp: dppFormDtoSchema,
+    irisScore: irisScoreDtoSchema.nullish(),
+});
+export type DppFormPublicDto = z.infer<typeof dppFormPublicDtoSchema>;

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { DppScoreInput, IrisGrade, ScoreReason, ScoreResult } from '@lumiris/types';
 
 import type { Http } from '../core/http';
 import { parseOr } from '../core/validate';
@@ -6,18 +7,34 @@ import {
     dppEventDtoSchema,
     dppFormCreatedDtoSchema,
     dppFormDtoSchema,
+    dppFormPublicDtoSchema,
     dppFormSummaryDtoSchema,
+    irisScoreDtoSchema,
     type DppEventDto,
     type DppEventPayload,
     type DppFilePart,
     type DppFormCreatedDto,
     type DppFormDto,
     type DppFormPayload,
+    type DppFormPublicDto,
     type DppFormSummaryDto,
+    type IrisScoreDto,
 } from '../types/dpp';
 
 const dppFormSummaryListSchema = z.array(dppFormSummaryDtoSchema);
 const dppEventListSchema = z.array(dppEventDtoSchema);
+
+const FIXED_WEIGHTS = { transparency: 0.4, craftsmanship: 0.25, impact: 0.25, repairability: 0.1 } as const;
+
+function toScoreResult(dto: IrisScoreDto): ScoreResult {
+    return {
+        total: dto.total,
+        grade: dto.grade as IrisGrade,
+        breakdown: dto.breakdown,
+        weights: dto.weights ?? FIXED_WEIGHTS,
+        reasons: (dto.reasons ?? []) as ScoreReason[],
+    };
+}
 
 export function dppApi(http: Http) {
     return {
@@ -51,6 +68,20 @@ export function dppApi(http: Http) {
                 dppEventDtoSchema,
                 await http.request(`/api/dpp-forms/${id}/events`, { method: 'POST', body: payload }),
             );
+        },
+        async getIrisScore(id: string): Promise<ScoreResult> {
+            return toScoreResult(parseOr(irisScoreDtoSchema, await http.request(`/api/dpp-forms/${id}/iris_score`)));
+        },
+        async computeIrisScore(draft: DppScoreInput): Promise<ScoreResult> {
+            return toScoreResult(
+                parseOr(
+                    irisScoreDtoSchema,
+                    await http.request('/api/dpp-forms/compute_iris_score', { method: 'POST', body: draft }),
+                ),
+            );
+        },
+        async getPublic(code: string): Promise<DppFormPublicDto> {
+            return parseOr(dppFormPublicDtoSchema, await http.request(`/public/dpp_forms/${code}`));
         },
     };
 }

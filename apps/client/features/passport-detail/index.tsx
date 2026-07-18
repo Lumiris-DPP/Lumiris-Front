@@ -10,6 +10,7 @@ import { Badge } from '@lumiris/ui/components/badge';
 import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import { Toaster } from '@lumiris/ui/components/sonner';
+import { IrisScoreCard } from '@lumiris/scoring-ui';
 import { useDppForm } from '@lumiris/api-client/react';
 import type { DppFormDto } from '@lumiris/api-client';
 import { useAuthStore } from '@/lib/auth-store';
@@ -17,8 +18,10 @@ import { useCurrentArtisan } from '@/lib/current-artisan';
 import { draftToPassport, useDraftStore } from '@/lib/draft-store';
 import { dppToPassport } from '@/lib/passport-adapter';
 import { CompositionCard, IdentityCard, ScoreAside, SustainabilityCard, TraceabilityCard } from './detail-cards';
+import { DocumentsCard } from './documents-card';
 import { EventFormCard } from './event-form-card';
 import { EventHistoryCard } from './event-history-card';
+import { QrCodeCard } from './QrCodeCard';
 import { buildDetailView } from './view-model';
 
 export function PassportDetail({ passportId }: { passportId: string }) {
@@ -103,13 +106,21 @@ export function PassportDetail({ passportId }: { passportId: string }) {
                     <SustainabilityCard view={view} />
                     {apiDpp && (
                         <>
+                            <DocumentsCard documents={apiDpp.documents ?? []} />
                             <EventFormCard passportId={passportId} />
                             <EventHistoryCard passportId={passportId} />
                         </>
                     )}
                 </div>
 
-                <ScoreAside score={score} passport={passport} />
+                {apiDpp ? (
+                    <aside className="lg:sticky lg:top-24 lg:self-start">
+                        <IrisScoreCard dppId={passportId} />
+                        {apiDpp.publicCode && <QrCodeCard publicCode={apiDpp.publicCode} />}
+                    </aside>
+                ) : (
+                    <ScoreAside score={score} passport={passport} />
+                )}
             </div>
         </>
     );
