@@ -10,7 +10,12 @@ import {
 
 import { createKeys } from '../core/keys';
 import { isApiError } from '../core/errors';
-import type { ArtisanProfileResponse, ArtisanRegisterRequest } from '../types/artisans';
+import type {
+    ArtisanPhotoResponse,
+    ArtisanProfileResponse,
+    ArtisanRegisterRequest,
+    ArtisanVitrineUpdateRequest,
+} from '../types/artisans';
 
 import { useApiClient } from '../core/provider';
 
@@ -52,6 +57,54 @@ export function useSignDeclaration(
     const queryClient = useQueryClient();
     return useMutation<ArtisanProfileResponse, Error, void>({
         mutationFn: () => client.artisans.signDeclaration(),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.setQueryData(artisanKeys.custom('me'), args[0]);
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+export function useUpdateArtisanVitrine(
+    options?: Omit<UseMutationOptions<ArtisanProfileResponse, Error, ArtisanVitrineUpdateRequest>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<ArtisanProfileResponse, Error, ArtisanVitrineUpdateRequest>({
+        mutationFn: (req) => client.artisans.updateProfile(req),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.setQueryData(artisanKeys.custom('me'), args[0]);
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+export function useAddArtisanPhoto(
+    options?: Omit<UseMutationOptions<ArtisanPhotoResponse, Error, File>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    return useMutation<ArtisanPhotoResponse, Error, File>({
+        mutationFn: (file) => client.artisans.addPhoto(file),
+        ...options,
+    });
+}
+
+export function useRemoveArtisanPhoto(options?: Omit<UseMutationOptions<void, Error, string>, 'mutationFn'>) {
+    const client = useApiClient();
+    return useMutation<void, Error, string>({
+        mutationFn: (photoId) => client.artisans.removePhoto(photoId),
+        ...options,
+    });
+}
+
+export function usePublishArtisanVitrine(
+    options?: Omit<UseMutationOptions<ArtisanProfileResponse, Error, void>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<ArtisanProfileResponse, Error, void>({
+        mutationFn: () => client.artisans.publish(),
         ...options,
         onSuccess: (...args) => {
             queryClient.setQueryData(artisanKeys.custom('me'), args[0]);

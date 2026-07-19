@@ -1,5 +1,11 @@
 import type { Http } from '../core/http';
-import type { ArtisanProfileResponse, ArtisanRegisterRequest } from '../types/artisans';
+import type {
+    ArtisanPhotoResponse,
+    ArtisanProfileResponse,
+    ArtisanPublicProfileResponse,
+    ArtisanRegisterRequest,
+    ArtisanVitrineUpdateRequest,
+} from '../types/artisans';
 
 export function artisansApi(http: Http) {
     return {
@@ -11,6 +17,23 @@ export function artisansApi(http: Http) {
         },
         signDeclaration(): Promise<ArtisanProfileResponse> {
             return http.request<ArtisanProfileResponse>('/api/artisans/sign-declaration', { method: 'POST' });
+        },
+        updateProfile(req: ArtisanVitrineUpdateRequest): Promise<ArtisanProfileResponse> {
+            return http.request<ArtisanProfileResponse>('/api/artisans/me/profile', { method: 'PUT', body: req });
+        },
+        addPhoto(file: File): Promise<ArtisanPhotoResponse> {
+            const form = new FormData();
+            form.append('file', file);
+            return http.request<ArtisanPhotoResponse>('/api/artisans/me/photos', { method: 'POST', body: form });
+        },
+        removePhoto(photoId: string): Promise<void> {
+            return http.request<void>(`/api/artisans/me/photos/${photoId}`, { method: 'DELETE', skipJson: true });
+        },
+        publish(): Promise<ArtisanProfileResponse> {
+            return http.request<ArtisanProfileResponse>('/api/artisans/me/publish', { method: 'POST' });
+        },
+        getPublicBySlug(slug: string): Promise<ArtisanPublicProfileResponse> {
+            return http.request<ArtisanPublicProfileResponse>(`/v1/artisans/${slug}`);
         },
     };
 }
