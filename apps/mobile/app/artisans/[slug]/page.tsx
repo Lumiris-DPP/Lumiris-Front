@@ -1,12 +1,6 @@
 import { notFound } from 'next/navigation';
-import { mockArtisansWithSlug, mockArtisanBySlug } from '@lumiris/mock-data';
-import { ArtisanProfile } from '@/features/artisan-profile';
-
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-    return mockArtisansWithSlug.map((a) => ({ slug: a.slug }));
-}
+import { fetchPublicArtisanProfile } from '@/lib/public-artisan-api';
+import { ArtisanPublicProfile } from '@/features/artisan-profile/public-view';
 
 interface RouteProps {
     params: Promise<{ slug: string }>;
@@ -14,11 +8,17 @@ interface RouteProps {
 
 export default async function ArtisanRoute({ params }: RouteProps) {
     const { slug } = await params;
-    const artisan = mockArtisanBySlug(slug);
-    if (!artisan) notFound();
+
+    let artisan;
+    try {
+        artisan = await fetchPublicArtisanProfile(slug);
+    } catch {
+        notFound();
+    }
+
     return (
         <div className="bg-background mx-auto flex h-dvh max-w-md flex-col">
-            <ArtisanProfile artisan={artisan} />
+            <ArtisanPublicProfile artisan={artisan} />
         </div>
     );
 }

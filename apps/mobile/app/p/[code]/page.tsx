@@ -49,7 +49,12 @@ export default function PublicDppPage({ params }: PageProps) {
 
     return (
         <div className="bg-background mx-auto flex h-dvh max-w-md flex-col">
-            <PublicPassportDetail dpp={data.dpp} irisScore={data.irisScore} events={events} />
+            <PublicPassportDetail
+                dpp={data.dpp}
+                irisScore={data.irisScore}
+                events={events}
+                artisanSlug={data.artisanSlug}
+            />
         </div>
     );
 }

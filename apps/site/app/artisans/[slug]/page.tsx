@@ -1,15 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { passportPublicByArtisan, CITY_COORDS } from '@lumiris/mock-data';
 import { ArtisanPublicView } from '@/features/artisan-public-view';
 import { JsonLd } from '@/features/json-ld';
-import { getAllArtisans, getArtisanBySlug } from '@/lib/artisans';
-
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-    return getAllArtisans().map((a) => ({ slug: a.slug }));
-}
+import { fetchPublicArtisanProfile } from '@/lib/public-artisan-api';
 
 interface RouteProps {
     params: Promise<{ slug: string }>;
@@ -17,11 +10,16 @@ interface RouteProps {
 
 export async function generateMetadata({ params }: RouteProps): Promise<Metadata> {
     const { slug } = await params;
-    const artisan = getArtisanBySlug(slug);
+    const artisan = await fetchPublicArtisanProfile(slug);
     if (!artisan) return {};
 
-    const title = `${artisan.atelierName} - ${artisan.city} | Artisan textile LUMIRIS`;
-    const description = artisan.story.length > 160 ? `${artisan.story.slice(0, 157).trimEnd()}…` : artisan.story;
+    const name = artisan.atelierName ?? artisan.displayName ?? 'Atelier';
+    const title = artisan.city ? `${name} - ${artisan.city} | Artisan textile LUMIRIS` : `${name} | LUMIRIS`;
+    const description = artisan.story
+        ? artisan.story.length > 160
+            ? `${artisan.story.slice(0, 157).trimEnd()}…`
+            : artisan.story
+        : undefined;
     const canonical = `/artisans/${artisan.slug}`;
 
     return {
@@ -33,54 +31,40 @@ export async function generateMetadata({ params }: RouteProps): Promise<Metadata
             url: canonical,
             title,
             description,
-            images: artisan.photoUrl ? [{ url: artisan.photoUrl }] : undefined,
-        },
-        twitter: {
-            card: 'summary_large_image',
-            title,
-            description,
-            images: artisan.photoUrl ? [artisan.photoUrl] : undefined,
+            images: artisan.photoUrls[0] ? [{ url: artisan.photoUrls[0] }] : undefined,
         },
     };
 }
 
 export default async function ArtisanPage({ params }: RouteProps) {
     const { slug } = await params;
-    const artisan = getArtisanBySlug(slug);
+    const artisan = await fetchPublicArtisanProfile(slug);
     if (!artisan) notFound();
 
-    const passports = passportPublicByArtisan(artisan.id);
-    const coords = CITY_COORDS[artisan.city];
-
+    const name = artisan.atelierName ?? artisan.displayName ?? 'Atelier';
     const localBusinessJsonLd = {
         '@context': 'https://schema.org',
         '@type': 'LocalBusiness',
         '@id': `https://lumiris.fr/artisans/${artisan.slug}`,
-        name: artisan.atelierName,
-        description: artisan.story,
+        name,
+        description: artisan.story ?? undefined,
         url: `https://lumiris.fr/artisans/${artisan.slug}`,
         sameAs: artisan.websiteUrl ? [artisan.websiteUrl] : undefined,
-        image: artisan.photoUrl || undefined,
-        address: {
-            '@type': 'PostalAddress',
-            addressLocality: artisan.city,
-            addressRegion: artisan.region,
-            addressCountry: 'FR',
-        },
-        geo: coords
+        image: artisan.photoUrls[0] || undefined,
+        address: artisan.city
             ? {
-                  '@type': 'GeoCoordinates',
-                  latitude: coords.lat,
-                  longitude: coords.lng,
+                  '@type': 'PostalAddress',
+                  addressLocality: artisan.city,
+                  addressRegion: artisan.region ?? undefined,
+                  addressCountry: 'FR',
               }
             : undefined,
-        founder: { '@type': 'Person', name: artisan.displayName },
     };
 
     return (
         <>
             <JsonLd data={localBusinessJsonLd} />
-            <ArtisanPublicView artisan={artisan} passports={passports} />
+            <ArtisanPublicView artisan={artisan} />
         </>
     );
 }

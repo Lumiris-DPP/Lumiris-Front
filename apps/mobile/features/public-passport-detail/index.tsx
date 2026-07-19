@@ -2,8 +2,9 @@
 
 import { type ReactNode } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { CheckCircle, XCircle, FileText, ArrowLeft, Download, Heart } from 'lucide-react';
+import { CheckCircle, XCircle, FileText, ArrowLeft, Download, Heart, ExternalLink } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { IrisGrade } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
@@ -77,9 +78,15 @@ interface PublicPassportDetailProps {
     dpp: DppFormDto;
     irisScore: IrisScoreDto | null;
     events?: DppEventDto[];
+    artisanSlug?: string | null;
 }
 
-export function PublicPassportDetail({ dpp, irisScore, events = [] }: PublicPassportDetailProps) {
+export function PublicPassportDetail({
+    dpp,
+    irisScore,
+    events = [],
+    artisanSlug,
+}: PublicPassportDetailProps) {
     const router = useRouter();
     const grade = irisScore?.grade as IrisGrade | undefined;
     const cssVar = grade ? GRADE_CSS_VAR[grade] : 'var(--color-lumiris-iris)';
@@ -239,6 +246,17 @@ export function PublicPassportDetail({ dpp, irisScore, events = [] }: PublicPass
                         )}
                     </div>
                 </Section>
+
+                {/* Artisan */}
+                {artisanSlug && (
+                    <Link
+                        href={`/artisans/${artisanSlug}`}
+                        className="border-border bg-card hover:bg-muted/40 flex items-center justify-between rounded-2xl border p-4 transition-colors"
+                    >
+                        <span className="text-foreground text-sm font-semibold">Voir la vitrine de l&apos;artisan</span>
+                        <ExternalLink className="text-muted-foreground h-4 w-4" />
+                    </Link>
+                )}
 
                 {/* Composition & Entretien */}
                 {((dpp.materials ?? []).length > 0 || (dpp.careInstructions ?? []).length > 0 || dpp.careNotes) && (

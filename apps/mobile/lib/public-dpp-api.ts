@@ -55,6 +55,7 @@ export interface IrisScoreDto {
 export interface DppFormPublicDto {
     dpp: DppFormDto;
     irisScore: IrisScoreDto | null;
+    artisanSlug: string | null;
 }
 
 export type DppEventActorType = 'MANUFACTURER' | 'DISTRIBUTOR' | 'RETAILER' | 'CONSUMER' | 'REPAIRER' | 'RECYCLER';
