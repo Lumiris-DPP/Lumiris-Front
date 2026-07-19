@@ -40,6 +40,9 @@ function deriveLabelAndHref(item: WardrobeItem): { label: string; href: string |
     if (item.kind === 'manual') {
         return { label: item.productName, href: '/vault' };
     }
+    if (item.kind === 'public-dpp') {
+        return { label: item.productName, href: `/p/${item.publicCode}` };
+    }
     return { label: `DPP externe · ${item.gtin}`, href: '/vault' };
 }
 

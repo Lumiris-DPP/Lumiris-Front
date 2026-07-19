@@ -16,7 +16,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@lumiris/ui/compon
 import { removeFromWardrobe, type WardrobeSector } from '@/lib/wardrobe-storage';
 
 interface VaultActionTarget {
-    kind: 'scored' | 'manual';
+    kind: 'scored' | 'public-dpp' | 'manual';
     key: string;
     label: string;
     sublabel: string;
