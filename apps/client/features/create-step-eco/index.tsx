@@ -70,6 +70,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
             careNotes: draft.careNotes || null,
             manufacturedAt: draft.traceability.manufacturedAt,
             batchNumber: draft.traceability.batchNumber ?? null,
+            quantity: draft.traceability.quantity && draft.traceability.quantity >= 1 ? draft.traceability.quantity : 1,
             gtin: draft.traceability.gtin ?? null,
             sku: draft.traceability.sku ?? null,
             reachCompliant: draft.traceability.reachCompliant,

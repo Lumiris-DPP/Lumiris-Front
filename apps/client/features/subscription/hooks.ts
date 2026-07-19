@@ -2,17 +2,10 @@
 
 import { useMemo, useState } from 'react';
 import type { BillingCycle, PlanDto } from '@lumiris/api-client';
-import { useBillingPortal, useChangePlan, usePlans } from '@lumiris/api-client/react';
+import { useBillingPortal, useChangePlan, useCheckoutSession, usePlans } from '@lumiris/api-client/react';
 import { toast } from '@lumiris/ui/components/sonner';
 import { useAuthStore } from '@/lib/auth-store';
 import { useSubscription } from '@/lib/use-subscription';
-import { euros } from './utils';
-
-export interface CheckoutTarget {
-    tier: string;
-    label: string;
-    amountLabel: string;
-}
 
 export function useSubscriptionPage() {
     const isRealMode = useAuthStore((s) => s.token != null);
@@ -20,9 +13,9 @@ export function useSubscriptionPage() {
     const plansQuery = usePlans({ enabled: isRealMode });
     const portal = useBillingPortal();
     const changePlan = useChangePlan();
+    const checkoutSession = useCheckoutSession();
 
     const [cycle, setCycle] = useState<BillingCycle>('monthly');
-    const [checkout, setCheckout] = useState<CheckoutTarget | null>(null);
 
     const plans = useMemo(() => (plansQuery.data?.plans ?? []).filter((p) => p.grantsPassports), [plansQuery.data]);
 
@@ -53,12 +46,21 @@ export function useSubscriptionPage() {
             );
             return;
         }
-        const amount = cycle === 'annual' ? plan.annualAmountCents : plan.monthlyAmountCents;
-        setCheckout({
-            tier: plan.tier,
-            label: plan.label,
-            amountLabel: `${euros(amount)} €/${cycle === 'annual' ? 'an' : 'mois'}`,
-        });
+        // Nouveau souscripteur → Stripe Checkout Session hébergée (redirection). La complétion est
+        // synchronisée via le webhook (customer.subscription.created / checkout.session.completed).
+        if (checkoutSession.isPending) return;
+        checkoutSession.mutate(
+            { tier: plan.tier, cycle },
+            {
+                onSuccess: ({ url }) => {
+                    window.location.href = url;
+                },
+                onError: (err) =>
+                    toast.error("Impossible d'ouvrir le paiement Stripe", {
+                        description: err instanceof Error ? err.message : undefined,
+                    }),
+            },
+        );
     }
 
     return {
@@ -73,10 +75,9 @@ export function useSubscriptionPage() {
         cycle,
         setCycle,
         isAnnual: cycle === 'annual',
-        checkout,
-        setCheckout,
         portal,
         changePlan,
+        checkoutSession,
         openPortal,
         onChoose,
         retry: () => {

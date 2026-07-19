@@ -12,6 +12,7 @@ import { createKeys } from '../core/keys';
 import { CACHE_TIMES } from '../core/cache';
 import type {
     CatalogDto,
+    CheckoutDto,
     CreateSetupIntentRequest,
     PortalDto,
     SetupIntentDto,
@@ -96,6 +97,17 @@ export function useBillingPortal(options?: Omit<UseMutationOptions<PortalDto, Er
     const client = useApiClient();
     return useMutation<PortalDto, Error, void>({
         mutationFn: () => client.subscription.openPortal(),
+        ...options,
+    });
+}
+
+// Hosted Stripe Checkout Session for a new subscriber; the caller redirects to the returned url.
+export function useCheckoutSession(
+    options?: Omit<UseMutationOptions<CheckoutDto, Error, CreateSetupIntentRequest>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    return useMutation<CheckoutDto, Error, CreateSetupIntentRequest>({
+        mutationFn: (req) => client.subscription.checkout(req),
         ...options,
     });
 }

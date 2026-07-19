@@ -170,6 +170,8 @@ export interface TraceabilityInfo {
     gtin?: string;
     sku?: string;
     reachCompliant: boolean;
+    /** Nombre d'exemplaires produits pour ce passeport (>=1). Sert de stock initial à la conversion marketplace. */
+    quantity?: number;
 }
 
 export interface EcoInfo {

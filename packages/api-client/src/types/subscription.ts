@@ -79,3 +79,9 @@ export const portalDtoSchema = z.object({
     url: z.string(),
 });
 export type PortalDto = z.infer<typeof portalDtoSchema>;
+
+// Hosted Stripe Checkout Session URL (mode=subscription) — the front redirects to it.
+export const checkoutDtoSchema = z.object({
+    url: z.string(),
+});
+export type CheckoutDto = z.infer<typeof checkoutDtoSchema>;

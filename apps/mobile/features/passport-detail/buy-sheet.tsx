@@ -6,6 +6,7 @@ import { Button } from '@lumiris/ui/components/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@lumiris/ui/components/sheet';
 import type { Passport } from '@lumiris/types';
 import type { ArtisanWithSlug } from '@lumiris/mock-data';
+import { useTrackAffiliate } from '@lumiris/api-client/react';
 import { trackAffiliateClick } from '@/lib/affiliate/track';
 import { useOnlineStatus } from '@/lib/network/use-online-status';
 
@@ -19,15 +20,18 @@ interface BuySheetProps {
 export function BuySheet({ open, onOpenChange, passport, artisan }: BuySheetProps) {
     const websiteUrl = artisan.websiteUrl;
     const online = useOnlineStatus();
+    const track = useTrackAffiliate();
 
     const onGoToWebsite = () => {
         if (!websiteUrl || !online) return;
+        // Journal local (historique) + tracking serveur via /public/track/affiliate.
         trackAffiliateClick({
             source: 'passport-buy',
             passportId: passport.id,
             artisanId: artisan.id,
             websiteUrl,
         });
+        track.mutate({ source: 'passport-buy', targetUrl: websiteUrl });
         onOpenChange(false);
     };
 

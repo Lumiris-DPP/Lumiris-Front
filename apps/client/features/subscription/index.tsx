@@ -1,6 +1,6 @@
 'use client';
 
-import { lazy, Suspense, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { ExternalLink, Loader2, ShieldCheck } from 'lucide-react';
 import { formatDate } from '@lumiris/utils';
 import { Badge } from '@lumiris/ui/components/badge';
@@ -9,8 +9,6 @@ import { Card, CardContent } from '@lumiris/ui/components/card';
 import { cn } from '@lumiris/ui/lib/cn';
 import { useSubscriptionPage } from './hooks';
 import { PlanCard } from './plan-card';
-
-const CheckoutDialog = lazy(() => import('./checkout-dialog').then((m) => ({ default: m.CheckoutDialog })));
 
 type SubscriptionPage = ReturnType<typeof useSubscriptionPage>;
 
@@ -72,7 +70,7 @@ export function Subscription() {
                             )}
                             isAnnual={sub.isAnnual}
                             hasActiveSubscription={sub.hasActiveSubscription}
-                            disabled={sub.portal.isPending || sub.changePlan.isPending}
+                            disabled={sub.portal.isPending || sub.changePlan.isPending || sub.checkoutSession.isPending}
                             onChoose={sub.onChoose}
                         />
                     ))}
@@ -83,20 +81,6 @@ export function Subscription() {
                 <ShieldCheck className="text-lumiris-emerald h-3.5 w-3.5" />
                 Paiement sécurisé par Stripe · aucun acteur ne peut payer pour influencer son score Iris.
             </p>
-
-            {sub.checkout && (
-                <Suspense fallback={null}>
-                    <CheckoutDialog
-                        open
-                        onOpenChange={(o) => !o && sub.setCheckout(null)}
-                        tier={sub.checkout.tier}
-                        cycle={sub.cycle}
-                        planLabel={sub.checkout.label}
-                        amountLabel={sub.checkout.amountLabel}
-                        onConfirmed={() => sub.setCheckout(null)}
-                    />
-                </Suspense>
-            )}
         </div>
     );
 }
