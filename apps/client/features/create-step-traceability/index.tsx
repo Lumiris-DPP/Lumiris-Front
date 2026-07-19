@@ -120,6 +120,21 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
                 </div>
             </div>
 
+            <div className="space-y-2">
+                <Label htmlFor="quantity">Nombre d&apos;exemplaires produits</Label>
+                <Input
+                    id="quantity"
+                    type="number"
+                    min={1}
+                    className="w-40"
+                    value={form.quantity ?? 1}
+                    onChange={(e) => setForm((f) => ({ ...f, quantity: Math.max(1, Number(e.target.value) || 1) }))}
+                />
+                <p className="text-muted-foreground text-[11px]">
+                    Combien de pièces pour ce passeport. Sert de stock initial si vous convertissez ce DPP en produit.
+                </p>
+            </div>
+
             {/* GTIN / EAN */}
             <div className="space-y-2">
                 <Label htmlFor="gtin">GTIN / EAN (code-barres)</Label>

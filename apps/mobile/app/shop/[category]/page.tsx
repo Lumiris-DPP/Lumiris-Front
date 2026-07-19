@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import type { GarmentKind } from '@lumiris/types';
-import { ShopCategory } from '@/features/shop/category';
+import { Shop } from '@/features/shop';
 import { SHOP_GARMENT_KINDS } from '@/lib/shop';
 
 // `dynamicParams = false` + `generateStaticParams()` => `output: 'export'` Tauri-friendly.
@@ -19,5 +19,5 @@ export default async function ShopCategoryPage({ params }: ShopCategoryPageProps
     if (!SHOP_GARMENT_KINDS.includes(category as GarmentKind)) {
         notFound();
     }
-    return <ShopCategory category={category as GarmentKind} />;
+    return <Shop key={category} initialCategory={category} />;
 }

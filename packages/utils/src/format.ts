@@ -99,6 +99,28 @@ export function formatEur(n: number): string {
     return n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 }
 
+/**
+ * Prix stocké en centimes → montant sans décimales (locale FR, devise EUR par défaut).
+ * Robuste : `cents` non-fini → 0 ; une devise non ISO-4217 (drift back / `parseOr`) ferait
+ * lever `RangeError: Invalid currency code` à `Intl` et tomber toute la grille → repli EUR.
+ */
+export function formatPriceCents(cents: number, currency = 'EUR'): string {
+    const amount = (Number.isFinite(cents) ? cents : 0) / 100;
+    try {
+        return new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: currency || 'EUR',
+            maximumFractionDigits: 0,
+        }).format(amount);
+    } catch {
+        return new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: 'EUR',
+            maximumFractionDigits: 0,
+        }).format(amount);
+    }
+}
+
 /** Taille de fichier lisible (B / KB / MB). */
 export function formatBytes(n: number): string {
     if (n < 1024) return `${n} B`;

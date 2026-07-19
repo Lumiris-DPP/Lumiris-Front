@@ -2,10 +2,12 @@ import type { Http } from '../core/http';
 import { parseOr } from '../core/validate';
 import {
     catalogDtoSchema,
+    checkoutDtoSchema,
     portalDtoSchema,
     setupIntentDtoSchema,
     subscriptionStateDtoSchema,
     type CatalogDto,
+    type CheckoutDto,
     type CreateSetupIntentRequest,
     type PortalDto,
     type SetupIntentDto,
@@ -45,6 +47,13 @@ export function subscriptionApi(http: Http) {
         },
         async openPortal(): Promise<PortalDto> {
             return parseOr(portalDtoSchema, await http.request('/api/subscription/portal', { method: 'POST' }));
+        },
+        // Hosted Stripe Checkout Session for a new subscriber (all 5 plans). Returns the URL to redirect to.
+        async checkout(req: CreateSetupIntentRequest): Promise<CheckoutDto> {
+            return parseOr(
+                checkoutDtoSchema,
+                await http.request('/api/subscription/checkout', { method: 'POST', body: req }),
+            );
         },
     };
 }

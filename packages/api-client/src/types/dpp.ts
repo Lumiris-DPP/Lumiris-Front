@@ -29,6 +29,7 @@ export const dppFormPayloadSchema = z.object({
     warrantyDescription: z.string().nullish(),
     isRepairable: z.boolean().nullish(),
     endOfLifeInstructions: z.string().nullish(),
+    quantity: z.number().int().min(1).nullish(),
 });
 export type DppFormPayload = z.infer<typeof dppFormPayloadSchema>;
 

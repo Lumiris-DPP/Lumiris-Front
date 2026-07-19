@@ -1,8 +1,8 @@
-// INVARIANT spec 5.3 : tri exclusivement par score Iris ; ATELIER+ ne joue qu'à score équivalent.
+// Métadonnées catalogue partagées (libellés + kinds). Depuis LUMIRIS-9, le tri et la
+// sélection des pièces sont opérés côté serveur (recherche auditée) ; ce module ne garde
+// que le type `ShopItem` et les libellés réutilisés par les cartes mock (discover, passport).
 
-import { mockArtisans, mockPassports } from '@lumiris/mock-data';
 import type { GarmentKind, Passport, ScoreResult } from '@lumiris/types';
-import { scorePassport } from '../passport-score';
 
 export interface ShopItem {
     passport: Passport;
@@ -30,44 +30,3 @@ export const GARMENT_KIND_LABEL: Record<GarmentKind, string> = {
     accessory: 'Accessoires',
     other: 'Autres',
 };
-
-function computeFeaturedArtisanIds(now: Date): readonly string[] {
-    const aCount = new Map<string, number>();
-    for (const p of mockPassports) {
-        if (p.status !== 'Published') continue;
-        if (scorePassport(p, now).grade !== 'A') continue;
-        aCount.set(p.artisanId, (aCount.get(p.artisanId) ?? 0) + 1);
-    }
-    return mockArtisans
-        .map((a) => ({ id: a.id, count: aCount.get(a.id) ?? 0 }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 3)
-        .map((row) => row.id);
-}
-
-const SCORE_DESC = (a: ShopItem, b: ShopItem): number => b.score.total - a.score.total;
-const FEATURED_DESC = (a: ShopItem, b: ShopItem): number => Number(b.isFeatured) - Number(a.isFeatured);
-const NAME_ASC = (a: ShopItem, b: ShopItem): number =>
-    a.passport.garment.reference.localeCompare(b.passport.garment.reference, 'fr', { sensitivity: 'base' });
-
-function compareShopItems(a: ShopItem, b: ShopItem): number {
-    return SCORE_DESC(a, b) || FEATURED_DESC(a, b) || NAME_ASC(a, b);
-}
-
-export function getShopItems(now: Date): readonly ShopItem[] {
-    const featuredIds = new Set(computeFeaturedArtisanIds(now));
-    const artisanById = new Map(mockArtisans.map((a) => [a.id, a]));
-    return mockPassports
-        .filter((p) => p.status === 'Published')
-        .map<ShopItem>((passport) => ({
-            passport,
-            score: scorePassport(passport, now),
-            artisanName: artisanById.get(passport.artisanId)?.atelierName ?? '-',
-            isFeatured: featuredIds.has(passport.artisanId),
-        }))
-        .sort(compareShopItems);
-}
-
-export function getShopItemsByCategory(category: GarmentKind, now: Date): readonly ShopItem[] {
-    return getShopItems(now).filter((item) => item.passport.garment.kind === category);
-}
