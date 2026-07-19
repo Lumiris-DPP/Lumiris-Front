@@ -7,3 +7,5 @@ export * from './artisans';
 export * from './admin-artisans';
 export * from './marketplace';
 export * from './track';
+export * from './seller';
+export * from './wardrobe';

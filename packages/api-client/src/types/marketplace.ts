@@ -30,6 +30,9 @@ export const marketplaceItemSchema = z.object({
     atelierPlus: z.boolean(),
     inAppSale: z.boolean().nullish(),
     createdAt: z.string().nullish(),
+    // Statistiques vendeur (0 sur les chemins publics search/suggest).
+    views: z.number().nullish(),
+    salesCount: z.number().nullish(),
 });
 export type MarketplaceItem = z.infer<typeof marketplaceItemSchema>;
 
@@ -107,11 +110,37 @@ export const convertDppRequestSchema = z.object({
     description: z.string().nullish(),
     material: z.string().nullish(),
     stock: z.number().int().nonnegative().nullish(),
+    // Vente directe (LUMIRIS-22) : frais de port + conditions de retour de l'offre.
+    shippingCents: z.number().int().nonnegative().nullish(),
+    returnPolicy: z.string().nullish(),
     externalOrderUrl: z.string().nullish(),
     photoUrl: z.string().nullish(),
     status: marketplaceProductStatusSchema.nullish(),
 });
 export type ConvertDppRequest = z.infer<typeof convertDppRequestSchema>;
+
+// ── Achat direct in-app (LUMIRIS-22) ────────────────────────────────────────
+// Panier → PaymentIntent Stripe Connect confirmé via Payment Element EMBARQUÉ
+// (pas de redirection). Un seul vendeur par panier (destination charge unique).
+export const cartIntentLineSchema = z.object({
+    productId: z.string(),
+    quantity: z.number().int().positive(),
+});
+export type CartIntentLine = z.infer<typeof cartIntentLineSchema>;
+
+export const cartIntentRequestSchema = z.object({
+    items: z.array(cartIntentLineSchema).min(1),
+});
+export type CartIntentRequest = z.infer<typeof cartIntentRequestSchema>;
+
+// Secret client du PaymentIntent + clé publiable (pour Stripe.js). Montant = articles + port.
+export const paymentIntentResponseSchema = z.object({
+    clientSecret: z.string(),
+    publishableKey: z.string(),
+    amountTotalCents: z.number(),
+    commissionCents: z.number(),
+});
+export type PaymentIntentResponse = z.infer<typeof paymentIntentResponseSchema>;
 
 // Payload CRUD produit (POST/PUT /api/marketplace/products).
 export const productPayloadSchema = z.object({

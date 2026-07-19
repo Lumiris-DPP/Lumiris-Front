@@ -8,6 +8,8 @@ import { artisansApi } from './modules/artisans';
 import { adminArtisansApi } from './modules/admin-artisans';
 import { marketplaceApi } from './modules/marketplace';
 import { trackApi } from './modules/track';
+import { sellerApi } from './modules/seller';
+import { wardrobeApi } from './modules/wardrobe';
 
 export type ClientOptions = HttpOptions;
 
@@ -23,6 +25,8 @@ export function createClient(opts: ClientOptions) {
         adminArtisans: adminArtisansApi(http),
         marketplace: marketplaceApi(http),
         track: trackApi(http),
+        seller: sellerApi(http),
+        wardrobe: wardrobeApi(http),
     };
 }
 

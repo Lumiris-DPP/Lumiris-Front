@@ -3,11 +3,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpDown, Check, SlidersHorizontal, X } from 'lucide-react';
-import type { Fiber, GarmentKind, IrisGrade } from '@lumiris/types';
+import type { IrisGrade } from '@lumiris/types';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@lumiris/ui/components/sheet';
 import { Slider } from '@lumiris/ui/components/slider';
 import { cn } from '@lumiris/ui/lib/cn';
-import { GARMENT_KIND_LABEL } from '@/lib/shop';
 import {
     MARKETPLACE_SORT_LABEL,
     MARKETPLACE_SORT_ORDER,
@@ -15,20 +14,11 @@ import {
     type MarketplaceSort,
 } from '@/lib/marketplace';
 
-const CATEGORY_OPTIONS: readonly GarmentKind[] = ['sweater', 'shirt', 'jacket', 'trouser', 'shoe', 'accessory'];
 const GRADE_OPTIONS: readonly IrisGrade[] = ['A', 'B', 'C', 'D', 'E'];
 
-const FIBER_LABEL: Record<Fiber, string> = {
-    wool: 'Laine',
-    linen: 'Lin',
-    cotton: 'Coton',
-    silk: 'Soie',
-    hemp: 'Chanvre',
-    leather: 'Cuir',
-    cashmere: 'Cachemire',
-    'recycled-polyester': 'Polyester recyclé',
-    other: 'Autre',
-};
+function titleCase(value: string): string {
+    return value.charAt(0).toUpperCase() + value.slice(1);
+}
 
 export interface PriceBounds {
     min: number;
@@ -36,9 +26,11 @@ export interface PriceBounds {
 }
 
 export interface BoutiqueFiltersState {
-    categories: readonly GarmentKind[];
+    /** Catégories produit (chaînes réelles du catalogue). */
+    categories: readonly string[];
     grades: readonly IrisGrade[];
-    fibers: readonly Fiber[];
+    /** Matières dominantes (chaînes réelles du catalogue). */
+    materials: readonly string[];
     /** Fourchette de prix [min, max] en euros, ou null si non bornée. */
     priceRange: readonly [number, number] | null;
     sort: MarketplaceSort;
@@ -47,33 +39,30 @@ export interface BoutiqueFiltersState {
 export const EMPTY_BOUTIQUE_FILTERS: BoutiqueFiltersState = {
     categories: [],
     grades: [],
-    fibers: [],
+    materials: [],
     priceRange: null,
     sort: 'relevance',
 };
 
-/** Matière dominante d'une pièce (plus fort pourcentage). */
-export function dominantFiber(item: MarketplaceItem): Fiber | null {
-    const materials = item.passport.materials;
-    if (materials.length === 0) return null;
-    return materials.reduce((top, m) => (m.percentage > top.percentage ? m : top)).fiber;
-}
-
 /** Bornes de prix observées sur l'ensemble des pièces en vente. */
 export function priceBoundsOf(items: readonly MarketplaceItem[]): PriceBounds {
     if (items.length === 0) return { min: 0, max: 0 };
-    const prices = items.map((i) => i.passport.garment.retailPrice);
+    const prices = items.map((i) => i.price);
     return { min: Math.floor(Math.min(...prices)), max: Math.ceil(Math.max(...prices)) };
 }
 
+/** Options de catégories réellement présentes dans le catalogue. */
+export function categoryOptionsOf(items: readonly MarketplaceItem[]): readonly string[] {
+    const set = new Set<string>();
+    for (const item of items) if (item.category) set.add(item.category);
+    return [...set].sort((a, b) => a.localeCompare(b, 'fr'));
+}
+
 /** Options de matières réellement présentes dans le catalogue. */
-export function fiberOptionsOf(items: readonly MarketplaceItem[]): readonly Fiber[] {
-    const set = new Set<Fiber>();
-    for (const item of items) {
-        const fiber = dominantFiber(item);
-        if (fiber) set.add(fiber);
-    }
-    return [...set];
+export function materialOptionsOf(items: readonly MarketplaceItem[]): readonly string[] {
+    const set = new Set<string>();
+    for (const item of items) if (item.material) set.add(item.material);
+    return [...set].sort((a, b) => a.localeCompare(b, 'fr'));
 }
 
 export function applyBoutiqueFilters(
@@ -81,22 +70,18 @@ export function applyBoutiqueFilters(
     state: BoutiqueFiltersState,
 ): readonly MarketplaceItem[] {
     return items.filter((item) => {
-        if (state.categories.length > 0 && !state.categories.includes(item.passport.garment.kind)) return false;
-        if (state.grades.length > 0 && !state.grades.includes(item.score.grade)) return false;
-        if (state.fibers.length > 0) {
-            const fiber = dominantFiber(item);
-            if (!fiber || !state.fibers.includes(fiber)) return false;
-        }
+        if (state.categories.length > 0 && (!item.category || !state.categories.includes(item.category))) return false;
+        if (state.grades.length > 0 && (!item.irisGrade || !state.grades.includes(item.irisGrade))) return false;
+        if (state.materials.length > 0 && (!item.material || !state.materials.includes(item.material))) return false;
         if (state.priceRange) {
-            const price = item.passport.garment.retailPrice;
-            if (price < state.priceRange[0] || price > state.priceRange[1]) return false;
+            if (item.price < state.priceRange[0] || item.price > state.priceRange[1]) return false;
         }
         return true;
     });
 }
 
 export function activeBoutiqueFilterCount(state: BoutiqueFiltersState): number {
-    return state.categories.length + state.grades.length + state.fibers.length + (state.priceRange ? 1 : 0);
+    return state.categories.length + state.grades.length + state.materials.length + (state.priceRange ? 1 : 0);
 }
 
 interface BoutiqueFiltersProps {
@@ -104,11 +89,19 @@ interface BoutiqueFiltersProps {
     onChange: (next: BoutiqueFiltersState) => void;
     resultCount: number;
     priceBounds: PriceBounds;
-    fiberOptions: readonly Fiber[];
+    categoryOptions: readonly string[];
+    materialOptions: readonly string[];
 }
 
 /** Barre sticky : tri rapide + déclencheur de la modale de filtres. */
-export function BoutiqueFilters({ state, onChange, resultCount, priceBounds, fiberOptions }: BoutiqueFiltersProps) {
+export function BoutiqueFilters({
+    state,
+    onChange,
+    resultCount,
+    priceBounds,
+    categoryOptions,
+    materialOptions,
+}: BoutiqueFiltersProps) {
     const [open, setOpen] = useState(false);
     const activeCount = activeBoutiqueFilterCount(state);
 
@@ -163,7 +156,8 @@ export function BoutiqueFilters({ state, onChange, resultCount, priceBounds, fib
                 onChange={onChange}
                 resultCount={resultCount}
                 priceBounds={priceBounds}
-                fiberOptions={fiberOptions}
+                categoryOptions={categoryOptions}
+                materialOptions={materialOptions}
             />
         </motion.div>
     );
@@ -181,7 +175,8 @@ function BoutiqueFilterSheet({
     onChange,
     resultCount,
     priceBounds,
-    fiberOptions,
+    categoryOptions,
+    materialOptions,
 }: SheetProps) {
     const priceEnabled = priceBounds.max > priceBounds.min;
     const range = state.priceRange ?? [priceBounds.min, priceBounds.max];
@@ -207,17 +202,19 @@ function BoutiqueFilterSheet({
                 </SheetHeader>
 
                 <div className="mt-5 flex flex-col gap-6">
-                    <FilterGroup label="Catégorie">
-                        {CATEGORY_OPTIONS.map((kind) => (
-                            <FilterChip
-                                key={kind}
-                                active={state.categories.includes(kind)}
-                                onClick={() => onChange({ ...state, categories: toggle(state.categories, kind) })}
-                            >
-                                {GARMENT_KIND_LABEL[kind]}
-                            </FilterChip>
-                        ))}
-                    </FilterGroup>
+                    {categoryOptions.length > 0 ? (
+                        <FilterGroup label="Catégorie">
+                            {categoryOptions.map((cat) => (
+                                <FilterChip
+                                    key={cat}
+                                    active={state.categories.includes(cat)}
+                                    onClick={() => onChange({ ...state, categories: toggle(state.categories, cat) })}
+                                >
+                                    {titleCase(cat)}
+                                </FilterChip>
+                            ))}
+                        </FilterGroup>
+                    ) : null}
 
                     <FilterGroup label="Score Iris">
                         {GRADE_OPTIONS.map((grade) => (
@@ -231,15 +228,15 @@ function BoutiqueFilterSheet({
                         ))}
                     </FilterGroup>
 
-                    {fiberOptions.length > 0 ? (
+                    {materialOptions.length > 0 ? (
                         <FilterGroup label="Matière principale">
-                            {fiberOptions.map((fiber) => (
+                            {materialOptions.map((material) => (
                                 <FilterChip
-                                    key={fiber}
-                                    active={state.fibers.includes(fiber)}
-                                    onClick={() => onChange({ ...state, fibers: toggle(state.fibers, fiber) })}
+                                    key={material}
+                                    active={state.materials.includes(material)}
+                                    onClick={() => onChange({ ...state, materials: toggle(state.materials, material) })}
                                 >
-                                    {FIBER_LABEL[fiber]}
+                                    {titleCase(material)}
                                 </FilterChip>
                             ))}
                         </FilterGroup>

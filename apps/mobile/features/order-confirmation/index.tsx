@@ -1,34 +1,33 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { CheckCircle2, FileText, ShieldCheck, Sparkles } from 'lucide-react';
-import { formatEur, getOrderById, type Order } from '@/lib/marketplace';
+import { CheckCircle2, FileText, Loader2, ShieldCheck, Sparkles } from 'lucide-react';
+import { useMyOrders, useWardrobe } from '@lumiris/api-client/react';
+import { useUser } from '@/lib/auth/use-user';
+import { clearCart, formatCents } from '@/lib/marketplace';
 
-export function OrderConfirmation({ orderId }: { orderId: string }) {
-    // L'Order vit dans le localStorage scopé user ; on le lit côté client après montage.
-    const [order, setOrder] = useState<Order | null>(null);
-    const [ready, setReady] = useState(false);
+export function OrderConfirmation() {
+    const { isAuthenticated } = useUser();
 
+    // Filet de sécurité : vider le panier à l'arrivée (notamment après redirection 3-D Secure).
     useEffect(() => {
-        setOrder(getOrderById(orderId));
-        setReady(true);
-    }, [orderId]);
+        clearCart();
+    }, []);
 
-    if (ready && !order) {
-        return (
-            <div className="bg-background flex h-full flex-col items-center justify-center gap-4 px-8 text-center">
-                <p className="text-foreground text-base font-semibold">Commande introuvable</p>
-                <Link
-                    href="/boutique"
-                    className="bg-foreground text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
-                >
-                    Retour à la Boutique
-                </Link>
-            </div>
-        );
-    }
+    // La commande passe à PAID via le webhook Stripe → on poll jusqu'à confirmation.
+    const { data: orders = [], isLoading } = useMyOrders({
+        enabled: isAuthenticated,
+        refetchInterval: (query) => {
+            const latest = query.state.data?.[0];
+            return latest && latest.status !== 'PENDING' ? false : 1500;
+        },
+    });
+    const { data: wardrobe = [] } = useWardrobe({ enabled: isAuthenticated });
+
+    const order = orders[0] ?? null;
+    const settling = !order || order.status === 'PENDING';
 
     return (
         <div className="bg-background flex h-full flex-col overflow-y-auto pb-28">
@@ -47,39 +46,37 @@ export function OrderConfirmation({ orderId }: { orderId: string }) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
                 >
-                    Commande confirmée
+                    {settling ? 'Paiement reçu' : 'Commande confirmée'}
                 </motion.h1>
-                {order ? (
+                {order?.invoiceNumber ? (
                     <p className="text-muted-foreground mt-1 text-sm">
-                        Commande <span className="text-foreground font-mono">{order.number}</span>
+                        Facture <span className="text-foreground font-mono">{order.invoiceNumber}</span>
                     </p>
-                ) : null}
+                ) : (
+                    <p className="text-muted-foreground mt-1 inline-flex items-center gap-1.5 text-sm">
+                        {settling && (isLoading || order) ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                        {settling ? 'Validation de la commande en cours…' : null}
+                    </p>
+                )}
             </div>
 
             {order ? (
                 <div className="mt-8 flex flex-col gap-4 px-4">
                     <section className="border-border/60 bg-card opal-shadow rounded-2xl border p-4">
                         <h2 className="text-muted-foreground mb-3 text-[11px] font-semibold uppercase tracking-wider">
-                            Articles
+                            Article
                         </h2>
-                        <ul className="flex flex-col gap-2">
-                            {order.lines.map((line) => (
-                                <li key={line.passportId} className="flex items-center justify-between gap-2">
-                                    <div className="min-w-0">
-                                        <p className="text-foreground truncate text-sm font-medium">
-                                            {line.quantity} × {line.reference}
-                                        </p>
-                                        <p className="text-muted-foreground truncate text-xs">{line.artisanName}</p>
-                                    </div>
-                                    <span className="text-foreground shrink-0 text-sm tabular-nums">
-                                        {formatEur(line.unitPrice * line.quantity)}
-                                    </span>
-                                </li>
-                            ))}
-                        </ul>
+                        <div className="flex items-center justify-between gap-2">
+                            <p className="text-foreground truncate text-sm font-medium">
+                                {order.productName ?? 'Pièce achetée'}
+                            </p>
+                            <span className="text-foreground shrink-0 text-sm tabular-nums">
+                                {formatCents(order.amountTotalCents)}
+                            </span>
+                        </div>
                         <div className="border-border/60 mt-3 flex items-center justify-between border-t pt-3 text-sm font-semibold">
                             <span className="text-foreground">Total payé</span>
-                            <span className="text-foreground tabular-nums">{formatEur(order.total)}</span>
+                            <span className="text-foreground tabular-nums">{formatCents(order.amountTotalCents)}</span>
                         </div>
                     </section>
 
@@ -89,32 +86,35 @@ export function OrderConfirmation({ orderId }: { orderId: string }) {
                             <h2 className="text-foreground text-sm font-semibold">Ajouté à ta Garde-Robe</h2>
                         </div>
                         <p className="text-muted-foreground mt-1.5 text-xs leading-relaxed">
-                            Chaque pièce a rejoint ta Garde-Robe avec son passeport numérique. Tes justificatifs sont
-                            chiffrés et rattachés :
+                            {settling
+                                ? 'Ta pièce rejoint ta Garde-Robe dès la validation du paiement, avec son passeport et ses justificatifs.'
+                                : 'Ta pièce a rejoint ta Garde-Robe avec son passeport numérique. Tes justificatifs sont rattachés :'}
                         </p>
-                        <ul className="mt-3 flex flex-col gap-2">
-                            <li className="text-foreground flex items-center gap-2 text-sm">
-                                <FileText className="text-muted-foreground h-4 w-4" />
-                                Facture {order.number}
-                            </li>
-                            <li className="text-foreground flex items-center gap-2 text-sm">
-                                <ShieldCheck className="text-muted-foreground h-4 w-4" />
-                                Certificat de garantie
-                            </li>
-                        </ul>
+                        {!settling ? (
+                            <ul className="mt-3 flex flex-col gap-2">
+                                <li className="text-foreground flex items-center gap-2 text-sm">
+                                    <FileText className="text-muted-foreground h-4 w-4" />
+                                    Facture {order.invoiceNumber}
+                                </li>
+                                <li className="text-foreground flex items-center gap-2 text-sm">
+                                    <ShieldCheck className="text-muted-foreground h-4 w-4" />
+                                    Certificat de garantie
+                                </li>
+                            </ul>
+                        ) : null}
                     </section>
 
-                    <section className="border-border/60 bg-card rounded-2xl border p-4">
-                        <h2 className="text-muted-foreground mb-1 text-[11px] font-semibold uppercase tracking-wider">
-                            Livraison
-                        </h2>
-                        <p className="text-foreground text-sm">{order.address.fullName}</p>
-                        <p className="text-muted-foreground text-xs">
-                            {order.address.line1}, {order.address.postalCode} {order.address.city}
+                    {!settling && wardrobe.length > 0 ? (
+                        <p className="text-muted-foreground text-center text-xs">
+                            {wardrobe.length} pièce{wardrobe.length > 1 ? 's' : ''} dans ta Garde-Robe.
                         </p>
-                    </section>
+                    ) : null}
                 </div>
-            ) : null}
+            ) : (
+                <div className="text-muted-foreground mt-10 flex items-center justify-center gap-2 text-sm">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Récupération de ta commande…
+                </div>
+            )}
 
             <div className="mt-8 flex flex-col gap-2 px-4">
                 <Link

@@ -4,19 +4,21 @@ import type { Http } from '../core/http';
 import { parseOr } from '../core/validate';
 import {
     marketplaceItemSchema,
+    paymentIntentResponseSchema,
     searchResultSchema,
     suggestionResultSchema,
     decisionLogSchema,
+    type CartIntentRequest,
     type ConvertDppRequest,
     type MarketplaceItem,
     type MarketplaceSearchParams,
+    type PaymentIntentResponse,
     type ProductPayload,
     type SearchResult,
     type SuggestInput,
     type SuggestionResult,
     type DecisionLog,
 } from '../types/marketplace';
-import { checkoutDtoSchema, type CheckoutDto } from '../types/subscription';
 
 const marketplaceItemListSchema = z.array(marketplaceItemSchema);
 
@@ -75,10 +77,20 @@ export function marketplaceApi(http: Http) {
                 }),
             );
         },
-        async buy(productId: string): Promise<CheckoutDto> {
+        // Vue d'une fiche produit (fire-and-forget) — alimente les stats vendeur (vues).
+        trackView(productId: string): Promise<void> {
+            return http.request<void>(`/public/marketplace/products/${productId}/view`, {
+                method: 'POST',
+                skipJson: true,
+            });
+        },
+
+        // ── Achat direct in-app (LUMIRIS-22) ────────────────────────────────
+        // Panier → PaymentIntent Connect ; le front confirme via Payment Element embarqué.
+        async checkoutIntent(payload: CartIntentRequest): Promise<PaymentIntentResponse> {
             return parseOr(
-                checkoutDtoSchema,
-                await http.request(`/public/marketplace/products/${productId}/checkout`, { method: 'POST' }),
+                paymentIntentResponseSchema,
+                await http.request('/api/marketplace/checkout/intent', { method: 'POST', body: payload }),
             );
         },
     };

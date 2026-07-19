@@ -12,16 +12,17 @@ import { createKeys } from '../core/keys';
 import { CACHE_TIMES } from '../core/cache';
 import { useApiClient } from '../core/provider';
 import type {
+    CartIntentRequest,
     ConvertDppRequest,
     DecisionLog,
     MarketplaceItem,
     MarketplaceSearchParams,
+    PaymentIntentResponse,
     ProductPayload,
     SearchResult,
     SuggestInput,
     SuggestionResult,
 } from '../types/marketplace';
-import type { CheckoutDto } from '../types/subscription';
 
 export const marketplaceKeys = {
     ...createKeys('marketplace'),
@@ -156,11 +157,14 @@ export function useConvertDppToProduct(
     });
 }
 
-// Achat direct in-app d'un article (le caller redirige vers l'URL Checkout renvoyée).
-export function useBuyProduct(options?: Omit<UseMutationOptions<CheckoutDto, Error, string>, 'mutationFn'>) {
+// Panier → PaymentIntent Connect. Le caller confirme ensuite via Stripe Payment Element embarqué
+// (pas de redirection). Le fulfillment (Garde-Robe + facture) est déclenché par le webhook.
+export function useCheckoutIntent(
+    options?: Omit<UseMutationOptions<PaymentIntentResponse, Error, CartIntentRequest>, 'mutationFn'>,
+) {
     const client = useApiClient();
-    return useMutation<CheckoutDto, Error, string>({
-        mutationFn: (productId) => client.marketplace.buy(productId),
+    return useMutation<PaymentIntentResponse, Error, CartIntentRequest>({
+        mutationFn: (payload) => client.marketplace.checkoutIntent(payload),
         ...options,
     });
 }
