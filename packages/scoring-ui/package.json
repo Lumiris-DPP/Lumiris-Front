@@ -14,6 +14,7 @@
         "./components/score-reasons-list": "./src/components/score-reasons-list.tsx",
         "./components/missing-fields-badge": "./src/components/missing-fields-badge.tsx",
         "./components/score-cap-warning": "./src/components/score-cap-warning.tsx",
+        "./components/iris-methodology-info": "./src/components/iris-methodology-info.tsx",
         "./components/status-badge": "./src/components/status-badge.tsx",
         "./components/wardrobe": "./src/components/wardrobe.tsx",
         "./components/passport-phone-preview": "./src/components/passport-phone-preview.tsx",

@@ -2,7 +2,14 @@ import Image from 'next/image';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { formatDateFr } from '@lumiris/utils';
 import type { Passport, ScoreResult } from '@lumiris/types';
-import { careSymbol, IrisGrade, MissingFieldsBadge, ScoreBreakdown, ScoreCapWarning } from '@lumiris/scoring-ui';
+import {
+    careSymbol,
+    IrisGrade,
+    IrisMethodologyInfo,
+    MissingFieldsBadge,
+    ScoreBreakdown,
+    ScoreCapWarning,
+} from '@lumiris/scoring-ui';
 import { Badge } from '@lumiris/ui/components/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import type { DetailView } from './view-model';
@@ -208,7 +215,10 @@ export function ScoreAside({ score, passport }: { score: ScoreResult; passport: 
         <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
             <Card>
                 <CardHeader>
-                    <p className="text-muted-foreground text-[11px] uppercase tracking-wider">Score Iris</p>
+                    <div className="flex items-center gap-1.5">
+                        <p className="text-muted-foreground text-[11px] uppercase tracking-wider">Score Iris</p>
+                        <IrisMethodologyInfo />
+                    </div>
                     <div className="mt-2 flex items-center gap-3">
                         <IrisGrade grade={score.grade} size="lg" />
                         <p className="text-foreground font-mono text-2xl font-semibold">

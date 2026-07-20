@@ -6,6 +6,7 @@ import { useApiClient } from '@lumiris/api-client/react';
 import { cn } from '@lumiris/ui/lib/cn';
 import { GRADE_LABEL } from '../theme/grade-color';
 import { IrisGrade } from './iris-grade';
+import { IrisMethodologyInfo } from './iris-methodology-info';
 import { ScoreBreakdown } from './score-breakdown';
 import { ScoreCapWarning } from './score-cap-warning';
 
@@ -71,9 +72,12 @@ function IrisScoreCardDisplay({ score, muted = false, variant = 'card', classNam
             )}
             {...rest}
         >
-            <p className="text-muted-foreground text-[11px] uppercase tracking-wider">
-                Score Iris · {GRADE_LABEL[score.grade]}
-            </p>
+            <div className="flex items-center gap-1.5">
+                <p className="text-muted-foreground text-[11px] uppercase tracking-wider">
+                    Score Iris · {GRADE_LABEL[score.grade]}
+                </p>
+                <IrisMethodologyInfo className="ml-auto" />
+            </div>
             <div className="flex items-center gap-3">
                 <IrisGrade grade={score.grade} size="lg" aria-hidden />
                 <p className="text-foreground font-mono text-2xl font-semibold">
