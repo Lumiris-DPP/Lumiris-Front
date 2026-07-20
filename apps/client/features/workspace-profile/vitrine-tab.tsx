@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { ExternalLink, ImagePlus, Loader2, Trash2, X } from 'lucide-react';
+import Link from 'next/link';
+import { Eye, ExternalLink, ImagePlus, Loader2, Trash2, X } from 'lucide-react';
 import { Badge } from '@lumiris/ui/components/badge';
 import { Button } from '@lumiris/ui/components/button';
 import { Input } from '@lumiris/ui/components/input';
@@ -315,6 +316,11 @@ export function VitrineTab() {
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
+                <Button asChild type="button" variant="ghost">
+                    <Link href="/preview/vitrine" target="_blank" rel="noopener noreferrer">
+                        <Eye className="mr-1.5 h-3.5 w-3.5" /> Aperçu
+                    </Link>
+                </Button>
                 <Button type="button" onClick={handleSave} disabled={updateMutation.isPending}>
                     {updateMutation.isPending ? 'Enregistrement…' : 'Enregistrer'}
                 </Button>
