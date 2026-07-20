@@ -51,6 +51,9 @@ export {
     STAGE_LABEL,
     GARMENT_CATEGORY_LABEL,
     garmentCategoryLabel,
+    CARE_SYMBOLS,
+    careSymbol,
+    type CareSymbol,
 } from './theme/dpp-labels';
 
 export { useComputeScore } from './hooks/use-compute-score';

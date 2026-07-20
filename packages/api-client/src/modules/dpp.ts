@@ -36,6 +36,17 @@ function toScoreResult(dto: IrisScoreDto): ScoreResult {
     };
 }
 
+function buildFormData(payload: DppFormPayload, files?: Partial<Record<DppFilePart, File>>): FormData {
+    const form = new FormData();
+    form.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+    if (files) {
+        for (const [part, file] of Object.entries(files)) {
+            if (file) form.append(part, file);
+        }
+    }
+    return form;
+}
+
 export function dppApi(http: Http) {
     return {
         async list(): Promise<DppFormSummaryDto[]> {
@@ -47,17 +58,39 @@ export function dppApi(http: Http) {
         async get(id: string): Promise<DppFormDto> {
             return parseOr(dppFormDtoSchema, await http.request(`/api/dpp-forms/${id}`));
         },
-        async create(payload: DppFormPayload, files?: Partial<Record<DppFilePart, File>>): Promise<DppFormCreatedDto> {
-            const form = new FormData();
-            form.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
-            if (files) {
-                for (const [part, file] of Object.entries(files)) {
-                    if (file) form.append(part, file);
-                }
-            }
+        async create(
+            payload: DppFormPayload,
+            files?: Partial<Record<DppFilePart, File>>,
+            draft = false,
+        ): Promise<DppFormCreatedDto> {
+            const form = buildFormData(payload, files);
+            const query = draft ? '?draft=true' : '';
             return parseOr(
                 dppFormCreatedDtoSchema,
-                await http.request('/api/dpp-forms', { method: 'POST', body: form }),
+                await http.request(`/api/dpp-forms${query}`, { method: 'POST', body: form }),
+            );
+        },
+        // Draft-only edit: the backend returns 409 for a published DPP.
+        async update(
+            id: string,
+            payload: DppFormPayload,
+            files?: Partial<Record<DppFilePart, File>>,
+        ): Promise<DppFormCreatedDto> {
+            const form = buildFormData(payload, files);
+            return parseOr(
+                dppFormCreatedDtoSchema,
+                await http.request(`/api/dpp-forms/${id}`, { method: 'PUT', body: form }),
+            );
+        },
+        // Draft-only delete: the backend returns 409 for a published DPP.
+        async remove(id: string): Promise<void> {
+            await http.request(`/api/dpp-forms/${id}`, { method: 'DELETE' });
+        },
+        // Finalises a draft: assigns the QR code, freezes the hash, persists the Iris score and anchors it.
+        async publish(id: string): Promise<DppFormCreatedDto> {
+            return parseOr(
+                dppFormCreatedDtoSchema,
+                await http.request(`/api/dpp-forms/${id}/publish`, { method: 'POST' }),
             );
         },
         async listEvents(id: string): Promise<DppEventDto[]> {

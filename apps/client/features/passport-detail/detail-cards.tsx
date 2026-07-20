@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { formatDateFr } from '@lumiris/utils';
 import type { Passport, ScoreResult } from '@lumiris/types';
-import { IrisGrade, MissingFieldsBadge, ScoreBreakdown, ScoreCapWarning } from '@lumiris/scoring-ui';
+import { careSymbol, IrisGrade, MissingFieldsBadge, ScoreBreakdown, ScoreCapWarning } from '@lumiris/scoring-ui';
 import { Badge } from '@lumiris/ui/components/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import type { DetailView } from './view-model';
@@ -107,12 +107,32 @@ export function CompositionCard({ view }: { view: DetailView }) {
                         <p className="text-muted-foreground text-[11px] uppercase tracking-wider">
                             Instructions d&apos;entretien
                         </p>
-                        <ul className="space-y-0.5">
-                            {view.careInstructions.map((instr, i) => (
-                                <li key={i} className="text-foreground text-sm">
-                                    · {instr}
-                                </li>
-                            ))}
+                        <ul className="grid grid-cols-1 gap-1.5 pt-0.5 sm:grid-cols-2">
+                            {view.careInstructions.map((instr, i) => {
+                                const symbol = careSymbol(instr);
+                                return (
+                                    <li
+                                        key={i}
+                                        className="border-border flex items-center gap-2 rounded-lg border px-2.5 py-2"
+                                    >
+                                        {symbol ? (
+                                            <Image
+                                                src={symbol.svgPath}
+                                                alt=""
+                                                aria-hidden
+                                                width={20}
+                                                height={20}
+                                                className="h-5 w-5 shrink-0"
+                                            />
+                                        ) : (
+                                            <span className="h-5 w-5 shrink-0" aria-hidden />
+                                        )}
+                                        <span className="text-foreground truncate text-sm">
+                                            {symbol?.label ?? instr}
+                                        </span>
+                                    </li>
+                                );
+                            })}
                         </ul>
                     </div>
                 )}

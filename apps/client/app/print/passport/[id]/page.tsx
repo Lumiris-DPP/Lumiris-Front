@@ -114,6 +114,17 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
         );
     }
 
+    // A draft has no public code yet, so there is no QR to print.
+    if (!dpp.publicCode) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-white p-12">
+                <p className="font-mono text-sm text-neutral-700">
+                    Ce passeport est un brouillon : publiez-le pour générer son QR code.
+                </p>
+            </div>
+        );
+    }
+
     const dppUrl = `${MOBILE_URL}/p/${dpp.publicCode}`;
     const gradeHex = score ? (GRADE_HEX[score.grade as IrisGrade] ?? '#6b7280') : '#6b7280';
     const publicDocuments = (dpp.documents ?? []).filter((d) => d.visibility === 'PUBLIC_USERS');
