@@ -11,6 +11,7 @@ import { trackApi } from './modules/track';
 import { sellerApi } from './modules/seller';
 import { wardrobeApi } from './modules/wardrobe';
 import { irisApi } from './modules/iris';
+import { atelierStatsApi, eventsApi } from './modules/atelier-stats';
 
 export type ClientOptions = HttpOptions;
 
@@ -29,6 +30,8 @@ export function createClient(opts: ClientOptions) {
         seller: sellerApi(http),
         wardrobe: wardrobeApi(http),
         iris: irisApi(http),
+        atelierStats: atelierStatsApi(http),
+        events: eventsApi(http),
     };
 }
 

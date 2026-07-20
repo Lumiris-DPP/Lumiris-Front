@@ -1,6 +1,7 @@
 'use client';
 
-import { use, useEffect, useState } from 'react';
+import { use, useEffect, useRef, useState } from 'react';
+import { useTrackEvent } from '@lumiris/api-client/react';
 import {
     fetchPublicDppEvents,
     fetchPublicDppForm,
@@ -18,6 +19,8 @@ export default function PublicDppPage({ params }: PageProps) {
     const [data, setData] = useState<DppFormPublicDto | null>(null);
     const [events, setEvents] = useState<DppEventDto[]>([]);
     const [notFound, setNotFound] = useState(false);
+    const trackEvent = useTrackEvent();
+    const tracked = useRef(false);
 
     useEffect(() => {
         fetchPublicDppForm(code)
@@ -27,6 +30,13 @@ export default function PublicDppPage({ params }: PageProps) {
             .then(setEvents)
             .catch(() => setEvents([]));
     }, [code]);
+
+    useEffect(() => {
+        if (!data || tracked.current) return;
+        tracked.current = true;
+        trackEvent.mutate({ publicCode: code, type: 'VIEW' });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data, code]);
 
     if (notFound) {
         return (

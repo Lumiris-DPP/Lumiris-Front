@@ -1,51 +1,39 @@
 'use client';
 
-import { BarChart3, Sparkles } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Sparkles } from 'lucide-react';
+import { Button } from '@lumiris/ui/components/button';
+import { useAtelierStats } from '@lumiris/api-client/react';
 import { EmptyState } from '@/features/empty-state';
-import { useBilling, useBillingHydrated } from '@/lib/billing-store';
-import { useCurrentArtisan } from '@/lib/current-artisan';
-import { usePassports } from '@/lib/passports-source';
-import { ScansSection } from './scans-section';
-import { PerformanceSection } from './performance-section';
-import { TopPassportsSection } from './top-passports-section';
+import { StatsTotals } from './stats-totals';
+import { StatsByPassport } from './stats-by-passport';
+
+const PERIODS = [
+    { label: '7 jours', days: 7 },
+    { label: '30 jours', days: 30 },
+    { label: '90 jours', days: 90 },
+] as const;
 
 export function Analytics() {
-    const artisan = useCurrentArtisan();
-    const billing = useBilling(artisan.id);
-    const hydrated = useBillingHydrated();
-    const passports = usePassports(artisan.id);
+    const [days, setDays] = useState<number>(30);
 
-    if (!hydrated) {
-        return (
-            <div className="text-muted-foreground flex flex-col items-center gap-3 px-8 py-16 text-sm">
-                <Sparkles className="text-lumiris-amber h-6 w-6" />
-                Vérification de l’accès ATELIER+…
-            </div>
-        );
-    }
+    const { from, to } = useMemo(() => {
+        const now = new Date();
+        const start = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+        return { from: start.toISOString(), to: now.toISOString() };
+    }, [days]);
 
-    if (!billing.atelierPlus) {
+    const { data, isLoading, isError } = useAtelierStats({ from, to });
+
+    if (isError) {
         return (
             <div className="p-4 md:p-8">
                 <EmptyState
                     icon={Sparkles}
                     tone="amber"
-                    title="Analytics nécessite ATELIER+"
-                    description="Activez ATELIER+ pour suivre vos scans QR, votre score Iris vs marché et vos pièces les plus vues."
-                    cta={{ label: 'Activer ATELIER+', href: '/subscription?upsell=analytics' }}
-                />
-            </div>
-        );
-    }
-
-    if (passports.length === 0) {
-        return (
-            <div className="p-4 md:p-8">
-                <EmptyState
-                    icon={BarChart3}
-                    title="Aucune statistique pour l’instant"
-                    description="Publiez votre premier passeport pour voir vos scans, votre score Iris et vos pièces les plus vues."
-                    cta={{ label: 'Créer mon premier passeport', href: '/create' }}
+                    title="Statistiques indisponibles"
+                    description="Un abonnement ATELIER actif est requis pour consulter vos statistiques d'audience et de vente."
+                    cta={{ label: "Voir les offres d'abonnement", href: '/subscription' }}
                 />
             </div>
         );
@@ -53,9 +41,28 @@ export function Analytics() {
 
     return (
         <div className="space-y-6 p-4 md:p-8">
-            <ScansSection artisanId={artisan.id} />
-            <PerformanceSection artisanId={artisan.id} />
-            <TopPassportsSection artisanId={artisan.id} />
+            <div className="flex flex-wrap items-center gap-2">
+                {PERIODS.map((p) => (
+                    <Button
+                        key={p.days}
+                        type="button"
+                        variant={days === p.days ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setDays(p.days)}
+                    >
+                        {p.label}
+                    </Button>
+                ))}
+            </div>
+
+            {isLoading || !data ? (
+                <p className="text-muted-foreground text-sm">Chargement…</p>
+            ) : (
+                <>
+                    <StatsTotals totals={data.totals} />
+                    <StatsByPassport rows={data.byPassport} locked={data.advancedLocked} />
+                </>
+            )}
         </div>
     );
 }
