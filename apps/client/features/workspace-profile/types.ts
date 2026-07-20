@@ -1,21 +1,3 @@
-import type { FrenchRegion } from '@lumiris/types';
-
-export const FRENCH_REGIONS: readonly FrenchRegion[] = [
-    'Auvergne-Rhône-Alpes',
-    'Bourgogne-Franche-Comté',
-    'Bretagne',
-    'Centre-Val de Loire',
-    'Corse',
-    'Grand Est',
-    'Hauts-de-France',
-    'Île-de-France',
-    'Normandie',
-    'Nouvelle-Aquitaine',
-    'Occitanie',
-    'Pays de la Loire',
-    "Provence-Alpes-Côte d'Azur",
-];
-
 export interface LabelConfig {
     key: 'epv' | 'ofg' | 'gots' | 'oeko-tex';
     name: string;
