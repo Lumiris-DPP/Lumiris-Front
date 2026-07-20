@@ -3,11 +3,13 @@
 import { type ReactNode } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { CheckCircle, XCircle, FileText, ArrowLeft } from 'lucide-react';
+import { CheckCircle, XCircle, FileText, ArrowLeft, Download, Heart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { IrisGrade } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
 import type { DppEventDto, DppEventActorType, DppFormDto, IrisScoreDto } from '@/lib/public-dpp-api';
+import { addPublicDpp, removePublicDpp, useWardrobe } from '@/lib/wardrobe-storage';
+import { toast } from '@/lib/toast';
 import { GRADE_TEXT, GRADE_BORDER, GRADE_BG_SOFT, GRADE_CSS_VAR } from '@/features/passport-detail/grade-classes';
 
 const FIBER_LABELS: Record<string, string> = {
@@ -82,6 +84,23 @@ export function PublicPassportDetail({ dpp, irisScore, events = [] }: PublicPass
     const grade = irisScore?.grade as IrisGrade | undefined;
     const cssVar = grade ? GRADE_CSS_VAR[grade] : 'var(--color-lumiris-iris)';
 
+    const wardrobe = useWardrobe();
+    const isSaved = wardrobe.some((it) => it.kind === 'public-dpp' && it.publicCode === dpp.publicCode);
+
+    const onToggleSaved = () => {
+        if (isSaved) {
+            removePublicDpp(dpp.publicCode);
+            toast.info('Retiré de ta garde-robe');
+        } else {
+            addPublicDpp({
+                publicCode: dpp.publicCode,
+                productName: dpp.productName ?? 'Produit sans nom',
+                grade: irisScore?.grade,
+            });
+            toast.success('Ajouté à ta garde-robe');
+        }
+    };
+
     const publicDocs = (dpp.documents ?? []).filter((d) => d.visibility === 'PUBLIC_USERS');
 
     return (
@@ -106,6 +125,19 @@ export function PublicPassportDetail({ dpp, irisScore, events = [] }: PublicPass
                     className="bg-card/70 absolute left-4 top-12 inline-flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md"
                 >
                     <ArrowLeft className="h-4 w-4" aria-hidden />
+                </button>
+
+                <button
+                    type="button"
+                    onClick={onToggleSaved}
+                    aria-label={isSaved ? 'Retirer de ma garde-robe' : 'Ajouter à ma garde-robe'}
+                    aria-pressed={isSaved}
+                    className={cn(
+                        'absolute right-4 top-12 inline-flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md transition-colors',
+                        isSaved ? 'bg-lumiris-rose/15 text-lumiris-rose' : 'bg-card/70 text-foreground',
+                    )}
+                >
+                    <Heart className={cn('h-4 w-4', isSaved && 'fill-current')} aria-hidden />
                 </button>
 
                 <div className="relative z-10 flex flex-col items-center gap-3">
@@ -289,24 +321,31 @@ export function PublicPassportDetail({ dpp, irisScore, events = [] }: PublicPass
 
                 {/* Documents publics */}
                 {publicDocs.length > 0 && (
-                    <Section delay={LAYER_DELAY * 5} title="Documents">
+                    <Section delay={LAYER_DELAY * 5} title="Documents publics">
                         <div className="space-y-1.5">
                             {publicDocs.map((doc) => (
-                                <a
+                                <div
                                     key={doc.fileId}
-                                    href={doc.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="border-border hover:bg-muted/40 flex items-center gap-2.5 rounded-xl border px-3 py-2.5 transition-colors"
+                                    className="border-border flex items-center gap-2.5 rounded-xl border px-3 py-2.5"
                                 >
                                     <FileText className="text-muted-foreground h-4 w-4 shrink-0" />
                                     <div className="min-w-0 flex-1">
-                                        <p className="text-foreground truncate text-sm font-medium">
+                                        <p className="text-foreground truncate text-sm font-medium">{doc.filename}</p>
+                                        <p className="text-muted-foreground truncate text-[11px]">
                                             {DOC_TYPE_LABELS[doc.documentType] ?? doc.documentType}
                                         </p>
-                                        <p className="text-muted-foreground truncate text-[11px]">{doc.filename}</p>
                                     </div>
-                                </a>
+                                    <a
+                                        href={doc.url}
+                                        download={doc.filename}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        aria-label={`Télécharger ${doc.filename}`}
+                                        className="border-border bg-card text-foreground hover:bg-muted/40 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-colors active:scale-95"
+                                    >
+                                        <Download className="h-3.5 w-3.5" aria-hidden />
+                                    </a>
+                                </div>
                             ))}
                         </div>
                     </Section>

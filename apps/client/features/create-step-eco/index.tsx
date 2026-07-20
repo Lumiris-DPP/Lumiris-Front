@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { QrCode } from 'lucide-react';
+import { QrCode, Save } from 'lucide-react';
 import type { EcoInfo } from '@lumiris/types';
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
@@ -13,7 +13,7 @@ import { useStepNavigation } from '@/features/wizard-shell/use-step-navigation';
 import { DocUploadField } from '@/features/wizard-shell/doc-upload-field';
 import { useDraftStore } from '@/lib/draft-store';
 import { useAuthStore } from '@/lib/auth-store';
-import { useCreateDppForm } from '@lumiris/api-client/react';
+import { useCreateDppForm, useUpdateDppForm, usePublishDppForm } from '@lumiris/api-client/react';
 import { isApiError, dppFilesToParts } from '@lumiris/api-client';
 import { toast } from '@lumiris/ui/components/sonner';
 import { useRouter } from 'next/navigation';
@@ -25,11 +25,15 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
     const deleteDraft = useDraftStore((s) => s.deleteDraft);
     const token = useAuthStore((s) => s.token);
     const createDpp = useCreateDppForm();
+    const updateDpp = useUpdateDppForm();
+    const publishDpp = usePublishDppForm();
     const { goTo } = useStepNavigation(draftId);
     const router = useRouter();
 
     const [form, setForm] = useState<EcoInfo>(draft?.eco ?? {});
     const [publishing, setPublishing] = useState(false);
+    const [savingDraft, setSavingDraft] = useState(false);
+    const backendId = draft?.backendId;
 
     const [repairManualFile, setRepairManualFile] = useState<File | null>(
         () => draft?.files?.['REPAIR_MANUAL'] ?? null,
@@ -46,58 +50,99 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
         goTo('traceability');
     };
 
-    const handlePublish = async () => {
-        if (!draft) return;
+    const persistForm = () => {
         setEco(draftId, form);
         setFile(draftId, 'REPAIR_MANUAL', form.isRepairable ? repairManualFile : null);
         setFile(draftId, 'CARE_GUIDE', careGuideFile);
         setFile(draftId, 'END_OF_LIFE_GUIDE', endOfLifeFile);
-        setPublishing(true);
+    };
 
-        const payload = {
-            productName: draft.garment.name ?? null,
-            productDescription: draft.garment.description ?? null,
-            productCategory: draft.garment.category ?? null,
-            originCountry: draft.garment.originCountry ?? null,
-            availableSizes: draft.garment.availableSizes ?? null,
-            colors: draft.garment.colors ?? null,
-            materials: draft.materials.map((m) => ({
-                fiber: m.fiber,
-                percentage: m.percentage,
-                originCountry: m.originCountry,
-            })),
-            careInstructions: draft.careInstructions,
-            careNotes: draft.careNotes || null,
-            manufacturedAt: draft.traceability.manufacturedAt,
-            batchNumber: draft.traceability.batchNumber ?? null,
-            quantity: draft.traceability.quantity && draft.traceability.quantity >= 1 ? draft.traceability.quantity : 1,
-            gtin: draft.traceability.gtin ?? null,
-            sku: draft.traceability.sku ?? null,
-            reachCompliant: draft.traceability.reachCompliant,
-            recycledPct: form.recycledPct ?? null,
-            warrantyDescription: form.warrantyDescription ?? null,
-            isRepairable: form.isRepairable ?? false,
-            endOfLifeInstructions: form.endOfLifeInstructions ?? null,
-        };
+    const buildPayload = (d: NonNullable<typeof draft>) => ({
+        productName: d.garment.name ?? null,
+        productDescription: d.garment.description ?? null,
+        productCategory: d.garment.category ?? null,
+        originCountry: d.garment.originCountry ?? null,
+        availableSizes: d.garment.availableSizes ?? null,
+        colors: d.garment.colors ?? null,
+        materials: d.materials.map((m) => ({
+            fiber: m.fiber,
+            percentage: m.percentage,
+            originCountry: m.originCountry,
+        })),
+        careInstructions: d.careInstructions,
+        careNotes: d.careNotes || null,
+        manufacturedAt: d.traceability.manufacturedAt,
+        batchNumber: d.traceability.batchNumber ?? null,
+        quantity: draft.traceability.quantity && draft.traceability.quantity >= 1 ? draft.traceability.quantity : 1,
+            gtin: d.traceability.gtin ?? null,
+        sku: d.traceability.sku ?? null,
+        reachCompliant: d.traceability.reachCompliant,
+        recycledPct: form.recycledPct ?? null,
+        warrantyDescription: form.warrantyDescription ?? null,
+        isRepairable: form.isRepairable ?? false,
+        endOfLifeInstructions: form.endOfLifeInstructions ?? null,
+    });
 
-        // Draft files are keyed by backend DocumentType; the create endpoint expects part names.
+    // Draft files are keyed by backend DocumentType; the endpoints expect part names.
+    const buildFiles = (d: NonNullable<typeof draft>) => {
         const files: Partial<Record<string, File>> = {
-            ...draft.files,
+            ...d.files,
             ...(form.isRepairable && repairManualFile ? { REPAIR_MANUAL: repairManualFile } : {}),
             ...(careGuideFile ? { CARE_GUIDE: careGuideFile } : {}),
             ...(endOfLifeFile ? { END_OF_LIFE_GUIDE: endOfLifeFile } : {}),
         };
         if (!form.isRepairable) delete files['REPAIR_MANUAL'];
+        return dppFilesToParts(files);
+    };
 
+    // "Enregistrer en brouillon": create a DRAFT (or update the one being edited), then back to list.
+    const handleSaveDraft = async () => {
+        if (!draft || !token) return;
+        persistForm();
+        setSavingDraft(true);
+        const payload = buildPayload(draft);
+        const files = buildFiles(draft);
         try {
-            if (token) {
-                const created = await createDpp.mutateAsync({ payload, files: dppFilesToParts(files) });
-                deleteDraft(draftId);
-                router.push(`/passports/${created.id}`);
-                return;
+            if (backendId) {
+                await updateDpp.mutateAsync({ id: backendId, payload, files });
+            } else {
+                await createDpp.mutateAsync({ payload, files, draft: true });
             }
             deleteDraft(draftId);
+            toast.success('Brouillon enregistré.');
             router.push('/passports');
+        } catch {
+            setSavingDraft(false);
+            toast.error("L'enregistrement du brouillon a échoué. Réessayez.");
+        }
+    };
+
+    // Final validation: publish. When editing a draft, push edits (PUT) then publish it.
+    const handlePublish = async () => {
+        if (!draft) return;
+        persistForm();
+        setPublishing(true);
+
+        const payload = buildPayload(draft);
+        const files = buildFiles(draft);
+
+        try {
+            if (!token) {
+                deleteDraft(draftId);
+                router.push('/passports');
+                return;
+            }
+            let publishedId: string;
+            if (backendId) {
+                await updateDpp.mutateAsync({ id: backendId, payload, files });
+                await publishDpp.mutateAsync(backendId);
+                publishedId = backendId;
+            } else {
+                const created = await createDpp.mutateAsync({ payload, files });
+                publishedId = created.id;
+            }
+            deleteDraft(draftId);
+            router.push(`/passports/${publishedId}`);
         } catch (err) {
             setPublishing(false);
             if (isApiError(err) && (err.code === 'FORBIDDEN' || err.status === 403)) {
@@ -225,20 +270,31 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                 />
             </div>
 
-            {/* Bouton publier */}
+            {/* Boutons brouillon + publier */}
             <div className="border-border border-t pt-4">
                 <div className="flex items-center justify-between gap-4">
-                    <Button variant="outline" onClick={handlePrev}>
+                    <Button variant="outline" onClick={handlePrev} disabled={publishing || savingDraft}>
                         Précédent
                     </Button>
-                    <Button
-                        onClick={handlePublish}
-                        disabled={publishing || (form.recycledPct ?? 0) > 100}
-                        className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 gap-2 text-white"
-                    >
-                        <QrCode className="h-4 w-4" />
-                        {publishing ? 'Publication…' : 'Publier et générer le QR Code'}
-                    </Button>
+                    <div className="flex items-center gap-3">
+                        <Button
+                            variant="outline"
+                            onClick={handleSaveDraft}
+                            disabled={publishing || savingDraft || (form.recycledPct ?? 0) > 100}
+                            className="gap-2"
+                        >
+                            <Save className="h-4 w-4" />
+                            {savingDraft ? 'Enregistrement…' : 'Enregistrer en brouillon'}
+                        </Button>
+                        <Button
+                            onClick={handlePublish}
+                            disabled={publishing || savingDraft || (form.recycledPct ?? 0) > 100}
+                            className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 gap-2 text-white"
+                        >
+                            <QrCode className="h-4 w-4" />
+                            {publishing ? 'Publication…' : 'Publier et générer le QR Code'}
+                        </Button>
+                    </div>
                 </div>
             </div>
         </WizardStepFrame>

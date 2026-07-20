@@ -71,6 +71,16 @@ export interface ExternalDppItem {
     documents: readonly WardrobeDocument[];
 }
 
+/** DPP Lumiris servi par le backend (page publique /p/[code]). Snapshot d'affichage pour la liste. */
+export interface PublicDppItem {
+    kind: 'public-dpp';
+    publicCode: string;
+    productName: string;
+    grade?: string;
+    addedAt: string;
+    documents: readonly WardrobeDocument[];
+}
+
 export interface ManualWardrobeItem {
     kind: 'manual';
     id: string;
@@ -83,7 +93,7 @@ export interface ManualWardrobeItem {
     documents: readonly WardrobeDocument[];
 }
 
-export type WardrobeItem = LumirisPassportItem | ExternalDppItem | ManualWardrobeItem;
+export type WardrobeItem = LumirisPassportItem | ExternalDppItem | PublicDppItem | ManualWardrobeItem;
 
 const EVENT = 'lumiris:wardrobe-changed';
 const USER_CHANGED = 'lumiris:user-changed';
@@ -158,6 +168,19 @@ function isExternalDppItem(value: unknown): value is ExternalDppItem {
     );
 }
 
+function isPublicDppItem(value: unknown): value is PublicDppItem {
+    if (!value || typeof value !== 'object') return false;
+    const v = value as Record<string, unknown>;
+    return (
+        v.kind === 'public-dpp' &&
+        typeof v.publicCode === 'string' &&
+        typeof v.productName === 'string' &&
+        (v.grade === undefined || typeof v.grade === 'string') &&
+        typeof v.addedAt === 'string' &&
+        isOptionalDocumentArray(v.documents)
+    );
+}
+
 function isManualItem(value: unknown): value is ManualWardrobeItem {
     if (!value || typeof value !== 'object') return false;
     const v = value as Record<string, unknown>;
@@ -175,7 +198,7 @@ function isManualItem(value: unknown): value is ManualWardrobeItem {
 }
 
 function isWardrobeItem(value: unknown): value is WardrobeItem {
-    return isLumirisPassportItem(value) || isExternalDppItem(value) || isManualItem(value);
+    return isLumirisPassportItem(value) || isExternalDppItem(value) || isPublicDppItem(value) || isManualItem(value);
 }
 
 function withDocuments(item: WardrobeItem): WardrobeItem {
@@ -240,6 +263,8 @@ export function itemKey(item: WardrobeItem): string {
             return `lumiris:${item.passportId}`;
         case 'external-dpp':
             return `gtin:${item.gtin}`;
+        case 'public-dpp':
+            return `public:${item.publicCode}`;
         case 'manual':
             return `manual:${item.id}`;
     }
@@ -260,6 +285,26 @@ function addLumirisPassport(passportId: string): void {
 
 export function addToWardrobe(passportId: string): void {
     addLumirisPassport(passportId);
+}
+
+export function addPublicDpp(input: { publicCode: string; productName: string; grade?: string }): void {
+    const current = read();
+    if (current.some((it) => it.kind === 'public-dpp' && it.publicCode === input.publicCode)) return;
+    write([
+        ...current,
+        {
+            kind: 'public-dpp',
+            publicCode: input.publicCode,
+            productName: input.productName,
+            ...(input.grade ? { grade: input.grade } : {}),
+            addedAt: new Date().toISOString(),
+            documents: [],
+        },
+    ]);
+}
+
+export function removePublicDpp(publicCode: string): void {
+    removeFromWardrobe(`public:${publicCode}`);
 }
 
 export function addExternalDpp(gtin: string): void {

@@ -19,6 +19,9 @@ export const WIZARD_STEPS: readonly WizardStep[] = ['product', 'care', 'traceabi
 
 export interface DraftPassport {
     id: string;
+    // Set when this local draft mirrors an existing backend DRAFT being edited.
+    // Its presence switches the wizard's final step from create (POST) to update (PUT)/publish.
+    backendId?: string;
     artisanId: string;
     createdAt: string;
     updatedAt: string;

@@ -8,8 +8,8 @@ export interface DetailView {
     reference: string;
     createdAt: string;
     photo: string;
-    /** Backend validation status, or null when the passport isn't API-sourced. */
-    apiStatus: 'VALID' | 'INVALID' | null;
+    /** Backend status, or null when the passport isn't API-sourced. */
+    apiStatus: 'DRAFT' | 'VALID' | 'INVALID' | null;
 
     description?: string | null;
     category?: string | null;
@@ -44,7 +44,7 @@ export function buildDetailView(passport: Passport, dpp: DppFormDto | null): Det
         reference: passport.garment.reference,
         createdAt: passport.createdAt,
         photo: dpp?.mainPhotoUrl || passport.garment.mainPhotoUrl || PLACEHOLDER_PHOTO,
-        apiStatus: dpp ? (dpp.status === 'VALID' ? 'VALID' : 'INVALID') : null,
+        apiStatus: dpp ? dpp.status : null,
 
         description: dpp?.productDescription ?? passport.garment.description,
         category: dpp?.productCategory ?? passport.garment.kind,

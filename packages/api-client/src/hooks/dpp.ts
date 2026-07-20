@@ -77,6 +77,8 @@ export function useCreateDppEvent(
 export interface CreateDppFormVars {
     payload: DppFormPayload;
     files?: Partial<Record<DppFilePart, File>>;
+    // When true, saves as a DRAFT: no QR code, no frozen hash, no Iris score, no anchor, no quota use.
+    draft?: boolean;
 }
 
 export function useCreateDppForm(
@@ -85,13 +87,64 @@ export function useCreateDppForm(
     const client = useApiClient();
     const queryClient = useQueryClient();
     return useMutation<DppFormCreatedDto, Error, CreateDppFormVars>({
-        mutationFn: ({ payload, files }) => client.dpp.create(payload, files),
+        mutationFn: ({ payload, files, draft }) => client.dpp.create(payload, files, draft),
         ...options,
         onSuccess: (...args) => {
             void queryClient.invalidateQueries({ queryKey: dppKeys.all });
-            // Creating a passport consumes quota → refresh subscription state for the badge.
+            // Publishing consumes quota → refresh subscription state for the badge.
             void queryClient.invalidateQueries({ queryKey: subscriptionKeys.state() });
             return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+export interface UpdateDppFormVars {
+    id: string;
+    payload: DppFormPayload;
+    files?: Partial<Record<DppFilePart, File>>;
+}
+
+export function useUpdateDppForm(
+    options?: Omit<UseMutationOptions<DppFormCreatedDto, Error, UpdateDppFormVars>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<DppFormCreatedDto, Error, UpdateDppFormVars>({
+        mutationFn: ({ id, payload, files }) => client.dpp.update(id, payload, files),
+        ...options,
+        onSuccess: (data, vars, ...rest) => {
+            void queryClient.invalidateQueries({ queryKey: dppKeys.all });
+            void queryClient.invalidateQueries({ queryKey: dppKeys.detail(vars.id) });
+            return options?.onSuccess?.(data, vars, ...rest);
+        },
+    });
+}
+
+export function useDeleteDppForm(options?: Omit<UseMutationOptions<void, Error, string>, 'mutationFn'>) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<void, Error, string>({
+        mutationFn: (id) => client.dpp.remove(id),
+        ...options,
+        onSuccess: (...args) => {
+            void queryClient.invalidateQueries({ queryKey: dppKeys.all });
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+export function usePublishDppForm(options?: Omit<UseMutationOptions<DppFormCreatedDto, Error, string>, 'mutationFn'>) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<DppFormCreatedDto, Error, string>({
+        mutationFn: (id) => client.dpp.publish(id),
+        ...options,
+        onSuccess: (data, id, ...rest) => {
+            void queryClient.invalidateQueries({ queryKey: dppKeys.all });
+            void queryClient.invalidateQueries({ queryKey: dppKeys.detail(id) });
+            // Publishing consumes quota → refresh subscription state for the badge.
+            void queryClient.invalidateQueries({ queryKey: subscriptionKeys.state() });
+            return options?.onSuccess?.(data, id, ...rest);
         },
     });
 }

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const dppStatusSchema = z.enum(['VALID', 'INVALID']);
+export const dppStatusSchema = z.enum(['DRAFT', 'VALID', 'INVALID']);
 export type DppStatus = z.infer<typeof dppStatusSchema>;
 
 export const dppMaterialSchema = z.object({

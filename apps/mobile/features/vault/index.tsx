@@ -66,7 +66,24 @@ interface ManualVaultRow {
     sublabel: string;
 }
 
-type VaultRow = ScoredVaultRow | ManualVaultRow;
+interface PublicDppRow {
+    kind: 'public-dpp';
+    key: string;
+    addedAt: string;
+    sector: WardrobeSector;
+    label: string;
+    sublabel: string;
+    grade: IrisGrade | null;
+    publicCode: string;
+}
+
+type VaultRow = ScoredVaultRow | PublicDppRow | ManualVaultRow;
+
+function rowGrade(row: VaultRow): IrisGrade | null {
+    if (row.kind === 'scored') return row.score.grade;
+    if (row.kind === 'public-dpp') return row.grade;
+    return null;
+}
 
 function buildRow(item: WardrobeItem, now: Date): VaultRow | null {
     if (item.kind === 'lumiris-passport') {
@@ -84,6 +101,18 @@ function buildRow(item: WardrobeItem, now: Date): VaultRow | null {
             passport,
             score: scorePassport(passport, now),
             artisanName: artisan?.atelierName ?? '-',
+        };
+    }
+    if (item.kind === 'public-dpp') {
+        return {
+            kind: 'public-dpp',
+            key: `public:${item.publicCode}`,
+            addedAt: item.addedAt,
+            sector: 'textile',
+            label: item.productName,
+            sublabel: 'Passeport numérique',
+            grade: (GRADES as readonly string[]).includes(item.grade ?? '') ? (item.grade as IrisGrade) : null,
+            publicCode: item.publicCode,
         };
     }
     if (item.kind === 'manual') {
@@ -119,7 +148,7 @@ export function Vault() {
     );
 
     const scoredRows = useMemo(() => rows.filter((r): r is ScoredVaultRow => r.kind === 'scored'), [rows]);
-    const grades = useMemo(() => scoredRows.map((r) => r.score.grade), [scoredRows]);
+    const grades = useMemo(() => rows.map(rowGrade).filter((g): g is IrisGrade => g !== null), [rows]);
     const distribution = useMemo(() => getGradeDistribution(grades), [grades]);
     const overall = useMemo(() => getOverallScore(grades), [grades]);
 
@@ -132,7 +161,14 @@ export function Vault() {
         [scoredRows],
     );
     const availableBrands = useMemo(
-        () => Array.from(new Set(rows.map((r) => r.sublabel).filter((s) => s !== '-' && s !== 'Sans marque'))),
+        () =>
+            Array.from(
+                new Set(
+                    rows
+                        .map((r) => r.sublabel)
+                        .filter((s) => s !== '-' && s !== 'Sans marque' && s !== 'Passeport numérique'),
+                ),
+            ),
         [rows],
     );
 
@@ -143,7 +179,7 @@ export function Vault() {
         filters.sort !== 'recent';
 
     const filteredRows = useMemo(() => {
-        const byGrade = gradeFilter ? rows.filter((r) => r.kind === 'scored' && r.score.grade === gradeFilter) : rows;
+        const byGrade = gradeFilter ? rows.filter((r) => rowGrade(r) === gradeFilter) : rows;
         const bySector = filters.sectors.length ? byGrade.filter((r) => filters.sectors.includes(r.sector)) : byGrade;
         const byKind = filters.kinds.length
             ? bySector.filter((r) => r.kind === 'scored' && filters.kinds.includes(r.passport.garment.kind))
@@ -156,9 +192,9 @@ export function Vault() {
                 break;
             case 'grade-desc':
                 sorted.sort((a, b) => {
-                    const ga = a.kind === 'scored' ? GRADE_RANK[a.score.grade] : 0;
-                    const gb = b.kind === 'scored' ? GRADE_RANK[b.score.grade] : 0;
-                    return gb - ga;
+                    const ga = rowGrade(a);
+                    const gb = rowGrade(b);
+                    return (gb ? GRADE_RANK[gb] : 0) - (ga ? GRADE_RANK[ga] : 0);
                 });
                 break;
             case 'price-asc':
@@ -230,6 +266,7 @@ export function Vault() {
                 return;
             }
             if (row.kind === 'scored') router.push(`/passeport/${row.passport.id}`);
+            if (row.kind === 'public-dpp') router.push(`/p/${row.publicCode}`);
         },
         [compareMode, router],
     );
@@ -308,15 +345,11 @@ export function Vault() {
             </motion.header>
 
             <div className="flex-1 overflow-y-auto px-5 pb-28">
-                {scoredRows.length > 0 ? (
-                    <WardrobeHealth
-                        grade={overall.grade}
-                        percentage={overall.percentage}
-                        scoredCount={scoredRows.length}
-                    />
+                {grades.length > 0 ? (
+                    <WardrobeHealth grade={overall.grade} percentage={overall.percentage} scoredCount={grades.length} />
                 ) : null}
 
-                {scoredRows.length > 0 ? (
+                {grades.length > 0 ? (
                     <DistributionChips distribution={distribution} activeGrade={gradeFilter} onSelect={onChipTap} />
                 ) : null}
 
@@ -544,7 +577,7 @@ interface VaultCardProps {
 
 function VaultCard({ row, index, compareMode, isSelected, onTap, onOpenActions }: VaultCardProps) {
     const Icon = SECTOR_ICON[row.sector];
-    const grade = row.kind === 'scored' ? row.score.grade : null;
+    const grade = rowGrade(row);
     const isE = grade === 'E';
     const isA = grade === 'A';
     const cardStyle: React.CSSProperties = {
@@ -552,7 +585,7 @@ function VaultCard({ row, index, compareMode, isSelected, onTap, onOpenActions }
         ...(isA ? { animation: 'iris-grade-a-glow 3s ease-in-out infinite' } : {}),
     };
 
-    const ariaLabel = row.kind === 'scored' ? `${row.label} - grade ${grade}` : `${row.label} - sans passeport`;
+    const ariaLabel = grade ? `${row.label} - grade ${grade}` : `${row.label} - sans passeport`;
 
     return (
         <motion.div
@@ -607,6 +640,8 @@ function VaultCard({ row, index, compareMode, isSelected, onTap, onOpenActions }
                             {row.passport.garment.retailPrice}{' '}
                             {row.passport.garment.currency === 'EUR' ? '€' : row.passport.garment.currency}
                         </p>
+                    ) : row.kind === 'public-dpp' ? (
+                        <p className="text-muted-foreground/70 mt-1 font-mono text-[11px]">{row.publicCode}</p>
                     ) : (
                         <p className="text-muted-foreground/70 mt-1 text-[11px]">Sans DPP</p>
                     )}

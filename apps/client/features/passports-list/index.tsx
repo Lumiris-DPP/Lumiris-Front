@@ -68,7 +68,8 @@ export function PassportsList() {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">Tous</SelectItem>
-                        <SelectItem value="VALID">Valide</SelectItem>
+                        <SelectItem value="DRAFT">Brouillon</SelectItem>
+                        <SelectItem value="VALID">Publié</SelectItem>
                         <SelectItem value="INVALID">Invalide</SelectItem>
                     </SelectContent>
                 </Select>
