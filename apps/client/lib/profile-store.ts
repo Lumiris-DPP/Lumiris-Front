@@ -4,24 +4,14 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { safeJSONStorage } from './persist-storage';
 import { mockArtisanById } from '@lumiris/mock-data';
-import type { Artisan, FrenchRegion } from '@lumiris/types';
+import type { Artisan } from '@lumiris/types';
 
 interface ProfileOverride {
-    story?: string;
-    city?: string;
-    region?: FrenchRegion;
-    specialities?: string[];
-    photoUrl?: string;
     epvLabeled?: boolean;
     ofgLabeled?: boolean;
 }
 
-export interface ProfileSnapshot {
-    story: string;
-    city: string;
-    region: FrenchRegion;
-    specialities: string[];
-    photoUrl: string;
+interface ProfileSnapshot {
     epvLabeled: boolean;
     ofgLabeled: boolean;
 }
@@ -60,11 +50,6 @@ export const useProfileStore = create<ProfileStoreState>()(
 
 function baselineFromArtisan(artisan: Artisan): ProfileSnapshot {
     return {
-        story: artisan.story,
-        city: artisan.city,
-        region: artisan.region,
-        specialities: [...artisan.specialities],
-        photoUrl: artisan.photoUrl,
         epvLabeled: artisan.epvLabeled,
         ofgLabeled: artisan.ofgLabeled,
     };
@@ -72,11 +57,6 @@ function baselineFromArtisan(artisan: Artisan): ProfileSnapshot {
 
 function fallbackProfile(): ProfileSnapshot {
     return {
-        story: '',
-        city: '',
-        region: 'Île-de-France',
-        specialities: [],
-        photoUrl: '',
         epvLabeled: false,
         ofgLabeled: false,
     };
@@ -85,11 +65,6 @@ function fallbackProfile(): ProfileSnapshot {
 function applyOverride(base: ProfileSnapshot, override: ProfileOverride | undefined): ProfileSnapshot {
     if (!override) return base;
     return {
-        story: override.story ?? base.story,
-        city: override.city ?? base.city,
-        region: override.region ?? base.region,
-        specialities: override.specialities ?? base.specialities,
-        photoUrl: override.photoUrl ?? base.photoUrl,
         epvLabeled: override.epvLabeled ?? base.epvLabeled,
         ofgLabeled: override.ofgLabeled ?? base.ofgLabeled,
     };
