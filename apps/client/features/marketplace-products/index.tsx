@@ -1,9 +1,27 @@
 'use client';
 
 import { useState } from 'react';
-import { PackagePlus, Pencil, Trash2, Wand2 } from 'lucide-react';
+import {
+    Archive,
+    ExternalLink,
+    Eye,
+    Loader2,
+    PackagePlus,
+    Pencil,
+    ShoppingBag,
+    Trash2,
+    Wallet,
+    Wand2,
+} from 'lucide-react';
 import type { MarketplaceItem } from '@lumiris/api-client';
-import { useDeleteProduct, useMyProducts } from '@lumiris/api-client/react';
+import {
+    useDeleteProduct,
+    useMyProducts,
+    useSellerDashboardLink,
+    useSellerStats,
+    useSellerStatus,
+    useStartSellerOnboarding,
+} from '@lumiris/api-client/react';
 import { Badge } from '@lumiris/ui/components/badge';
 import { Button } from '@lumiris/ui/components/button';
 import {
@@ -58,7 +76,10 @@ export function MarketplaceProducts() {
 
     return (
         <div className="space-y-4 p-8">
-            <div className="flex items-center justify-end">
+            <SellerConnectBanner />
+            <SellerStatsCards />
+            <div className="flex items-center justify-end gap-2">
+                <StripeDashboardButton />
                 <Button
                     onClick={() => setConvertOpen(true)}
                     className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 text-white"
@@ -84,6 +105,8 @@ export function MarketplaceProducts() {
                                 <TableHead>Produit</TableHead>
                                 <TableHead>Prix</TableHead>
                                 <TableHead>Stock</TableHead>
+                                <TableHead className="text-right">Vues</TableHead>
+                                <TableHead className="text-right">Ventes</TableHead>
                                 <TableHead>Score</TableHead>
                                 <TableHead>Statut</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
@@ -107,6 +130,12 @@ export function MarketplaceProducts() {
                                     </TableCell>
                                     <TableCell>{formatPriceCents(product.priceCents, product.currency)}</TableCell>
                                     <TableCell>{product.stock}</TableCell>
+                                    <TableCell className="text-muted-foreground text-right tabular-nums">
+                                        {product.views ?? 0}
+                                    </TableCell>
+                                    <TableCell className="text-right font-medium tabular-nums">
+                                        {product.salesCount ?? 0}
+                                    </TableCell>
                                     <TableCell>
                                         {product.irisGrade ? (
                                             <Badge variant="secondary">
@@ -165,5 +194,101 @@ export function MarketplaceProducts() {
                 </AlertDialogContent>
             </AlertDialog>
         </div>
+    );
+}
+
+function SellerConnectBanner() {
+    const token = useAuthStore((s) => s.token);
+    const { data: status } = useSellerStatus({ enabled: Boolean(token) });
+    const onboarding = useStartSellerOnboarding();
+
+    // Une fois les paiements activés, plus de bandeau : l'activation est acquise.
+    if (!token || status?.chargesEnabled) return null;
+
+    // Onboarding Stripe Connect en redirection pure (page hébergée Stripe), pas d'intégration front.
+    const activate = () =>
+        onboarding.mutate(undefined, {
+            onSuccess: ({ url }) => {
+                window.location.href = url;
+            },
+            onError: () => toast.error("Impossible d'ouvrir l'onboarding des paiements."),
+        });
+
+    return (
+        <div className="border-lumiris-amber/40 bg-lumiris-amber/10 flex flex-col gap-2 rounded-xl border p-4 md:flex-row md:items-center md:justify-between">
+            <div className="text-sm">
+                <p className="text-foreground font-medium">Activez les paiements pour vendre en direct</p>
+                <p className="text-muted-foreground text-xs">
+                    Onboarding Stripe Connect — commission plateforme d’environ 5 %, payout net versé à l’atelier.
+                </p>
+            </div>
+            <Button
+                onClick={activate}
+                disabled={onboarding.isPending}
+                className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 shrink-0 gap-1.5 text-white"
+            >
+                {onboarding.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                    <ExternalLink className="h-4 w-4" />
+                )}
+                Activer les paiements
+            </Button>
+        </div>
+    );
+}
+
+// Tableau de bord vendeur : ventes, revenus nets (net de commission), vues, pièces en garde-robe.
+function SellerStatsCards() {
+    const token = useAuthStore((s) => s.token);
+    const { data: stats } = useSellerStats({ enabled: Boolean(token) });
+    if (!token || !stats) return null;
+
+    const cards = [
+        { label: 'Ventes', value: String(stats.salesCount), icon: ShoppingBag, hint: 'commandes réglées' },
+        {
+            label: 'Revenus nets',
+            value: formatPriceCents(stats.netCents, 'EUR'),
+            icon: Wallet,
+            hint: `net de ${formatPriceCents(stats.commissionCents, 'EUR')} de commission`,
+        },
+        { label: 'Vues', value: String(stats.totalViews), icon: Eye, hint: 'sur vos fiches produit' },
+        { label: 'En garde-robe', value: String(stats.wardrobeCount), icon: Archive, hint: 'pièces chez vos clients' },
+    ];
+
+    return (
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {cards.map(({ label, value, icon: Icon, hint }) => (
+                <div key={label} className="bg-card rounded-xl border p-4">
+                    <div className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium">
+                        <Icon className="h-3.5 w-3.5" />
+                        {label}
+                    </div>
+                    <p className="text-foreground mt-1 text-2xl font-semibold tabular-nums">{value}</p>
+                    <p className="text-muted-foreground mt-0.5 text-[11px]">{hint}</p>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+// Ouvre le tableau de bord Stripe Express (solde + virements encaissés) — visible une fois activé.
+function StripeDashboardButton() {
+    const token = useAuthStore((s) => s.token);
+    const { data: status } = useSellerStatus({ enabled: Boolean(token) });
+    const dashboard = useSellerDashboardLink();
+    if (!token || !status?.chargesEnabled) return null;
+
+    const open = () =>
+        dashboard.mutate(undefined, {
+            onSuccess: ({ url }) => window.open(url, '_blank', 'noopener,noreferrer'),
+            onError: () => toast.error("Impossible d'ouvrir le tableau de bord Stripe."),
+        });
+
+    return (
+        <Button variant="outline" onClick={open} disabled={dashboard.isPending} className="gap-1.5">
+            {dashboard.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wallet className="h-4 w-4" />}
+            Mes paiements Stripe
+        </Button>
     );
 }

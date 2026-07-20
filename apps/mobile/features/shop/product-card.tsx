@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ExternalLink, ShoppingBag, Shirt } from 'lucide-react';
 import { IrisGrade } from '@lumiris/scoring-ui';
 import type { IrisGrade as IrisGradeValue } from '@lumiris/types';
-import { useBuyProduct, useTrackAffiliate } from '@lumiris/api-client/react';
+import { useTrackAffiliate } from '@lumiris/api-client/react';
 import type { MarketplaceItem } from '@lumiris/api-client';
 import { cn } from '@lumiris/ui/lib/cn';
 import { formatPriceCents } from '@lumiris/utils';
@@ -37,11 +38,12 @@ interface ProductCardProps {
     source?: string;
 }
 
-// Carte du catalogue réel (LUMIRIS-9). Le clic vers le lien de commande de l'atelier
-// est tracké via /public/track/affiliate (fire-and-forget) avant d'ouvrir l'onglet externe.
+// Carte du catalogue réel. Deux modes :
+//  • vente in-app → renvoie vers la fiche Boutique (/boutique/[id]) qui porte le VRAI flux
+//    panier + paiement embarqué (aucun paiement direct au clic) ;
+//  • affilié → ouvre le lien de commande de l'atelier, tracké via /public/track/affiliate.
 export function ProductCard({ item, index, source = 'shop' }: ProductCardProps) {
     const track = useTrackAffiliate();
-    const buy = useBuyProduct();
     const grade = asGrade(item.irisGrade);
     const href = safeHttpUrl(item.externalOrderUrl);
     const inApp = item.inAppSale === true;
@@ -53,15 +55,6 @@ export function ProductCard({ item, index, source = 'shop' }: ProductCardProps) 
     const onOrderClick = () => {
         if (!href) return;
         track.mutate({ source, productId: item.id, targetUrl: href });
-    };
-
-    const onBuy = () => {
-        if (buy.isPending) return;
-        buy.mutate(item.id, {
-            onSuccess: ({ url }) => {
-                window.location.href = url;
-            },
-        });
     };
 
     const body = (
@@ -123,15 +116,13 @@ export function ProductCard({ item, index, source = 'shop' }: ProductCardProps) 
             transition={{ delay: 0.05 + index * 0.03 }}
         >
             {inApp ? (
-                <button
-                    type="button"
-                    onClick={onBuy}
-                    disabled={buy.isPending}
-                    className={cn(className, 'disabled:opacity-60')}
-                    aria-label={`Acheter « ${item.name} » (paiement in-app)`}
+                <Link
+                    href={`/boutique/${item.id}`}
+                    className={className}
+                    aria-label={`Voir « ${item.name} » dans la Boutique`}
                 >
                     {body}
-                </button>
+                </Link>
             ) : href ? (
                 <a
                     href={href}

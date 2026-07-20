@@ -31,6 +31,7 @@ import { toast } from '@/lib/toast';
 import { ComparisonOverlay, type VaultItem } from './comparison-overlay';
 import { FiltersSheet, VAULT_DEFAULT_FILTERS, type VaultFilters } from './filters-sheet';
 import { ItemActionsSheet } from './item-actions-sheet';
+import { PurchasedItems } from './purchased-items';
 
 const GRADES: readonly IrisGrade[] = ['A', 'B', 'C', 'D', 'E'];
 const GRADE_RANK: Record<IrisGrade, number> = { A: 5, B: 4, C: 3, D: 2, E: 1 };
@@ -276,7 +277,12 @@ export function Vault() {
     }, []);
 
     if (rows.length === 0) {
-        return <VaultEmpty onScan={() => router.push('/')} onAdd={() => router.push('/vault/add')} />;
+        return (
+            <div className="bg-background flex h-full flex-col overflow-y-auto pt-12">
+                <PurchasedItems />
+                <VaultEmpty onScan={() => router.push('/')} onAdd={() => router.push('/vault/add')} />
+            </div>
+        );
     }
 
     const compareItems = compareIds
@@ -343,6 +349,8 @@ export function Vault() {
                     </button>
                 </div>
             </motion.header>
+
+            <PurchasedItems />
 
             <div className="flex-1 overflow-y-auto px-5 pb-28">
                 {grades.length > 0 ? (

@@ -81,7 +81,7 @@ export function MarketplaceBanner() {
             ) : null}
 
             <Button asChild className="mt-4 w-full rounded-full">
-                <Link href="/shop" aria-label="Parcourir tout le catalogue marketplace">
+                <Link href="/boutique" aria-label="Parcourir tout le catalogue marketplace">
                     <span>Parcourir tout le catalogue</span>
                     <ArrowRight className="h-4 w-4" aria-hidden />
                 </Link>

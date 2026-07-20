@@ -32,7 +32,6 @@ function activeTabFor(pathname: string): Tab | null {
     if (
         pathname === '/boutique' ||
         pathname.startsWith('/boutique/') ||
-        pathname.startsWith('/shop') ||
         pathname === '/panier' ||
         pathname === '/checkout' ||
         pathname.startsWith('/commande/')

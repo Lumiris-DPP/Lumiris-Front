@@ -23,7 +23,9 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
 
     const [dppFormId, setDppFormId] = useState('');
     const [priceEuros, setPriceEuros] = useState('');
+    const [shippingEuros, setShippingEuros] = useState('');
     const [stock, setStock] = useState('');
+    const [returnPolicy, setReturnPolicy] = useState('');
     const [externalOrderUrl, setExternalOrderUrl] = useState('');
 
     const priceCents = useMemo(() => Math.round(parseFloat(priceEuros.replace(',', '.')) * 100), [priceEuros]);
@@ -32,7 +34,9 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
     const reset = () => {
         setDppFormId('');
         setPriceEuros('');
+        setShippingEuros('');
         setStock('');
+        setReturnPolicy('');
         setExternalOrderUrl('');
     };
 
@@ -45,6 +49,10 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                     priceCents,
                     currency: 'EUR',
                     stock: stock ? Number(stock) : undefined,
+                    shippingCents: shippingEuros
+                        ? Math.round(parseFloat(shippingEuros.replace(',', '.')) * 100)
+                        : undefined,
+                    returnPolicy: returnPolicy.trim() || undefined,
                     externalOrderUrl: externalOrderUrl.trim() || undefined,
                     status: 'PUBLISHED',
                 },
@@ -120,6 +128,30 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                                 value={stock}
                                 placeholder="ex. 10"
                                 onChange={(e) => setStock(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                            <Label htmlFor="convert-shipping">Frais de port (€)</Label>
+                            <Input
+                                id="convert-shipping"
+                                type="number"
+                                min={0}
+                                step="0.01"
+                                value={shippingEuros}
+                                placeholder="5.00"
+                                onChange={(e) => setShippingEuros(e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="convert-return">Conditions de retour</Label>
+                            <Input
+                                id="convert-return"
+                                value={returnPolicy}
+                                placeholder="Retour sous 14 jours"
+                                onChange={(e) => setReturnPolicy(e.target.value)}
                             />
                         </div>
                     </div>

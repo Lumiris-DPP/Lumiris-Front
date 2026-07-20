@@ -1,15 +1,15 @@
 'use client';
 
-// Panier marketplace scopé par user, même pattern que wardrobe-storage.
-// Une ligne = un passeport en vente + une quantité.
+// Panier marketplace scopé par user (localStorage), même pattern que wardrobe-storage.
+// Une ligne = un produit réel (id) + une quantité. Le stock est borné par l'UI
+// (qui dispose du produit) ; le backend revalide au moment du PaymentIntent.
 
 import { useSyncExternalStore } from 'react';
 import { readUser } from '../auth/storage';
 import { USER_KEYS, userScopedKey } from '../storage-keys';
-import { getListing } from './listings';
 
 export interface CartLine {
-    passportId: string;
+    productId: string;
     quantity: number;
     addedAt: string;
 }
@@ -32,7 +32,7 @@ function notify(): void {
 function isCartLine(value: unknown): value is CartLine {
     if (!value || typeof value !== 'object') return false;
     const v = value as Record<string, unknown>;
-    return typeof v.passportId === 'string' && typeof v.quantity === 'number' && typeof v.addedAt === 'string';
+    return typeof v.productId === 'string' && typeof v.quantity === 'number' && typeof v.addedAt === 'string';
 }
 
 function read(): CartLine[] {
@@ -54,38 +54,28 @@ function write(lines: readonly CartLine[]): void {
     notify();
 }
 
-/** Borne la quantité au stock disponible de l'annonce. */
-function clampToStock(passportId: string, quantity: number): number {
-    const stock = getListing(passportId)?.stock ?? 0;
-    if (stock <= 0) return 0;
-    return Math.min(Math.max(1, Math.round(quantity)), stock);
-}
-
-export function addToCart(passportId: string, quantity = 1): void {
+export function addToCart(productId: string, quantity = 1): void {
     const current = read();
-    const existing = current.find((line) => line.passportId === passportId);
+    const existing = current.find((line) => line.productId === productId);
     if (existing) {
-        const next = clampToStock(passportId, existing.quantity + quantity);
-        write(current.map((line) => (line.passportId === passportId ? { ...line, quantity: next } : line)));
+        const next = Math.max(1, existing.quantity + quantity);
+        write(current.map((line) => (line.productId === productId ? { ...line, quantity: next } : line)));
         return;
     }
-    const qty = clampToStock(passportId, quantity);
-    if (qty <= 0) return;
-    write([...current, { passportId, quantity: qty, addedAt: new Date().toISOString() }]);
+    write([...current, { productId, quantity: Math.max(1, quantity), addedAt: new Date().toISOString() }]);
 }
 
-export function setCartQuantity(passportId: string, quantity: number): void {
+export function setCartQuantity(productId: string, quantity: number): void {
     const current = read();
     if (quantity <= 0) {
-        write(current.filter((line) => line.passportId !== passportId));
+        write(current.filter((line) => line.productId !== productId));
         return;
     }
-    const qty = clampToStock(passportId, quantity);
-    write(current.map((line) => (line.passportId === passportId ? { ...line, quantity: qty } : line)));
+    write(current.map((line) => (line.productId === productId ? { ...line, quantity } : line)));
 }
 
-export function removeFromCart(passportId: string): void {
-    write(read().filter((line) => line.passportId !== passportId));
+export function removeFromCart(productId: string): void {
+    write(read().filter((line) => line.productId !== productId));
 }
 
 export function clearCart(): void {
