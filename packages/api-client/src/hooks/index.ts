@@ -9,3 +9,4 @@ export * from './marketplace';
 export * from './track';
 export * from './seller';
 export * from './wardrobe';
+export * from './iris';

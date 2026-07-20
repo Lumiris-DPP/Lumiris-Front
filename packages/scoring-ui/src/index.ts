@@ -17,6 +17,7 @@ export {
     type StatusBadgeSize,
 } from './components/status-badge';
 export { ScoreCapWarning, type ScoreCapWarningProps } from './components/score-cap-warning';
+export { IrisMethodologyInfo, type IrisMethodologyInfoProps } from './components/iris-methodology-info';
 export { Wardrobe, type WardrobeProps, type WardrobeCardItem } from './components/wardrobe';
 export { PassportPhonePreview, type PassportPhonePreviewProps } from './components/passport-phone-preview';
 export { CompositionList, type CompositionListProps } from './components/composition-list';

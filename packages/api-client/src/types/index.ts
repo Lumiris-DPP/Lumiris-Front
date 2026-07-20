@@ -8,3 +8,4 @@ export * from './admin-artisans';
 export * from './marketplace';
 export * from './seller';
 export * from './wardrobe';
+export * from './iris';
