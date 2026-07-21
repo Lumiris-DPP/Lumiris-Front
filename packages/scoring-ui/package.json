@@ -29,6 +29,7 @@
         "./components/care-guide": "./src/components/care-guide.tsx",
         "./components/repairers-nearby": "./src/components/repairers-nearby.tsx",
         "./components/passport-status-banner": "./src/components/passport-status-banner.tsx",
+        "./components/origin-map": "./src/components/origin-map.tsx",
         "./hooks/use-compute-score": "./src/hooks/use-compute-score.ts",
         "./theme/grade-color": "./src/theme/grade-color.ts"
     },
@@ -43,7 +44,9 @@
         "@lumiris/core": "workspace:*",
         "@lumiris/types": "workspace:*",
         "@lumiris/ui": "workspace:*",
-        "lucide-react": "^0.564.0"
+        "leaflet": "^1.9.4",
+        "lucide-react": "^0.564.0",
+        "react-leaflet": "^5.0.0"
     },
     "peerDependencies": {
         "react": "^19",
@@ -51,6 +54,7 @@
     },
     "devDependencies": {
         "@lumiris/config": "workspace:*",
+        "@types/leaflet": "^1.9.12",
         "@types/react": "^19",
         "@types/react-dom": "^19",
         "eslint": "^9.17.0",

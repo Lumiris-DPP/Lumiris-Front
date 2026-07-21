@@ -4,6 +4,8 @@ export interface DppMaterialDto {
     fiber: string;
     percentage: number;
     originCountry: string;
+    latitude: number | null;
+    longitude: number | null;
 }
 
 export interface DppDocumentDto {
@@ -65,6 +67,10 @@ export interface DppEventDto {
     occurredAt: string;
     description: string;
     actorType: DppEventActorType;
+    locationCity: string | null;
+    locationCountry: string | null;
+    latitude: number | null;
+    longitude: number | null;
     createdAt: string | null;
 }
 

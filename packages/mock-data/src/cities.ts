@@ -20,6 +20,14 @@ export const CITY_COORDS: Record<string, CityCoords> = {
     Paris: { name: 'Paris', lat: 48.857, lng: 2.351, postalPrefix: '75' },
 };
 
+// Country centroids for the ISO codes used by mock material origins (demo data only —
+// real passports resolve origins via the backend geocoding pipeline instead).
+export const COUNTRY_COORDS: Record<string, { name: string; lat: number; lng: number }> = {
+    FR: { name: 'France', lat: 46.5, lng: 2.5 },
+    BE: { name: 'Belgique', lat: 50.6, lng: 4.5 },
+    MN: { name: 'Mongolie', lat: 46.8, lng: 103.8 },
+};
+
 export const POSTAL_PREFIX_TO_CITY: Record<string, string> = {
     '29': 'Quimper',
     '69': 'Lyon',

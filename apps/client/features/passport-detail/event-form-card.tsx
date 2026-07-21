@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { DppEventActorType } from '@lumiris/api-client';
 import { useCreateDppEvent } from '@lumiris/api-client/react';
+import { COUNTRIES } from '@lumiris/utils';
 import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import { Input } from '@lumiris/ui/components/input';
@@ -16,23 +17,30 @@ export function EventFormCard({ passportId }: { passportId: string }) {
     const [occurredAt, setOccurredAt] = useState('');
     const [description, setDescription] = useState('');
     const [actorType, setActorType] = useState<DppEventActorType | ''>('');
+    const [locationCity, setLocationCity] = useState('');
+    const [locationCountryCode, setLocationCountryCode] = useState('');
 
     const canSubmit = occurredAt !== '' && description.trim() !== '' && actorType !== '';
 
     const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!canSubmit || createEvent.isPending) return;
+        const country = COUNTRIES.find((c) => c.code === locationCountryCode);
         createEvent.mutate(
             {
                 occurredAt: new Date(occurredAt).toISOString(),
                 description: description.trim(),
                 actorType: actorType as DppEventActorType,
+                locationCity: locationCity.trim() || null,
+                locationCountry: country?.label ?? null,
             },
             {
                 onSuccess: () => {
                     setOccurredAt('');
                     setDescription('');
                     setActorType('');
+                    setLocationCity('');
+                    setLocationCountryCode('');
                 },
             },
         );
@@ -71,6 +79,40 @@ export function EventFormCard({ passportId }: { passportId: string }) {
                                     {Object.entries(ACTOR_LABELS).map(([value, label]) => (
                                         <SelectItem key={value} value={value}>
                                             {label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="flex flex-col gap-1">
+                            <label
+                                htmlFor="event-location-city"
+                                className="text-muted-foreground text-[11px] uppercase tracking-wider"
+                            >
+                                Ville (optionnel)
+                            </label>
+                            <Input
+                                id="event-location-city"
+                                type="text"
+                                value={locationCity}
+                                onChange={(e) => setLocationCity(e.target.value)}
+                                placeholder="Lyon"
+                            />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <span className="text-muted-foreground text-[11px] uppercase tracking-wider">
+                                Pays (optionnel)
+                            </span>
+                            <Select value={locationCountryCode} onValueChange={setLocationCountryCode}>
+                                <SelectTrigger aria-label="Pays" className="w-full">
+                                    <SelectValue placeholder="Sélectionner un pays" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {COUNTRIES.map((country) => (
+                                        <SelectItem key={country.code} value={country.code}>
+                                            {country.label}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>

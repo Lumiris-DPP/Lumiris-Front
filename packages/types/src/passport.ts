@@ -36,6 +36,7 @@ export interface Material {
     originCountry: CountryCode;
     certifications: readonly CertificationRef[];
     invoiceRef?: string;
+    coordinates?: Coordinates;
 }
 
 export type StageKind =
@@ -58,6 +59,7 @@ export interface ProductionStep {
     locationCountry: CountryCode;
     photos: readonly string[];
     performedAt?: string;
+    coordinates?: Coordinates;
 }
 
 export type GarmentKind = 'sweater' | 'shirt' | 'shoe' | 'jacket' | 'trouser' | 'accessory' | 'other';

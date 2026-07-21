@@ -1,17 +1,28 @@
 'use client';
 
-import { type ReactNode } from 'react';
+import { type ReactNode, useMemo } from 'react';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { CheckCircle, XCircle, FileText, ArrowLeft, Download, Heart, ExternalLink } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { IrisGrade } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
+import type { OriginMapOriginPoint, OriginMapStepPoint } from '@lumiris/scoring-ui/components/origin-map';
 import type { DppEventDto, DppEventActorType, DppFormDto, IrisScoreDto } from '@/lib/public-dpp-api';
 import { addPublicDpp, removePublicDpp, useWardrobe } from '@/lib/wardrobe-storage';
 import { toast } from '@/lib/toast';
 import { GRADE_TEXT, GRADE_BORDER, GRADE_BG_SOFT, GRADE_CSS_VAR } from '@/features/passport-detail/grade-classes';
+
+const OriginMap = dynamic(() => import('@lumiris/scoring-ui/components/origin-map').then((m) => m.OriginMap), {
+    ssr: false,
+    loading: () => (
+        <div className="border-border bg-card text-muted-foreground flex h-72 items-center justify-center rounded-2xl border text-xs italic">
+            Chargement de la carte…
+        </div>
+    ),
+});
 
 const FIBER_LABELS: Record<string, string> = {
     cotton: 'Coton',
@@ -109,6 +120,35 @@ export function PublicPassportDetail({
     };
 
     const publicDocs = (dpp.documents ?? []).filter((d) => d.visibility === 'PUBLIC_USERS');
+
+    const originPoints: OriginMapOriginPoint[] = useMemo(
+        () =>
+            (dpp.materials ?? []).map((m, i) => ({
+                id: `material-${i}`,
+                label: FIBER_LABELS[m.fiber] ?? m.fiber,
+                country: m.originCountry,
+                latitude: m.latitude,
+                longitude: m.longitude,
+            })),
+        [dpp.materials],
+    );
+
+    const stepPoints: OriginMapStepPoint[] = useMemo(
+        () =>
+            [...events]
+                .sort((a, b) => new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime())
+                .map((e, i) => ({
+                    id: e.id,
+                    order: i + 1,
+                    label: e.description,
+                    sublabel: ACTOR_LABELS[e.actorType],
+                    city: e.locationCity,
+                    country: e.locationCountry,
+                    latitude: e.latitude,
+                    longitude: e.longitude,
+                })),
+        [events],
+    );
 
     return (
         <div className="bg-background flex h-full w-full flex-col overflow-y-auto pb-10">
@@ -392,6 +432,12 @@ export function PublicPassportDetail({
                                 </li>
                             ))}
                         </ol>
+                    </Section>
+                )}
+
+                {(originPoints.length > 0 || stepPoints.length > 0) && (
+                    <Section delay={LAYER_DELAY * 7} title="Origine et parcours">
+                        <OriginMap origins={originPoints} steps={stepPoints} />
                     </Section>
                 )}
 
