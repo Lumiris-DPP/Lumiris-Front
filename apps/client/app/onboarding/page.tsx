@@ -11,6 +11,7 @@ import { Checkbox } from '@lumiris/ui/components/checkbox';
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { useAuthUserId, useAuthRole, useAuthToken, useAuthHydrated } from '@/lib/use-auth';
+import { signOut } from '@/lib/auth-store';
 import { useVerificationStore } from '@/lib/verification-store';
 
 const SIRET_RE = /^\d{14}$/;
@@ -108,6 +109,11 @@ export default function OnboardingPage() {
         );
     }
 
+    function handleLogout() {
+        signOut();
+        router.replace('/login');
+    }
+
     function handleDeclarationSubmit(e: SyntheticEvent) {
         e.preventDefault();
         if (!userId) return;
@@ -125,12 +131,17 @@ export default function OnboardingPage() {
     return (
         <div className="flex min-h-screen flex-col bg-background">
             <header className="border-b border-border bg-card">
-                <div className="mx-auto flex max-w-6xl items-center gap-3 px-6 py-5">
-                    <LumirisLogo className="h-9 w-auto" />
-                    <div>
-                        <p className="text-sm leading-none font-semibold text-foreground">LUMIRIS</p>
-                        <p className="font-mono text-[10px] tracking-widest text-muted-foreground">ATELIER</p>
+                <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+                    <div className="flex items-center gap-3">
+                        <LumirisLogo className="h-9 w-auto" />
+                        <div>
+                            <p className="text-sm leading-none font-semibold text-foreground">LUMIRIS</p>
+                            <p className="font-mono text-[10px] tracking-widest text-muted-foreground">ATELIER</p>
+                        </div>
                     </div>
+                    <Button variant="ghost" size="sm" onClick={handleLogout} className="text-muted-foreground">
+                        Se déconnecter
+                    </Button>
                 </div>
             </header>
 
