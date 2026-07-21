@@ -260,10 +260,13 @@
         "@lumiris/core": "workspace:*",
         "@lumiris/types": "workspace:*",
         "@lumiris/ui": "workspace:*",
+        "leaflet": "^1.9.4",
         "lucide-react": "^0.564.0",
+        "react-leaflet": "^5.0.0",
       },
       "devDependencies": {
         "@lumiris/config": "workspace:*",
+        "@types/leaflet": "^1.9.12",
         "@types/react": "^19",
         "@types/react-dom": "^19",
         "eslint": "^9.17.0",

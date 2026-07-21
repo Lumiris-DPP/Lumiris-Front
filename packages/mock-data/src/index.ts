@@ -41,7 +41,14 @@ export {
     passportPublicByArtisan,
     type PassportPublicView,
 } from './passport-public';
-export { CITY_COORDS, POSTAL_PREFIX_TO_CITY, distanceKm, cityFromPostalCode, type CityCoords } from './cities';
+export {
+    CITY_COORDS,
+    COUNTRY_COORDS,
+    POSTAL_PREFIX_TO_CITY,
+    distanceKm,
+    cityFromPostalCode,
+    type CityCoords,
+} from './cities';
 export { mockRegulatoryItems } from './regulatory';
 export { ATELIER_PLANS, ATELIER_ADD_ONS, LOCAL_PLANS, popularAtelierPlan } from './atelier-plans';
 export {

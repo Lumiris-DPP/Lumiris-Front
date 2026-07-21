@@ -7,6 +7,8 @@ export const dppMaterialSchema = z.object({
     fiber: z.string(),
     percentage: z.number(),
     originCountry: z.string().nullish(),
+    latitude: z.number().nullish(),
+    longitude: z.number().nullish(),
 });
 export type DppMaterial = z.infer<typeof dppMaterialSchema>;
 
@@ -120,6 +122,10 @@ export const dppEventDtoSchema = z.object({
     occurredAt: z.string(),
     description: z.string(),
     actorType: dppEventActorTypeSchema,
+    locationCity: z.string().nullish(),
+    locationCountry: z.string().nullish(),
+    latitude: z.number().nullish(),
+    longitude: z.number().nullish(),
     createdAt: z.string().nullish(),
 });
 export type DppEventDto = z.infer<typeof dppEventDtoSchema>;
@@ -128,6 +134,8 @@ export const dppEventPayloadSchema = z.object({
     occurredAt: z.string(),
     description: z.string(),
     actorType: dppEventActorTypeSchema,
+    locationCity: z.string().nullish(),
+    locationCountry: z.string().nullish(),
 });
 export type DppEventPayload = z.infer<typeof dppEventPayloadSchema>;
 
