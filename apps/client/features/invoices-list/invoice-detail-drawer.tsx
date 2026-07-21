@@ -99,7 +99,7 @@ function DocumentPreview({ invoice }: { invoice: InvoiceView }) {
                         href={src}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-lumiris-emerald inline-flex items-center gap-1 text-sm hover:underline"
+                        className="text-lumiris-cyan inline-flex items-center gap-1 text-sm hover:underline"
                     >
                         Ouvrir le document <ExternalLink className="h-3 w-3" />
                     </a>

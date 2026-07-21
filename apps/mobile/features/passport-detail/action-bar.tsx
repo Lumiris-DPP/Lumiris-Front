@@ -117,7 +117,7 @@ function ActionButton({ onClick, label, Icon, active = false, disabled = false, 
                 disabled
                     ? 'text-muted-foreground/40 active:scale-100'
                     : active
-                      ? 'text-lumiris-emerald'
+                      ? 'text-lumiris-cyan'
                       : 'text-foreground/80 hover:text-foreground',
             )}
         >
@@ -126,7 +126,7 @@ function ActionButton({ onClick, label, Icon, active = false, disabled = false, 
                 {badge !== undefined && badge > 0 ? (
                     <span
                         aria-hidden
-                        className="bg-lumiris-emerald text-background absolute -right-2 -top-1 inline-flex min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-semibold leading-none"
+                        className="bg-lumiris-cyan text-background absolute -right-2 -top-1 inline-flex min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-semibold leading-none"
                     >
                         {badge > 9 ? '9+' : badge}
                     </span>

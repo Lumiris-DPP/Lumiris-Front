@@ -35,7 +35,7 @@ export function StepSuccess({ name }: StepSuccessProps) {
 
             <Button
                 onClick={() => router.replace('/dashboard')}
-                className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 h-10 w-full text-white"
+                className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 h-10 w-full text-white"
             >
                 Aller au tableau de bord
             </Button>

@@ -9,37 +9,37 @@ const RULES = [
         title: 'Score non achetable',
         description:
             "Aucun acteur ne peut payer pour ameliorer son score. Le seul levier est d'ameliorer ses pratiques.",
-        color: 'bg-emerald-500/10 text-emerald-600',
+        color: 'bg-lumiris-cyan/10 text-lumiris-cyan',
     },
     {
         icon: GitBranch,
         title: 'Algorithme open source',
         description: 'Le code de calcul est public sur GitHub, versionne et auditable par tous.',
-        color: 'bg-cyan-500/10 text-cyan-600',
+        color: 'bg-lumiris-cyan/10 text-lumiris-cyan',
     },
     {
         icon: Database,
         title: 'Datasets publics',
         description: 'Les donnees de reference (ADEME, Higg, Water Footprint Network) sont publiques et versionnees.',
-        color: 'bg-violet-500/10 text-violet-600',
+        color: 'bg-lumiris-iris/10 text-lumiris-iris',
     },
     {
         icon: Scale,
         title: 'Ponderations fixes',
         description: 'Les poids 40/25/25/10 sont definis collectivement et ne peuvent etre modifies individuellement.',
-        color: 'bg-amber-500/10 text-amber-600',
+        color: 'bg-lumiris-amber/10 text-lumiris-amber',
     },
     {
         icon: Star,
         title: 'Pas de score "premium"',
         description: "L'option ATELIER+ agit uniquement a score equivalent - elle n'ameliore jamais la note.",
-        color: 'bg-pink-500/10 text-pink-600',
+        color: 'bg-lumiris-rose/10 text-lumiris-rose',
     },
     {
         icon: Shield,
         title: 'Audit independant',
         description: 'La methodologie est soumise a un audit annuel par un tiers independant.',
-        color: 'bg-blue-500/10 text-blue-600',
+        color: 'bg-lumiris-cyan/10 text-lumiris-cyan',
     },
 ];
 

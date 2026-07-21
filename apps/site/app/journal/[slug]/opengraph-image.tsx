@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { getAllArticles, getArticleBySlug } from '@/lib/journal';
+import { OG_LOGO_DATA_URI } from '@/lib/og-logo';
 
 export const alt = 'Article LUMIRIS Journal';
 export const size = { width: 1200, height: 630 };
@@ -34,22 +35,8 @@ export default async function Image({ params }: OgProps) {
             }}
         >
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                <div
-                    style={{
-                        width: 36,
-                        height: 36,
-                        borderRadius: 8,
-                        background: 'linear-gradient(135deg,#10b981,#06b6d4,#f59e0b)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 700,
-                        fontSize: 18,
-                        color: '#0b1014',
-                    }}
-                >
-                    L
-                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element -- next/og renders via Satori, not the DOM */}
+                <img src={OG_LOGO_DATA_URI} width={51} height={36} alt="" />
                 <div style={{ display: 'flex', fontSize: 20, letterSpacing: 4, color: '#475569' }}>
                     LUMIRIS · JOURNAL
                 </div>

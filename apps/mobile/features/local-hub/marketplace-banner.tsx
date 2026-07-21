@@ -29,9 +29,9 @@ export function MarketplaceBanner() {
     return (
         <section
             aria-label="Marketplace LUMIRIS"
-            className="border-lumiris-emerald/30 bg-lumiris-emerald/5 rounded-2xl border p-5"
+            className="border-lumiris-cyan/30 bg-lumiris-cyan/5 rounded-2xl border p-5"
         >
-            <p className="text-lumiris-emerald text-[10px] font-semibold uppercase tracking-wider">
+            <p className="text-lumiris-cyan text-[10px] font-semibold uppercase tracking-wider">
                 Marketplace LUMIRIS
             </p>
             <p className="text-foreground mt-1 text-sm font-semibold">Trie exclusivement par score Iris</p>

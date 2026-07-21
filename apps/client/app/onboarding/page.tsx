@@ -2,7 +2,8 @@
 
 import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, ShieldCheck, Sparkles } from 'lucide-react';
+import { CheckCircle2, ShieldCheck } from 'lucide-react';
+import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { isApiError, useArtisanMe, useArtisanRegister, useSignDeclaration } from '@lumiris/api-client/react';
 import { Button } from '@lumiris/ui/components/button';
 import { Card } from '@lumiris/ui/components/card';
@@ -38,8 +39,16 @@ export default function OnboardingPage() {
     const [certified, setCertified] = useState(false);
 
     useEffect(() => {
+        if (!me.data) return;
+        // A REJECTED artisan is starting a fresh dossier: prefill their known SIRET but keep
+        // them on step 1 so they can re-submit (the backend upserts on re-register).
+        if (me.data.status === 'REJECTED') {
+            if (me.data.siret) setSiret(me.data.siret);
+            setStep('siret');
+            return;
+        }
         // Resume at step 2 if SIRET was already submitted but the declaration wasn't signed yet.
-        if (me.data?.siret && !me.data.declarationSigned) {
+        if (me.data.siret && !me.data.declarationSigned) {
             setSiret(me.data.siret);
             setStep('declaration');
         }
@@ -57,7 +66,9 @@ export default function OnboardingPage() {
         }
         if (token) {
             if (me.isLoading) return;
-            if (me.data?.declarationSigned) router.replace('/dashboard');
+            // A REJECTED artisan may resubmit here, so don't bounce them to the workspace even
+            // though they previously signed the declaration.
+            if (me.data?.declarationSigned && me.data.status !== 'REJECTED') router.replace('/dashboard');
             return;
         }
         const status = getRecord(userId).status;
@@ -109,9 +120,7 @@ export default function OnboardingPage() {
         <div className="bg-background flex min-h-screen flex-col">
             <header className="border-border bg-card border-b">
                 <div className="mx-auto flex max-w-6xl items-center gap-3 px-6 py-5">
-                    <div className="bg-lumiris-emerald flex h-9 w-9 items-center justify-center rounded-lg">
-                        <Sparkles className="text-primary-foreground h-4 w-4" />
-                    </div>
+                    <LumirisLogo className="h-9 w-auto" />
                     <div>
                         <p className="text-foreground text-sm font-semibold leading-none">LUMIRIS</p>
                         <p className="text-muted-foreground font-mono text-[10px] tracking-widest">ATELIER</p>
@@ -164,7 +173,7 @@ export default function OnboardingPage() {
                             <Button
                                 type="submit"
                                 disabled={registerArtisan.isPending}
-                                className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 mt-1 h-10 w-full text-white disabled:opacity-60"
+                                className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 mt-1 h-10 w-full text-white disabled:opacity-60"
                             >
                                 {registerArtisan.isPending ? 'Vérification…' : 'Continuer'}
                             </Button>
@@ -230,7 +239,7 @@ export default function OnboardingPage() {
                                 <Button
                                     type="submit"
                                     disabled={!certified || signDeclaration.isPending}
-                                    className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 flex-1 text-white disabled:opacity-40"
+                                    className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 flex-1 text-white disabled:opacity-40"
                                 >
                                     <CheckCircle2 className="mr-1.5 h-4 w-4" />
                                     {signDeclaration.isPending ? 'Envoi…' : "Finaliser l'inscription"}
@@ -241,7 +250,7 @@ export default function OnboardingPage() {
                 )}
 
                 <div className="text-muted-foreground mt-6 flex items-center justify-center gap-1.5 text-xs">
-                    <ShieldCheck className="text-lumiris-emerald h-3.5 w-3.5" />
+                    <ShieldCheck className="text-lumiris-cyan h-3.5 w-3.5" />
                     Vos données sont protégées — conformité RGPD
                 </div>
             </main>
@@ -256,9 +265,9 @@ function StepDot({ active, done, label }: { active: boolean; done: boolean; labe
                 className={[
                     'flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition-colors',
                     done
-                        ? 'bg-lumiris-emerald text-white'
+                        ? 'bg-lumiris-cyan text-white'
                         : active
-                          ? 'border-lumiris-emerald bg-lumiris-emerald/10 text-lumiris-emerald border-2'
+                          ? 'border-lumiris-cyan bg-lumiris-cyan/10 text-lumiris-cyan border-2'
                           : 'bg-muted text-muted-foreground border-border border',
                 ].join(' ')}
             >

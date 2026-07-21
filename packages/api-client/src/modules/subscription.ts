@@ -45,8 +45,37 @@ export function subscriptionApi(http: Http) {
                 await http.request('/api/subscription/change', { method: 'POST', body: req }),
             );
         },
+        // ATELIER+ add-on : ajoute le 2ᵉ article Stripe à l'abonnement de base actif.
+        // 422 s'il n'existe pas d'abonnement de base actif.
+        async addAtelierPlus(): Promise<SubscriptionStateDto> {
+            return parseOr(
+                subscriptionStateDtoSchema,
+                await http.request('/api/subscription/atelier-plus', { method: 'POST' }),
+            );
+        },
+        // Retire l'option ATELIER+ de l'abonnement de base actif. 422 sans abonnement actif.
+        async removeAtelierPlus(): Promise<SubscriptionStateDto> {
+            return parseOr(
+                subscriptionStateDtoSchema,
+                await http.request('/api/subscription/atelier-plus', { method: 'DELETE' }),
+            );
+        },
         async openPortal(): Promise<PortalDto> {
             return parseOr(portalDtoSchema, await http.request('/api/subscription/portal', { method: 'POST' }));
+        },
+        // Résiliation in-app : actif jusqu'à la fin de la période payée, puis extinction.
+        async cancel(): Promise<SubscriptionStateDto> {
+            return parseOr(
+                subscriptionStateDtoSchema,
+                await http.request('/api/subscription/cancel', { method: 'POST' }),
+            );
+        },
+        // Reprise in-app : annule une résiliation programmée avant l'échéance.
+        async resume(): Promise<SubscriptionStateDto> {
+            return parseOr(
+                subscriptionStateDtoSchema,
+                await http.request('/api/subscription/resume', { method: 'POST' }),
+            );
         },
         // Hosted Stripe Checkout Session for a new subscriber (all 5 plans). Returns the URL to redirect to.
         async checkout(req: CreateSetupIntentRequest): Promise<CheckoutDto> {

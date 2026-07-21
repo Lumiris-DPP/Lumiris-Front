@@ -35,3 +35,13 @@ export function useMe(options?: Omit<UseQueryOptions<User, Error>, 'queryKey' | 
         ...options,
     });
 }
+
+// RGPD : supprime (anonymise) le compte côté serveur. Le caller enchaîne ensuite la purge
+// locale + la déconnexion (voir lib/auth/wipe.ts côté app mobile).
+export function useDeleteAccount(options?: Omit<UseMutationOptions<void, Error, void>, 'mutationFn'>) {
+    const client = useApiClient();
+    return useMutation<void, Error, void>({
+        mutationFn: () => client.auth.deleteAccount(),
+        ...options,
+    });
+}

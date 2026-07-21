@@ -32,14 +32,14 @@ export function AttentionBlock({
             </CardHeader>
             <CardContent className="divide-border divide-y">
                 <Row
-                    icon={<Clock className="h-4 w-4 text-amber-500" />}
+                    icon={<Clock className="h-4 w-4 text-lumiris-amber" />}
                     label="Certifs qui expirent"
                     count={expiring.length}
                     href="/certifications"
                     emptyLabel="aucune"
                 />
                 <Row
-                    icon={<AlertCircle className="h-4 w-4 text-orange-500" />}
+                    icon={<AlertCircle className="h-4 w-4 text-lumiris-amber" />}
                     label="Passeports incomplets"
                     count={incomplete.length}
                     href="/passports"
@@ -47,7 +47,7 @@ export function AttentionBlock({
                 />
                 <div className="flex items-center justify-between py-2.5">
                     <div className="flex items-center gap-2">
-                        <BarChart3 className="h-4 w-4 text-cyan-500" />
+                        <BarChart3 className="h-4 w-4 text-lumiris-cyan" />
                         <span className="text-foreground text-sm">Quota du plan</span>
                     </div>
                     <div className="flex items-center gap-3">
@@ -56,7 +56,7 @@ export function AttentionBlock({
                         </span>
                         {!unlimited && <Progress value={Math.min(100, quota.percent)} className="h-1.5 w-24" />}
                         {overThreshold && (
-                            <Link href="/subscription" className="text-lumiris-emerald text-xs hover:underline">
+                            <Link href="/subscription" className="text-lumiris-cyan text-xs hover:underline">
                                 Mettre à niveau →
                             </Link>
                         )}
@@ -64,7 +64,7 @@ export function AttentionBlock({
                 </div>
                 {esprWindowOpen && (
                     <div className="flex items-center gap-2 py-2.5">
-                        <ShieldCheck className="text-lumiris-emerald h-4 w-4" />
+                        <ShieldCheck className="text-lumiris-cyan h-4 w-4" />
                         <span className="text-foreground text-sm">
                             ESPR — DPP textile obligatoire mi-2028. {publishedCount} passeport
                             {publishedCount > 1 ? 's' : ''} prêt{publishedCount > 1 ? 's' : ''}.

@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, type ComponentType, type SVGProps } from '
 import { motion } from 'framer-motion';
 import { Archive, MapPin, Sparkles } from 'lucide-react';
 import { Button } from '@lumiris/ui/components/button';
+import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { toast } from '@/lib/toast';
 import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
 
@@ -52,6 +53,7 @@ export default function AuthPage() {
             <motion.div className="w-full max-w-sm" variants={slideUpFade} initial="initial" animate="animate">
                 <GlassCard className="p-7">
                     <header className="flex flex-col items-center text-center">
+                        <LumirisLogo title="Lumiris" className="mb-3 h-10 w-auto" />
                         <p className="text-muted-foreground text-[10px] font-semibold uppercase tracking-[0.32em]">
                             Lumiris
                         </p>

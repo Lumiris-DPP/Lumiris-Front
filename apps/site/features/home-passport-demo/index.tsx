@@ -30,7 +30,7 @@ interface AxisRow {
 }
 
 const AXES: readonly AxisRow[] = [
-    { label: 'Transparence', value: 85, bar: 'bg-lumiris-emerald', text: 'text-lumiris-emerald' },
+    { label: 'Transparence', value: 85, bar: 'bg-lumiris-cyan', text: 'text-lumiris-cyan' },
     { label: 'Savoir-faire', value: 78, bar: 'bg-lumiris-cyan', text: 'text-lumiris-cyan' },
     { label: 'Impact', value: 92, bar: 'bg-lumiris-amber', text: 'text-lumiris-amber' },
     { label: 'Réparabilité', value: 88, bar: 'bg-lumiris-iris', text: 'text-lumiris-iris' },
@@ -111,7 +111,7 @@ export function HomePassportDemo() {
                                                 {TOTAL}
                                             </span>
                                             <span className="text-muted-foreground font-mono text-xs">/ 100</span>
-                                            <span className="text-lumiris-emerald ml-auto text-xs font-semibold uppercase tracking-wider">
+                                            <span className="text-lumiris-cyan ml-auto text-xs font-semibold uppercase tracking-wider">
                                                 Score Iris
                                             </span>
                                         </div>

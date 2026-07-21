@@ -93,11 +93,79 @@ export function useChangePlan(
     });
 }
 
+// ATELIER+ add-on : ajoute le 2ᵉ article Stripe à l'abonnement de base actif.
+export function useAddAtelierPlus(
+    options?: Omit<UseMutationOptions<SubscriptionStateDto, Error, void>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<SubscriptionStateDto, Error, void>({
+        mutationFn: () => client.subscription.addAtelierPlus(),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.setQueryData(subscriptionKeys.state(), args[0]);
+            void queryClient.invalidateQueries({ queryKey: subscriptionKeys.state() });
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+// Retire l'option ATELIER+ de l'abonnement de base actif.
+export function useRemoveAtelierPlus(
+    options?: Omit<UseMutationOptions<SubscriptionStateDto, Error, void>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<SubscriptionStateDto, Error, void>({
+        mutationFn: () => client.subscription.removeAtelierPlus(),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.setQueryData(subscriptionKeys.state(), args[0]);
+            void queryClient.invalidateQueries({ queryKey: subscriptionKeys.state() });
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
 export function useBillingPortal(options?: Omit<UseMutationOptions<PortalDto, Error, void>, 'mutationFn'>) {
     const client = useApiClient();
     return useMutation<PortalDto, Error, void>({
         mutationFn: () => client.subscription.openPortal(),
         ...options,
+    });
+}
+
+// Résiliation in-app (cancel_at_period_end) — l'accès reste jusqu'à la fin de la période payée.
+export function useCancelSubscription(
+    options?: Omit<UseMutationOptions<SubscriptionStateDto, Error, void>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<SubscriptionStateDto, Error, void>({
+        mutationFn: () => client.subscription.cancel(),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.setQueryData(subscriptionKeys.state(), args[0]);
+            void queryClient.invalidateQueries({ queryKey: subscriptionKeys.state() });
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+// Reprise in-app : annule une résiliation programmée avant l'échéance.
+export function useResumeSubscription(
+    options?: Omit<UseMutationOptions<SubscriptionStateDto, Error, void>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<SubscriptionStateDto, Error, void>({
+        mutationFn: () => client.subscription.resume(),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.setQueryData(subscriptionKeys.state(), args[0]);
+            void queryClient.invalidateQueries({ queryKey: subscriptionKeys.state() });
+            return options?.onSuccess?.(...args);
+        },
     });
 }
 

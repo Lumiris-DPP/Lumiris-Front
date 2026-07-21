@@ -23,7 +23,7 @@ const PRIVACY_POINTS = [
 
 export function VisionPrivacy() {
     return (
-        <section className="bg-cyan-500/5 py-20 sm:py-28">
+        <section className="bg-lumiris-cyan/5 py-20 sm:py-28">
             <div className="mx-auto max-w-6xl px-6">
                 <motion.div
                     initial={{ opacity: 0, y: 16 }}
@@ -50,8 +50,8 @@ export function VisionPrivacy() {
                             transition={{ duration: 0.4, delay: index * 0.1 }}
                         >
                             <div className="bg-card border-border rounded-xl border p-5 text-center">
-                                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/10">
-                                    <point.icon className="h-6 w-6 text-cyan-600" />
+                                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-lumiris-cyan/10">
+                                    <point.icon className="h-6 w-6 text-lumiris-cyan" />
                                 </div>
                                 <h3 className="text-foreground font-semibold">{point.title}</h3>
                                 <p className="text-muted-foreground mt-2 text-sm leading-relaxed">

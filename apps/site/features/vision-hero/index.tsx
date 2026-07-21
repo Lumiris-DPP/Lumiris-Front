@@ -8,8 +8,8 @@ export function VisionHero() {
         <section className="relative overflow-hidden pb-16 pt-32">
             {/* Subtle gradient background */}
             <div className="pointer-events-none absolute inset-0 -z-10">
-                <div className="absolute right-1/4 top-1/4 h-96 w-96 rounded-full bg-violet-500/5 blur-3xl" />
-                <div className="absolute bottom-1/4 left-1/4 h-96 w-96 rounded-full bg-cyan-500/5 blur-3xl" />
+                <div className="absolute right-1/4 top-1/4 h-96 w-96 rounded-full bg-lumiris-iris/5 blur-3xl" />
+                <div className="absolute bottom-1/4 left-1/4 h-96 w-96 rounded-full bg-lumiris-cyan/5 blur-3xl" />
             </div>
 
             <div className="mx-auto max-w-6xl px-6">
@@ -17,7 +17,7 @@ export function VisionHero() {
                     {/* Left: Copy */}
                     <div>
                         <span className="border-border bg-card text-muted-foreground inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium">
-                            <ScanLine className="h-3.5 w-3.5 text-violet-500" aria-hidden="true" />
+                            <ScanLine className="h-3.5 w-3.5 text-lumiris-iris" aria-hidden="true" />
                             Application mobile gratuite
                         </span>
                         <h1 className="text-foreground mt-6 text-balance text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
@@ -64,7 +64,7 @@ export function VisionHero() {
                                         {/* Overlay with score */}
                                         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3">
                                             <p className="text-xs font-medium text-white">Chemise Lin</p>
-                                            <div className="mt-1 inline-flex items-center gap-1 rounded bg-emerald-500 px-1.5 py-0.5 text-xs font-bold text-white">
+                                            <div className="mt-1 inline-flex items-center gap-1 rounded bg-lumiris-emerald px-1.5 py-0.5 text-xs font-bold text-white">
                                                 A
                                             </div>
                                         </div>
@@ -88,7 +88,7 @@ export function VisionHero() {
                                 </div>
                             </div>
                             {/* Glow */}
-                            <div className="pointer-events-none absolute -inset-8 -z-10 rounded-full bg-gradient-to-br from-violet-500/10 via-transparent to-cyan-500/10 blur-2xl" />
+                            <div className="pointer-events-none absolute -inset-8 -z-10 rounded-full bg-gradient-to-br from-lumiris-iris/10 via-transparent to-lumiris-cyan/10 blur-2xl" />
                         </div>
                     </div>
                 </div>

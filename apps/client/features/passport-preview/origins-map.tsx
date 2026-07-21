@@ -119,7 +119,7 @@ export function OriginsMap({ materials, steps }: OriginsMapProps) {
                                     cx={matX}
                                     cy={c.y}
                                     r={6}
-                                    fill="var(--lumiris-emerald)"
+                                    fill="var(--lumiris-cyan)"
                                     stroke="var(--background)"
                                     strokeWidth={1.5}
                                 >
@@ -144,7 +144,7 @@ export function OriginsMap({ materials, steps }: OriginsMapProps) {
             <div className="border-border/60 space-y-3 border-t p-4">
                 <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
                     <span className="inline-flex items-center gap-1.5">
-                        <span className="bg-lumiris-emerald inline-block h-2.5 w-2.5 rounded-full" aria-hidden />
+                        <span className="bg-lumiris-cyan inline-block h-2.5 w-2.5 rounded-full" aria-hidden />
                         Matières premières
                     </span>
                     <span className="inline-flex items-center gap-1.5">

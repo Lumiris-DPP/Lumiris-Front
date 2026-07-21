@@ -64,7 +64,7 @@ export function CreatePassportCta({ children, className, variant, size }: Create
                                 setOpen(false);
                                 router.push('/subscription');
                             }}
-                            className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 text-white"
+                            className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 text-white"
                         >
                             Voir les offres
                             <ArrowUpRight className="ml-1.5 h-3.5 w-3.5" />

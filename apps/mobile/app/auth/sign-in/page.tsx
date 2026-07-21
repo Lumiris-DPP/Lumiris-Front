@@ -14,6 +14,13 @@ import { useUser } from '@/lib/auth';
 
 const MIN_SIGNUP_PASSWORD_LENGTH = 8;
 
+// N'autorise qu'un chemin interne absolu (barrière anti open-redirect) : une valeur externe
+// (`//evil.com`, `https://…`) est ignorée et on retombe sur la destination par défaut.
+function sanitizeReturnTo(value: string | null): string | null {
+    if (!value) return null;
+    return value.startsWith('/') && !value.startsWith('//') ? value : null;
+}
+
 function SignInForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -27,6 +34,9 @@ function SignInForm() {
     const [displayName, setDisplayName] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
+    // Stopgap : aucun endpoint de réinitialisation côté backend pour l'instant. On n'appelle
+    // donc AUCUNE API — on affiche un message honnête renvoyant vers le support.
+    const [showReset, setShowReset] = useState(false);
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -60,7 +70,10 @@ function SignInForm() {
                   })
                 : await loginMutation.mutateAsync({ email: trimmedEmail, password });
             signIn(user, token, refreshToken);
-            router.push(isSignup ? '/onboarding/profile' : '/');
+            // Un `returnTo` interne (ex. depuis le paiement) est prioritaire sur la destination
+            // par défaut, pour ramener l'utilisateur exactement là où il s'était arrêté.
+            const returnTo = sanitizeReturnTo(searchParams.get('returnTo'));
+            router.push(returnTo ?? (isSignup ? '/onboarding/profile' : '/'));
         } catch (err: unknown) {
             const status = (err as { status?: number })?.status;
             if (isSignup && status === 409) {
@@ -123,6 +136,33 @@ function SignInForm() {
                     required
                 />
             </div>
+            {!isSignup ? (
+                <div className="-mt-2">
+                    <button
+                        type="button"
+                        onClick={() => setShowReset((v) => !v)}
+                        aria-expanded={showReset}
+                        className="text-muted-foreground hover:text-foreground text-[11px] underline-offset-4 hover:underline"
+                    >
+                        Mot de passe oublié ?
+                    </button>
+                    {showReset ? (
+                        <p
+                            role="note"
+                            className="border-border/60 bg-card/60 text-muted-foreground mt-2 rounded-xl border p-3 text-[11px] leading-relaxed"
+                        >
+                            La réinitialisation du mot de passe par e-mail arrive bientôt. En attendant, écris-nous à{' '}
+                            <a
+                                href="mailto:support@lumiris.eu?subject=R%C3%A9initialisation%20de%20mot%20de%20passe"
+                                className="text-foreground underline-offset-4 hover:underline"
+                            >
+                                support@lumiris.eu
+                            </a>{' '}
+                            et nous t&apos;aiderons à récupérer ton accès.
+                        </p>
+                    ) : null}
+                </div>
+            ) : null}
             {error ? (
                 <p className="text-destructive text-xs" role="alert">
                     {error}
@@ -135,9 +175,21 @@ function SignInForm() {
             >
                 {isPending ? 'Un instant…' : 'Continuer'}
             </Button>
-            <p className="text-muted-foreground text-center text-[11px]">
-                {isSignup ? 'En continuant, tu crées un compte LUMIRIS.' : 'Connecte-toi à ton compte LUMIRIS.'}
-            </p>
+            {isSignup ? (
+                <p className="text-muted-foreground text-center text-[11px] leading-relaxed">
+                    En continuant, tu acceptes les{' '}
+                    <Link href="/about#cgu" className="text-foreground underline-offset-4 hover:underline">
+                        CGV
+                    </Link>{' '}
+                    et la{' '}
+                    <Link href="/about#rgpd" className="text-foreground underline-offset-4 hover:underline">
+                        politique de confidentialité
+                    </Link>
+                    .
+                </p>
+            ) : (
+                <p className="text-muted-foreground text-center text-[11px]">Connecte-toi à ton compte LUMIRIS.</p>
+            )}
         </form>
     );
 }

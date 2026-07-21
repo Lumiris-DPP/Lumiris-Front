@@ -1,16 +1,16 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BadgeCheck, Check, MapPin, Shirt, ShoppingCart, Truck } from 'lucide-react';
-import { useApiClient, useMarketplaceSearch } from '@lumiris/api-client/react';
+import { ArrowLeft, BadgeCheck, Check, Info, MapPin, RotateCcw, ShieldCheck, Shirt, ShoppingCart, Truck } from 'lucide-react';
+import { isApiError, useApiClient, useMarketplaceProduct } from '@lumiris/api-client/react';
 import { IrisGrade } from '@lumiris/scoring-ui';
 import { Button } from '@lumiris/ui/components/button';
 import { Skeleton } from '@lumiris/ui/components/skeleton';
-import { addToCart, formatEur, toMarketplaceItem, useCart, type MarketplaceItem } from '@/lib/marketplace';
+import { addToCart, formatCents, toMarketplaceItem, useCart, type MarketplaceItem } from '@/lib/marketplace';
 import { toast } from '@/lib/toast';
 
 // Une vue comptée au plus une fois par produit et par chargement de page (évite le double
@@ -20,12 +20,10 @@ const viewed = new Set<string>();
 export function BoutiqueDetail({ productId }: { productId: string }) {
     const router = useRouter();
     const client = useApiClient();
-    const { data, isLoading } = useMarketplaceSearch();
+    // Fiche produit publique unique (deep-link direct) : plus de scan du catalogue complet.
+    const { data: dto, isLoading, error } = useMarketplaceProduct(productId);
 
-    const product = useMemo<MarketplaceItem | null>(() => {
-        const dto = data?.items.find((p) => p.id === productId);
-        return dto ? toMarketplaceItem(dto) : null;
-    }, [data, productId]);
+    const product = useMemo<MarketplaceItem | null>(() => (dto ? toMarketplaceItem(dto) : null), [dto]);
 
     // Ping de vue fire-and-forget dès que la fiche existe (statistiques vendeur).
     useEffect(() => {
@@ -45,10 +43,19 @@ export function BoutiqueDetail({ productId }: { productId: string }) {
     }
 
     if (!product) {
+        // 404 (NOT_FOUND) = pièce non publiée / vendeur non payable → « introuvable ».
+        // Toute autre erreur (réseau/serveur) = chargement impossible, distinct de l'absence.
+        const notFound = !error || (isApiError(error) && error.code === 'NOT_FOUND');
         return (
             <div className="bg-background flex h-full flex-col items-center justify-center gap-4 px-8 text-center">
-                <p className="text-foreground text-base font-semibold">Pièce introuvable</p>
-                <p className="text-muted-foreground text-sm">Cette pièce n&apos;est plus disponible à l&apos;achat.</p>
+                <p className="text-foreground text-base font-semibold">
+                    {notFound ? 'Pièce introuvable' : 'Chargement impossible'}
+                </p>
+                <p className="text-muted-foreground text-sm">
+                    {notFound
+                        ? 'Cette pièce n’est plus disponible à l’achat.'
+                        : 'Impossible d’afficher cette pièce pour le moment. Réessaie.'}
+                </p>
                 <Link
                     href="/boutique"
                     className="bg-foreground text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
@@ -163,6 +170,32 @@ function DetailBody({
                         </div>
                     ) : null}
                 </dl>
+
+                {/* Livraison, retours & garantie — annoncés AVANT l'achat (plus de « frais calculés au paiement »). */}
+                <section
+                    aria-label="Livraison, retours et garantie"
+                    className="border-border/60 bg-card divide-border/50 flex flex-col divide-y rounded-2xl border text-sm"
+                >
+                    <InfoRow Icon={Truck} label="Livraison">
+                        {product.shippingCents === null
+                            ? 'Expédiée à domicile.'
+                            : product.shippingCents === 0
+                              ? 'Offerte — expédiée à domicile.'
+                              : `${formatCents(product.shippingCents)} — expédiée à domicile.`}
+                    </InfoRow>
+                    {product.returnPolicy ? (
+                        <InfoRow Icon={RotateCcw} label="Retours">
+                            {product.returnPolicy}
+                        </InfoRow>
+                    ) : null}
+                    {product.warrantyDescription ? (
+                        <InfoRow Icon={ShieldCheck} label="Garantie">
+                            {product.warrantyDescription}
+                        </InfoRow>
+                    ) : null}
+                </section>
+
+                {product.irisGrade ? <IrisGradeExplainer grade={product.irisGrade} /> : null}
             </div>
 
             <motion.aside
@@ -175,11 +208,15 @@ function DetailBody({
                 <div className="flex items-end justify-between gap-3">
                     <div className="min-w-0">
                         <p className="text-foreground font-mono text-xl font-bold leading-none">
-                            {formatEur(product.price)}
+                            {formatCents(product.priceCents)}
                         </p>
                         <p className="text-muted-foreground mt-1 inline-flex items-center gap-1 text-[11px]">
                             <Truck className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
-                            Livraison à domicile · frais calculés au paiement
+                            {product.shippingCents === null
+                                ? 'Livraison à domicile'
+                                : product.shippingCents === 0
+                                  ? 'Livraison offerte'
+                                  : `Livraison ${formatCents(product.shippingCents)}`}
                         </p>
                     </div>
                     {soldOut ? (
@@ -217,10 +254,53 @@ function DetailBody({
                         disabled={soldOut}
                         className="bg-primary text-primary-foreground hover:bg-primary/90 h-11 flex-[1.4] rounded-full text-sm font-semibold"
                     >
-                        Acheter — {formatEur(product.price)}
+                        Acheter — {formatCents(product.priceCents)}
                     </Button>
                 </div>
             </motion.aside>
         </div>
+    );
+}
+
+function InfoRow({ Icon, label, children }: { Icon: typeof Truck; label: string; children: ReactNode }) {
+    return (
+        <div className="flex items-start gap-3 p-4">
+            <Icon className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+            <div className="min-w-0">
+                <p className="text-foreground font-medium">{label}</p>
+                <p className="text-muted-foreground mt-0.5 text-[13px] leading-relaxed">{children}</p>
+            </div>
+        </div>
+    );
+}
+
+// Explication acheteur du score Iris — libellés FR courts (le badge et l'échelle A→E restent
+// alignés sur scoring-ui). Rend la note lisible sur la fiche produit sans jargon.
+const IRIS_GRADE_LABEL_FR: Record<NonNullable<MarketplaceItem['irisGrade']>, string> = {
+    A: 'exceptionnel',
+    B: 'bon',
+    C: 'moyen',
+    D: 'faible',
+    E: 'opaque',
+};
+
+function IrisGradeExplainer({ grade }: { grade: NonNullable<MarketplaceItem['irisGrade']> }) {
+    return (
+        <section aria-label="Comprendre le score Iris" className="border-border/60 bg-card rounded-2xl border p-4">
+            <div className="flex items-center gap-2">
+                <Info className="text-muted-foreground h-4 w-4" strokeWidth={1.5} aria-hidden />
+                <h2 className="text-foreground text-sm font-semibold">Le score Iris</h2>
+            </div>
+            <div className="mt-2 flex items-start gap-3">
+                <IrisGrade grade={grade} size="sm" tone="solid" />
+                <p className="text-muted-foreground text-[13px] leading-relaxed">
+                    Le score Iris note la transparence et la durabilité de la pièce, de{' '}
+                    <strong className="text-foreground">A</strong> (exceptionnel) à{' '}
+                    <strong className="text-foreground">E</strong> (opaque), à partir des données vérifiées de son
+                    passeport numérique. Cette pièce est notée <strong className="text-foreground">{grade}</strong> —{' '}
+                    {IRIS_GRADE_LABEL_FR[grade]}.
+                </p>
+            </div>
+        </section>
     );
 }

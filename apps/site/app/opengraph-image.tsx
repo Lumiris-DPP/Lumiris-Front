@@ -1,4 +1,5 @@
 import { ImageResponse } from 'next/og';
+import { OG_LOGO_DATA_URI } from '@/lib/og-logo';
 
 export const alt = 'LUMIRIS — Le passeport numérique de la consommation européenne';
 export const size = { width: 1200, height: 630 };
@@ -20,22 +21,8 @@ export default function Image() {
             }}
         >
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                <div
-                    style={{
-                        width: 44,
-                        height: 44,
-                        borderRadius: 10,
-                        background: 'linear-gradient(135deg,#10b981,#06b6d4,#f59e0b)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 700,
-                        fontSize: 22,
-                        color: '#0b1014',
-                    }}
-                >
-                    L
-                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element -- next/og renders via Satori, not the DOM */}
+                <img src={OG_LOGO_DATA_URI} width={62} height={44} alt="" />
                 <div style={{ display: 'flex', fontSize: 24, letterSpacing: 6, color: '#475569' }}>LUMIRIS</div>
             </div>
 

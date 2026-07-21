@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { LumirisLogo } from '@lumiris/ui/components/logo';
 
 const footerColumns = [
     {
@@ -43,12 +44,7 @@ export function Footer() {
                 {/* Logo + tagline */}
                 <div className="mb-12">
                     <Link href="/" className="mb-4 flex items-center gap-2.5" aria-label="Accueil LUMIRIS">
-                        <div className="relative h-8 w-8">
-                            <div className="prismatic-bg absolute inset-0 rounded-lg opacity-90" />
-                            <div className="bg-card absolute inset-[2.5px] flex items-center justify-center rounded-[6px]">
-                                <span className="text-foreground font-mono text-xs font-bold">L</span>
-                            </div>
-                        </div>
+                        <LumirisLogo className="h-8 w-auto" />
                         <span className="text-foreground text-lg font-semibold tracking-tight">LUMIRIS</span>
                     </Link>
                     <p className="text-muted-foreground max-w-sm text-sm leading-relaxed">

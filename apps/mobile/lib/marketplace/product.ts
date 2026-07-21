@@ -27,6 +27,12 @@ export interface MarketplaceItem {
     irisGrade: IrisGrade | null;
     irisTotal: number | null;
     createdAt: string | null;
+    /** Frais de port de l'offre en centimes. `null` = inconnu, `0` = livraison offerte. */
+    shippingCents: number | null;
+    /** Conditions de retour affichées à l'acheteur avant paiement. */
+    returnPolicy: string | null;
+    /** Garantie / SAV annoncés par l'atelier. */
+    warrantyDescription: string | null;
 }
 
 export type MarketplaceSort = 'relevance' | 'newest' | 'price-asc' | 'price-desc' | 'iris';
@@ -80,5 +86,8 @@ export function toMarketplaceItem(dto: MarketplaceItemDto): MarketplaceItem {
         irisGrade: asGrade(dto.irisGrade),
         irisTotal: dto.irisTotal ?? null,
         createdAt: dto.createdAt ?? null,
+        shippingCents: dto.shippingCents ?? null,
+        returnPolicy: dto.returnPolicy ?? null,
+        warrantyDescription: dto.warrantyDescription ?? null,
     };
 }

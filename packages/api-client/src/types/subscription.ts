@@ -34,6 +34,8 @@ export const subscriptionStateDtoSchema = z.object({
     subscription: subscriptionDtoSchema.nullable(),
     quota: quotaDtoSchema,
     hasActiveSubscription: z.boolean(),
+    // ATELIER+ add-on (2nd Stripe item) active on top of the active base subscription.
+    atelierPlus: z.boolean(),
     publishableKey: z.string().nullable(),
 });
 export type SubscriptionStateDto = z.infer<typeof subscriptionStateDtoSchema>;

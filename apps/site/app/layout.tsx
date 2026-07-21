@@ -32,6 +32,10 @@ export const metadata: Metadata = {
         template: '%s · LUMIRIS',
     },
     description: DESCRIPTION,
+    icons: {
+        icon: '/icon.svg',
+        apple: '/icon.svg',
+    },
     alternates: {
         canonical: '/',
     },

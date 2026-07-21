@@ -9,7 +9,7 @@ import { formatCents, removeFromCart, setCartQuantity, useCartDetails } from '@/
 
 export function Panier() {
     const router = useRouter();
-    const { items, subtotalCents, count, sellerCount, isLoading } = useCartDetails();
+    const { items, subtotalCents, count, sellerCount, missingCount, isLoading } = useCartDetails();
     const empty = items.length === 0;
     const multiSeller = sellerCount > 1;
 
@@ -35,6 +35,19 @@ export function Panier() {
                     </p>
                 </div>
             </motion.header>
+
+            {!isLoading && missingCount > 0 ? (
+                <div className="mb-1 px-4">
+                    <p
+                        className="border-lumiris-amber/30 bg-lumiris-amber/10 text-lumiris-amber rounded-2xl border p-3 text-xs"
+                        role="status"
+                    >
+                        {missingCount} article{missingCount > 1 ? 's' : ''} ne{' '}
+                        {missingCount > 1 ? 'sont plus disponibles' : 'est plus disponible'} et{' '}
+                        {missingCount > 1 ? 'ont' : 'a'} été retiré{missingCount > 1 ? 's' : ''}.
+                    </p>
+                </div>
+            ) : null}
 
             {isLoading && empty ? (
                 <div className="text-muted-foreground flex flex-1 items-center justify-center gap-2 text-sm">

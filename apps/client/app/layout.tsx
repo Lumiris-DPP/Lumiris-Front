@@ -24,6 +24,10 @@ export const metadata: Metadata = {
     },
     description:
         'Outil B2B des artisans textile français pour créer, scorer et publier leurs passeports numériques produit (DPP).',
+    icons: {
+        icon: '/icon.svg',
+        apple: '/icon.svg',
+    },
 };
 
 export const viewport: Viewport = {

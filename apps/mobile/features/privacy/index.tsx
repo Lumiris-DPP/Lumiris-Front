@@ -16,6 +16,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@lumiris/ui/components/alert-dialog';
+import { useDeleteAccount } from '@lumiris/api-client/react';
 import { useUser } from '@/lib/auth';
 import { wipeAllUserData } from '@/lib/auth/wipe';
 import { useWardrobe } from '@/lib/wardrobe-storage';
@@ -23,9 +24,11 @@ import { useSettings } from '@/lib/settings';
 import { USER_KEYS, userScopedKey } from '@/lib/storage-keys';
 import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
 import { SectionLabel } from '@/lib/section';
+import { toast } from '@/lib/toast';
 
 const APP_VERSION = '0.1.0';
-const DPO_EMAIL = 'contact@lumiris.example';
+// TODO(RGPD) : remplacer par l'adresse DPO officielle une fois le contrat DPO signé.
+const DPO_EMAIL = 'privacy@lumiris.eu';
 
 export function Privacy() {
     return (
@@ -63,7 +66,7 @@ function Header() {
                     aria-hidden
                     className="border-border/60 bg-background/60 flex h-10 w-10 items-center justify-center rounded-full border"
                 >
-                    <ShieldCheck className="text-lumiris-emerald h-5 w-5" />
+                    <ShieldCheck className="text-lumiris-cyan h-5 w-5" />
                 </span>
                 <div>
                     <h1 className="text-foreground text-xl font-bold">Confidentialité & données</h1>
@@ -94,20 +97,20 @@ interface DataItem {
 
 const DATA_COLLECTED: readonly DataItem[] = [
     {
-        label: 'Compte (mock local)',
-        detail: 'Pseudo, email, ville - saisis par toi. Stockés dans localStorage de ce navigateur, jamais envoyés.',
+        label: 'Compte',
+        detail: 'Ton email et ton nom sont enregistrés côté serveur pour te connecter et rattacher tes commandes. Un jeton de session est conservé sur cet appareil.',
     },
     {
-        label: 'Garde-robe',
-        detail: 'Pièces que tu ajoutes (référence DPP, date d’ajout, notes d’entretien). Local uniquement.',
+        label: 'Commandes & paiement',
+        detail: 'Tes commandes et factures sont conservées côté serveur. Les paiements sont traités par Stripe ; Lumiris ne stocke aucune donnée de carte bancaire.',
     },
     {
-        label: 'Scans',
-        detail: 'Compteur du nombre de passeports scannés. Aucune donnée associée à ton identité.',
+        label: 'Garde-Robe',
+        detail: 'Les pièces achetées (passeport, facture, garantie) sont enregistrées côté serveur, rattachées à ton compte. Les pièces que tu scannes et tes notes d’entretien restent sur cet appareil.',
     },
     {
-        label: 'Réglages',
-        detail: 'Thème, animations, préférences de notifications. Local uniquement.',
+        label: 'Scans & réglages',
+        detail: 'Ton compteur de scans et tes préférences (thème, animations, notifications) restent locaux à ce navigateur.',
     },
 ];
 
@@ -117,7 +120,7 @@ function DataCollectedSection() {
             <ul className="flex flex-col gap-3">
                 {DATA_COLLECTED.map((item) => (
                     <li key={item.label} className="flex items-start gap-3">
-                        <span className="bg-lumiris-emerald/60 mt-1.5 inline-flex h-1.5 w-1.5 shrink-0 rounded-full" />
+                        <span className="bg-lumiris-cyan/60 mt-1.5 inline-flex h-1.5 w-1.5 shrink-0 rounded-full" />
                         <div>
                             <p className="text-foreground text-sm font-semibold">{item.label}</p>
                             <p className="text-muted-foreground mt-0.5 text-xs leading-relaxed">{item.detail}</p>
@@ -126,8 +129,8 @@ function DataCollectedSection() {
                 ))}
             </ul>
             <p className="text-muted-foreground/80 mt-4 text-[11px] leading-relaxed">
-                Et rien d&apos;autre - pas d&apos;IP, pas d&apos;identifiant d&apos;appareil, pas de tracker tiers, pas
-                d&apos;analytics côté serveur.
+                Nous limitons la collecte au strict nécessaire au fonctionnement du service (compte, commandes,
+                Garde-Robe). Les données de paiement sont isolées chez Stripe et ne transitent jamais par nos serveurs.
             </p>
         </Section>
     );
@@ -152,6 +155,7 @@ function RightsSection() {
     const wardrobe = useWardrobe();
     const settings = useSettings();
     const router = useRouter();
+    const deleteAccount = useDeleteAccount();
 
     const exportPayload = useMemo(
         () => ({
@@ -190,10 +194,20 @@ function RightsSection() {
         window.dispatchEvent(new CustomEvent('lumiris:wardrobe-changed'));
     }
 
-    function handleDeleteAccount() {
+    async function handleDeleteAccount() {
+        // RGPD : on anonymise le compte côté serveur (DELETE /api/auth/me) AVANT de purger le
+        // local. En cas d'échec réseau, on n'efface pas le local pour permettre une nouvelle
+        // tentative — sinon on laisserait une session locale orpheline sans suppression serveur.
+        try {
+            await deleteAccount.mutateAsync();
+        } catch {
+            toast.error('La suppression a échoué. Réessaie ou contacte le support.');
+            return;
+        }
         // Ordre critique : wipe avant signOut, sinon le scope `lumiris.users.{id}.*` reste.
         wipeAllUserData();
         signOut();
+        toast.success('Ton compte a été supprimé.');
         router.push('/');
     }
 
@@ -261,13 +275,13 @@ function RightsSection() {
                 <RightRow
                     Icon={UserX}
                     title="Supprimer mon compte"
-                    description="Compte, garde-robe, scans, réglages : tout est effacé immédiatement."
+                    description="Ton compte est anonymisé côté serveur, puis toutes tes données locales sont effacées."
                 >
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
                             <button
                                 type="button"
-                                disabled={user === null}
+                                disabled={user === null || deleteAccount.isPending}
                                 className="border-lumiris-rose/30 bg-lumiris-rose/5 text-lumiris-rose hover:bg-lumiris-rose/10 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition disabled:opacity-40"
                             >
                                 <UserX className="h-3.5 w-3.5" />
@@ -278,8 +292,10 @@ function RightsSection() {
                             <AlertDialogHeader>
                                 <AlertDialogTitle>Supprimer ton compte LUMIRIS ?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    Ton compte, ta garde-robe, ton historique de scans et tes réglages seront effacés de
-                                    ce navigateur. Cette action est immédiate et définitive.
+                                    Ton compte sera anonymisé côté serveur (RGPD) : email, nom et garde-robe seront
+                                    dissociés de ton identité. Tes commandes et factures sont conservées de façon
+                                    anonymisée pour nos obligations comptables et légales. Tes données locales (scans,
+                                    réglages) sont ensuite effacées de ce navigateur. Cette action est définitive.
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>

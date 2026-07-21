@@ -48,7 +48,7 @@ export function AtelierAddons() {
                     transition={{ duration: 0.5 }}
                     className="mb-10 text-center"
                 >
-                    <span className="inline-block rounded-full bg-pink-500/10 px-3 py-1 text-xs font-medium uppercase tracking-wider text-pink-600">
+                    <span className="inline-block rounded-full bg-lumiris-rose/10 px-3 py-1 text-xs font-medium uppercase tracking-wider text-lumiris-rose">
                         Options
                     </span>
                     <h2 className="text-foreground mt-4 text-2xl font-bold tracking-tight sm:text-3xl">
@@ -71,14 +71,14 @@ export function AtelierAddons() {
                             <div
                                 className={`bg-card relative h-full overflow-hidden rounded-2xl border-2 p-6 transition-all hover:shadow-lg ${
                                     addon.color === 'violet'
-                                        ? 'border-violet-500/30 hover:border-violet-500/50'
-                                        : 'border-pink-500/30 hover:border-pink-500/50'
+                                        ? 'border-lumiris-iris/30 hover:border-lumiris-iris/50'
+                                        : 'border-lumiris-rose/30 hover:border-lumiris-rose/50'
                                 }`}
                             >
                                 {/* Background decoration */}
                                 <div
                                     className={`pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full blur-3xl ${
-                                        addon.color === 'violet' ? 'bg-violet-500/10' : 'bg-pink-500/10'
+                                        addon.color === 'violet' ? 'bg-lumiris-iris/10' : 'bg-lumiris-rose/10'
                                     }`}
                                 />
 
@@ -87,12 +87,12 @@ export function AtelierAddons() {
                                     <div className="flex items-center gap-3">
                                         <div
                                             className={`flex h-12 w-12 items-center justify-center rounded-xl ${
-                                                addon.color === 'violet' ? 'bg-violet-500/10' : 'bg-pink-500/10'
+                                                addon.color === 'violet' ? 'bg-lumiris-iris/10' : 'bg-lumiris-rose/10'
                                             }`}
                                         >
                                             <addon.icon
                                                 className={`h-6 w-6 ${
-                                                    addon.color === 'violet' ? 'text-violet-600' : 'text-pink-600'
+                                                    addon.color === 'violet' ? 'text-lumiris-iris' : 'text-lumiris-rose'
                                                 }`}
                                             />
                                         </div>
@@ -101,7 +101,7 @@ export function AtelierAddons() {
                                             <div className="flex items-baseline gap-1.5">
                                                 <span
                                                     className={`text-lg font-bold ${
-                                                        addon.color === 'violet' ? 'text-violet-600' : 'text-pink-600'
+                                                        addon.color === 'violet' ? 'text-lumiris-iris' : 'text-lumiris-rose'
                                                     }`}
                                                 >
                                                     {addon.monthly} EUR
@@ -126,12 +126,12 @@ export function AtelierAddons() {
                                         <li key={feature} className="flex items-start gap-2.5 text-sm">
                                             <div
                                                 className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
-                                                    addon.color === 'violet' ? 'bg-violet-500/10' : 'bg-pink-500/10'
+                                                    addon.color === 'violet' ? 'bg-lumiris-iris/10' : 'bg-lumiris-rose/10'
                                                 }`}
                                             >
                                                 <Check
                                                     className={`h-3 w-3 ${
-                                                        addon.color === 'violet' ? 'text-violet-600' : 'text-pink-600'
+                                                        addon.color === 'violet' ? 'text-lumiris-iris' : 'text-lumiris-rose'
                                                     }`}
                                                 />
                                             </div>
@@ -145,8 +145,8 @@ export function AtelierAddons() {
                                     href={SIGNUP_URL}
                                     className={`relative inline-flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all hover:scale-[1.02] ${
                                         addon.color === 'violet'
-                                            ? 'bg-violet-600 text-white hover:bg-violet-700'
-                                            : 'bg-pink-500 text-white hover:bg-pink-600'
+                                            ? 'bg-lumiris-iris text-white hover:bg-lumiris-iris/90'
+                                            : 'bg-lumiris-rose text-white hover:bg-lumiris-rose/90'
                                     }`}
                                 >
                                     Ajouter {addon.name}

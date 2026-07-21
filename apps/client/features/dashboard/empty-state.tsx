@@ -74,7 +74,7 @@ export function EmptyState({ artisan, items }: EmptyStateProps) {
                                     variant={isPrimary ? 'default' : 'outline'}
                                     className={
                                         isPrimary
-                                            ? 'bg-lumiris-emerald hover:bg-lumiris-emerald/90 text-white'
+                                            ? 'bg-lumiris-cyan hover:bg-lumiris-cyan/90 text-white'
                                             : undefined
                                     }
                                 >

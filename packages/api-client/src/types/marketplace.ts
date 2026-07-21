@@ -33,6 +33,11 @@ export const marketplaceItemSchema = z.object({
     // Statistiques vendeur (0 sur les chemins publics search/suggest).
     views: z.number().nullish(),
     salesCount: z.number().nullish(),
+    // Vente directe (LUMIRIS-22) : frais de port, conditions de retour et garantie de l'offre,
+    // affichés à l'acheteur AVANT le paiement. `shippingCents` == 0 ⇒ « Livraison offerte ».
+    shippingCents: z.number().nullish(),
+    returnPolicy: z.string().nullish(),
+    warrantyDescription: z.string().nullish(),
 });
 export type MarketplaceItem = z.infer<typeof marketplaceItemSchema>;
 
@@ -141,6 +146,41 @@ export const paymentIntentResponseSchema = z.object({
     commissionCents: z.number(),
 });
 export type PaymentIntentResponse = z.infer<typeof paymentIntentResponseSchema>;
+
+// ── Commandes d'achat direct (LUMIRIS-22) ───────────────────────────────────
+// Miroir de OrderResponse (backend), enrichi de `shippingCents` + `paymentIntentId`.
+// Un paiement (un PaymentIntent) peut couvrir PLUSIEURS lignes → chaque ligne partage
+// le même `paymentIntentId`. status : PENDING | PAID | FULFILLED | CANCELLED | REFUNDED.
+// (Défini ici plutôt que dans types/wardrobe car rattaché au flux d'achat marketplace.)
+export const orderResponseSchema = z.object({
+    id: z.string(),
+    productName: z.string().nullish(),
+    amountTotalCents: z.number(),
+    commissionCents: z.number(),
+    shippingCents: z.number().nullish(),
+    paymentIntentId: z.string().nullish(),
+    currency: z.string().nullish(),
+    status: z.string(),
+    invoiceNumber: z.string().nullish(),
+    createdAt: z.string().nullish(),
+});
+export type OrderResponse = z.infer<typeof orderResponseSchema>;
+
+// GET /api/orders/group/{paymentIntentId} — regroupe toutes les lignes d'un même paiement
+// et expose le total RÉELLEMENT facturé par Stripe (`amountChargedCents` = articles + port),
+// seule source de vérité correcte pour l'écran de confirmation.
+export const orderGroupSchema = z.object({
+    paymentIntentId: z.string(),
+    lines: z.array(orderResponseSchema),
+    itemsTotalCents: z.number(),
+    shippingCents: z.number(),
+    amountChargedCents: z.number(),
+    currency: z.string().nullish(),
+    status: z.string(),
+    invoiceNumber: z.string().nullish(),
+    createdAt: z.string().nullish(),
+});
+export type OrderGroup = z.infer<typeof orderGroupSchema>;
 
 // Payload CRUD produit (POST/PUT /api/marketplace/products).
 export const productPayloadSchema = z.object({

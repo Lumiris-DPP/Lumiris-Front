@@ -1,6 +1,7 @@
 'use client';
 
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import type {
     GarmentInfo,
     CareInstructionCode,
@@ -12,6 +13,8 @@ import type {
     PassportStatus,
 } from '@lumiris/types';
 import { buildGS1Identifier } from '@lumiris/types';
+import { safeJSONStorage } from './persist-storage';
+import { makeHydratedHook } from './use-store-hydrated';
 
 export type WizardStep = 'product' | 'care' | 'traceability' | 'eco';
 
@@ -34,6 +37,9 @@ export interface DraftPassport {
     eco: EcoInfo;
     files: Partial<Record<string, File>>;
     lastStep?: WizardStep;
+    // Set true on rehydrate when this draft had uploaded files that couldn't be persisted
+    // (File objects aren't serialisable) — the wizard uses it to prompt a re-upload.
+    filesDropped?: boolean;
 }
 
 interface DraftStoreState {
@@ -50,6 +56,7 @@ interface DraftStoreState {
     setEco: (id: string, eco: EcoInfo) => void;
     setFile: (id: string, docType: string, file: File | null) => void;
     setLastStep: (id: string, step: WizardStep) => void;
+    clearFilesDropped: (id: string) => void;
     deleteDraft: (id: string) => void;
 }
 
@@ -87,7 +94,9 @@ function patch(state: DraftStoreState, id: string, fields: Partial<DraftPassport
     };
 }
 
-export const useDraftStore = create<DraftStoreState>()((set, get) => ({
+export const useDraftStore = create<DraftStoreState>()(
+    persist(
+        (set, get) => ({
     drafts: {},
 
     createDraft: (artisanId, id) => {
@@ -128,16 +137,43 @@ export const useDraftStore = create<DraftStoreState>()((set, get) => ({
             const files = { ...draft.files };
             if (file === null) delete files[docType];
             else files[docType] = file;
-            return { ...s, drafts: { ...s.drafts, [id]: { ...draft, files, updatedAt: new Date().toISOString() } } };
+            // Selecting a file resolves the "re-upload needed" prompt for this draft.
+            const filesDropped = file !== null ? false : draft.filesDropped;
+            return {
+                ...s,
+                drafts: { ...s.drafts, [id]: { ...draft, files, filesDropped, updatedAt: new Date().toISOString() } },
+            };
         }),
     setLastStep: (id, step) => set((s) => patch(s, id, { lastStep: step })),
+    clearFilesDropped: (id) => set((s) => patch(s, id, { filesDropped: false })),
 
     deleteDraft: (id) => {
         const next = { ...get().drafts };
         delete next[id];
         set((s) => ({ ...s, drafts: next }));
     },
-}));
+        }),
+        {
+            name: 'atelier-draft',
+            version: 1,
+            storage: safeJSONStorage,
+            // File objects can't be serialised — persist only the scalar/text fields so a hard
+            // refresh mid-wizard keeps everything except uploads. `filesDropped` records that
+            // a draft had files at save time so the wizard can prompt a re-upload on reload.
+            partialize: (state) => ({
+                drafts: Object.fromEntries(
+                    Object.entries(state.drafts).map(([id, draft]) => [
+                        id,
+                        { ...draft, files: {}, filesDropped: Object.keys(draft.files).length > 0 },
+                    ]),
+                ),
+            }),
+        },
+    ),
+);
+
+/** True once the persisted wizard drafts have been rehydrated from storage. */
+export const useDraftHydrated = makeHydratedHook(useDraftStore);
 
 export function draftToPassport(draft: DraftPassport): Passport {
     return {

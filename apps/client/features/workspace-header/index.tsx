@@ -19,7 +19,7 @@ interface WorkspaceHeaderProps {
     actions?: React.ReactNode;
 }
 
-export function WorkspaceHeader({ title, description, actions }: WorkspaceHeaderProps) {
+export function WorkspaceHeader({ title, actions }: WorkspaceHeaderProps) {
     const { openSidebar } = useWorkspaceShell();
     const artisan = useCurrentArtisan();
     const notifications = useWorkspaceNotifications(artisan);
@@ -27,7 +27,8 @@ export function WorkspaceHeader({ title, description, actions }: WorkspaceHeader
 
     return (
         <header className="border-border bg-card sticky top-0 z-20 border-b">
-            <div className="flex items-center gap-3 px-4 py-3 md:gap-4 md:px-8 md:py-4">
+            {/* Hauteur alignée sur le bloc logo de la sidebar (px-5 py-5) pour la cohérence. */}
+            <div className="flex items-center gap-3 px-5 py-5 md:gap-4">
                 <Button
                     variant="ghost"
                     size="icon"
@@ -40,7 +41,6 @@ export function WorkspaceHeader({ title, description, actions }: WorkspaceHeader
 
                 <div className="min-w-0 flex-1">
                     <h1 className="text-foreground truncate text-xl font-semibold tracking-tight">{title}</h1>
-                    {description && <p className="text-muted-foreground mt-0.5 truncate text-sm">{description}</p>}
                 </div>
 
                 <div className="flex items-center gap-2 md:gap-3">

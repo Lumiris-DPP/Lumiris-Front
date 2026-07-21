@@ -21,6 +21,9 @@ import { STATUS_LABEL, STATUSES } from './labels';
 
 const NO_DPP = 'none';
 
+// Prix minimum d'un produit publié (le backend rejette sinon en 422).
+const MIN_PUBLISHED_PRICE_CENTS = 50;
+
 interface FormState {
     name: string;
     description: string;
@@ -78,13 +81,22 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
             toast.error('Le nom du produit est requis.');
             return;
         }
+        const priceCents = Math.max(0, Math.round((Number(form.priceEuros) || 0) * 100));
+        // Un produit publié doit coûter au moins 0,50 € (le backend rejette sinon en 422),
+        // en miroir de la règle « prix > 0 » de la boîte de conversion DPP.
+        if (form.status === 'PUBLISHED' && priceCents < MIN_PUBLISHED_PRICE_CENTS) {
+            toast.error('Prix trop bas pour un produit publié', {
+                description: 'Un produit publié doit coûter au moins 0,50 €.',
+            });
+            return;
+        }
         const payload: ProductPayload = {
             name: form.name.trim(),
             description: form.description.trim() || undefined,
             category: form.category.trim() || undefined,
             material: form.material.trim() || undefined,
             originCountry: form.originCountry.trim() || undefined,
-            priceCents: Math.max(0, Math.round((Number(form.priceEuros) || 0) * 100)),
+            priceCents,
             currency: 'EUR',
             stock: Math.max(0, Math.round(Number(form.stock) || 0)),
             externalOrderUrl: form.externalOrderUrl.trim() || undefined,

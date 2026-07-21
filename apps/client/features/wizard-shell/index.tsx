@@ -8,7 +8,7 @@ import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import { IrisScoreCard } from '@lumiris/scoring-ui';
 import type { DppScoreInput } from '@lumiris/types';
-import { useDraftStore, type WizardStep } from '@/lib/draft-store';
+import { useDraftHydrated, useDraftStore, type WizardStep } from '@/lib/draft-store';
 import { Stepper } from './stepper';
 
 export { STEP_VALIDATORS } from './step-validators';
@@ -35,6 +35,7 @@ export function WizardShell({
     hideNav = false,
 }: WizardShellProps) {
     const draft = useDraftStore((s) => s.drafts[draftId]);
+    const hydrated = useDraftHydrated();
     const navigatingRef = useRef(false);
 
     const draftPayload = useMemo(
@@ -55,6 +56,9 @@ export function WizardShell({
         ],
     );
 
+    // Wait for persisted drafts to rehydrate before deciding the draft is missing,
+    // otherwise a hard refresh mid-wizard would flash "brouillon introuvable".
+    if (!hydrated) return null;
     if (!draft) return <DraftNotFound />;
 
     const nextDisabled = nextMissing.length > 0;
@@ -85,7 +89,7 @@ export function WizardShell({
                             <Button
                                 onClick={handleNext}
                                 disabled={nextDisabled}
-                                className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 text-white"
+                                className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 text-white"
                             >
                                 {nextLabel}
                             </Button>

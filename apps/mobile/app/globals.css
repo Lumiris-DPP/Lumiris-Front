@@ -39,6 +39,42 @@
     }
 }
 
+/* Impression de la facture : on masque toute l'app (cadre, navigation, bannières) et on
+   n'imprime que la feuille de facture, à pleine largeur et fond blanc. La feuille porte la
+   classe `.facture-print` ; les éléments interactifs (boutons, retour) portent `.facture-no-print`. */
+@media print {
+    html,
+    body {
+        height: auto !important;
+        overflow: visible !important;
+        background: #ffffff !important;
+    }
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    .facture-print,
+    .facture-print * {
+        visibility: visible !important;
+    }
+
+    .facture-print {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
+        border: none !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    .facture-no-print {
+        display: none !important;
+    }
+}
+
 /* Toggle "Réduire les animations" piloté par /me/settings - coupe transitions
    et animations à la racine, indépendamment de `prefers-reduced-motion`
    (l'app expose son propre opt-in en mode démo). */

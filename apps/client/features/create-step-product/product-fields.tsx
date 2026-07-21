@@ -116,8 +116,8 @@ export function SizesField({ selected, onToggle }: { selected: readonly string[]
                             onClick={() => onToggle(size)}
                             className={`rounded-md border px-3 py-1 text-sm transition-colors ${
                                 isSelected
-                                    ? 'bg-lumiris-emerald border-lumiris-emerald text-white'
-                                    : 'border-border text-muted-foreground hover:border-lumiris-emerald'
+                                    ? 'bg-lumiris-cyan border-lumiris-cyan text-white'
+                                    : 'border-border text-muted-foreground hover:border-lumiris-cyan'
                             }`}
                         >
                             {size}
@@ -159,7 +159,7 @@ export function ColorsField({ colors, onChange }: { colors: readonly string[]; o
                 <button
                     type="button"
                     onClick={add}
-                    className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 rounded-md px-3 text-sm text-white"
+                    className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 rounded-md px-3 text-sm text-white"
                 >
                     Ajouter
                 </button>

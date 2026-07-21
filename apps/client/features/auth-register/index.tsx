@@ -33,9 +33,9 @@ export function RegisterForm() {
                             <div
                                 className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-semibold transition-colors ${
                                     i < stepIndex
-                                        ? 'bg-lumiris-emerald text-white'
+                                        ? 'bg-lumiris-cyan text-white'
                                         : i === stepIndex
-                                          ? 'bg-lumiris-emerald ring-lumiris-emerald/30 text-white ring-2 ring-offset-1'
+                                          ? 'bg-lumiris-cyan ring-lumiris-cyan/30 text-white ring-2 ring-offset-1'
                                           : 'bg-muted text-muted-foreground'
                                 }`}
                             >
@@ -47,7 +47,7 @@ export function RegisterForm() {
                         </div>
                         {i < STEPS.length - 1 && (
                             <div
-                                className={`mb-4 h-px flex-1 transition-colors ${i < stepIndex ? 'bg-lumiris-emerald' : 'bg-border'}`}
+                                className={`mb-4 h-px flex-1 transition-colors ${i < stepIndex ? 'bg-lumiris-cyan' : 'bg-border'}`}
                             />
                         )}
                     </div>

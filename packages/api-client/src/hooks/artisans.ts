@@ -31,6 +31,10 @@ export function useArtisanMe(options?: Omit<UseQueryOptions<ArtisanProfileRespon
             if (isApiError(error) && error.code === 'NOT_FOUND') return false;
             return failureCount < 2;
         },
+        // While KYB review is still PENDING, poll so the "en cours de vérification" screen
+        // advances to the workspace (or the rejected screen) once an admin acts — no manual
+        // reload. Polling stops as soon as the status is terminal (VERIFIED/REJECTED).
+        refetchInterval: (query) => (query.state.data?.status === 'PENDING' ? 15_000 : false),
         ...options,
     });
 }

@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { Shirt, BadgeCheck } from 'lucide-react';
 import { IrisGrade } from '@lumiris/scoring-ui';
 import { cn } from '@lumiris/ui/lib/cn';
-import { formatEur, type MarketplaceItem } from '@/lib/marketplace';
+import { formatCents, type MarketplaceItem } from '@/lib/marketplace';
 
 interface BoutiqueCardProps {
     item: MarketplaceItem;
@@ -78,7 +78,7 @@ export function BoutiqueCard({ item, index, featured = false }: BoutiqueCardProp
                     </h3>
                     <p className="text-muted-foreground mt-0.5 truncate text-[11px]">{item.artisanName}</p>
                     <div className="mt-1.5 flex items-center justify-between gap-2">
-                        <p className="text-foreground font-mono text-sm font-semibold">{formatEur(item.price)}</p>
+                        <p className="text-foreground font-mono text-sm font-semibold">{formatCents(item.priceCents)}</p>
                         {lowStock ? (
                             <span className="text-lumiris-amber text-[10px] font-medium">
                                 {item.stock === 0 ? 'Épuisé' : `Plus que ${item.stock}`}

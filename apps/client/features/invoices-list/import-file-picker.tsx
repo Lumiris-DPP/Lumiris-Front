@@ -70,7 +70,7 @@ export function ImportFilePicker({ file, dragActive, onDragActiveChange, onFiles
             }}
             className={cn(
                 'border-border bg-muted/40 hover:bg-muted relative flex h-40 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed transition-colors',
-                dragActive && 'border-lumiris-emerald bg-lumiris-emerald/5',
+                dragActive && 'border-lumiris-cyan bg-lumiris-cyan/5',
             )}
         >
             <Upload className="text-muted-foreground h-6 w-6" />

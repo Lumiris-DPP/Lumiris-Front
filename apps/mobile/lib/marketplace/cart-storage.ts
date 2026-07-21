@@ -82,6 +82,56 @@ export function clearCart(): void {
     write([]);
 }
 
+function readKey(key: string): CartLine[] {
+    if (typeof window === 'undefined') return [];
+    try {
+        const raw = window.localStorage.getItem(key);
+        if (!raw) return [];
+        const parsed: unknown = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter(isCartLine).filter((line) => line.quantity > 0);
+    } catch {
+        return [];
+    }
+}
+
+/**
+ * Fusionne le panier invité (`lumiris.anon.cart.v1`) dans le panier de l'utilisateur qui vient
+ * de se connecter, puis vide le panier invité. À appeler juste APRÈS `writeUser` dans `signIn`,
+ * pour qu'un invité ayant rempli son panier le conserve après connexion. Idempotent : sans panier
+ * invité, ne fait rien. Sur doublon de produit, on garde la quantité la plus élevée (le backend
+ * reborne le stock au PaymentIntent).
+ */
+export function migrateAnonCartToUser(userId: string): void {
+    if (typeof window === 'undefined') return;
+
+    const anonKey = userScopedKey(null, USER_KEYS.cart);
+    const userKey = userScopedKey(userId, USER_KEYS.cart);
+    if (anonKey === userKey) return;
+
+    const anonLines = readKey(anonKey);
+    if (anonLines.length === 0) {
+        window.localStorage.removeItem(anonKey);
+        return;
+    }
+
+    const merged = new Map<string, CartLine>();
+    for (const line of readKey(userKey)) merged.set(line.productId, line);
+    for (const line of anonLines) {
+        const existing = merged.get(line.productId);
+        merged.set(
+            line.productId,
+            existing
+                ? { ...existing, quantity: Math.max(existing.quantity, line.quantity) }
+                : line,
+        );
+    }
+
+    window.localStorage.setItem(userKey, JSON.stringify([...merged.values()]));
+    window.localStorage.removeItem(anonKey);
+    notify();
+}
+
 // Snapshot stable pour useSyncExternalStore.
 const EMPTY: readonly CartLine[] = [];
 let snapshotCache: readonly CartLine[] = EMPTY;

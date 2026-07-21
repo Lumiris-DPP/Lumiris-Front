@@ -1,7 +1,9 @@
 'use client';
 
-import { Mail, Sparkles, XCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Mail, XCircle } from 'lucide-react';
 import { Button } from '@lumiris/ui/components/button';
+import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { Card, CardContent } from '@lumiris/ui/components/card';
 import { toast } from '@lumiris/ui/components/sonner';
 import { signOut } from '@/lib/auth-store';
@@ -9,6 +11,7 @@ import { useAuthUserId } from '@/lib/use-auth';
 import { useVerificationStore } from '@/lib/verification-store';
 
 export function RejectedScreen() {
+    const router = useRouter();
     const userId = useAuthUserId();
     const getRecord = useVerificationStore((s) => s.getRecord);
     const reset = useVerificationStore((s) => s.reset);
@@ -18,9 +21,13 @@ export function RejectedScreen() {
         toast.info('Fonctionnalité non disponible');
     }
 
+    // Actually restart onboarding: clear the local verification flag (so demo mode shows the
+    // form) and navigate to /onboarding. In real mode the onboarding page lets a REJECTED
+    // artisan re-submit a SIRET (backend upserts on re-register), moving them back to PENDING.
     function handleResubmit() {
         if (!userId) return;
         reset(userId);
+        router.push('/onboarding');
     }
 
     return (
@@ -28,9 +35,7 @@ export function RejectedScreen() {
             <header className="border-border bg-card border-b">
                 <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-6 py-5">
                     <div className="flex items-center gap-3">
-                        <div className="bg-lumiris-emerald flex h-9 w-9 items-center justify-center rounded-lg">
-                            <Sparkles className="text-primary-foreground h-4 w-4" />
-                        </div>
+                        <LumirisLogo className="h-9 w-auto" />
                         <div>
                             <p className="text-foreground text-sm font-semibold leading-none">LUMIRIS</p>
                             <p className="text-muted-foreground font-mono text-[10px] tracking-widest">ATELIER</p>
@@ -71,7 +76,7 @@ export function RejectedScreen() {
                             </Button>
                             <Button
                                 onClick={handleResubmit}
-                                className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 gap-2 text-white"
+                                className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 gap-2 text-white"
                             >
                                 Nouveau dossier
                             </Button>

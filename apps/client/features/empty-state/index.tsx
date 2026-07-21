@@ -26,12 +26,12 @@ export interface EmptyStateProps {
 }
 
 const TONE_CLASSES: Record<EmptyStateTone, string> = {
-    emerald: 'bg-lumiris-emerald/10 text-lumiris-emerald',
+    emerald: 'bg-lumiris-cyan/10 text-lumiris-cyan',
     amber: 'bg-lumiris-amber/10 text-lumiris-amber',
 };
 
 const CTA_CLASSES: Record<EmptyStateTone, string> = {
-    emerald: 'bg-lumiris-emerald hover:bg-lumiris-emerald/90 text-white',
+    emerald: 'bg-lumiris-cyan hover:bg-lumiris-cyan/90 text-white',
     amber: 'bg-lumiris-amber hover:bg-lumiris-amber/90 text-white',
 };
 

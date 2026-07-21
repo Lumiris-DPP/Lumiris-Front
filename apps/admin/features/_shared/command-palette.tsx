@@ -132,7 +132,7 @@ function CommandPaletteComponent() {
             <button
                 type="button"
                 onClick={() => setOpen(true)}
-                className="border-border bg-background text-muted-foreground hover:border-lumiris-emerald/40 hover:text-foreground flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition-colors"
+                className="border-border bg-background text-muted-foreground hover:border-lumiris-cyan/40 hover:text-foreground flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition-colors"
             >
                 <Search className="h-3.5 w-3.5" aria-hidden />
                 <span>Rechercher…</span>
@@ -185,7 +185,7 @@ function CommandPaletteComponent() {
                                         className={cn(
                                             'text-foreground flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors',
                                             index === activeIndex
-                                                ? 'bg-lumiris-emerald/8 text-lumiris-emerald'
+                                                ? 'bg-lumiris-cyan/8 text-lumiris-cyan'
                                                 : 'hover:bg-muted',
                                         )}
                                     >

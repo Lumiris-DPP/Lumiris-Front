@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, type HTMLAttributes } from 'react';
+import { AlertCircle, Loader2, RefreshCw } from 'lucide-react';
 import type { DppScoreInput, ScoreResult } from '@lumiris/types';
 import { useApiClient } from '@lumiris/api-client/react';
 import { cn } from '@lumiris/ui/lib/cn';
@@ -9,14 +10,6 @@ import { IrisGrade } from './iris-grade';
 import { IrisMethodologyInfo } from './iris-methodology-info';
 import { ScoreBreakdown } from './score-breakdown';
 import { ScoreCapWarning } from './score-cap-warning';
-
-const ZERO_SCORE: ScoreResult = {
-    total: 0,
-    grade: 'E',
-    breakdown: { transparency: 0, craftsmanship: 0, impact: 0, repairability: 0 },
-    weights: { transparency: 0.4, craftsmanship: 0.25, impact: 0.25, repairability: 0.1 },
-    reasons: [],
-};
 
 interface DisplayProps extends HTMLAttributes<HTMLDivElement> {
     score: ScoreResult;
@@ -92,6 +85,57 @@ function IrisScoreCardDisplay({ score, muted = false, variant = 'card', classNam
     );
 }
 
+type StatusTone = 'loading' | 'error';
+
+interface StatusProps extends HTMLAttributes<HTMLDivElement> {
+    tone: StatusTone;
+    variant?: 'card' | 'strip' | 'responsive';
+    onRetry?: () => void;
+}
+
+// Neutral loading / error surface — deliberately NOT a grade, so a network hiccup can never
+// be mistaken for a genuine low (E) score.
+function IrisScoreCardStatus({ tone, variant = 'card', className, onRetry, ...rest }: StatusProps) {
+    const isStrip = variant === 'strip';
+    return (
+        <div
+            role="status"
+            aria-live="polite"
+            aria-label={tone === 'loading' ? 'Calcul du score Iris en cours' : 'Score Iris indisponible'}
+            className={cn(
+                'border-border bg-card flex items-center gap-3 border',
+                isStrip ? 'rounded-lg px-3 py-2' : 'rounded-2xl p-6',
+                className,
+            )}
+            {...rest}
+        >
+            {tone === 'loading' ? (
+                <>
+                    <Loader2 className="text-muted-foreground h-5 w-5 shrink-0 animate-spin" aria-hidden />
+                    <p className="text-muted-foreground text-sm">Calcul du score Iris…</p>
+                </>
+            ) : (
+                <>
+                    <AlertCircle className="text-lumiris-amber h-5 w-5 shrink-0" aria-hidden />
+                    <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
+                        <p className="text-muted-foreground text-sm">Score indisponible</p>
+                        {onRetry && (
+                            <button
+                                type="button"
+                                onClick={onRetry}
+                                className="text-foreground hover:text-lumiris-cyan inline-flex shrink-0 items-center gap-1 text-xs font-medium underline underline-offset-2"
+                            >
+                                <RefreshCw className="h-3 w-3" aria-hidden />
+                                Réessayer
+                            </button>
+                        )}
+                    </div>
+                </>
+            )}
+        </div>
+    );
+}
+
 export interface IrisScoreCardProps extends HTMLAttributes<HTMLDivElement> {
     /** Fetches the persisted score of a published DPP from the backend. */
     dppId?: string | null;
@@ -102,6 +146,8 @@ export interface IrisScoreCardProps extends HTMLAttributes<HTMLDivElement> {
     muted?: boolean;
     variant?: 'card' | 'strip' | 'responsive';
 }
+
+type FetchStatus = 'idle' | 'loading' | 'success' | 'error';
 
 export function IrisScoreCard({
     dppId,
@@ -114,43 +160,70 @@ export function IrisScoreCard({
     ...rest
 }: IrisScoreCardProps) {
     const api = useApiClient();
-    const [fetched, setFetched] = useState<ScoreResult | null>(null);
+    const [state, setState] = useState<{ status: FetchStatus; score: ScoreResult | null }>({
+        status: 'idle',
+        score: null,
+    });
+    const [reloadKey, setReloadKey] = useState(0);
 
     useEffect(() => {
-        if (!dppId) return;
+        // A directly provided score never triggers a backend call.
+        if (providedScore) return;
+
+        let promise: Promise<ScoreResult>;
+        if (dppId) promise = api.dpp.getIrisScore(dppId);
+        else if (draft) promise = api.dpp.computeIrisScore(draft);
+        else return; // nothing to fetch (e.g. wizard mid-navigation) — keep whatever we have
+
         let cancelled = false;
-        api.dpp
-            .getIrisScore(dppId)
+        // Preserve any previously computed score while recomputing, to avoid flicker on edits.
+        setState((prev) => ({ status: 'loading', score: prev.score }));
+        promise
             .then((s) => {
-                if (!cancelled) setFetched(s);
+                if (!cancelled) setState({ status: 'success', score: s });
             })
             .catch(() => {
-                if (!cancelled) setFetched(null);
+                if (!cancelled) setState((prev) => ({ status: 'error', score: prev.score }));
             });
         return () => {
             cancelled = true;
         };
-    }, [dppId, api]);
+    }, [dppId, draft, providedScore, api, reloadKey]);
 
-    useEffect(() => {
-        if (!draft) return;
-        let cancelled = false;
-        api.dpp
-            .computeIrisScore(draft)
-            .then((s) => {
-                if (!cancelled) setFetched(s);
-            })
-            .catch(() => null);
-        return () => {
-            cancelled = true;
-        };
-    }, [draft, api]);
+    const displayScore = providedScore ?? state.score;
 
-    const score = providedScore ?? fetched ?? ZERO_SCORE;
+    // A real score (provided or last successfully fetched) always wins — including a
+    // legitimately low one, and a stale-but-real value while a refetch is in flight.
+    if (displayScore) {
+        return (
+            <IrisScoreCardDisplay
+                score={displayScore}
+                muted={muted}
+                variant={variant}
+                className={className}
+                {...rest}
+            >
+                {children}
+            </IrisScoreCardDisplay>
+        );
+    }
 
-    return (
-        <IrisScoreCardDisplay score={score} muted={muted} variant={variant} className={className} {...rest}>
-            {children}
-        </IrisScoreCardDisplay>
-    );
+    if (state.status === 'error') {
+        return (
+            <IrisScoreCardStatus
+                tone="error"
+                variant={variant}
+                className={className}
+                onRetry={() => setReloadKey((k) => k + 1)}
+                {...rest}
+            />
+        );
+    }
+
+    if (state.status === 'loading') {
+        return <IrisScoreCardStatus tone="loading" variant={variant} className={className} {...rest} />;
+    }
+
+    // Idle with nothing to show yet (no id/draft/score) — render nothing rather than a fake grade.
+    return null;
 }

@@ -263,7 +263,7 @@ function BlogInner() {
             <div className="flex items-baseline justify-between gap-3">
                 <div>
                     <h2 className="text-foreground text-xl font-semibold">
-                        <BookOpen className="text-lumiris-emerald mr-1.5 inline h-5 w-5" />
+                        <BookOpen className="text-lumiris-cyan mr-1.5 inline h-5 w-5" />
                         Blog - Journal LUMIRIS
                     </h2>
                     <p className="text-muted-foreground mt-1 text-sm">

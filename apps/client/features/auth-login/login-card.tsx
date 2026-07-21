@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Sparkles } from 'lucide-react';
 import { Button } from '@lumiris/ui/components/button';
+import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { Card } from '@lumiris/ui/components/card';
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
@@ -18,9 +18,7 @@ export function LoginCard() {
         <>
             <Card className="bg-card rounded-2xl px-7 py-8 shadow-xl">
                 <header className="flex flex-col items-center text-center">
-                    <div className="bg-lumiris-emerald flex h-12 w-12 items-center justify-center rounded-xl">
-                        <Sparkles className="text-primary-foreground h-5 w-5" />
-                    </div>
+                    <LumirisLogo className="h-12 w-auto" />
                     <h1 className="text-foreground mt-4 text-xl font-semibold tracking-tight">LUMIRIS</h1>
                     <p className="text-muted-foreground mt-1 text-xs">ATELIER · l&apos;outil des artisans textile</p>
                 </header>
@@ -83,14 +81,14 @@ export function LoginCard() {
                     <Button
                         type="submit"
                         disabled={form.isPending}
-                        className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 mt-1 h-10 w-full text-white"
+                        className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 mt-1 h-10 w-full text-white"
                     >
                         {form.isPending ? 'Connexion…' : 'Se connecter'}
                     </Button>
 
                     <p className="text-muted-foreground text-center text-[11px]">
                         Pas encore de compte ?{' '}
-                        <Link href="/register" className="text-lumiris-emerald hover:underline">
+                        <Link href="/register" className="text-lumiris-cyan hover:underline">
                             Créer un compte
                         </Link>
                     </p>

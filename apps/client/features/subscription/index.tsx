@@ -1,14 +1,27 @@
 'use client';
 
 import { type ReactNode } from 'react';
-import { ExternalLink, Loader2, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, BarChart3, ExternalLink, Loader2, ShieldCheck, Sparkles } from 'lucide-react';
+import type { BillingCycle, PlanDto } from '@lumiris/api-client';
 import { formatDate } from '@lumiris/utils';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@lumiris/ui/components/alert-dialog';
 import { Badge } from '@lumiris/ui/components/badge';
 import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent } from '@lumiris/ui/components/card';
 import { cn } from '@lumiris/ui/lib/cn';
+import { CheckoutDialog } from './checkout-dialog';
 import { useSubscriptionPage } from './hooks';
 import { PlanCard } from './plan-card';
+import { euros } from './utils';
 
 type SubscriptionPage = ReturnType<typeof useSubscriptionPage>;
 
@@ -40,7 +53,9 @@ export function Subscription() {
 
     return (
         <div className="space-y-6 p-4 md:p-8">
+            <PaymentRecoveryBanner sub={sub} />
             <CurrentSubscriptionCard sub={sub} />
+            <AtelierPlusCard sub={sub} />
 
             <div className="flex items-center justify-center">
                 <div className="text-muted-foreground bg-muted inline-flex items-center gap-1 rounded-md p-0.5">
@@ -48,7 +63,7 @@ export function Subscription() {
                         Mensuel
                     </CycleButton>
                     <CycleButton active={sub.isAnnual} onClick={() => sub.setCycle('annual')}>
-                        Annuel <span className="text-lumiris-emerald ml-1 font-mono text-[10px]">2 mois offerts</span>
+                        Annuel <span className="text-lumiris-cyan ml-1 font-mono text-[10px]">2 mois offerts</span>
                     </CycleButton>
                 </div>
             </div>
@@ -70,7 +85,7 @@ export function Subscription() {
                             )}
                             isAnnual={sub.isAnnual}
                             hasActiveSubscription={sub.hasActiveSubscription}
-                            disabled={sub.portal.isPending || sub.changePlan.isPending || sub.checkoutSession.isPending}
+                            disabled={sub.portal.isPending || sub.changePlan.isPending}
                             onChoose={sub.onChoose}
                         />
                     ))}
@@ -78,11 +93,82 @@ export function Subscription() {
             )}
 
             <p className="text-muted-foreground flex items-center justify-center gap-1.5 text-xs">
-                <ShieldCheck className="text-lumiris-emerald h-3.5 w-3.5" />
+                <ShieldCheck className="text-lumiris-cyan h-3.5 w-3.5" />
                 Paiement sécurisé par Stripe · aucun acteur ne peut payer pour influencer son score Iris.
             </p>
+
+            {sub.checkout && (
+                <CheckoutDialog
+                    open
+                    onOpenChange={(next) => {
+                        if (!next) sub.closeCheckout();
+                    }}
+                    tier={sub.checkout.plan.tier}
+                    cycle={sub.checkout.cycle}
+                    planLabel={sub.checkout.plan.label}
+                    amountLabel={amountLabel(sub.checkout.plan, sub.checkout.cycle)}
+                    onConfirmed={sub.closeCheckout}
+                />
+            )}
+
+            <AlertDialog
+                open={sub.pendingPlan != null}
+                onOpenChange={(open) => {
+                    if (!open) sub.cancelPlanChange();
+                }}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Changer de plan</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Vous allez passer à {sub.pendingPlan?.label ?? 'ce plan'}. Un ajustement au prorata sera
+                            facturé ou crédité automatiquement sur votre moyen de paiement.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Annuler</AlertDialogCancel>
+                        <AlertDialogAction onClick={sub.confirmPlanChange}>
+                            Confirmer le changement
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
+}
+
+// Bandeau de récupération : un abonnement existant mais non actif (paiement échoué :
+// past_due/incomplete/unpaid) n'a autrement aucune action de recouvrement. On expose le portail
+// Stripe pour mettre à jour la carte et rétablir l'accès.
+function PaymentRecoveryBanner({ sub }: { sub: SubscriptionPage }) {
+    const { subscription } = sub;
+    if (!subscription || subscription.active) return null;
+    return (
+        <div className="border-destructive/40 bg-destructive/10 flex flex-col gap-3 rounded-xl border p-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-start gap-2.5 text-sm">
+                <AlertTriangle className="text-destructive mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                <div>
+                    <p className="text-foreground font-medium">Paiement de votre abonnement en échec</p>
+                    <p className="text-muted-foreground text-xs">
+                        Le paiement de votre abonnement a échoué — mettez à jour votre carte pour rétablir l&apos;accès.
+                    </p>
+                </div>
+            </div>
+            <Button onClick={sub.openPortal} disabled={sub.portal.isPending} className="shrink-0 gap-1.5">
+                {sub.portal.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                    <ExternalLink className="h-4 w-4" />
+                )}
+                Mettre à jour le paiement
+            </Button>
+        </div>
+    );
+}
+
+function amountLabel(plan: PlanDto, cycle: BillingCycle): string {
+    const cents = cycle === 'annual' ? plan.annualAmountCents : plan.monthlyAmountCents;
+    return `${euros(cents)} €/${cycle === 'annual' ? 'an' : 'mois'}`;
 }
 
 function Notice({ children }: { children: ReactNode }) {
@@ -96,7 +182,7 @@ function Notice({ children }: { children: ReactNode }) {
 }
 
 function CurrentSubscriptionCard({ sub }: { sub: SubscriptionPage }) {
-    const { subscription, quota, hasActiveSubscription, isLoading } = sub;
+    const { subscription, quota, isLoading } = sub;
     return (
         <Card>
             <CardContent className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
@@ -139,23 +225,115 @@ function CurrentSubscriptionCard({ sub }: { sub: SubscriptionPage }) {
                             Prochain renouvellement : {formatDate(subscription.currentPeriodEnd, { locale: 'fr-FR' })}
                         </p>
                     )}
-                    {!hasActiveSubscription && (
+                    {!subscription && (
                         <p className="text-lumiris-amber text-xs">
                             Souscrivez un palier ATELIER pour créer vos passeports.
                         </p>
                     )}
                 </div>
 
-                {hasActiveSubscription && (
-                    <Button variant="outline" onClick={sub.openPortal} disabled={sub.portal.isPending}>
-                        {sub.portal.isPending ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {/* Résiliation/reprise n'ont de sens que sur un abonnement actif. Le portail d'un
+                    abonnement non actif (paiement échoué) est exposé par PaymentRecoveryBanner. */}
+                {subscription?.active && (
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                        {subscription.cancelAtPeriodEnd ? (
+                            <Button onClick={sub.resumeSubscription} disabled={sub.resumeSub.isPending}>
+                                {sub.resumeSub.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Reprendre l&apos;abonnement
+                            </Button>
                         ) : (
-                            <ExternalLink className="mr-2 h-4 w-4" />
+                            <Button
+                                variant="ghost"
+                                className="text-destructive hover:text-destructive"
+                                onClick={sub.cancelSubscription}
+                                disabled={sub.cancelSub.isPending}
+                            >
+                                {sub.cancelSub.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Résilier
+                            </Button>
                         )}
-                        Gérer / facturation
-                    </Button>
+                        <Button variant="outline" onClick={sub.openPortal} disabled={sub.portal.isPending}>
+                            {sub.portal.isPending ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                                <ExternalLink className="mr-2 h-4 w-4" />
+                            )}
+                            Gérer / facturation
+                        </Button>
+                    </div>
                 )}
+            </CardContent>
+        </Card>
+    );
+}
+
+// Option ATELIER+ : un ADD-ON (2ᵉ article Stripe) qui s'ajoute au palier de base, pas un plan
+// autonome. Activable uniquement lorsqu'un abonnement de base est actif.
+function AtelierPlusCard({ sub }: { sub: SubscriptionPage }) {
+    const active = sub.atelierPlus;
+    const canManage = sub.hasActiveSubscription;
+    const pending = sub.addAtelierPlus.isPending || sub.removeAtelierPlus.isPending;
+
+    return (
+        <Card className={cn(active && 'border-lumiris-iris/40 bg-lumiris-iris/5')}>
+            <CardContent className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
+                <div className="space-y-1.5">
+                    <div className="flex items-center gap-2">
+                        <div className="bg-lumiris-iris/10 flex h-8 w-8 items-center justify-center rounded-lg">
+                            <Sparkles className="text-lumiris-iris h-4 w-4" />
+                        </div>
+                        <p className="text-foreground text-lg font-semibold">Option ATELIER+</p>
+                        <Badge
+                            className={cn(
+                                active
+                                    ? 'bg-lumiris-iris/10 text-lumiris-iris border-lumiris-iris/30'
+                                    : 'bg-muted text-muted-foreground border-border',
+                            )}
+                        >
+                            {active ? 'Activée' : 'Non activée'}
+                        </Badge>
+                    </div>
+                    <p className="text-muted-foreground max-w-xl text-sm">
+                        Option complémentaire qui s&apos;ajoute à votre palier ATELIER (elle ne le remplace pas).
+                        Débloque l&apos;Analytics avancé : scans QR, score Iris vs marché et pièces les plus vues.
+                    </p>
+                    <p className="text-muted-foreground flex items-center gap-1.5 text-xs">
+                        <BarChart3 className="text-lumiris-iris h-3.5 w-3.5" />
+                        Facturée en plus de votre abonnement de base, au prorata.
+                    </p>
+                    {!canManage && (
+                        <p className="text-lumiris-amber text-xs">
+                            Un abonnement ATELIER actif est requis pour ajouter cette option.
+                        </p>
+                    )}
+                </div>
+
+                <div className="shrink-0">
+                    {active ? (
+                        <Button
+                            variant="ghost"
+                            className="text-destructive hover:text-destructive"
+                            onClick={sub.deactivateAtelierPlus}
+                            disabled={!canManage || pending}
+                        >
+                            {sub.removeAtelierPlus.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Retirer l&apos;option
+                        </Button>
+                    ) : (
+                        <Button
+                            className="bg-lumiris-iris hover:bg-lumiris-iris/90 gap-1.5 text-white"
+                            onClick={sub.activateAtelierPlus}
+                            disabled={!canManage || pending}
+                        >
+                            {sub.addAtelierPlus.isPending ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                <Sparkles className="h-4 w-4" />
+                            )}
+                            Activer ATELIER+
+                        </Button>
+                    )}
+                </div>
             </CardContent>
         </Card>
     );

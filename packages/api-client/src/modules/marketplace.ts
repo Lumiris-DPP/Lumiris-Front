@@ -40,6 +40,19 @@ export function marketplaceApi(http: Http) {
             );
         },
 
+        // Fiche produit publique unique. 404 si non publié ou vendeur non payable.
+        async getPublicProduct(id: string): Promise<MarketplaceItem> {
+            return parseOr(marketplaceItemSchema, await http.request(`/public/marketplace/products/${id}`));
+        },
+
+        // Produit publié rattaché à un passeport scanné (par formId du DPP). 404 si aucun.
+        async getProductByDpp(dppFormId: string): Promise<MarketplaceItem> {
+            return parseOr(
+                marketplaceItemSchema,
+                await http.request(`/public/marketplace/products/by-dpp/${dppFormId}`),
+            );
+        },
+
         // Suggestions sur DPP scanné : 3 alternatives de score >= au scan.
         async suggest(input: SuggestInput): Promise<SuggestionResult> {
             return parseOr(
