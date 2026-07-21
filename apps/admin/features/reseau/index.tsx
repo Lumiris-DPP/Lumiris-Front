@@ -5,12 +5,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { FeatureLayout } from '@lumiris/ui/components/feature-layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@lumiris/ui/components/tabs';
 import { PermissionGate } from '../_shared/permission-gate';
+import { RepairerValidationQueue } from '../kyb-review/repairer-validation-queue';
 import { Retoucheurs } from '../retoucheurs';
 import { VisionUsers } from '../vision-users';
 
-type TabValue = 'retoucheurs' | 'users';
+type TabValue = 'retoucheurs' | 'validation' | 'users';
 
-const VALID_TABS: ReadonlySet<TabValue> = new Set(['retoucheurs', 'users']);
+const VALID_TABS: ReadonlySet<TabValue> = new Set(['retoucheurs', 'validation', 'users']);
 
 function isTab(value: string | null): value is TabValue {
     return value !== null && VALID_TABS.has(value as TabValue);
@@ -45,6 +46,7 @@ function ReseauInner() {
                 tabs={
                     <TabsList>
                         <TabsTrigger value="retoucheurs">Retoucheurs</TabsTrigger>
+                        <TabsTrigger value="validation">Validation</TabsTrigger>
                         <TabsTrigger value="users">Utilisateurs</TabsTrigger>
                     </TabsList>
                 }
@@ -52,6 +54,11 @@ function ReseauInner() {
                 <TabsContent value="retoucheurs" className="mt-0 outline-none">
                     <PermissionGate requires="retoucheur.read">
                         <Retoucheurs />
+                    </PermissionGate>
+                </TabsContent>
+                <TabsContent value="validation" className="mt-0 outline-none">
+                    <PermissionGate requires="retoucheur.kyc_verify">
+                        <RepairerValidationQueue />
                     </PermissionGate>
                 </TabsContent>
                 <TabsContent value="users" className="mt-0 outline-none">

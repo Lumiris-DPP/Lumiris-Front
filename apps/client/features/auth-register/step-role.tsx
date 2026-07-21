@@ -1,6 +1,6 @@
 'use client';
 
-import { Brush, ShoppingBag, Wrench } from 'lucide-react';
+import { Brush, Wrench } from 'lucide-react';
 import type { UserRole } from '@lumiris/types';
 import { Button } from '@lumiris/ui/components/button';
 import { cn } from '@lumiris/ui/lib/cn';
@@ -18,12 +18,6 @@ const ROLES: RoleOption[] = [
         label: 'Artisan',
         description: 'Créateur textile — créez et publiez vos passeports produit',
         icon: Brush,
-    },
-    {
-        role: 'consumer',
-        label: 'Consommateur',
-        description: 'Acheteur conscient — suivez vos achats responsables',
-        icon: ShoppingBag,
     },
     {
         role: 'repairer',
