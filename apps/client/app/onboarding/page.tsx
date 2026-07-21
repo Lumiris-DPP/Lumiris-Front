@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type SyntheticEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { LumirisLogo } from '@lumiris/ui/components/logo';
 import {
     isApiError,
@@ -358,6 +358,16 @@ export default function OnboardingPage() {
 
                 {step === 'kyb' && (
                     <Card className="rounded-2xl bg-card px-7 py-8 shadow-xl">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setStep(isRepairer ? 'siret' : 'declaration')}
+                            className="-ml-2 mb-2 h-7 px-2 text-muted-foreground"
+                        >
+                            <ArrowLeft className="mr-1 h-3.5 w-3.5" />
+                            Retour
+                        </Button>
                         <h1 className="text-xl font-semibold tracking-tight text-foreground">Dossier KYB</h1>
                         <p className="mt-1 text-sm text-muted-foreground">
                             Ces informations sont vérifiées par notre équipe avant l&apos;activation de votre compte.
