@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { AlertTriangle, ArrowLeft, Loader2, Pencil } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Loader2, Pencil, Trash2 } from 'lucide-react';
 import { computeScore } from '@lumiris/core/scoring';
 import { mockCertificates, mockPassportById } from '@lumiris/mock-data';
 import type { Passport } from '@lumiris/types';
@@ -21,7 +22,7 @@ import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import { Toaster, toast } from '@lumiris/ui/components/sonner';
 import { IrisScoreCard } from '@lumiris/scoring-ui';
-import { useDppForm, useWithdrawDpp } from '@lumiris/api-client/react';
+import { useDeleteDppForm, useDppForm } from '@lumiris/api-client/react';
 import { isApiError, type DppFormDto } from '@lumiris/api-client';
 import { useAuthStore } from '@/lib/auth-store';
 import { useCurrentArtisan } from '@/lib/current-artisan';
@@ -149,12 +150,14 @@ export function PassportDetail({ passportId }: { passportId: string }) {
                 {apiDpp ? (
                     <aside className="lg:sticky lg:top-24 lg:self-start">
                         {isDraft ? (
-                            <DraftAside dppId={passportId} />
+                            <div className="space-y-4">
+                                <DraftAside dppId={passportId} />
+                                <DeleteDraftCard dppId={passportId} />
+                            </div>
                         ) : (
                             <div className="space-y-4">
                                 <IrisScoreCard dppId={passportId} />
                                 {apiDpp.publicCode && <QrCodeCard publicCode={apiDpp.publicCode} />}
-                                {apiDpp.status === 'VALID' && <WithdrawCard dppId={passportId} />}
                             </div>
                         )}
                     </aside>
@@ -166,31 +169,30 @@ export function PassportDetail({ passportId }: { passportId: string }) {
     );
 }
 
-// Retrait d'un passeport publié : VALID → INVALID + délistage de l'annonce marketplace.
-// Action irréversible, protégée par une confirmation explicite.
-function WithdrawCard({ dppId }: { dppId: string }) {
+function DeleteDraftCard({ dppId }: { dppId: string }) {
+    const router = useRouter();
     const [confirmOpen, setConfirmOpen] = useState(false);
-    const withdraw = useWithdrawDpp();
+    const deleteDpp = useDeleteDppForm();
+    const deleteLocalDraft = useDraftStore((s) => s.deleteDraft);
 
     const onConfirm = () => {
-        if (withdraw.isPending) return;
-        withdraw.mutate(dppId, {
+        if (deleteDpp.isPending) return;
+        deleteDpp.mutate(dppId, {
             onSuccess: () => {
                 setConfirmOpen(false);
-                toast.success('Passeport retiré', {
-                    description: 'Il est désormais invalide et son annonce marketplace a été délistée.',
-                });
+                deleteLocalDraft(dppId);
+                toast.success('Brouillon supprimé.');
+                router.replace('/passports');
             },
             onError: (e) => {
                 setConfirmOpen(false);
-                // 409 : le DPP n'est pas publié — on relaie le message backend.
                 if (isApiError(e) && e.status === 409) {
-                    toast.error('Retrait impossible', {
-                        description: e.message || "Ce passeport n'est pas publié.",
+                    toast.error('Suppression impossible', {
+                        description: e.message || 'Seul un brouillon peut être supprimé.',
                     });
                     return;
                 }
-                toast.error('Le retrait a échoué', { description: e.message });
+                toast.error('La suppression a échoué', { description: e.message });
             },
         });
     };
@@ -199,46 +201,50 @@ function WithdrawCard({ dppId }: { dppId: string }) {
         <Card className="border-destructive/30">
             <CardHeader>
                 <CardTitle className="text-destructive flex items-center gap-1.5 text-base">
-                    <AlertTriangle className="h-4 w-4" /> Retirer ce passeport
+                    <AlertTriangle className="h-4 w-4" /> Supprimer ce brouillon
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
                 <p className="text-muted-foreground text-sm">
-                    Le passeport passera au statut <span className="text-foreground font-medium">invalide</span> et son
-                    annonce dans la Marketplace sera délistée. Cette action est irréversible.
+                    Le brouillon et ses documents seront définitivement effacés. Une fois publié, un passeport ne peut
+                    plus être supprimé.
                 </p>
                 <Button
                     variant="outline"
                     className="text-destructive hover:text-destructive border-destructive/40 w-full gap-2"
                     onClick={() => setConfirmOpen(true)}
-                    disabled={withdraw.isPending}
+                    disabled={deleteDpp.isPending}
                 >
-                    {withdraw.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <AlertTriangle className="h-4 w-4" />}
-                    Retirer ce passeport
+                    {deleteDpp.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                        <Trash2 className="h-4 w-4" />
+                    )}
+                    Supprimer ce brouillon
                 </Button>
             </CardContent>
 
             <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Retirer ce passeport ?</AlertDialogTitle>
+                        <AlertDialogTitle>Supprimer ce brouillon ?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Le passeport deviendra invalide et son annonce marketplace sera délistée. Cette action est
-                            définitive et ne peut pas être annulée.
+                            Le brouillon et ses documents seront définitivement effacés. Cette action ne peut pas être
+                            annulée.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={withdraw.isPending}>Annuler</AlertDialogCancel>
+                        <AlertDialogCancel disabled={deleteDpp.isPending}>Annuler</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={(e) => {
                                 e.preventDefault();
                                 onConfirm();
                             }}
-                            disabled={withdraw.isPending}
+                            disabled={deleteDpp.isPending}
                             className="bg-destructive hover:bg-destructive/90 text-white"
                         >
-                            {withdraw.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Retirer définitivement
+                            {deleteDpp.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Supprimer définitivement
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

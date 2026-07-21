@@ -44,8 +44,7 @@ export function DppTable({ rows }: DppTableProps) {
     const deleteDpp = useDeleteDppForm();
 
     const openRow = (dpp: DppFormSummaryDto) => {
-        if (dpp.status === 'DRAFT') void editDraft(dpp.id);
-        else router.push(`/passports/${dpp.id}`);
+        router.push(`/passports/${dpp.id}`);
     };
 
     const onDelete = async (dpp: DppFormSummaryDto) => {
@@ -121,7 +120,10 @@ export function DppTable({ rows }: DppTableProps) {
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end" className="w-44">
-                                                {isDraft ? (
+                                                <DropdownMenuItem onClick={() => router.push(`/passports/${dpp.id}`)}>
+                                                    <Eye className="h-3.5 w-3.5" /> Voir détail
+                                                </DropdownMenuItem>
+                                                {isDraft && (
                                                     <>
                                                         <DropdownMenuItem onClick={() => void editDraft(dpp.id)}>
                                                             <Pencil className="h-3.5 w-3.5" /> Modifier
@@ -134,12 +136,6 @@ export function DppTable({ rows }: DppTableProps) {
                                                             <Trash2 className="h-3.5 w-3.5" /> Supprimer
                                                         </DropdownMenuItem>
                                                     </>
-                                                ) : (
-                                                    <DropdownMenuItem
-                                                        onClick={() => router.push(`/passports/${dpp.id}`)}
-                                                    >
-                                                        <Eye className="h-3.5 w-3.5" /> Voir détail
-                                                    </DropdownMenuItem>
                                                 )}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
