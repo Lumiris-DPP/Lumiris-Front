@@ -13,6 +13,7 @@ import {
     ShoppingBag,
     Store,
     Wallet,
+    Wrench,
 } from 'lucide-react';
 import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { Sheet, SheetContent } from '@lumiris/ui/components/sheet';
@@ -23,6 +24,7 @@ import { ATELIER_PASSPORT_LIMIT_LABEL, useHasAtelierPlus, usePassportCount } fro
 import { useCurrentArtisan } from '@/lib/current-artisan';
 import { useBilling, useBillingStore } from '@/lib/billing-store';
 import { useAuthStore } from '@/lib/auth-store';
+import { useAuthRole } from '@/lib/use-auth';
 import { useSubscription } from '@/lib/use-subscription';
 
 interface NavItem {
@@ -42,6 +44,12 @@ const NAV_ITEMS: readonly NavItem[] = [
     { href: '/shop', label: 'Boutique', icon: ShoppingBag },
     { href: '/analytics', label: 'Analytics', icon: BarChart3, plusOnly: true },
     { href: '/profile', label: 'Profil atelier', icon: Store },
+    { href: '/subscription', label: 'Abonnement', icon: Wallet },
+];
+
+const REPAIRER_NAV_ITEMS: readonly NavItem[] = [
+    { href: '/dashboard', label: 'Demandes', icon: LayoutDashboard },
+    { href: '/repairer-profile', label: 'Mon profil', icon: Wrench },
     { href: '/subscription', label: 'Abonnement', icon: Wallet },
 ];
 
@@ -119,9 +127,12 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     const pathname = usePathname() ?? '/';
+    const role = useAuthRole();
+    const isRepairer = role === 'repairer';
     const artisan = useCurrentArtisan();
     const isRealMode = useAuthStore((s) => s.token != null);
-    const { quota, atelierPlus } = useSubscription();
+    const { subscription, quota, atelierPlus } = useSubscription();
+    const navItems = isRepairer ? REPAIRER_NAV_ITEMS : NAV_ITEMS;
 
     const demoPassportCount = usePassportCount(artisan.id);
     const demoHasPlus = useHasAtelierPlus(artisan.id);
@@ -160,7 +171,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
             <nav className="flex-1 overflow-y-auto px-3 py-4">
                 <ul className="space-y-1">
-                    {NAV_ITEMS.map((item) =>
+                    {navItems.map((item) =>
                         item.plusOnly && !hasAtelierPlus ? null : (
                             <NavLink
                                 key={item.href}
@@ -173,49 +184,68 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 </ul>
             </nav>
 
-            <div className="space-y-2 border-t border-border px-4 py-3">
-                <div className="flex items-center gap-2">
+            {isRepairer ? (
+                <div className="space-y-1 border-t border-border px-4 py-3">
                     <span
                         className={cn(
-                            'rounded-md px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wider uppercase',
-                            artisan.tier === 'Solo' && 'bg-tier-solo/15 text-tier-solo',
-                            artisan.tier === 'Studio' && 'bg-tier-studio/15 text-tier-studio',
-                            artisan.tier === 'Maison' && 'bg-tier-maison/15 text-tier-maison',
+                            'inline-flex rounded-md px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wider uppercase',
+                            subscription?.active
+                                ? 'bg-lumiris-emerald/15 text-lumiris-emerald'
+                                : 'bg-lumiris-amber/15 text-lumiris-amber',
                         )}
                     >
-                        {artisan.tier}
+                        {subscription?.active ? 'LUMIRIS Local actif' : 'Sans abonnement Local'}
                     </span>
-                    {hasAtelierPlus && (
-                        <span className="rounded-md bg-lumiris-iris/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-lumiris-iris">
-                            ATELIER+
+                </div>
+            ) : (
+                <div className="space-y-2 border-t border-border px-4 py-3">
+                    <div className="flex items-center gap-2">
+                        <span
+                            className={cn(
+                                'rounded-md px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wider uppercase',
+                                artisan.tier === 'Solo' && 'bg-tier-solo/15 text-tier-solo',
+                                artisan.tier === 'Studio' && 'bg-tier-studio/15 text-tier-studio',
+                                artisan.tier === 'Maison' && 'bg-tier-maison/15 text-tier-maison',
+                            )}
+                        >
+                            {artisan.tier}
                         </span>
+                        {hasAtelierPlus && (
+                            <span className="rounded-md bg-lumiris-iris/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-lumiris-iris">
+                                ATELIER+
+                            </span>
+                        )}
+                    </div>
+                    <p className="font-mono text-[11px] text-muted-foreground">
+                        {usedCount} / {limitLabel} passeports actifs
+                    </p>
+                    {/* The cycle switch only ever wrote to a local mock billing store — a fake control
+                    in real mode, where the true cycle is managed on the /subscription page. */}
+                    {!isRealMode && (
+                        <div className="flex items-center justify-between gap-2 pt-1">
+                            <span className="text-[10px] tracking-wider text-muted-foreground uppercase">Cycle</span>
+                            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                                <span
+                                    className={cn(billing.billingCycle === 'monthly' && 'font-medium text-foreground')}
+                                >
+                                    mois
+                                </span>
+                                <Switch
+                                    checked={billing.billingCycle === 'annual'}
+                                    onCheckedChange={onToggleCycle}
+                                    aria-label="Basculer entre cycle mensuel et annuel"
+                                    className="h-4 w-7"
+                                />
+                                <span
+                                    className={cn(billing.billingCycle === 'annual' && 'font-medium text-foreground')}
+                                >
+                                    an <span className="font-mono text-lumiris-cyan">−17%</span>
+                                </span>
+                            </div>
+                        </div>
                     )}
                 </div>
-                <p className="font-mono text-[11px] text-muted-foreground">
-                    {usedCount} / {limitLabel} passeports actifs
-                </p>
-                {/* The cycle switch only ever wrote to a local mock billing store — a fake control
-                    in real mode, where the true cycle is managed on the /subscription page. */}
-                {!isRealMode && (
-                    <div className="flex items-center justify-between gap-2 pt-1">
-                        <span className="text-[10px] tracking-wider text-muted-foreground uppercase">Cycle</span>
-                        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                            <span className={cn(billing.billingCycle === 'monthly' && 'font-medium text-foreground')}>
-                                mois
-                            </span>
-                            <Switch
-                                checked={billing.billingCycle === 'annual'}
-                                onCheckedChange={onToggleCycle}
-                                aria-label="Basculer entre cycle mensuel et annuel"
-                                className="h-4 w-7"
-                            />
-                            <span className={cn(billing.billingCycle === 'annual' && 'font-medium text-foreground')}>
-                                an <span className="font-mono text-lumiris-cyan">−17%</span>
-                            </span>
-                        </div>
-                    </div>
-                )}
-            </div>
+            )}
         </div>
     );
 }
