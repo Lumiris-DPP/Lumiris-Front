@@ -16,6 +16,7 @@ import type {
     ArtisanRegisterRequest,
     ArtisanVitrineUpdateRequest,
 } from '../types/artisans';
+import type { KybDetailsRequest, KybDocumentLabel } from '../types/kyb';
 
 import { useApiClient } from '../core/provider';
 
@@ -76,6 +77,39 @@ export function useUpdateArtisanVitrine(
     const queryClient = useQueryClient();
     return useMutation<ArtisanProfileResponse, Error, ArtisanVitrineUpdateRequest>({
         mutationFn: (req) => client.artisans.updateProfile(req),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.setQueryData(artisanKeys.custom('me'), args[0]);
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+export function useSubmitArtisanKyb(
+    options?: Omit<UseMutationOptions<ArtisanProfileResponse, Error, KybDetailsRequest>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<ArtisanProfileResponse, Error, KybDetailsRequest>({
+        mutationFn: (req) => client.artisans.submitKyb(req),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.setQueryData(artisanKeys.custom('me'), args[0]);
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+export function useUploadArtisanKybDocument(
+    options?: Omit<
+        UseMutationOptions<ArtisanProfileResponse, Error, { label: KybDocumentLabel; file: File }>,
+        'mutationFn'
+    >,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<ArtisanProfileResponse, Error, { label: KybDocumentLabel; file: File }>({
+        mutationFn: ({ label, file }) => client.artisans.uploadKybDocument(label, file),
         ...options,
         onSuccess: (...args) => {
             queryClient.setQueryData(artisanKeys.custom('me'), args[0]);

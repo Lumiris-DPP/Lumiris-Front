@@ -6,6 +6,7 @@ import type {
     ArtisanRegisterRequest,
     ArtisanVitrineUpdateRequest,
 } from '../types/artisans';
+import type { KybDetailsRequest, KybDocumentLabel } from '../types/kyb';
 
 export function artisansApi(http: Http) {
     return {
@@ -20,6 +21,17 @@ export function artisansApi(http: Http) {
         },
         updateProfile(req: ArtisanVitrineUpdateRequest): Promise<ArtisanProfileResponse> {
             return http.request<ArtisanProfileResponse>('/api/artisans/me/profile', { method: 'PUT', body: req });
+        },
+        submitKyb(req: KybDetailsRequest): Promise<ArtisanProfileResponse> {
+            return http.request<ArtisanProfileResponse>('/api/artisans/me/kyb', { method: 'PUT', body: req });
+        },
+        uploadKybDocument(label: KybDocumentLabel, file: File): Promise<ArtisanProfileResponse> {
+            const form = new FormData();
+            form.append('file', file);
+            return http.request<ArtisanProfileResponse>(`/api/artisans/me/kyb/documents/${label}`, {
+                method: 'POST',
+                body: form,
+            });
         },
         addPhoto(file: File): Promise<ArtisanPhotoResponse> {
             const form = new FormData();

@@ -1,3 +1,5 @@
+import type { KybDetailsResponse } from './kyb';
+
 export type RepairerStatus = 'PENDING' | 'VERIFIED' | 'REJECTED';
 
 export interface RepairerProfileResponse {
@@ -16,6 +18,7 @@ export interface RepairerProfileResponse {
     averageRating?: number;
     reviewCount: number;
     createdAt: string;
+    kyb?: KybDetailsResponse;
 }
 
 export interface RepairerRegisterRequest {

@@ -25,6 +25,7 @@ import type {
     RepairRequestCreateRequest,
     RepairRequestResponse,
 } from '../types/repairers';
+import type { KybDetailsRequest, KybDocumentLabel } from '../types/kyb';
 
 import { useApiClient } from '../core/provider';
 
@@ -65,6 +66,39 @@ export function useUpdateRepairerProfile(
     const queryClient = useQueryClient();
     return useMutation<RepairerProfileResponse, Error, RepairerProfileUpdateRequest>({
         mutationFn: (req) => client.repairers.updateProfile(req),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.setQueryData(repairerKeys.custom('me'), args[0]);
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+export function useSubmitRepairerKyb(
+    options?: Omit<UseMutationOptions<RepairerProfileResponse, Error, KybDetailsRequest>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<RepairerProfileResponse, Error, KybDetailsRequest>({
+        mutationFn: (req) => client.repairers.submitKyb(req),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.setQueryData(repairerKeys.custom('me'), args[0]);
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+export function useUploadRepairerKybDocument(
+    options?: Omit<
+        UseMutationOptions<RepairerProfileResponse, Error, { label: KybDocumentLabel; file: File }>,
+        'mutationFn'
+    >,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<RepairerProfileResponse, Error, { label: KybDocumentLabel; file: File }>({
+        mutationFn: ({ label, file }) => client.repairers.uploadKybDocument(label, file),
         ...options,
         onSuccess: (...args) => {
             queryClient.setQueryData(repairerKeys.custom('me'), args[0]);
