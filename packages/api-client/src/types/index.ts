@@ -10,3 +10,4 @@ export * from './seller';
 export * from './wardrobe';
 export * from './iris';
 export * from './atelier-stats';
+export * from './repairers';

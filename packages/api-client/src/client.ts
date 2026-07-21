@@ -12,6 +12,7 @@ import { sellerApi } from './modules/seller';
 import { wardrobeApi } from './modules/wardrobe';
 import { irisApi } from './modules/iris';
 import { atelierStatsApi, eventsApi } from './modules/atelier-stats';
+import { repairersApi, repairRequestsApi } from './modules/repairers';
 
 export type ClientOptions = HttpOptions;
 
@@ -32,6 +33,8 @@ export function createClient(opts: ClientOptions) {
         iris: irisApi(http),
         atelierStats: atelierStatsApi(http),
         events: eventsApi(http),
+        repairers: repairersApi(http),
+        repairRequests: repairRequestsApi(http),
     };
 }
 
