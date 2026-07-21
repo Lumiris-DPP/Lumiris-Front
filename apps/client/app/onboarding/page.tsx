@@ -22,14 +22,32 @@ import { Card } from '@lumiris/ui/components/card';
 import { Checkbox } from '@lumiris/ui/components/checkbox';
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
-import { KybForm } from '@/features/kyb-form';
+import {
+    DocumentsCard,
+    EntityFields,
+    RepresentativeFields,
+    defaultKybDraft,
+    isEntityDraftValid,
+    isRepresentativeDraftValid,
+    kybDraftToRequest,
+    type KybDraft,
+} from '@/features/kyb-form';
 import { useAuthUserId, useAuthRole, useAuthToken, useAuthHydrated } from '@/lib/use-auth';
 import { signOut } from '@/lib/auth-store';
 import { useVerificationStore } from '@/lib/verification-store';
 
 const SIRET_RE = /^\d{14}$/;
 
-type Step = 'siret' | 'declaration' | 'kyb';
+type Step = 'entity' | 'representative' | 'documents' | 'validation';
+
+const STEP_LABEL: Record<Step, string> = {
+    entity: 'Entité juridique',
+    representative: 'Représentant légal',
+    documents: 'Documents',
+    validation: 'Validation',
+};
+
+const STEP_ORDER: readonly Step[] = ['entity', 'representative', 'documents', 'validation'];
 
 export default function OnboardingPage() {
     const router = useRouter();
@@ -54,44 +72,31 @@ export default function OnboardingPage() {
     const me = useArtisanMe({ enabled: Boolean(token) && isArtisan });
     const repairerMe = useRepairerMe({ enabled: Boolean(token) && isRepairer });
 
-    const [step, setStep] = useState<Step>('siret');
+    const [step, setStep] = useState<Step>('entity');
     const siretInputRef = useRef<HTMLInputElement>(null);
     const [siret, setSiret] = useState('');
     const [siretError, setSiretError] = useState('');
-    const [certified, setCertified] = useState(false);
+    const [draft, setDraft] = useState<KybDraft>(() => defaultKybDraft());
+    const [termsAccepted, setTermsAccepted] = useState(false);
     const [kybError, setKybError] = useState<string | null>(null);
     const [uploadingLabel, setUploadingLabel] = useState<KybDocumentLabel | null>(null);
 
+    // Prefills once from whatever the server already knows (a prior partial submission, or a
+    // REJECTED/INCOMPLETE dossier being redone) — but only from the *initial* query settlement,
+    // never again afterwards. Steps 1-3 are staged client-side only until the final submit, so
+    // there's nothing meaningful to re-sync from the server later — in particular, registering
+    // the SIRET in step 1 updates `me`/`repairerMe`'s cache, which must NOT re-trigger this and
+    // stomp over whatever the user already typed into the entity/representative fields.
+    const initializedRef = useRef(false);
     useEffect(() => {
-        if (!isArtisan || !me.data) return;
-        // A REJECTED artisan is starting a fresh dossier: prefill their known SIRET but keep
-        // them on step 1 so they can re-submit (the backend upserts on re-register).
-        if (me.data.status === 'REJECTED') {
-            if (me.data.siret) setSiret(me.data.siret);
-            setStep('siret');
-            return;
-        }
-        if (!me.data.declarationSigned) {
-            setSiret(me.data.siret ?? '');
-            setStep('declaration');
-            return;
-        }
-        if (!me.data.kyb?.termsAcceptedAt) {
-            setStep('kyb');
-        }
-    }, [isArtisan, me.data]);
-
-    useEffect(() => {
-        if (!isRepairer || !repairerMe.data) return;
-        if (repairerMe.data.status === 'REJECTED') {
-            if (repairerMe.data.siret) setSiret(repairerMe.data.siret);
-            setStep('siret');
-            return;
-        }
-        if (!repairerMe.data.kyb?.termsAcceptedAt) {
-            setStep('kyb');
-        }
-    }, [isRepairer, repairerMe.data]);
+        if (initializedRef.current) return;
+        const isLoading = isArtisan ? me.isLoading : isRepairer ? repairerMe.isLoading : false;
+        if (isLoading) return;
+        initializedRef.current = true;
+        const data = isArtisan ? me.data : isRepairer ? repairerMe.data : undefined;
+        if (data?.siret) setSiret(data.siret);
+        if (data?.kyb) setDraft(defaultKybDraft(data.kyb));
+    }, [isArtisan, isRepairer, me.isLoading, me.data, repairerMe.isLoading, repairerMe.data]);
 
     useEffect(() => {
         if (!hydrated) return;
@@ -133,46 +138,15 @@ export default function OnboardingPage() {
 
     // The SIRET field is the only control of its step, so land the caret in it.
     useEffect(() => {
-        if (step === 'siret') siretInputRef.current?.focus();
+        if (step === 'entity') siretInputRef.current?.focus();
     }, [step]);
 
     if (!hydrated || !userId) return null;
     if (!isArtisan && !isRepairer) return null;
     if (token && (isArtisan ? me.isLoading : repairerMe.isLoading)) return null;
 
-    function handleSiretSubmit(e: SyntheticEvent) {
-        e.preventDefault();
-        if (!userId) return;
-        const clean = siret.replace(/\s/g, '');
-        if (!SIRET_RE.test(clean)) {
-            setSiretError('Le numéro SIRET doit contenir exactement 14 chiffres.');
-            return;
-        }
-        setSiretError('');
-        if (isRepairer) {
-            registerRepairer.mutate(
-                { siret: clean },
-                {
-                    onSuccess: () => setStep('kyb'),
-                    onError: (err) => {
-                        setSiretError(isApiError(err) ? err.message : 'Impossible de vérifier ce SIRET.');
-                    },
-                },
-            );
-            return;
-        }
-        registerArtisan.mutate(
-            { siret: clean },
-            {
-                onSuccess: (profile) => {
-                    setFromProfile(userId, profile);
-                    setStep('declaration');
-                },
-                onError: (err) => {
-                    setSiretError(isApiError(err) ? err.message : 'Impossible de vérifier ce SIRET.');
-                },
-            },
-        );
+    function updateDraft(patch: Partial<KybDraft>) {
+        setDraft((prev) => ({ ...prev, ...patch }));
     }
 
     function handleLogout() {
@@ -180,18 +154,46 @@ export default function OnboardingPage() {
         router.replace('/login');
     }
 
-    function handleDeclarationSubmit(e: SyntheticEvent) {
+    function handleEntitySubmit(e: SyntheticEvent) {
         e.preventDefault();
         if (!userId) return;
-        signDeclaration.mutate(undefined, {
-            onSuccess: (profile) => {
-                setFromProfile(userId, profile);
-                setStep('kyb');
+        const clean = siret.replace(/\s/g, '');
+        if (!SIRET_RE.test(clean)) {
+            setSiretError('Le numéro SIRET doit contenir exactement 14 chiffres.');
+            return;
+        }
+        if (!isEntityDraftValid(draft)) {
+            setSiretError('Merci de compléter tous les champs obligatoires.');
+            return;
+        }
+        setSiretError('');
+        const onError = (err: unknown) => {
+            setSiretError(isApiError(err) ? err.message : 'Impossible de vérifier ce SIRET.');
+        };
+        if (isRepairer) {
+            registerRepairer.mutate({ siret: clean }, { onSuccess: () => setStep('representative'), onError });
+            return;
+        }
+        registerArtisan.mutate(
+            { siret: clean },
+            {
+                onSuccess: (profile) => {
+                    setFromProfile(userId, profile);
+                    setStep('representative');
+                },
+                onError,
             },
-            onError: (err) => {
-                setSiretError(isApiError(err) ? err.message : "Impossible d'enregistrer la déclaration.");
-            },
-        });
+        );
+    }
+
+    function handleRepresentativeSubmit(e: SyntheticEvent) {
+        e.preventDefault();
+        if (!isRepresentativeDraftValid(draft)) {
+            setKybError('Merci de compléter tous les champs obligatoires du représentant légal.');
+            return;
+        }
+        setKybError(null);
+        setStep('documents');
     }
 
     function handleUploadDocument(label: KybDocumentLabel, file: File, expiresAt?: string) {
@@ -206,18 +208,54 @@ export default function OnboardingPage() {
         );
     }
 
-    const isSubmittingKyb = isRepairer ? submitRepairerKyb.isPending : submitArtisanKyb.isPending;
+    function handleFinalSubmit(e: SyntheticEvent) {
+        e.preventDefault();
+        if (!termsAccepted) {
+            setKybError("Vous devez accepter les conditions générales d'utilisation.");
+            return;
+        }
+        setKybError(null);
+        const payload = kybDraftToRequest(draft, true);
+        if (isRepairer) {
+            submitRepairerKyb.mutate(payload, {
+                onSuccess: () => router.replace('/dashboard'),
+                onError: (err) => setKybError(isApiError(err) ? err.message : "Impossible d'envoyer le dossier."),
+            });
+            return;
+        }
+        submitArtisanKyb.mutate(payload, {
+            onSuccess: (profile) => {
+                if (userId) setFromProfile(userId, profile);
+                signDeclaration.mutate(undefined, {
+                    onSuccess: (signedProfile) => {
+                        if (userId) setFromProfile(userId, signedProfile);
+                        router.replace('/dashboard');
+                    },
+                    onError: (err) => {
+                        setKybError(isApiError(err) ? err.message : "Impossible d'enregistrer la déclaration.");
+                    },
+                });
+            },
+            onError: (err) => setKybError(isApiError(err) ? err.message : "Impossible d'envoyer le dossier."),
+        });
+    }
+
     const kybResponse = isRepairer ? repairerMe.data?.kyb : me.data?.kyb;
+    const isSubmittingFinal = isRepairer
+        ? submitRepairerKyb.isPending
+        : submitArtisanKyb.isPending || signDeclaration.isPending;
+    const roleLabel = isRepairer ? 'réparateur' : 'artisan';
+    const formattedSiret = siret.replace(/\s/g, '').replace(/(\d{3})(?=\d)/g, '$1 ');
 
     return (
-        <div className="flex min-h-screen flex-col bg-background">
-            <header className="border-b border-border bg-card">
+        <div className="bg-background flex min-h-screen flex-col">
+            <header className="border-border bg-card border-b">
                 <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
                     <div className="flex items-center gap-3">
                         <LumirisLogo className="h-9 w-auto" />
                         <div>
-                            <p className="text-sm leading-none font-semibold text-foreground">LUMIRIS</p>
-                            <p className="font-mono text-[10px] tracking-widest text-muted-foreground">ATELIER</p>
+                            <p className="text-foreground text-sm font-semibold leading-none">LUMIRIS</p>
+                            <p className="text-muted-foreground font-mono text-[10px] tracking-widest">ATELIER</p>
                         </div>
                     </div>
                     <Button variant="ghost" size="sm" onClick={handleLogout} className="text-muted-foreground">
@@ -228,29 +266,26 @@ export default function OnboardingPage() {
 
             <main className="mx-auto flex w-full max-w-lg flex-1 flex-col px-6 py-12">
                 {/* Stepper */}
-                <div className="mb-8 flex items-center gap-3">
-                    <StepDot active={step === 'siret'} done={step !== 'siret'} label="SIRET" />
-                    <div className="h-px flex-1 bg-border" />
-                    {isArtisan ? (
-                        <>
-                            <StepDot active={step === 'declaration'} done={step === 'kyb'} label="Déclaration" />
-                            <div className="h-px flex-1 bg-border" />
-                        </>
-                    ) : null}
-                    <StepDot active={step === 'kyb'} done={false} label="Dossier KYB" />
+                <div className="mb-8 flex items-center gap-2">
+                    {STEP_ORDER.map((s, i) => (
+                        <div key={s} className="flex flex-1 items-center gap-2 last:flex-none">
+                            <StepDot active={step === s} done={STEP_ORDER.indexOf(step) > i} label={STEP_LABEL[s]} />
+                            {i < STEP_ORDER.length - 1 ? <div className="bg-border h-px flex-1" /> : null}
+                        </div>
+                    ))}
                 </div>
 
-                {step === 'siret' && (
-                    <Card className="rounded-2xl bg-card px-7 py-8 shadow-xl">
-                        <h1 className="text-xl font-semibold tracking-tight text-foreground">Numéro SIRET</h1>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                            Entrez le numéro SIRET de votre {isRepairer ? 'activité' : 'atelier'} pour initialiser votre
-                            compte.
+                {step === 'entity' && (
+                    <Card className="bg-card rounded-2xl px-7 py-8 shadow-xl">
+                        <h1 className="text-foreground text-xl font-semibold tracking-tight">Entité juridique</h1>
+                        <p className="text-muted-foreground mt-1 text-sm">
+                            Renseignez le SIRET et les informations légales de votre{' '}
+                            {roleLabel === 'artisan' ? 'atelier' : 'activité'}.
                         </p>
 
-                        <form onSubmit={handleSiretSubmit} className="mt-6 flex flex-col gap-4">
+                        <form onSubmit={handleEntitySubmit} className="mt-6 flex flex-col gap-4">
                             <div className="flex flex-col gap-1.5">
-                                <Label htmlFor="siret" className="text-xs font-semibold text-foreground/80">
+                                <Label htmlFor="siret" className="text-foreground/80 text-xs font-semibold">
                                     Numéro SIRET (14 chiffres)
                                 </Label>
                                 <Input
@@ -268,17 +303,20 @@ export default function OnboardingPage() {
                                     aria-invalid={siretError ? true : undefined}
                                     ref={siretInputRef}
                                 />
-                                {siretError && (
-                                    <p className="text-xs text-destructive" role="alert">
-                                        {siretError}
-                                    </p>
-                                )}
                             </div>
+
+                            <EntityFields draft={draft} onChange={updateDraft} />
+
+                            {siretError && (
+                                <p className="text-destructive text-xs" role="alert">
+                                    {siretError}
+                                </p>
+                            )}
 
                             <Button
                                 type="submit"
                                 disabled={registerArtisan.isPending || registerRepairer.isPending}
-                                className="mt-1 h-10 w-full bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90 disabled:opacity-60"
+                                className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 mt-1 h-10 w-full text-white disabled:opacity-60"
                             >
                                 {registerArtisan.isPending || registerRepairer.isPending
                                     ? 'Vérification…'
@@ -288,44 +326,122 @@ export default function OnboardingPage() {
                     </Card>
                 )}
 
-                {step === 'declaration' && isArtisan && (
-                    <Card className="rounded-2xl bg-card px-7 py-8 shadow-xl">
-                        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+                {step === 'representative' && (
+                    <Card className="bg-card rounded-2xl px-7 py-8 shadow-xl">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setStep('entity')}
+                            className="text-muted-foreground -ml-2 mb-2 h-7 px-2"
+                        >
+                            <ArrowLeft className="mr-1 h-3.5 w-3.5" />
+                            Retour
+                        </Button>
+                        <h1 className="text-foreground text-xl font-semibold tracking-tight">Représentant légal</h1>
+                        <p className="text-muted-foreground mt-1 text-sm">
+                            Informations sur la personne physique qui représente légalement l&apos;entité.
+                        </p>
+                        <form onSubmit={handleRepresentativeSubmit} className="mt-6 flex flex-col gap-4">
+                            <RepresentativeFields draft={draft} onChange={updateDraft} />
+                            {kybError && (
+                                <p className="text-destructive text-xs" role="alert">
+                                    {kybError}
+                                </p>
+                            )}
+                            <Button
+                                type="submit"
+                                className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 mt-1 h-10 w-full text-white"
+                            >
+                                Continuer
+                            </Button>
+                        </form>
+                    </Card>
+                )}
+
+                {step === 'documents' && (
+                    <div className="flex flex-col gap-5">
+                        <Card className="bg-card rounded-2xl px-7 py-8 shadow-xl">
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setStep('representative')}
+                                className="text-muted-foreground -ml-2 mb-2 h-7 px-2"
+                            >
+                                <ArrowLeft className="mr-1 h-3.5 w-3.5" />
+                                Retour
+                            </Button>
+                            <h1 className="text-foreground text-xl font-semibold tracking-tight">
+                                Documents justificatifs
+                            </h1>
+                            <p className="text-muted-foreground mt-1 text-sm">
+                                Ces documents sont vérifiés par notre équipe avant l&apos;activation de votre compte.
+                            </p>
+                        </Card>
+
+                        <DocumentsCard
+                            initialKyb={kybResponse}
+                            onUploadDocument={handleUploadDocument}
+                            uploadingLabel={uploadingLabel}
+                        />
+
+                        <Button
+                            type="button"
+                            onClick={() => setStep('validation')}
+                            className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 h-10 w-full text-white"
+                        >
+                            Continuer
+                        </Button>
+                    </div>
+                )}
+
+                {step === 'validation' && (
+                    <Card className="bg-card rounded-2xl px-7 py-8 shadow-xl">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setStep('documents')}
+                            className="text-muted-foreground -ml-2 mb-2 h-7 px-2"
+                        >
+                            <ArrowLeft className="mr-1 h-3.5 w-3.5" />
+                            Retour
+                        </Button>
+                        <h1 className="text-foreground text-xl font-semibold tracking-tight">
                             Déclaration sur l&apos;honneur
                         </h1>
-                        <p className="mt-1 text-sm text-muted-foreground">
+                        <p className="text-muted-foreground mt-1 text-sm">
                             Lisez attentivement et certifiez l&apos;exactitude de vos informations.
                         </p>
 
-                        <div className="mt-5 rounded-lg border border-border bg-muted/30 p-4 text-sm leading-relaxed">
-                            <p className="font-medium text-foreground">Déclaration sur l&apos;honneur</p>
-                            <p className="mt-2 text-[13px] text-muted-foreground">
-                                Je soussigné(e), artisan enregistré sous le numéro SIRET{' '}
-                                <span className="font-mono font-semibold text-foreground">
-                                    {siret.replace(/\s/g, '').replace(/(\d{3})(?=\d)/g, '$1 ')}
-                                </span>
-                                , déclare sur l&apos;honneur que :
+                        <div className="border-border bg-muted/30 mt-5 rounded-lg border p-4 text-sm leading-relaxed">
+                            <p className="text-foreground font-medium">Déclaration sur l&apos;honneur</p>
+                            <p className="text-muted-foreground mt-2 text-[13px]">
+                                Je soussigné(e), {roleLabel} enregistré sous le numéro SIRET{' '}
+                                <span className="text-foreground font-mono font-semibold">{formattedSiret}</span>,
+                                déclare sur l&apos;honneur que :
                             </p>
-                            <ul className="mt-2 list-inside list-disc space-y-1 text-[13px] text-muted-foreground">
+                            <ul className="text-muted-foreground mt-2 list-inside list-disc space-y-1 text-[13px]">
                                 <li>Les informations renseignées sont exactes et sincères.</li>
-                                <li>Je suis bien titulaire de l&apos;activité artisanale déclarée.</li>
+                                <li>Je suis bien titulaire de l&apos;activité déclarée.</li>
                                 <li>Je m&apos;engage à signaler toute modification de ma situation.</li>
                                 <li>
                                     J&apos;ai pris connaissance des Conditions Générales d&apos;Utilisation de LUMIRIS.
                                 </li>
                             </ul>
-                            <p className="mt-3 text-[12px] text-muted-foreground italic">
+                            <p className="text-muted-foreground mt-3 text-[12px] italic">
                                 Toute fausse déclaration m&apos;expose aux sanctions prévues par l&apos;article 441-1 du
                                 Code pénal.
                             </p>
                         </div>
 
-                        <form onSubmit={handleDeclarationSubmit} className="mt-5 flex flex-col gap-5">
+                        <form onSubmit={handleFinalSubmit} className="mt-5 flex flex-col gap-5">
                             <div className="flex items-start gap-3">
                                 <Checkbox
                                     id="certified"
-                                    checked={certified}
-                                    onCheckedChange={(v) => setCertified(v === true)}
+                                    checked={termsAccepted}
+                                    onCheckedChange={(v) => setTermsAccepted(v === true)}
                                     className="mt-0.5"
                                 />
                                 <Label htmlFor="certified" className="cursor-pointer text-sm leading-snug">
@@ -334,70 +450,26 @@ export default function OnboardingPage() {
                                 </Label>
                             </div>
 
-                            <div className="flex gap-3">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    className="flex-1"
-                                    onClick={() => setStep('siret')}
-                                >
-                                    Retour
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    disabled={!certified || signDeclaration.isPending}
-                                    className="flex-1 bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90 disabled:opacity-40"
-                                >
-                                    <CheckCircle2 className="mr-1.5 h-4 w-4" />
-                                    {signDeclaration.isPending ? 'Envoi…' : 'Continuer'}
-                                </Button>
-                            </div>
+                            {kybError && (
+                                <p className="text-destructive text-xs" role="alert">
+                                    {kybError}
+                                </p>
+                            )}
+
+                            <Button
+                                type="submit"
+                                disabled={!termsAccepted || isSubmittingFinal}
+                                className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 h-10 w-full text-white disabled:opacity-40"
+                            >
+                                <CheckCircle2 className="mr-1.5 h-4 w-4" />
+                                {isSubmittingFinal ? 'Envoi…' : 'Envoyer mon dossier KYB'}
+                            </Button>
                         </form>
                     </Card>
                 )}
 
-                {step === 'kyb' && (
-                    <Card className="rounded-2xl bg-card px-7 py-8 shadow-xl">
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setStep(isRepairer ? 'siret' : 'declaration')}
-                            className="-ml-2 mb-2 h-7 px-2 text-muted-foreground"
-                        >
-                            <ArrowLeft className="mr-1 h-3.5 w-3.5" />
-                            Retour
-                        </Button>
-                        <h1 className="text-xl font-semibold tracking-tight text-foreground">Dossier KYB</h1>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                            Ces informations sont vérifiées par notre équipe avant l&apos;activation de votre compte.
-                        </p>
-                        <div className="mt-6">
-                            <KybForm
-                                initialKyb={kybResponse}
-                                isSubmitting={isSubmittingKyb}
-                                submitError={kybError}
-                                uploadingLabel={uploadingLabel}
-                                onUploadDocument={handleUploadDocument}
-                                onSubmit={(req) => {
-                                    setKybError(null);
-                                    const mutation = isRepairer ? submitRepairerKyb : submitArtisanKyb;
-                                    mutation.mutate(req, {
-                                        onSuccess: () => router.replace('/dashboard'),
-                                        onError: (err) => {
-                                            setKybError(
-                                                isApiError(err) ? err.message : "Impossible d'envoyer le dossier.",
-                                            );
-                                        },
-                                    });
-                                }}
-                            />
-                        </div>
-                    </Card>
-                )}
-
-                <div className="mt-6 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-                    <ShieldCheck className="h-3.5 w-3.5 text-lumiris-cyan" />
+                <div className="text-muted-foreground mt-6 flex items-center justify-center gap-1.5 text-xs">
+                    <ShieldCheck className="text-lumiris-cyan h-3.5 w-3.5" />
                     Vos données sont protégées — conformité RGPD
                 </div>
             </main>
@@ -414,13 +486,15 @@ function StepDot({ active, done, label }: { active: boolean; done: boolean; labe
                     done
                         ? 'bg-lumiris-cyan text-white'
                         : active
-                          ? 'border-2 border-lumiris-cyan bg-lumiris-cyan/10 text-lumiris-cyan'
-                          : 'border border-border bg-muted text-muted-foreground',
+                          ? 'border-lumiris-cyan bg-lumiris-cyan/10 text-lumiris-cyan border-2'
+                          : 'bg-muted text-muted-foreground border-border border',
                 ].join(' ')}
             >
                 {done ? <CheckCircle2 className="h-4 w-4" /> : active ? '●' : '○'}
             </div>
-            <span className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">{label}</span>
+            <span className="text-muted-foreground text-center text-[9px] font-medium uppercase leading-tight tracking-wider">
+                {label}
+            </span>
         </div>
     );
 }
