@@ -273,7 +273,7 @@ function CheckoutForm({
     }
 
     return (
-        <form onSubmit={handleSubmit} className="bg-background flex h-full flex-col overflow-y-auto pb-40 md:pb-16">
+        <form onSubmit={handleSubmit} className="bg-background flex h-full flex-col overflow-y-auto pb-44 md:pb-20">
             <motion.header
                 className="mx-auto flex w-full max-w-md items-center gap-3 px-4 pb-3 pt-12 md:max-w-4xl md:px-6"
                 initial={{ opacity: 0, y: -10 }}

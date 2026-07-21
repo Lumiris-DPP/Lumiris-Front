@@ -158,7 +158,7 @@ export function PublicPassportDetail({
     );
 
     return (
-        <div className="bg-background flex h-full w-full flex-col overflow-y-auto pb-10">
+        <div className="bg-background flex h-full w-full flex-col overflow-y-auto pb-28">
             {/* Hero score */}
             <header className="relative flex h-56 shrink-0 items-center justify-center overflow-hidden">
                 {grade && (
