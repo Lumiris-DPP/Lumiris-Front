@@ -16,7 +16,7 @@ import type {
     ArtisanRegisterRequest,
     ArtisanVitrineUpdateRequest,
 } from '../types/artisans';
-import type { KybDetailsRequest, KybDocumentLabel } from '../types/kyb';
+import type { KybDetailsRequest, KybDocumentLabel, KybDocumentUploadOptions } from '../types/kyb';
 
 import { useApiClient } from '../core/provider';
 
@@ -100,16 +100,20 @@ export function useSubmitArtisanKyb(
     });
 }
 
+interface UploadArtisanKybDocumentInput {
+    label: KybDocumentLabel;
+    file: File;
+    expiresAt?: string;
+}
+
 export function useUploadArtisanKybDocument(
-    options?: Omit<
-        UseMutationOptions<ArtisanProfileResponse, Error, { label: KybDocumentLabel; file: File }>,
-        'mutationFn'
-    >,
+    options?: Omit<UseMutationOptions<ArtisanProfileResponse, Error, UploadArtisanKybDocumentInput>, 'mutationFn'>,
 ) {
     const client = useApiClient();
     const queryClient = useQueryClient();
-    return useMutation<ArtisanProfileResponse, Error, { label: KybDocumentLabel; file: File }>({
-        mutationFn: ({ label, file }) => client.artisans.uploadKybDocument(label, file),
+    return useMutation<ArtisanProfileResponse, Error, UploadArtisanKybDocumentInput>({
+        mutationFn: ({ label, file, expiresAt }) =>
+            client.artisans.uploadKybDocument(label, file, { expiresAt } satisfies KybDocumentUploadOptions),
         ...options,
         onSuccess: (...args) => {
             queryClient.setQueryData(artisanKeys.custom('me'), args[0]);

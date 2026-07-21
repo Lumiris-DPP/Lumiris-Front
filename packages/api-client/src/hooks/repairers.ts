@@ -25,7 +25,7 @@ import type {
     RepairRequestCreateRequest,
     RepairRequestResponse,
 } from '../types/repairers';
-import type { KybDetailsRequest, KybDocumentLabel } from '../types/kyb';
+import type { KybDetailsRequest, KybDocumentLabel, KybDocumentUploadOptions } from '../types/kyb';
 
 import { useApiClient } from '../core/provider';
 
@@ -89,16 +89,20 @@ export function useSubmitRepairerKyb(
     });
 }
 
+interface UploadRepairerKybDocumentInput {
+    label: KybDocumentLabel;
+    file: File;
+    expiresAt?: string;
+}
+
 export function useUploadRepairerKybDocument(
-    options?: Omit<
-        UseMutationOptions<RepairerProfileResponse, Error, { label: KybDocumentLabel; file: File }>,
-        'mutationFn'
-    >,
+    options?: Omit<UseMutationOptions<RepairerProfileResponse, Error, UploadRepairerKybDocumentInput>, 'mutationFn'>,
 ) {
     const client = useApiClient();
     const queryClient = useQueryClient();
-    return useMutation<RepairerProfileResponse, Error, { label: KybDocumentLabel; file: File }>({
-        mutationFn: ({ label, file }) => client.repairers.uploadKybDocument(label, file),
+    return useMutation<RepairerProfileResponse, Error, UploadRepairerKybDocumentInput>({
+        mutationFn: ({ label, file, expiresAt }) =>
+            client.repairers.uploadKybDocument(label, file, { expiresAt } satisfies KybDocumentUploadOptions),
         ...options,
         onSuccess: (...args) => {
             queryClient.setQueryData(repairerKeys.custom('me'), args[0]);

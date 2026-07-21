@@ -15,7 +15,7 @@ import type {
     RepairRequestCreateRequest,
     RepairRequestResponse,
 } from '../types/repairers';
-import type { KybDetailsRequest, KybDocumentLabel } from '../types/kyb';
+import type { KybDetailsRequest, KybDocumentLabel, KybDocumentUploadOptions } from '../types/kyb';
 
 export function repairersApi(http: Http) {
     return {
@@ -31,12 +31,17 @@ export function repairersApi(http: Http) {
         submitKyb(req: KybDetailsRequest): Promise<RepairerProfileResponse> {
             return http.request<RepairerProfileResponse>('/api/repairers/me/kyb', { method: 'PUT', body: req });
         },
-        uploadKybDocument(label: KybDocumentLabel, file: File): Promise<RepairerProfileResponse> {
+        uploadKybDocument(
+            label: KybDocumentLabel,
+            file: File,
+            options?: KybDocumentUploadOptions,
+        ): Promise<RepairerProfileResponse> {
             const form = new FormData();
             form.append('file', file);
             return http.request<RepairerProfileResponse>(`/api/repairers/me/kyb/documents/${label}`, {
                 method: 'POST',
                 body: form,
+                query: { expiresAt: options?.expiresAt },
             });
         },
         getPublicById(id: string): Promise<RepairerPublicProfileResponse> {
