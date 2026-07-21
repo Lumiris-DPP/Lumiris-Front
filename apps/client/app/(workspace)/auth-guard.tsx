@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { mockArtisanById } from '@lumiris/mock-data';
-import { useArtisanMe } from '@lumiris/api-client/react';
+import { useArtisanMe, useRepairerMe } from '@lumiris/api-client/react';
 import { toast } from '@lumiris/ui/components/sonner';
 import { useAuthArtisanId, useAuthUserId, useAuthRole, useAuthToken, useAuthHydrated } from '@/lib/use-auth';
 import { signOut } from '@/lib/auth-store';
@@ -27,35 +27,48 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     const getRecord = useVerificationStore((s) => s.getRecord);
     const setFromProfile = useVerificationStore((s) => s.setFromProfile);
 
-    // KYB onboarding only applies to artisan accounts — other roles (consumer, repairer, admin)
-    // have no ArtisanProfile at all, so GET /api/artisans/me would just 404 for them.
     const isArtisan = role === 'artisan';
+    const isRepairer = role === 'repairer';
     // ATELIER is for artisan and repairer accounts only. `role === null` covers mock/demo-mode
     // sessions that never went through `signInWithToken` — those don't carry a real role and
     // must not be bounced by this real-mode-only check.
-    const isAllowedRole = role === null || role === 'artisan' || role === 'repairer';
+    const isAllowedRole = role === null || isArtisan || isRepairer;
 
-    // Real mode: GET /api/artisans/me is the source of truth on every load, not local storage.
-    // The backend auto-creates an empty ArtisanProfile row (status defaults to PENDING) for every
-    // artisan signup even before onboarding starts, and a user can also stop after step 1 (SIRET)
-    // without signing the declaration — so only `declarationSigned` means "actually submitted for
-    // review"; `status` alone can't be trusted until then.
+    // Real mode: GET /api/artisans/me (resp. /api/repairers/me) is the source of truth on every
+    // load, not local storage. The backend creates the profile row (status PENDING) as soon as
+    // the SIRET step completes — so "submitted for review" also requires the KYB dossier
+    // (declaration + KYB for artisan, KYB alone for repairer), not just a PENDING status.
     const me = useArtisanMe({ enabled: Boolean(token) && isArtisan });
-    const onboardingSubmitted = Boolean(me.data?.declarationSigned);
+    const artisanSubmitted = Boolean(me.data?.declarationSigned && me.data?.kyb?.termsAcceptedAt);
+
+    const repairerMe = useRepairerMe({ enabled: Boolean(token) && isRepairer });
+    const repairerSubmitted = Boolean(repairerMe.data?.kyb?.termsAcceptedAt);
 
     useEffect(() => {
-        if (me.data && onboardingSubmitted && userId) setFromProfile(userId, me.data);
-    }, [me.data, onboardingSubmitted, userId, setFromProfile]);
+        if (isArtisan && me.data && artisanSubmitted && userId) setFromProfile(userId, me.data);
+    }, [isArtisan, me.data, artisanSubmitted, userId, setFromProfile]);
 
     const record = userId ? getRecord(userId) : null;
     // ponytail: existing mock artisans are pre-verified so the demo works out of the box
     const isExistingMockArtisan = artisanId ? mockArtisanById(artisanId) !== null : false;
 
     let status: VerificationStatus;
-    if (!isArtisan) {
-        status = 'verified'; // non-artisan roles skip onboarding entirely
+    if (isRepairer) {
+        if (token) {
+            if (repairerMe.data) {
+                status = repairerSubmitted ? (STATUS_MAP[repairerMe.data.status] ?? 'unregistered') : 'unregistered';
+            } else if (repairerMe.isLoading) {
+                status = record?.status ?? 'unregistered';
+            } else {
+                status = 'unregistered'; // 404 (no profile yet) or any other fetch error
+            }
+        } else {
+            status = record?.status ?? 'unregistered';
+        }
+    } else if (!isArtisan) {
+        status = 'verified'; // consumer/admin never reach here (blocked earlier); mock-mode fallback
     } else if (token) {
-        if (me.data) status = onboardingSubmitted ? (STATUS_MAP[me.data.status] ?? 'unregistered') : 'unregistered';
+        if (me.data) status = artisanSubmitted ? (STATUS_MAP[me.data.status] ?? 'unregistered') : 'unregistered';
         else if (me.isLoading) status = record?.status ?? 'unregistered';
         else status = 'unregistered'; // 404 (no profile yet) or any other fetch error
     } else {
@@ -65,7 +78,9 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
                 : (record?.status ?? 'unregistered');
     }
 
-    const awaitingLiveCheck = isArtisan && Boolean(token) && me.isLoading && !me.data;
+    const awaitingLiveCheck =
+        (isArtisan && Boolean(token) && me.isLoading && !me.data) ||
+        (isRepairer && Boolean(token) && repairerMe.isLoading && !repairerMe.data);
 
     useEffect(() => {
         if (!hydrated) return;

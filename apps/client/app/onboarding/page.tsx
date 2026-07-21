@@ -4,19 +4,32 @@ import { useEffect, useRef, useState, type SyntheticEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { CheckCircle2, ShieldCheck } from 'lucide-react';
 import { LumirisLogo } from '@lumiris/ui/components/logo';
-import { isApiError, useArtisanMe, useArtisanRegister, useSignDeclaration } from '@lumiris/api-client/react';
+import {
+    isApiError,
+    useArtisanMe,
+    useArtisanRegister,
+    useSignDeclaration,
+    useSubmitArtisanKyb,
+    useUploadArtisanKybDocument,
+    useRepairerMe,
+    useRegisterRepairer,
+    useSubmitRepairerKyb,
+    useUploadRepairerKybDocument,
+} from '@lumiris/api-client/react';
+import type { KybDocumentLabel } from '@lumiris/api-client';
 import { Button } from '@lumiris/ui/components/button';
 import { Card } from '@lumiris/ui/components/card';
 import { Checkbox } from '@lumiris/ui/components/checkbox';
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
+import { KybForm } from '@/features/kyb-form';
 import { useAuthUserId, useAuthRole, useAuthToken, useAuthHydrated } from '@/lib/use-auth';
 import { signOut } from '@/lib/auth-store';
 import { useVerificationStore } from '@/lib/verification-store';
 
 const SIRET_RE = /^\d{14}$/;
 
-type Step = 'siret' | 'declaration';
+type Step = 'siret' | 'declaration' | 'kyb';
 
 export default function OnboardingPage() {
     const router = useRouter();
@@ -28,20 +41,29 @@ export default function OnboardingPage() {
     const setFromProfile = useVerificationStore((s) => s.setFromProfile);
     const registerArtisan = useArtisanRegister();
     const signDeclaration = useSignDeclaration();
-    // KYB onboarding only applies to artisan accounts.
+    const submitArtisanKyb = useSubmitArtisanKyb();
+    const uploadArtisanKybDoc = useUploadArtisanKybDocument();
+    const registerRepairer = useRegisterRepairer();
+    const submitRepairerKyb = useSubmitRepairerKyb();
+    const uploadRepairerKybDoc = useUploadRepairerKybDocument();
+    // Onboarding only applies to artisan and repairer accounts (KYB simplifié : SIRET puis dossier).
     const isArtisan = role === 'artisan';
+    const isRepairer = role === 'repairer';
     // Real mode: same live source of truth as AuthGuard, so the two never disagree on
     // "already submitted" and bounce the user back and forth in a redirect loop.
     const me = useArtisanMe({ enabled: Boolean(token) && isArtisan });
+    const repairerMe = useRepairerMe({ enabled: Boolean(token) && isRepairer });
 
     const [step, setStep] = useState<Step>('siret');
     const siretInputRef = useRef<HTMLInputElement>(null);
     const [siret, setSiret] = useState('');
     const [siretError, setSiretError] = useState('');
     const [certified, setCertified] = useState(false);
+    const [kybError, setKybError] = useState<string | null>(null);
+    const [uploadingLabel, setUploadingLabel] = useState<KybDocumentLabel | null>(null);
 
     useEffect(() => {
-        if (!me.data) return;
+        if (!isArtisan || !me.data) return;
         // A REJECTED artisan is starting a fresh dossier: prefill their known SIRET but keep
         // them on step 1 so they can re-submit (the backend upserts on re-register).
         if (me.data.status === 'REJECTED') {
@@ -49,12 +71,27 @@ export default function OnboardingPage() {
             setStep('siret');
             return;
         }
-        // Resume at step 2 if SIRET was already submitted but the declaration wasn't signed yet.
-        if (me.data.siret && !me.data.declarationSigned) {
-            setSiret(me.data.siret);
+        if (!me.data.declarationSigned) {
+            setSiret(me.data.siret ?? '');
             setStep('declaration');
+            return;
         }
-    }, [me.data]);
+        if (!me.data.kyb?.termsAcceptedAt) {
+            setStep('kyb');
+        }
+    }, [isArtisan, me.data]);
+
+    useEffect(() => {
+        if (!isRepairer || !repairerMe.data) return;
+        if (repairerMe.data.status === 'REJECTED') {
+            if (repairerMe.data.siret) setSiret(repairerMe.data.siret);
+            setStep('siret');
+            return;
+        }
+        if (!repairerMe.data.kyb?.termsAcceptedAt) {
+            setStep('kyb');
+        }
+    }, [isRepairer, repairerMe.data]);
 
     useEffect(() => {
         if (!hydrated) return;
@@ -62,20 +99,37 @@ export default function OnboardingPage() {
             router.replace('/login');
             return;
         }
-        if (!isArtisan) {
+        if (!isArtisan && !isRepairer) {
             router.replace('/dashboard');
             return;
         }
         if (token) {
-            if (me.isLoading) return;
-            // A REJECTED artisan may resubmit here, so don't bounce them to the workspace even
-            // though they previously signed the declaration.
-            if (me.data?.declarationSigned && me.data.status !== 'REJECTED') router.replace('/dashboard');
+            const isLoading = isArtisan ? me.isLoading : repairerMe.isLoading;
+            if (isLoading) return;
+            const fullySubmitted = isArtisan
+                ? Boolean(me.data?.declarationSigned && me.data.kyb?.termsAcceptedAt)
+                : Boolean(repairerMe.data?.kyb?.termsAcceptedAt);
+            const status = isArtisan ? me.data?.status : repairerMe.data?.status;
+            // A REJECTED account may resubmit here, so don't bounce it to the workspace even
+            // though a prior dossier was already submitted.
+            if (fullySubmitted && status !== 'REJECTED') router.replace('/dashboard');
             return;
         }
-        const status = getRecord(userId).status;
-        if (status !== 'unregistered') router.replace('/dashboard');
-    }, [hydrated, userId, isArtisan, token, me.isLoading, me.data, getRecord, router]);
+        const record = getRecord(userId).status;
+        if (record !== 'unregistered') router.replace('/dashboard');
+    }, [
+        hydrated,
+        userId,
+        isArtisan,
+        isRepairer,
+        token,
+        me.isLoading,
+        me.data,
+        repairerMe.isLoading,
+        repairerMe.data,
+        getRecord,
+        router,
+    ]);
 
     // The SIRET field is the only control of its step, so land the caret in it.
     useEffect(() => {
@@ -83,8 +137,8 @@ export default function OnboardingPage() {
     }, [step]);
 
     if (!hydrated || !userId) return null;
-    if (!isArtisan) return null;
-    if (token && me.isLoading) return null;
+    if (!isArtisan && !isRepairer) return null;
+    if (token && (isArtisan ? me.isLoading : repairerMe.isLoading)) return null;
 
     function handleSiretSubmit(e: SyntheticEvent) {
         e.preventDefault();
@@ -95,6 +149,18 @@ export default function OnboardingPage() {
             return;
         }
         setSiretError('');
+        if (isRepairer) {
+            registerRepairer.mutate(
+                { siret: clean },
+                {
+                    onSuccess: () => setStep('kyb'),
+                    onError: (err) => {
+                        setSiretError(isApiError(err) ? err.message : 'Impossible de vérifier ce SIRET.');
+                    },
+                },
+            );
+            return;
+        }
         registerArtisan.mutate(
             { siret: clean },
             {
@@ -120,13 +186,34 @@ export default function OnboardingPage() {
         signDeclaration.mutate(undefined, {
             onSuccess: (profile) => {
                 setFromProfile(userId, profile);
-                router.push('/dashboard');
+                setStep('kyb');
             },
             onError: (err) => {
                 setSiretError(isApiError(err) ? err.message : "Impossible d'enregistrer la déclaration.");
             },
         });
     }
+
+    function handleUploadDocument(label: KybDocumentLabel, file: File) {
+        setUploadingLabel(label);
+        const mutation = isRepairer ? uploadRepairerKybDoc : uploadArtisanKybDoc;
+        mutation.mutate(
+            { label, file },
+            {
+                onSettled: () => setUploadingLabel(null),
+                onError: (err) => setKybError(isApiError(err) ? err.message : "Échec de l'envoi du document."),
+            },
+        );
+    }
+
+    const isSubmittingKyb = isRepairer ? submitRepairerKyb.isPending : submitArtisanKyb.isPending;
+    const kybResponse = isRepairer ? repairerMe.data?.kyb : me.data?.kyb;
+    const documentsUploaded = {
+        idDoc: Boolean(kybResponse?.idDocUploaded),
+        kbis: Boolean(kybResponse?.kbisUploaded),
+        proofOfAddress: Boolean(kybResponse?.proofOfAddressUploaded),
+        rib: Boolean(kybResponse?.ribUploaded),
+    };
 
     return (
         <div className="flex min-h-screen flex-col bg-background">
@@ -148,16 +235,23 @@ export default function OnboardingPage() {
             <main className="mx-auto flex w-full max-w-lg flex-1 flex-col px-6 py-12">
                 {/* Stepper */}
                 <div className="mb-8 flex items-center gap-3">
-                    <StepDot active={step === 'siret'} done={step === 'declaration'} label="SIRET" />
+                    <StepDot active={step === 'siret'} done={step !== 'siret'} label="SIRET" />
                     <div className="h-px flex-1 bg-border" />
-                    <StepDot active={step === 'declaration'} done={false} label="Déclaration" />
+                    {isArtisan ? (
+                        <>
+                            <StepDot active={step === 'declaration'} done={step === 'kyb'} label="Déclaration" />
+                            <div className="h-px flex-1 bg-border" />
+                        </>
+                    ) : null}
+                    <StepDot active={step === 'kyb'} done={false} label="Dossier KYB" />
                 </div>
 
                 {step === 'siret' && (
                     <Card className="rounded-2xl bg-card px-7 py-8 shadow-xl">
                         <h1 className="text-xl font-semibold tracking-tight text-foreground">Numéro SIRET</h1>
                         <p className="mt-1 text-sm text-muted-foreground">
-                            Entrez le numéro SIRET de votre atelier pour initialiser votre compte.
+                            Entrez le numéro SIRET de votre {isRepairer ? 'activité' : 'atelier'} pour initialiser votre
+                            compte.
                         </p>
 
                         <form onSubmit={handleSiretSubmit} className="mt-6 flex flex-col gap-4">
@@ -189,16 +283,18 @@ export default function OnboardingPage() {
 
                             <Button
                                 type="submit"
-                                disabled={registerArtisan.isPending}
+                                disabled={registerArtisan.isPending || registerRepairer.isPending}
                                 className="mt-1 h-10 w-full bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90 disabled:opacity-60"
                             >
-                                {registerArtisan.isPending ? 'Vérification…' : 'Continuer'}
+                                {registerArtisan.isPending || registerRepairer.isPending
+                                    ? 'Vérification…'
+                                    : 'Continuer'}
                             </Button>
                         </form>
                     </Card>
                 )}
 
-                {step === 'declaration' && (
+                {step === 'declaration' && isArtisan && (
                     <Card className="rounded-2xl bg-card px-7 py-8 shadow-xl">
                         <h1 className="text-xl font-semibold tracking-tight text-foreground">
                             Déclaration sur l&apos;honneur
@@ -259,10 +355,41 @@ export default function OnboardingPage() {
                                     className="flex-1 bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90 disabled:opacity-40"
                                 >
                                     <CheckCircle2 className="mr-1.5 h-4 w-4" />
-                                    {signDeclaration.isPending ? 'Envoi…' : "Finaliser l'inscription"}
+                                    {signDeclaration.isPending ? 'Envoi…' : 'Continuer'}
                                 </Button>
                             </div>
                         </form>
+                    </Card>
+                )}
+
+                {step === 'kyb' && (
+                    <Card className="rounded-2xl bg-card px-7 py-8 shadow-xl">
+                        <h1 className="text-xl font-semibold tracking-tight text-foreground">Dossier KYB</h1>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                            Ces informations sont vérifiées par notre équipe avant l&apos;activation de votre compte.
+                        </p>
+                        <div className="mt-6">
+                            <KybForm
+                                initialKyb={kybResponse}
+                                isSubmitting={isSubmittingKyb}
+                                submitError={kybError}
+                                uploadingLabel={uploadingLabel}
+                                documentsUploaded={documentsUploaded}
+                                onUploadDocument={handleUploadDocument}
+                                onSubmit={(req) => {
+                                    setKybError(null);
+                                    const mutation = isRepairer ? submitRepairerKyb : submitArtisanKyb;
+                                    mutation.mutate(req, {
+                                        onSuccess: () => router.replace('/dashboard'),
+                                        onError: (err) => {
+                                            setKybError(
+                                                isApiError(err) ? err.message : "Impossible d'envoyer le dossier.",
+                                            );
+                                        },
+                                    });
+                                }}
+                            />
+                        </div>
                     </Card>
                 )}
 
