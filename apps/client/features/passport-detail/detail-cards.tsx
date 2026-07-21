@@ -27,11 +27,11 @@ export function InfoRow({ label, value }: { label: string; value: React.ReactNod
 export function BooleanField({ value }: { value: boolean | null | undefined }) {
     if (value === null || value === undefined) return <span className="text-muted-foreground text-sm">—</span>;
     return value ? (
-        <span className="flex items-center gap-1 text-sm text-lumiris-emerald">
+        <span className="text-lumiris-emerald flex items-center gap-1 text-sm">
             <CheckCircle className="h-3.5 w-3.5" /> Oui
         </span>
     ) : (
-        <span className="flex items-center gap-1 text-sm text-lumiris-rose">
+        <span className="text-lumiris-rose flex items-center gap-1 text-sm">
             <XCircle className="h-3.5 w-3.5" /> Non
         </span>
     );
@@ -222,19 +222,25 @@ export function BlockchainAnchorCard({ view }: { view: DetailView }) {
         status === 'ANCHORED'
             ? {
                   label: 'Ancré',
-                  icon: <CheckCircle className="h-4 w-4 text-lumiris-emerald" aria-hidden />,
+                  icon: <CheckCircle className="text-lumiris-emerald h-4 w-4" aria-hidden />,
                   className: 'text-lumiris-emerald',
+                  description:
+                      'L’empreinte de ce passeport est scellée sur la blockchain Ethereum (Sepolia) — une preuve d’intégrité infalsifiable.',
               }
             : status === 'FAILED'
               ? {
                     label: 'Échec de l’ancrage',
-                    icon: <XCircle className="h-4 w-4 text-lumiris-rose" aria-hidden />,
+                    icon: <XCircle className="text-lumiris-rose h-4 w-4" aria-hidden />,
                     className: 'text-lumiris-rose',
+                    description:
+                        'L’ancrage de l’empreinte sur la blockchain Ethereum (Sepolia) n’a pas abouti. Le passeport reste valide, mais aucune preuve d’intégrité on-chain n’est disponible pour l’instant.',
                 }
               : {
                     label: 'En attente',
                     icon: <Clock className="text-lumiris-amber h-4 w-4" aria-hidden />,
                     className: 'text-lumiris-amber',
+                    description:
+                        'L’empreinte de ce passeport n’est pas encore scellée sur la blockchain Ethereum (Sepolia). La preuve d’intégrité sera disponible dès la confirmation de la transaction.',
                 };
 
     const hash = view.blockchainTxHash;
@@ -249,10 +255,7 @@ export function BlockchainAnchorCard({ view }: { view: DetailView }) {
                     {meta.icon}
                     <span className={`text-sm font-medium ${meta.className}`}>{meta.label}</span>
                 </div>
-                <p className="text-muted-foreground text-xs">
-                    L&apos;empreinte de ce passeport est scellée sur la blockchain Ethereum (Sepolia) — une preuve
-                    d&apos;intégrité infalsifiable.
-                </p>
+                <p className="text-muted-foreground text-xs">{meta.description}</p>
                 {status === 'ANCHORED' && hash && (
                     <div className="flex flex-col gap-1">
                         <span className="text-muted-foreground text-[11px] uppercase tracking-wider">Transaction</span>
