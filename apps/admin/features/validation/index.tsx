@@ -7,7 +7,14 @@ import { Button } from '@lumiris/ui/components/button';
 import { FeatureLayout } from '@lumiris/ui/components/feature-layout';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
 import { useToast } from '@lumiris/ui/hooks/use-toast';
-import { isApiError, useAdminArtisansList, useRejectArtisan, useVerifyArtisan } from '@lumiris/api-client/react';
+import {
+    isApiError,
+    useAdminArtisansList,
+    useMarkArtisanKybIncomplete,
+    useMarkArtisanKybOngoing,
+    useRejectArtisan,
+    useVerifyArtisan,
+} from '@lumiris/api-client/react';
 import type { ArtisanProfileResponse } from '@lumiris/api-client';
 import { usePermission } from '@/lib/auth/permissions';
 import { EmptyState } from '../_shared/empty-state';
@@ -34,6 +41,8 @@ export function ValidationQueue() {
     const pending = rawPending.filter((req) => req.declarationSigned && req.kyb?.termsAcceptedAt);
     const verifyArtisan = useVerifyArtisan();
     const rejectArtisan = useRejectArtisan();
+    const markOngoing = useMarkArtisanKybOngoing();
+    const markIncomplete = useMarkArtisanKybIncomplete();
 
     function approve(req: ArtisanProfileResponse) {
         verifyArtisan.mutate(req.id, {
@@ -66,6 +75,37 @@ export function ValidationQueue() {
                 onError: (err) =>
                     toast({
                         title: 'Échec du rejet',
+                        description: isApiError(err) ? err.message : undefined,
+                        variant: 'destructive',
+                    }),
+            },
+        );
+    }
+
+    function markOngoingAction(req: ArtisanProfileResponse) {
+        markOngoing.mutate(req.id, {
+            onError: (err) =>
+                toast({
+                    title: 'Échec',
+                    description: isApiError(err) ? err.message : undefined,
+                    variant: 'destructive',
+                }),
+        });
+    }
+
+    function markIncompleteAction(req: ArtisanProfileResponse) {
+        const reason = window.prompt(`Qu'est-ce qui manque pour ${req.userName} ?`) ?? undefined;
+        if (reason === undefined) return;
+        markIncomplete.mutate(
+            { id: req.id, reason },
+            {
+                onSuccess: () => {
+                    toast({ title: 'Dossier renvoyé', description: `${req.userName} a été notifié par e-mail.` });
+                    setSelected(null);
+                },
+                onError: (err) =>
+                    toast({
+                        title: 'Échec',
                         description: isApiError(err) ? err.message : undefined,
                         variant: 'destructive',
                     }),
@@ -174,8 +214,12 @@ export function ValidationQueue() {
                 kyb={selected?.kyb}
                 onApprove={() => selected && approve(selected)}
                 onReject={() => selected && reject(selected)}
+                onMarkOngoing={() => selected && markOngoingAction(selected)}
+                onMarkIncomplete={() => selected && markIncompleteAction(selected)}
                 approving={verifyArtisan.isPending}
                 rejecting={rejectArtisan.isPending}
+                markingOngoing={markOngoing.isPending}
+                markingIncomplete={markIncomplete.isPending}
                 canApprove={canVerify}
                 canReject={canReject}
             />

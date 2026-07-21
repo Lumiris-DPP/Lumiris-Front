@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
-import { CheckCircle2, Loader2, UploadCloud } from 'lucide-react';
+import { CheckCircle2, ExternalLink, Loader2, UploadCloud } from 'lucide-react';
 import type { KybDetailsRequest, KybDetailsResponse, KybDocumentLabel } from '@lumiris/api-client';
 import { Button } from '@lumiris/ui/components/button';
 import { Card } from '@lumiris/ui/components/card';
@@ -23,23 +23,26 @@ const DOCUMENTS: Array<{ key: KybDocumentLabel; title: string; hint: string }> =
     { key: 'rib', title: 'RIB', hint: 'pour les versements' },
 ];
 
-export interface DocumentUploadStatus {
-    idDoc: boolean;
-    kbis: boolean;
-    proofOfAddress: boolean;
-    rib: boolean;
+interface DocumentInfo {
+    uploaded: boolean;
+    url?: string;
+    expiresAt?: string;
 }
 
-function documentKeyToStatusKey(label: KybDocumentLabel): keyof DocumentUploadStatus {
+function documentInfo(kyb: KybDetailsResponse | undefined, label: KybDocumentLabel): DocumentInfo {
     switch (label) {
         case 'legal_representative_id_doc':
-            return 'idDoc';
+            return { uploaded: Boolean(kyb?.idDocUploaded), url: kyb?.idDocUrl, expiresAt: kyb?.idDocExpiresAt };
         case 'kbis':
-            return 'kbis';
+            return { uploaded: Boolean(kyb?.kbisUploaded), url: kyb?.kbisUrl, expiresAt: kyb?.kbisExpiresAt };
         case 'proof_of_address':
-            return 'proofOfAddress';
+            return {
+                uploaded: Boolean(kyb?.proofOfAddressUploaded),
+                url: kyb?.proofOfAddressUrl,
+                expiresAt: kyb?.proofOfAddressExpiresAt,
+            };
         case 'rib':
-            return 'rib';
+            return { uploaded: Boolean(kyb?.ribUploaded), url: kyb?.ribUrl, expiresAt: kyb?.ribExpiresAt };
     }
 }
 
@@ -48,9 +51,8 @@ interface KybFormProps {
     onSubmit: (req: KybDetailsRequest) => void;
     isSubmitting: boolean;
     submitError?: string | null;
-    onUploadDocument: (label: KybDocumentLabel, file: File) => void;
+    onUploadDocument: (label: KybDocumentLabel, file: File, expiresAt?: string) => void;
     uploadingLabel: KybDocumentLabel | null;
-    documentsUploaded: DocumentUploadStatus;
 }
 
 export function KybForm({
@@ -60,7 +62,6 @@ export function KybForm({
     submitError,
     onUploadDocument,
     uploadingLabel,
-    documentsUploaded,
 }: KybFormProps) {
     const [category, setCategory] = useState(String(initialKyb?.category ?? 1));
     const [businessEntity, setBusinessEntity] = useState(initialKyb?.businessEntity ?? '');
@@ -83,6 +84,12 @@ export function KybForm({
     );
     const [termsAccepted, setTermsAccepted] = useState(Boolean(initialKyb?.termsAcceptedAt));
     const [formError, setFormError] = useState<string | null>(null);
+    const [pendingExpiry, setPendingExpiry] = useState<Record<KybDocumentLabel, string>>({
+        legal_representative_id_doc: '',
+        kbis: '',
+        proof_of_address: '',
+        rib: '',
+    });
 
     function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -303,47 +310,83 @@ export function KybForm({
 
             <Card className="flex flex-col gap-3 p-5">
                 <h2 className="text-foreground text-sm font-semibold">Documents justificatifs</h2>
-                <ul className="flex flex-col gap-2">
+                <ul className="flex flex-col gap-3">
                     {DOCUMENTS.map((doc) => {
-                        const uploaded = documentsUploaded[documentKeyToStatusKey(doc.key)];
+                        const info = documentInfo(initialKyb, doc.key);
                         const uploading = uploadingLabel === doc.key;
                         return (
                             <li
                                 key={doc.key}
-                                className="border-border/60 bg-background flex items-center justify-between gap-3 rounded-lg border p-3"
+                                className="border-border/60 bg-background flex flex-col gap-2 rounded-lg border p-3"
                             >
-                                <div className="min-w-0">
-                                    <p className="text-foreground text-sm font-medium">{doc.title}</p>
-                                    <p className="text-muted-foreground text-xs">{doc.hint}</p>
+                                <div className="flex items-center justify-between gap-3">
+                                    <div className="min-w-0">
+                                        <p className="text-foreground text-sm font-medium">{doc.title}</p>
+                                        <p className="text-muted-foreground text-xs">{doc.hint}</p>
+                                    </div>
+                                    <div className="flex shrink-0 items-center gap-2">
+                                        {info.uploaded && info.url ? (
+                                            <a
+                                                href={info.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs underline underline-offset-2"
+                                            >
+                                                Voir <ExternalLink className="h-3 w-3" />
+                                            </a>
+                                        ) : null}
+                                        <label
+                                            className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium ${
+                                                info.uploaded
+                                                    ? 'border-lumiris-emerald/40 bg-lumiris-emerald/10 text-lumiris-emerald'
+                                                    : 'border-border bg-card text-muted-foreground hover:bg-muted'
+                                            }`}
+                                        >
+                                            {uploading ? (
+                                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                            ) : info.uploaded ? (
+                                                <CheckCircle2 className="h-3.5 w-3.5" />
+                                            ) : (
+                                                <UploadCloud className="h-3.5 w-3.5" />
+                                            )}
+                                            {info.uploaded ? 'Remplacer' : 'Téléverser'}
+                                            <input
+                                                type="file"
+                                                aria-label={doc.title}
+                                                accept="application/pdf,image/*"
+                                                className="sr-only"
+                                                disabled={uploading}
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    e.target.value = '';
+                                                    if (file)
+                                                        onUploadDocument(
+                                                            doc.key,
+                                                            file,
+                                                            pendingExpiry[doc.key] || undefined,
+                                                        );
+                                                }}
+                                            />
+                                        </label>
+                                    </div>
                                 </div>
-                                <label
-                                    className={`inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium ${
-                                        uploaded
-                                            ? 'border-lumiris-emerald/40 bg-lumiris-emerald/10 text-lumiris-emerald'
-                                            : 'border-border bg-card text-muted-foreground hover:bg-muted'
-                                    }`}
-                                >
-                                    {uploading ? (
-                                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                    ) : uploaded ? (
-                                        <CheckCircle2 className="h-3.5 w-3.5" />
-                                    ) : (
-                                        <UploadCloud className="h-3.5 w-3.5" />
-                                    )}
-                                    {uploaded ? 'Reçu' : 'Téléverser'}
-                                    <input
-                                        type="file"
-                                        aria-label={doc.title}
-                                        accept="application/pdf,image/*"
-                                        className="sr-only"
-                                        disabled={uploading}
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0];
-                                            e.target.value = '';
-                                            if (file) onUploadDocument(doc.key, file);
-                                        }}
+                                <div className="flex items-center gap-2">
+                                    <Label
+                                        htmlFor={`kyb-doc-expiry-${doc.key}`}
+                                        className="text-muted-foreground text-[11px]"
+                                    >
+                                        Date d&apos;expiration (optionnel)
+                                    </Label>
+                                    <Input
+                                        id={`kyb-doc-expiry-${doc.key}`}
+                                        type="date"
+                                        value={pendingExpiry[doc.key] || info.expiresAt || ''}
+                                        onChange={(e) =>
+                                            setPendingExpiry((prev) => ({ ...prev, [doc.key]: e.target.value }))
+                                        }
+                                        className="h-7 w-40 text-xs"
                                     />
-                                </label>
+                                </div>
                             </li>
                         );
                     })}

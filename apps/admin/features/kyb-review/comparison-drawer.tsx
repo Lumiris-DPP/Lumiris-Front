@@ -1,7 +1,7 @@
 'use client';
 
-import { AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
-import type { KybDetailsResponse } from '@lumiris/api-client';
+import { AlertTriangle, CheckCircle2, Clock3, ExternalLink, FileWarning, XCircle } from 'lucide-react';
+import type { KybDetailsResponse, KybStatus } from '@lumiris/api-client';
 import { Badge } from '@lumiris/ui/components/badge';
 import { Button } from '@lumiris/ui/components/button';
 import { DetailDrawer } from '@lumiris/ui/components/detail-drawer';
@@ -10,6 +10,22 @@ const CATEGORY_LABEL: Record<number, string> = {
     0: 'Entreprise individuelle (Solo)',
     1: 'Société',
     2: 'Association',
+};
+
+const KYB_STATUS_LABEL: Record<KybStatus, string> = {
+    PENDING: 'En attente',
+    ONGOING: 'En cours de revue',
+    VALIDATED: 'Validé',
+    REJECTED: 'Rejeté',
+    INCOMPLETE: 'Incomplet',
+};
+
+const KYB_STATUS_TONE: Record<KybStatus, string> = {
+    PENDING: 'bg-lumiris-amber/10 text-lumiris-amber border-lumiris-amber/30',
+    ONGOING: 'bg-lumiris-cyan/10 text-lumiris-cyan border-lumiris-cyan/30',
+    VALIDATED: 'bg-lumiris-emerald/10 text-lumiris-emerald border-lumiris-emerald/30',
+    REJECTED: 'bg-lumiris-rose/10 text-lumiris-rose border-lumiris-rose/30',
+    INCOMPLETE: 'bg-lumiris-amber/10 text-lumiris-amber border-lumiris-amber/30',
 };
 
 interface Dirigeant {
@@ -45,6 +61,11 @@ function looksConsistent(declared: string, sirene?: string): boolean | null {
     return d.length > 0 && (s.includes(d.slice(0, 12)) || d.includes(s.slice(0, 12)));
 }
 
+function isExpired(dateIso?: string): boolean {
+    if (!dateIso) return false;
+    return new Date(dateIso).getTime() < Date.now();
+}
+
 function ConsistencyBadge({ consistent }: { consistent: boolean | null }) {
     if (consistent === null) return null;
     return consistent ? (
@@ -58,19 +79,63 @@ function ConsistencyBadge({ consistent }: { consistent: boolean | null }) {
     );
 }
 
-function DocRow({ label, uploaded }: { label: string; uploaded: boolean }) {
+function DocRow({
+    label,
+    uploaded,
+    url,
+    expiresAt,
+    nameMatch,
+}: {
+    label: string;
+    uploaded: boolean;
+    url?: string;
+    expiresAt?: string;
+    nameMatch?: boolean;
+}) {
+    const expired = isExpired(expiresAt);
     return (
-        <div className="flex items-center justify-between gap-2 text-sm">
-            <span className="text-foreground">{label}</span>
-            {uploaded ? (
-                <span className="text-lumiris-emerald inline-flex items-center gap-1 text-xs font-medium">
-                    <CheckCircle2 className="h-3.5 w-3.5" /> Reçu
-                </span>
-            ) : (
-                <span className="text-destructive inline-flex items-center gap-1 text-xs font-medium">
-                    <XCircle className="h-3.5 w-3.5" /> Manquant
-                </span>
-            )}
+        <div className="flex flex-col gap-1 text-sm">
+            <div className="flex items-center justify-between gap-2">
+                <span className="text-foreground">{label}</span>
+                <div className="flex items-center gap-2">
+                    {uploaded ? (
+                        <span className="text-lumiris-emerald inline-flex items-center gap-1 text-xs font-medium">
+                            <CheckCircle2 className="h-3.5 w-3.5" /> Reçu
+                        </span>
+                    ) : (
+                        <span className="text-destructive inline-flex items-center gap-1 text-xs font-medium">
+                            <XCircle className="h-3.5 w-3.5" /> Manquant
+                        </span>
+                    )}
+                    {uploaded && url ? (
+                        <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-lumiris-cyan inline-flex items-center gap-1 text-xs underline underline-offset-2"
+                        >
+                            Voir <ExternalLink className="h-3 w-3" />
+                        </a>
+                    ) : null}
+                </div>
+            </div>
+            {uploaded && expiresAt ? (
+                <p className={`text-[11px] ${expired ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>
+                    {expired ? 'Expiré le' : 'Expire le'} {new Date(expiresAt).toLocaleDateString('fr-FR')}
+                    {expired ? ' — à renouveler' : ''}
+                </p>
+            ) : null}
+            {nameMatch !== undefined ? (
+                nameMatch ? (
+                    <span className="text-lumiris-emerald inline-flex w-fit items-center gap-1 text-[11px]">
+                        <CheckCircle2 className="h-3 w-3" /> Nom du représentant détecté sur le document (OCR)
+                    </span>
+                ) : (
+                    <span className="text-lumiris-amber inline-flex w-fit items-center gap-1 text-[11px]">
+                        <FileWarning className="h-3 w-3" /> Nom du représentant non détecté sur le document (OCR)
+                    </span>
+                )
+            ) : null}
         </div>
     );
 }
@@ -93,8 +158,12 @@ export interface KybComparisonDrawerProps {
     kyb?: KybDetailsResponse;
     onApprove: () => void;
     onReject: () => void;
+    onMarkOngoing: () => void;
+    onMarkIncomplete: () => void;
     approving: boolean;
     rejecting: boolean;
+    markingOngoing: boolean;
+    markingIncomplete: boolean;
     canApprove: boolean;
     canReject: boolean;
 }
@@ -108,8 +177,12 @@ export function KybComparisonDrawer({
     kyb,
     onApprove,
     onReject,
+    onMarkOngoing,
+    onMarkIncomplete,
     approving,
     rejecting,
+    markingOngoing,
+    markingIncomplete,
     canApprove,
     canReject,
 }: KybComparisonDrawerProps) {
@@ -122,6 +195,7 @@ export function KybComparisonDrawer({
     const addressConsistent = looksConsistent(declaredAddress, kyb?.sireneSiegeAddress);
     const dirigeants = parseDirigeants(kyb?.sireneDirigeantsJson);
     const repFullName = [kyb?.repFirstName, kyb?.repLastName].filter(Boolean).join(' ');
+    const pending = approving || rejecting || markingOngoing || markingIncomplete;
 
     return (
         <DetailDrawer
@@ -132,6 +206,23 @@ export function KybComparisonDrawer({
             width="lg"
         >
             <div className="flex flex-col gap-6">
+                {kyb ? (
+                    <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground text-[11px] uppercase tracking-wide">
+                            Statut du dossier
+                        </span>
+                        <Badge variant="outline" className={`font-mono text-[10px] ${KYB_STATUS_TONE[kyb.kybStatus]}`}>
+                            {KYB_STATUS_LABEL[kyb.kybStatus]}
+                        </Badge>
+                    </div>
+                ) : null}
+                {kyb?.kybReviewNote ? (
+                    <p className="border-border/60 bg-background rounded-lg border p-3 text-xs">
+                        <span className="text-muted-foreground">Note admin : </span>
+                        {kyb.kybReviewNote}
+                    </p>
+                ) : null}
+
                 <section className="flex flex-col gap-3">
                     <h3 className="text-foreground text-sm font-semibold">Entité juridique déclarée</h3>
                     <div className="grid grid-cols-2 gap-3">
@@ -208,18 +299,59 @@ export function KybComparisonDrawer({
                     )}
                 </section>
 
-                <section className="flex flex-col gap-2">
+                <section className="flex flex-col gap-3">
                     <h3 className="text-foreground text-sm font-semibold">Documents</h3>
-                    <DocRow label="Pièce d'identité du représentant" uploaded={Boolean(kyb?.idDocUploaded)} />
-                    <DocRow label="Extrait KBIS" uploaded={Boolean(kyb?.kbisUploaded)} />
-                    <DocRow label="Justificatif de domicile" uploaded={Boolean(kyb?.proofOfAddressUploaded)} />
-                    <DocRow label="RIB" uploaded={Boolean(kyb?.ribUploaded)} />
+                    <DocRow
+                        label="Pièce d'identité du représentant"
+                        uploaded={Boolean(kyb?.idDocUploaded)}
+                        url={kyb?.idDocUrl}
+                        expiresAt={kyb?.idDocExpiresAt}
+                        nameMatch={kyb?.idDocNameMatch}
+                    />
+                    <DocRow
+                        label="Extrait KBIS"
+                        uploaded={Boolean(kyb?.kbisUploaded)}
+                        url={kyb?.kbisUrl}
+                        expiresAt={kyb?.kbisExpiresAt}
+                    />
+                    <DocRow
+                        label="Justificatif de domicile"
+                        uploaded={Boolean(kyb?.proofOfAddressUploaded)}
+                        url={kyb?.proofOfAddressUrl}
+                        expiresAt={kyb?.proofOfAddressExpiresAt}
+                    />
+                    <DocRow
+                        label="RIB"
+                        uploaded={Boolean(kyb?.ribUploaded)}
+                        url={kyb?.ribUrl}
+                        expiresAt={kyb?.ribExpiresAt}
+                    />
                 </section>
 
-                <div className="flex justify-end gap-2 pt-2">
+                <div className="flex flex-wrap justify-end gap-2 pt-2">
                     <Button
                         size="sm"
-                        disabled={!canReject || rejecting}
+                        variant="outline"
+                        disabled={pending}
+                        onClick={onMarkOngoing}
+                        className="h-8 gap-1.5"
+                    >
+                        <Clock3 className="h-3.5 w-3.5" />
+                        En cours
+                    </Button>
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={!canReject || pending}
+                        onClick={onMarkIncomplete}
+                        className="border-lumiris-amber/40 text-lumiris-amber hover:bg-lumiris-amber/10 h-8 gap-1.5"
+                    >
+                        <FileWarning className="h-3.5 w-3.5" />
+                        Incomplet
+                    </Button>
+                    <Button
+                        size="sm"
+                        disabled={!canReject || pending}
                         onClick={onReject}
                         className="bg-lumiris-rose hover:bg-lumiris-rose/90 h-8 gap-1.5 text-white disabled:opacity-40"
                     >
@@ -228,12 +360,12 @@ export function KybComparisonDrawer({
                     </Button>
                     <Button
                         size="sm"
-                        disabled={!canApprove || approving}
+                        disabled={!canApprove || pending}
                         onClick={onApprove}
                         className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 h-8 gap-1.5 text-white disabled:opacity-40"
                     >
                         <CheckCircle2 className="h-3.5 w-3.5" />
-                        Approuver
+                        Valider
                     </Button>
                 </div>
             </div>

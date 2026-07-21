@@ -194,11 +194,11 @@ export default function OnboardingPage() {
         });
     }
 
-    function handleUploadDocument(label: KybDocumentLabel, file: File) {
+    function handleUploadDocument(label: KybDocumentLabel, file: File, expiresAt?: string) {
         setUploadingLabel(label);
         const mutation = isRepairer ? uploadRepairerKybDoc : uploadArtisanKybDoc;
         mutation.mutate(
-            { label, file },
+            { label, file, expiresAt },
             {
                 onSettled: () => setUploadingLabel(null),
                 onError: (err) => setKybError(isApiError(err) ? err.message : "Échec de l'envoi du document."),
@@ -208,12 +208,6 @@ export default function OnboardingPage() {
 
     const isSubmittingKyb = isRepairer ? submitRepairerKyb.isPending : submitArtisanKyb.isPending;
     const kybResponse = isRepairer ? repairerMe.data?.kyb : me.data?.kyb;
-    const documentsUploaded = {
-        idDoc: Boolean(kybResponse?.idDocUploaded),
-        kbis: Boolean(kybResponse?.kbisUploaded),
-        proofOfAddress: Boolean(kybResponse?.proofOfAddressUploaded),
-        rib: Boolean(kybResponse?.ribUploaded),
-    };
 
     return (
         <div className="flex min-h-screen flex-col bg-background">
@@ -374,7 +368,6 @@ export default function OnboardingPage() {
                                 isSubmitting={isSubmittingKyb}
                                 submitError={kybError}
                                 uploadingLabel={uploadingLabel}
-                                documentsUploaded={documentsUploaded}
                                 onUploadDocument={handleUploadDocument}
                                 onSubmit={(req) => {
                                     setKybError(null);
