@@ -24,10 +24,6 @@ import {
 const dppFormSummaryListSchema = z.array(dppFormSummaryDtoSchema);
 const dppEventListSchema = z.array(dppEventDtoSchema);
 
-// Réponse de POST /api/dpp-forms/{id}/withdraw — le backend ne renvoie que l'id retiré.
-export const dppWithdrawnDtoSchema = z.object({ id: z.string() });
-export type DppWithdrawnDto = z.infer<typeof dppWithdrawnDtoSchema>;
-
 const FIXED_WEIGHTS = { transparency: 0.4, craftsmanship: 0.25, impact: 0.25, repairability: 0.1 } as const;
 
 function toScoreResult(dto: IrisScoreDto): ScoreResult {
@@ -95,14 +91,6 @@ export function dppApi(http: Http) {
             return parseOr(
                 dppFormCreatedDtoSchema,
                 await http.request(`/api/dpp-forms/${id}/publish`, { method: 'POST' }),
-            );
-        },
-        // Retire un passeport PUBLIÉ (VALID → INVALID) et archive son annonce marketplace.
-        // 409 si le DPP n'est pas publié.
-        async withdraw(id: string): Promise<DppWithdrawnDto> {
-            return parseOr(
-                dppWithdrawnDtoSchema,
-                await http.request(`/api/dpp-forms/${id}/withdraw`, { method: 'POST' }),
             );
         },
         async listEvents(id: string): Promise<DppEventDto[]> {
