@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetClose } from '@lumiris/ui/components/sheet';
 
 const navLinks = [
@@ -44,12 +45,7 @@ export function Header() {
         >
             <nav className="flex items-center justify-between px-6 py-3" aria-label="Navigation principale">
                 <Link href="/" className="group flex items-center gap-2.5" aria-label="Accueil LUMIRIS">
-                    <div className="relative h-7 w-7">
-                        <div className="prismatic-bg absolute inset-0 rounded-lg opacity-90" />
-                        <div className="bg-card absolute inset-[2.5px] flex items-center justify-center rounded-[5px]">
-                            <span className="text-foreground font-mono text-[10px] font-bold">L</span>
-                        </div>
-                    </div>
+                    <LumirisLogo className="h-7 w-auto" />
                     <span className="text-foreground text-base font-semibold tracking-tight">LUMIRIS</span>
                 </Link>
 
@@ -90,12 +86,7 @@ export function Header() {
                     <SheetContent side="right" className="w-[300px] sm:w-[350px]">
                         <SheetHeader>
                             <SheetTitle className="flex items-center gap-2.5">
-                                <div className="relative h-7 w-7">
-                                    <div className="prismatic-bg absolute inset-0 rounded-lg opacity-90" />
-                                    <div className="bg-card absolute inset-[2.5px] flex items-center justify-center rounded-[5px]">
-                                        <span className="text-foreground font-mono text-[10px] font-bold">L</span>
-                                    </div>
-                                </div>
+                                <LumirisLogo className="h-7 w-auto" />
                                 <span className="text-foreground text-base font-semibold tracking-tight">LUMIRIS</span>
                             </SheetTitle>
                         </SheetHeader>

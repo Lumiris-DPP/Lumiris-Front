@@ -21,6 +21,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
     title: 'LUMIRIS | Console',
     description: 'Console LUMIRIS · audit, curation, gouvernance.',
+    icons: {
+        icon: '/icon.svg',
+        apple: '/icon.svg',
+    },
 };
 
 export const viewport: Viewport = {

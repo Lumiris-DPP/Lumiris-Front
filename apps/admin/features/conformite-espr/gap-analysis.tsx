@@ -42,7 +42,7 @@ export function GapAnalysis({ gaps, totalArtisans }: GapAnalysisProps) {
                     size="sm"
                     onClick={() => setDialogOpen(true)}
                     disabled={gaps.length === 0}
-                    className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 gap-1.5"
+                    className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 gap-1.5"
                 >
                     <Megaphone className="h-3.5 w-3.5" /> Lancer campagne
                 </Button>
@@ -189,7 +189,7 @@ function CampaignDialog({
                     <AlertDialogAction
                         onClick={handleLaunch}
                         disabled={gaps.length === 0}
-                        className="bg-lumiris-emerald hover:bg-lumiris-emerald/90"
+                        className="bg-lumiris-cyan hover:bg-lumiris-cyan/90"
                     >
                         Lancer · {gaps.length}
                     </AlertDialogAction>

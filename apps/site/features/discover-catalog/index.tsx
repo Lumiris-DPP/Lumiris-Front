@@ -215,7 +215,7 @@ export function DiscoverCatalog() {
                                     <Link href={`/passeport/${item.passport.id}`} className="group block">
                                         <div className="bg-card border-border overflow-hidden rounded-xl border transition-shadow hover:shadow-lg">
                                             <div className="relative aspect-[4/5]">
-                                                <div className="absolute inset-0 bg-gradient-to-br from-slate-100 via-cyan-50 to-violet-50" />
+                                                <div className="absolute inset-0 bg-gradient-to-br from-slate-100 via-lumiris-cyan/10 to-lumiris-iris/10" />
                                                 <div className="absolute left-2.5 top-2.5">
                                                     <IrisGrade grade={item.irisScore?.grade ?? 'B'} size="sm" />
                                                 </div>
@@ -361,12 +361,12 @@ export function DiscoverCatalog() {
                                                                         {(artisan.epvLabeled || artisan.ofgLabeled) && (
                                                                             <div className="flex gap-1">
                                                                                 {artisan.epvLabeled && (
-                                                                                    <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">
+                                                                                    <span className="rounded bg-lumiris-amber/10 px-1.5 py-0.5 text-[10px] font-bold text-lumiris-amber">
                                                                                         EPV
                                                                                     </span>
                                                                                 )}
                                                                                 {artisan.ofgLabeled && (
-                                                                                    <span className="rounded bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold text-blue-700">
+                                                                                    <span className="rounded bg-lumiris-cyan/10 px-1.5 py-0.5 text-[10px] font-bold text-lumiris-cyan">
                                                                                         OFG
                                                                                     </span>
                                                                                 )}

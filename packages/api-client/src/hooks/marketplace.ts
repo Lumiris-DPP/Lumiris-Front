@@ -29,8 +29,42 @@ export const marketplaceKeys = {
     search: (params?: MarketplaceSearchParams) => ['marketplace', 'search', params] as const,
     suggest: (input?: SuggestInput | null) => ['marketplace', 'suggest', input] as const,
     products: () => ['marketplace', 'products'] as const,
+    publicProduct: (id: string) => ['marketplace', 'public-product', id] as const,
+    productByDpp: (dppFormId: string) => ['marketplace', 'product-by-dpp', dppFormId] as const,
     decisionLog: (id: string) => ['marketplace', 'decision-log', id] as const,
 };
+
+// Fiche produit publique unique (catalogue). La query reste désactivée tant qu'aucun id n'est
+// fourni ; un 404 (NOT_FOUND, non rejoué) signifie « pièce introuvable / plus publiée ».
+export function useMarketplaceProduct(
+    id?: string | null,
+    options?: Omit<UseQueryOptions<MarketplaceItem, Error>, 'queryKey' | 'queryFn'>,
+) {
+    const client = useApiClient();
+    return useQuery<MarketplaceItem, Error>({
+        queryKey: marketplaceKeys.publicProduct(id ?? ''),
+        queryFn: () => client.marketplace.getPublicProduct(id as string),
+        enabled: Boolean(id),
+        staleTime: CACHE_TIMES.DETAIL,
+        ...options,
+    });
+}
+
+// Produit Boutique publié rattaché à un passeport scanné (formId du DPP). Un 404 est
+// attendu et normal (aucune annonce) : le caller masque simplement le CTA d'achat.
+export function useMarketplaceProductByDpp(
+    dppFormId?: string | null,
+    options?: Omit<UseQueryOptions<MarketplaceItem, Error>, 'queryKey' | 'queryFn'>,
+) {
+    const client = useApiClient();
+    return useQuery<MarketplaceItem, Error>({
+        queryKey: marketplaceKeys.productByDpp(dppFormId ?? ''),
+        queryFn: () => client.marketplace.getProductByDpp(dppFormId as string),
+        enabled: Boolean(dppFormId),
+        staleTime: CACHE_TIMES.DETAIL,
+        ...options,
+    });
+}
 
 // Catalogue public filtré (catégorie/matière/origine) + reco perso (personalize).
 export function useMarketplaceSearch(

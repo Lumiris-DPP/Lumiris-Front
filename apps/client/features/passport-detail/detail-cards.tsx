@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, Clock, ExternalLink, XCircle } from 'lucide-react';
 import { formatDateFr } from '@lumiris/utils';
 import type { Passport, ScoreResult } from '@lumiris/types';
 import {
@@ -27,11 +27,11 @@ export function InfoRow({ label, value }: { label: string; value: React.ReactNod
 export function BooleanField({ value }: { value: boolean | null | undefined }) {
     if (value === null || value === undefined) return <span className="text-muted-foreground text-sm">—</span>;
     return value ? (
-        <span className="flex items-center gap-1 text-sm text-green-600">
+        <span className="flex items-center gap-1 text-sm text-lumiris-emerald">
             <CheckCircle className="h-3.5 w-3.5" /> Oui
         </span>
     ) : (
-        <span className="flex items-center gap-1 text-sm text-red-500">
+        <span className="flex items-center gap-1 text-sm text-lumiris-rose">
             <XCircle className="h-3.5 w-3.5" /> Non
         </span>
     );
@@ -205,6 +205,68 @@ export function SustainabilityCard({ view }: { view: DetailView }) {
                     </FieldGroup>
                     <InfoRow label="Instructions fin de vie" value={view.endOfLifeInstructions} />
                 </div>
+            </CardContent>
+        </Card>
+    );
+}
+
+// Explorateur Sepolia (testnet) : le backend ancre l'empreinte du DPP sur ce réseau.
+const SEPOLIA_TX_BASE = 'https://sepolia.etherscan.io/tx/';
+
+// Rend visible une revendication de confiance centrale : l'ancrage on-chain de l'empreinte du DPP.
+export function BlockchainAnchorCard({ view }: { view: DetailView }) {
+    const status = view.blockchainAnchorStatus?.toUpperCase();
+    if (!status) return null;
+
+    const meta =
+        status === 'ANCHORED'
+            ? {
+                  label: 'Ancré',
+                  icon: <CheckCircle className="h-4 w-4 text-lumiris-emerald" aria-hidden />,
+                  className: 'text-lumiris-emerald',
+              }
+            : status === 'FAILED'
+              ? {
+                    label: 'Échec de l’ancrage',
+                    icon: <XCircle className="h-4 w-4 text-lumiris-rose" aria-hidden />,
+                    className: 'text-lumiris-rose',
+                }
+              : {
+                    label: 'En attente',
+                    icon: <Clock className="text-lumiris-amber h-4 w-4" aria-hidden />,
+                    className: 'text-lumiris-amber',
+                };
+
+    const hash = view.blockchainTxHash;
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Ancrage blockchain</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+                <div className="flex items-center gap-2">
+                    {meta.icon}
+                    <span className={`text-sm font-medium ${meta.className}`}>{meta.label}</span>
+                </div>
+                <p className="text-muted-foreground text-xs">
+                    L&apos;empreinte de ce passeport est scellée sur la blockchain Ethereum (Sepolia) — une preuve
+                    d&apos;intégrité infalsifiable.
+                </p>
+                {status === 'ANCHORED' && hash && (
+                    <div className="flex flex-col gap-1">
+                        <span className="text-muted-foreground text-[11px] uppercase tracking-wider">Transaction</span>
+                        <a
+                            href={`${SEPOLIA_TX_BASE}${hash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-lumiris-cyan inline-flex items-center gap-1 break-all font-mono text-xs hover:underline"
+                        >
+                            {hash}
+                            <ExternalLink className="h-3 w-3 shrink-0" aria-hidden />
+                        </a>
+                    </div>
+                )}
             </CardContent>
         </Card>
     );

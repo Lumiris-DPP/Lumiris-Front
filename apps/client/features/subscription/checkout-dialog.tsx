@@ -70,7 +70,7 @@ export function CheckoutDialog({
                         stripe={stripePromise}
                         options={{
                             clientSecret: intent.clientSecret,
-                            appearance: { theme: 'flat', variables: { colorPrimary: '#10b981' } },
+                            appearance: { theme: 'flat', variables: { colorPrimary: '#0e6e88' } },
                         }}
                     >
                         <CheckoutForm
@@ -139,7 +139,7 @@ function CheckoutForm({ amountLabel, onConfirmed }: { amountLabel: string; onCon
                 type="button"
                 onClick={handlePay}
                 disabled={!stripe || submitting}
-                className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 h-10 w-full text-white"
+                className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 h-10 w-full text-white"
             >
                 {submitting ? (
                     <>

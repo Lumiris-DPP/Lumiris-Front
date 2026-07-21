@@ -2,6 +2,7 @@
 
 import { use, useMemo } from 'react';
 import { formatDateFr } from '@lumiris/utils';
+import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { useBilling, useBillingHydrated } from '@/lib/billing-store';
 import { useCurrentArtisan } from '@/lib/current-artisan';
 import { useAutoPrint } from '@/lib/use-auto-print';
@@ -34,6 +35,7 @@ export default function PrintReceiptPage({ params }: PageProps) {
         <div className="bg-white text-neutral-900">
             <div className="mx-auto flex min-h-screen w-[105mm] flex-col gap-4 p-6 print:min-h-0">
                 <header className="space-y-1 border-b border-neutral-300 pb-3">
+                    <LumirisLogo title="" className="mb-1 h-5 w-auto" />
                     <p className="font-mono text-[10px] uppercase tracking-widest text-neutral-500">
                         LUMIRIS · Atelier
                     </p>

@@ -178,7 +178,7 @@ export function StepCredentials({ role, onBack, onSuccess }: StepCredentialsProp
                 <Button
                     type="submit"
                     disabled={registerMutation.isPending}
-                    className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 mt-1 h-10 w-full text-white"
+                    className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 mt-1 h-10 w-full text-white"
                 >
                     {registerMutation.isPending ? 'Création…' : 'Créer mon compte'}
                 </Button>

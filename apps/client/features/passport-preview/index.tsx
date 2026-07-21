@@ -84,7 +84,7 @@ export function PassportPreview({ passport, artisan }: PassportPreviewProps) {
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="text-lumiris-emerald hover:text-lumiris-emerald/80 -ml-3"
+                            className="text-lumiris-cyan hover:text-lumiris-cyan/80 -ml-3"
                             onClick={scrollToStory}
                         >
                             Lire la suite

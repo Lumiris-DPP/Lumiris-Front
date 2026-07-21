@@ -8,18 +8,20 @@ import { mockPassportById } from '@lumiris/mock-data';
 import type { IrisGrade } from '@lumiris/types';
 import { useApiClient } from '@lumiris/api-client/react';
 import type { DppFormDto, IrisScoreDto } from '@lumiris/api-client';
+import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { draftToPassport, useDraftStore } from '@/lib/draft-store';
 
 interface PageProps {
     params: Promise<{ id: string }>;
 }
 
+// Échelle de grade Iris de marque (aligne l'impression sur prismatic.css : A=emerald … E=rose).
 const GRADE_HEX: Record<IrisGrade, string> = {
-    A: '#10a37f',
-    B: '#0891b2',
-    C: '#d97706',
-    D: '#ea580c',
-    E: '#e11d48',
+    A: '#0f8a50', // lumiris-emerald
+    B: '#0e6e88', // lumiris-cyan
+    C: '#7b2fe0', // lumiris-iris
+    D: '#cf7415', // lumiris-amber
+    E: '#c81f45', // lumiris-rose
 };
 
 const FIBER_LABEL_FR: Record<string, string> = {
@@ -146,7 +148,12 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                     {/* En-tête */}
                     <header className="flex items-start justify-between border-b border-neutral-300 pb-3">
                         <div className="space-y-0.5">
-                            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-500">LUMIRIS</p>
+                            <div className="mb-1 flex items-center gap-1.5">
+                                <LumirisLogo title="" className="h-4 w-auto" />
+                                <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-500">
+                                    LUMIRIS
+                                </p>
+                            </div>
                             <p className="text-base font-semibold leading-tight">
                                 {dpp.productName ?? 'Produit sans nom'}
                             </p>
@@ -301,11 +308,11 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                                     <dd className="flex items-center gap-1">
                                         {dpp.reachCompliant ? (
                                             <>
-                                                <CheckCircle className="h-3 w-3 text-green-600" /> Oui
+                                                <CheckCircle className="h-3 w-3 text-lumiris-emerald" /> Oui
                                             </>
                                         ) : (
                                             <>
-                                                <XCircle className="h-3 w-3 text-red-500" /> Non
+                                                <XCircle className="h-3 w-3 text-lumiris-rose" /> Non
                                             </>
                                         )}
                                     </dd>
@@ -338,11 +345,11 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                                     <dd className="flex items-center gap-1">
                                         {dpp.isRepairable ? (
                                             <>
-                                                <CheckCircle className="h-3 w-3 text-green-600" /> Oui
+                                                <CheckCircle className="h-3 w-3 text-lumiris-emerald" /> Oui
                                             </>
                                         ) : (
                                             <>
-                                                <XCircle className="h-3 w-3 text-red-500" /> Non
+                                                <XCircle className="h-3 w-3 text-lumiris-rose" /> Non
                                             </>
                                         )}
                                     </dd>

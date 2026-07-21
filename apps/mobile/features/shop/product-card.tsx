@@ -9,7 +9,7 @@ import type { IrisGrade as IrisGradeValue } from '@lumiris/types';
 import { useTrackAffiliate } from '@lumiris/api-client/react';
 import type { MarketplaceItem } from '@lumiris/api-client';
 import { cn } from '@lumiris/ui/lib/cn';
-import { formatPriceCents } from '@lumiris/utils';
+import { formatCents } from '@/lib/marketplace';
 import { AtelierPlusBadge } from './atelier-plus-badge';
 import { materialLabel } from './labels';
 
@@ -87,9 +87,7 @@ export function ProductCard({ item, index, source = 'shop' }: ProductCardProps) 
                     {item.material ? ` · ${materialLabel(item.material)}` : ''}
                 </p>
                 <div className="mt-1 flex items-center justify-between gap-2">
-                    <p className="text-foreground text-xs font-bold">
-                        {formatPriceCents(item.priceCents, item.currency)}
-                    </p>
+                    <p className="text-foreground text-xs font-bold">{formatCents(item.priceCents)}</p>
                     {inApp ? (
                         <ShoppingBag className="text-primary h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden />
                     ) : href ? (

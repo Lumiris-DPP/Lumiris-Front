@@ -37,9 +37,9 @@ const STEPS: readonly Step[] = [
         step: '03',
         title: 'Fabrication',
         description: 'Documentez filature, tissage, confection. Ajoutez vos certifications.',
-        iconBg: 'bg-lumiris-emerald/10',
-        iconText: 'text-lumiris-emerald',
-        accentText: 'text-lumiris-emerald',
+        iconBg: 'bg-lumiris-cyan/10',
+        iconText: 'text-lumiris-cyan',
+        accentText: 'text-lumiris-cyan',
     },
     {
         icon: QrCode,

@@ -45,7 +45,7 @@ export function PassportsList() {
                     title="Vous n'avez pas encore de passeport"
                     description="Créez votre premier passeport numérique produit pour documenter une pièce textile et générer son QR."
                 >
-                    <CreatePassportCta className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 text-white">
+                    <CreatePassportCta className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 text-white">
                         Créer mon premier passeport
                     </CreatePassportCta>
                 </EmptyState>

@@ -321,7 +321,7 @@ function ActionButton({ onClick, label, Icon, active = false }: ActionButtonProp
             onClick={onClick}
             className={cn(
                 'flex flex-1 flex-col items-center gap-0.5 rounded-lg px-2 py-1.5 transition-colors active:scale-95',
-                active ? 'text-lumiris-emerald' : 'text-foreground/80 hover:text-foreground',
+                active ? 'text-lumiris-cyan' : 'text-foreground/80 hover:text-foreground',
             )}
         >
             <Icon className="h-5 w-5" aria-hidden />

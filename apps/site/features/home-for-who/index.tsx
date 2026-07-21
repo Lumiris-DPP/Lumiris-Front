@@ -56,12 +56,12 @@ export function HomeForWho() {
                             <div className="bg-card border-border group relative h-full overflow-hidden rounded-2xl border p-6 transition-shadow hover:shadow-lg sm:p-8">
                                 <div
                                     className={`flex h-12 w-12 items-center justify-center rounded-xl ${
-                                        persona.accent === 'cyan' ? 'bg-cyan-500/10' : 'bg-violet-500/10'
+                                        persona.accent === 'cyan' ? 'bg-lumiris-cyan/10' : 'bg-lumiris-iris/10'
                                     }`}
                                 >
                                     <persona.icon
                                         className={`h-6 w-6 ${
-                                            persona.accent === 'cyan' ? 'text-cyan-600' : 'text-violet-600'
+                                            persona.accent === 'cyan' ? 'text-lumiris-cyan' : 'text-lumiris-iris'
                                         }`}
                                     />
                                 </div>
@@ -73,8 +73,8 @@ export function HomeForWho() {
                                     href={persona.href}
                                     className={`mt-5 inline-flex items-center gap-1.5 text-sm font-medium transition-colors ${
                                         persona.accent === 'cyan'
-                                            ? 'text-cyan-600 hover:text-cyan-700'
-                                            : 'text-violet-600 hover:text-violet-700'
+                                            ? 'text-lumiris-cyan hover:text-lumiris-cyan/90'
+                                            : 'text-lumiris-iris hover:text-lumiris-iris/90'
                                     }`}
                                 >
                                     {persona.cta}

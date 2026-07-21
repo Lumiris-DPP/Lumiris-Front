@@ -48,7 +48,7 @@ export function PassportTable({ rows, onShowQr, onDuplicate, onPreview, onDelete
                                 <TableCell>
                                     <Link
                                         href={`/passports/${passport.id}`}
-                                        className="text-foreground hover:text-lumiris-emerald block font-medium"
+                                        className="text-foreground hover:text-lumiris-cyan block font-medium"
                                     >
                                         {passport.garment.reference || 'Brouillon'}
                                     </Link>

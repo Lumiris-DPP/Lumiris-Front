@@ -3,6 +3,7 @@
 import { memo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { cn } from '@lumiris/ui/lib/cn';
 import { useCurrentUser } from '@/lib/auth';
 import { can } from '@/lib/auth/permissions';
@@ -26,9 +27,7 @@ function SidebarComponent() {
     return (
         <aside className="border-border bg-sidebar fixed left-0 top-0 z-40 flex h-screen w-60 flex-col border-r">
             <div className="border-border flex items-center gap-3 border-b px-5 py-6">
-                <div className="bg-lumiris-cyan flex h-8 w-8 items-center justify-center rounded-lg">
-                    <div className="bg-primary-foreground h-3 w-3 rounded-sm" />
-                </div>
+                <LumirisLogo className="h-8 w-auto" />
                 <div>
                     <h1 className="text-foreground text-sm font-semibold tracking-wide">LUMIRIS</h1>
                 </div>

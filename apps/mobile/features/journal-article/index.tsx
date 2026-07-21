@@ -50,7 +50,7 @@ export function JournalArticle({ article }: JournalArticleProps) {
                         className="aspect-video rounded-2xl opacity-30"
                         style={{
                             background:
-                                'linear-gradient(135deg, var(--lumiris-emerald), var(--lumiris-cyan), var(--lumiris-amber))',
+                                'linear-gradient(135deg, var(--lumiris-iris), var(--lumiris-cyan), var(--lumiris-amber))',
                         }}
                     />
                 )}

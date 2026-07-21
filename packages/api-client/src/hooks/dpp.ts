@@ -20,6 +20,8 @@ import type {
     DppFormSummaryDto,
 } from '../types/dpp';
 
+import type { DppWithdrawnDto } from '../modules/dpp';
+
 import { useApiClient } from '../core/provider';
 import { subscriptionKeys } from './subscription';
 
@@ -129,6 +131,21 @@ export function useDeleteDppForm(options?: Omit<UseMutationOptions<void, Error, 
         onSuccess: (...args) => {
             void queryClient.invalidateQueries({ queryKey: dppKeys.all });
             return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+// Retire un passeport publié (VALID → INVALID) et délite son annonce marketplace. 409 sinon.
+export function useWithdrawDpp(options?: Omit<UseMutationOptions<DppWithdrawnDto, Error, string>, 'mutationFn'>) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<DppWithdrawnDto, Error, string>({
+        mutationFn: (id) => client.dpp.withdraw(id),
+        ...options,
+        onSuccess: (data, id, ...rest) => {
+            void queryClient.invalidateQueries({ queryKey: dppKeys.all });
+            void queryClient.invalidateQueries({ queryKey: dppKeys.detail(id) });
+            return options?.onSuccess?.(data, id, ...rest);
         },
     });
 }

@@ -148,8 +148,8 @@ export function ScoreCard({ passport, score }: { passport: Passport; score: Scor
 export function WarrantyNote({ warranty }: { warranty: Passport['warranty'] }) {
     if (warranty.durationMonths <= 0) return null;
     return (
-        <div className="border-lumiris-emerald/30 bg-lumiris-emerald/5 rounded-2xl border p-4">
-            <p className="text-lumiris-emerald text-xs font-semibold uppercase tracking-wider">
+        <div className="border-lumiris-cyan/30 bg-lumiris-cyan/5 rounded-2xl border p-4">
+            <p className="text-lumiris-cyan text-xs font-semibold uppercase tracking-wider">
                 Garantie {Math.round(warranty.durationMonths / 12)} an{warranty.durationMonths >= 24 ? 's' : ''}
             </p>
             {warranty.terms && <p className="text-foreground/90 mt-1 text-sm">{warranty.terms}</p>}

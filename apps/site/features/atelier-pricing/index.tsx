@@ -98,7 +98,7 @@ export function AtelierPricing() {
                         <motion.span
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="bg-lumiris-emerald/10 text-lumiris-emerald inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
+                            className="bg-lumiris-cyan/10 text-lumiris-cyan inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
                         >
                             <Sparkles className="h-3 w-3" />
                             -17% (2 mois offerts)

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { IridescentBackground } from '@/lib/motion';
 import { hasCompletedOnboarding } from '@/lib/onboarding/storage';
 
@@ -75,6 +76,7 @@ function SplashScreen() {
                     <div className="border-border/25 pointer-events-none absolute h-[80%] w-[80%] rounded-full border" />
                     <div className="border-border/15 pointer-events-none absolute h-[62%] w-[62%] rounded-full border" />
                     <div className="border-border/10 pointer-events-none absolute h-[44%] w-[44%] rounded-full border" />
+                    <LumirisLogo title="" className="relative h-14 w-auto" />
                 </div>
             </div>
 

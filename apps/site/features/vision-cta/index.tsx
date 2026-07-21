@@ -7,7 +7,7 @@ export function VisionCta() {
         <section className="relative overflow-hidden py-20 sm:py-28">
             {/* Prismatic halo */}
             <div className="pointer-events-none absolute inset-0 -z-10">
-                <div className="from-violet-500/6 via-cyan-500/4 to-pink-500/6 absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br blur-3xl" />
+                <div className="from-lumiris-iris/6 via-lumiris-cyan/4 to-lumiris-rose/6 absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br blur-3xl" />
             </div>
 
             <div className="mx-auto max-w-4xl px-6 text-center">

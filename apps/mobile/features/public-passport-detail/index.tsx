@@ -5,11 +5,13 @@ import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { CheckCircle, XCircle, FileText, ArrowLeft, Download, Heart, ExternalLink } from 'lucide-react';
+import { CheckCircle, XCircle, FileText, ArrowLeft, Download, Heart, ExternalLink, ShoppingBag } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useMarketplaceProductByDpp } from '@lumiris/api-client/react';
 import type { IrisGrade } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
 import type { OriginMapOriginPoint, OriginMapStepPoint } from '@lumiris/scoring-ui/components/origin-map';
+import { formatCents } from '@/lib/marketplace';
 import type { DppEventDto, DppEventActorType, DppFormDto, IrisScoreDto } from '@/lib/public-dpp-api';
 import { addPublicDpp, removePublicDpp, useWardrobe } from '@/lib/wardrobe-storage';
 import { toast } from '@/lib/toast';
@@ -104,6 +106,11 @@ export function PublicPassportDetail({
 
     const wardrobe = useWardrobe();
     const isSaved = wardrobe.some((it) => it.kind === 'public-dpp' && it.publicCode === dpp.publicCode);
+
+    // Pont scan → achat : si une annonce Boutique publiée est rattachée à ce passeport (par son
+    // formId), on propose de l'acheter en direct. Un 404 (aucune annonce) laisse `buyProduct`
+    // indéfini → le CTA reste masqué.
+    const { data: buyProduct } = useMarketplaceProductByDpp(dpp.id);
 
     const onToggleSaved = () => {
         if (isSaved) {
@@ -227,6 +234,26 @@ export function PublicPassportDetail({
             </header>
 
             <div className="flex flex-col gap-5 px-4">
+                {/* Pont scan → achat : visible seulement si une annonce Boutique est publiée. */}
+                {buyProduct ? (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: LAYER_DELAY * 0.5 }}
+                    >
+                        <Link
+                            href={`/boutique/${buyProduct.id}`}
+                            className="bg-primary text-primary-foreground flex items-center justify-between gap-3 rounded-2xl px-4 py-3.5 text-sm font-semibold shadow-sm transition-opacity active:opacity-90"
+                        >
+                            <span className="inline-flex items-center gap-2">
+                                <ShoppingBag className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+                                Acheter cette pièce sur la Boutique
+                            </span>
+                            <span className="font-mono tabular-nums">{formatCents(buyProduct.priceCents)}</span>
+                        </Link>
+                    </motion.div>
+                ) : null}
+
                 {/* Produit */}
                 <Section delay={LAYER_DELAY * 1} title="Le Produit">
                     {dpp.mainPhotoUrl && (
@@ -479,11 +506,11 @@ function InfoRow({ label, value, fullWidth }: { label: string; value: ReactNode;
 
 function BooleanField({ value }: { value: boolean }) {
     return value ? (
-        <span className="flex items-center gap-1 text-sm text-green-600">
+        <span className="flex items-center gap-1 text-sm text-lumiris-emerald">
             <CheckCircle className="h-3.5 w-3.5" /> Oui
         </span>
     ) : (
-        <span className="flex items-center gap-1 text-sm text-red-500">
+        <span className="flex items-center gap-1 text-sm text-lumiris-rose">
             <XCircle className="h-3.5 w-3.5" /> Non
         </span>
     );

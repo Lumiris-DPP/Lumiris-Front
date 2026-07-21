@@ -28,8 +28,8 @@ function buildIcon(color: string, glowAlpha: string, svg: string, active: boolea
     });
 }
 
-const ARTISAN_COLOR = '#10b981';
-const REPAIRER_COLOR = '#06b6d4';
+const ARTISAN_COLOR = '#8021f3'; // lumiris-iris (distinct du cyan retoucheur)
+const REPAIRER_COLOR = '#06b6d4'; // lumiris-cyan
 
 function ResizeOnMount() {
     const map = useMap();
@@ -115,7 +115,7 @@ export function MapClient({ points, userCoords, selectedId, onSelect }: MapClien
                         pathOptions={{
                             color: '#ffffff',
                             weight: 2,
-                            fillColor: '#3b82f6',
+                            fillColor: '#0e6e88',
                             fillOpacity: 0.95,
                         }}
                         interactive={false}

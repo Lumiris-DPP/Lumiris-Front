@@ -90,9 +90,9 @@ export function Stepper({ draftId, currentStep, draft }: StepperProps) {
 function badgeClass(state: StepState): string {
     switch (state) {
         case 'done':
-            return 'border-lumiris-emerald bg-lumiris-emerald text-white';
+            return 'border-lumiris-cyan bg-lumiris-cyan text-white';
         case 'current':
-            return 'border-lumiris-emerald bg-background text-lumiris-emerald';
+            return 'border-lumiris-cyan bg-background text-lumiris-cyan';
         default:
             return 'border-border bg-muted text-muted-foreground';
     }

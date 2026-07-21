@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from 'react';
 import type { User } from '@lumiris/types';
+import { migrateAnonCartToUser } from '../marketplace/cart-storage';
 import { readUser, writeUser } from './storage';
 import type { AuthUser } from './types';
 
@@ -83,6 +84,9 @@ export function useUser(): UseUserResult {
                 createdAt: sameAccount ? existing.createdAt : new Date().toISOString(),
             };
             writeUser(next);
+            // Conserve le panier rempli en tant qu'invité : on le fusionne dans le panier
+            // scopé user avant de notifier, sinon les articles resteraient bloqués sous `anon`.
+            migrateAnonCartToUser(next.id);
             notify();
         },
         signOut: clearUser,

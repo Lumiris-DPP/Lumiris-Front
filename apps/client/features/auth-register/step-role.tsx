@@ -62,14 +62,14 @@ export function StepRole({ selected, onSelect, onNext }: StepRoleProps) {
                         className={cn(
                             'flex items-center gap-4 rounded-xl border p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2',
                             selected === role
-                                ? 'border-lumiris-emerald bg-lumiris-emerald/5 ring-lumiris-emerald/20 ring-2'
-                                : 'border-border hover:border-lumiris-emerald/40 hover:bg-muted/40',
+                                ? 'border-lumiris-cyan bg-lumiris-cyan/5 ring-lumiris-cyan/20 ring-2'
+                                : 'border-border hover:border-lumiris-cyan/40 hover:bg-muted/40',
                         )}
                     >
                         <div
                             className={cn(
                                 'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg',
-                                selected === role ? 'bg-lumiris-emerald text-white' : 'bg-muted text-muted-foreground',
+                                selected === role ? 'bg-lumiris-cyan text-white' : 'bg-muted text-muted-foreground',
                             )}
                         >
                             <Icon className="h-5 w-5" />
@@ -85,7 +85,7 @@ export function StepRole({ selected, onSelect, onNext }: StepRoleProps) {
             <Button
                 onClick={onNext}
                 disabled={selected === null}
-                className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 h-10 w-full text-white"
+                className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 h-10 w-full text-white"
             >
                 Continuer
             </Button>

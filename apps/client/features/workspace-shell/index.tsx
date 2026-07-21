@@ -11,10 +11,10 @@ import {
     PlusCircle,
     Receipt,
     ShoppingBag,
-    Sparkles,
     Store,
     Wallet,
 } from 'lucide-react';
+import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { Sheet, SheetContent } from '@lumiris/ui/components/sheet';
 import { toast } from '@lumiris/ui/components/sonner';
 import { Switch } from '@lumiris/ui/components/switch';
@@ -22,6 +22,8 @@ import { cn } from '@lumiris/ui/lib/cn';
 import { ATELIER_PASSPORT_LIMIT_LABEL, useHasAtelierPlus, usePassportCount } from './hooks';
 import { useCurrentArtisan } from '@/lib/current-artisan';
 import { useBilling, useBillingStore } from '@/lib/billing-store';
+import { useAuthStore } from '@/lib/auth-store';
+import { useSubscription } from '@/lib/use-subscription';
 
 interface NavItem {
     href: string;
@@ -118,10 +120,23 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     const pathname = usePathname() ?? '/';
     const artisan = useCurrentArtisan();
-    const passportCount = usePassportCount(artisan.id);
-    const hasAtelierPlus = useHasAtelierPlus(artisan.id);
+    const isRealMode = useAuthStore((s) => s.token != null);
+    const { quota, atelierPlus } = useSubscription();
+
+    const demoPassportCount = usePassportCount(artisan.id);
+    const demoHasPlus = useHasAtelierPlus(artisan.id);
     const billing = useBilling(artisan.id);
     const setBillingCycle = useBillingStore((s) => s.setBillingCycle);
+
+    // Real mode: tier comes from useCurrentArtisan (live subscription), quota from GET /api/subscription.
+    // ATELIER+ is now a live add-on signal (subscription.atelierPlus); demo keeps the mock billing store.
+    const hasAtelierPlus = isRealMode ? atelierPlus : demoHasPlus;
+    const usedCount = isRealMode ? (quota?.used ?? 0) : demoPassportCount;
+    const limitLabel = isRealMode
+        ? quota?.unlimited
+            ? '∞'
+            : (quota?.limit != null ? String(quota.limit) : '—')
+        : ATELIER_PASSPORT_LIMIT_LABEL[artisan.tier];
 
     const onToggleCycle = (annual: boolean) => {
         const next = annual ? 'annual' : 'monthly';
@@ -134,9 +149,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     return (
         <div className="flex h-full flex-col">
             <div className="border-border flex items-center gap-3 border-b px-5 py-5">
-                <div className="bg-lumiris-cyan flex h-9 w-9 items-center justify-center rounded-lg">
-                    <Sparkles className="text-primary-foreground h-4 w-4" />
-                </div>
+                <LumirisLogo className="h-9 w-auto" />
                 <div>
                     <p className="text-foreground text-sm font-semibold leading-none">LUMIRIS</p>
                     <p className="text-muted-foreground font-mono text-[10px] tracking-widest">ATELIER</p>
@@ -177,25 +190,29 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                     )}
                 </div>
                 <p className="text-muted-foreground font-mono text-[11px]">
-                    {passportCount} / {ATELIER_PASSPORT_LIMIT_LABEL[artisan.tier]} passeports actifs
+                    {usedCount} / {limitLabel} passeports actifs
                 </p>
-                <div className="flex items-center justify-between gap-2 pt-1">
-                    <span className="text-muted-foreground text-[10px] uppercase tracking-wider">Cycle</span>
-                    <div className="text-muted-foreground flex items-center gap-1.5 text-[10px]">
-                        <span className={cn(billing.billingCycle === 'monthly' && 'text-foreground font-medium')}>
-                            mois
-                        </span>
-                        <Switch
-                            checked={billing.billingCycle === 'annual'}
-                            onCheckedChange={onToggleCycle}
-                            aria-label="Basculer entre cycle mensuel et annuel"
-                            className="h-4 w-7"
-                        />
-                        <span className={cn(billing.billingCycle === 'annual' && 'text-foreground font-medium')}>
-                            an <span className="text-lumiris-emerald font-mono">−17%</span>
-                        </span>
+                {/* The cycle switch only ever wrote to a local mock billing store — a fake control
+                    in real mode, where the true cycle is managed on the /subscription page. */}
+                {!isRealMode && (
+                    <div className="flex items-center justify-between gap-2 pt-1">
+                        <span className="text-muted-foreground text-[10px] uppercase tracking-wider">Cycle</span>
+                        <div className="text-muted-foreground flex items-center gap-1.5 text-[10px]">
+                            <span className={cn(billing.billingCycle === 'monthly' && 'text-foreground font-medium')}>
+                                mois
+                            </span>
+                            <Switch
+                                checked={billing.billingCycle === 'annual'}
+                                onCheckedChange={onToggleCycle}
+                                aria-label="Basculer entre cycle mensuel et annuel"
+                                className="h-4 w-7"
+                            />
+                            <span className={cn(billing.billingCycle === 'annual' && 'text-foreground font-medium')}>
+                                an <span className="text-lumiris-cyan font-mono">−17%</span>
+                            </span>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );

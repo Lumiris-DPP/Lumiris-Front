@@ -16,5 +16,10 @@ export function authApi(http: Http) {
         refresh(req: RefreshRequest): Promise<AuthResponse> {
             return http.request<AuthResponse>('/api/auth/refresh', { method: 'POST', body: req });
         },
+        // RGPD : anonymisation du compte côté serveur (204). Le caller doit ensuite purger
+        // l'état local et déconnecter l'utilisateur.
+        deleteAccount(): Promise<void> {
+            return http.request<void>('/api/auth/me', { method: 'DELETE', skipJson: true });
+        },
     };
 }

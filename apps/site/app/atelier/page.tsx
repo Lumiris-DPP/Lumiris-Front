@@ -20,9 +20,9 @@ export default function AtelierPage() {
         <main className="bg-background relative">
             {/* Background decoration */}
             <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-                <div className="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-cyan-500/5 blur-3xl" />
-                <div className="absolute -left-40 top-1/3 h-96 w-96 rounded-full bg-violet-500/5 blur-3xl" />
-                <div className="absolute bottom-1/4 right-1/4 h-64 w-64 rounded-full bg-pink-500/5 blur-3xl" />
+                <div className="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-lumiris-cyan/5 blur-3xl" />
+                <div className="absolute -left-40 top-1/3 h-96 w-96 rounded-full bg-lumiris-iris/5 blur-3xl" />
+                <div className="absolute bottom-1/4 right-1/4 h-64 w-64 rounded-full bg-lumiris-rose/5 blur-3xl" />
             </div>
 
             {/* Hero */}
@@ -30,7 +30,7 @@ export default function AtelierPage() {
                 <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
                     {/* Left: Copy */}
                     <div>
-                        <span className="text-lumiris-cyan inline-flex items-center gap-2 rounded-full bg-cyan-500/10 px-4 py-1.5 text-xs font-semibold">
+                        <span className="text-lumiris-cyan inline-flex items-center gap-2 rounded-full bg-lumiris-cyan/10 px-4 py-1.5 text-xs font-semibold">
                             <Hammer className="h-3.5 w-3.5" aria-hidden="true" />
                             Pour les TPE et PME artisanales
                         </span>
@@ -65,30 +65,30 @@ export default function AtelierPage() {
                             <div className="bg-card border-border rounded-2xl border p-5 shadow-2xl">
                                 <div className="bg-muted mb-4 flex items-center gap-2 rounded-lg p-2">
                                     <div className="flex gap-1.5">
-                                        <div className="h-2.5 w-2.5 rounded-full bg-red-400" />
-                                        <div className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-                                        <div className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+                                        <div className="h-2.5 w-2.5 rounded-full bg-lumiris-rose" />
+                                        <div className="h-2.5 w-2.5 rounded-full bg-lumiris-amber" />
+                                        <div className="h-2.5 w-2.5 rounded-full bg-lumiris-cyan" />
                                     </div>
                                     <div className="bg-background ml-2 h-5 flex-1 rounded-md" />
                                 </div>
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between">
                                         <div className="bg-muted h-6 w-32 rounded" />
-                                        <div className="text-lumiris-cyan rounded-full bg-cyan-500/20 px-2 py-0.5 text-xs font-medium">
+                                        <div className="text-lumiris-cyan rounded-full bg-lumiris-cyan/20 px-2 py-0.5 text-xs font-medium">
                                             12 actifs
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-3 gap-3">
-                                        <div className="flex h-20 flex-col items-center justify-center rounded-xl bg-emerald-500/10">
-                                            <span className="text-2xl font-bold text-emerald-600">A</span>
+                                        <div className="flex h-20 flex-col items-center justify-center rounded-xl bg-lumiris-emerald/10">
+                                            <span className="text-2xl font-bold text-lumiris-emerald">A</span>
                                             <span className="text-muted-foreground text-xs">Grade moyen</span>
                                         </div>
-                                        <div className="flex h-20 flex-col items-center justify-center rounded-xl bg-cyan-500/10">
+                                        <div className="flex h-20 flex-col items-center justify-center rounded-xl bg-lumiris-cyan/10">
                                             <span className="text-lumiris-cyan text-2xl font-bold">87%</span>
                                             <span className="text-muted-foreground text-xs">Conformite</span>
                                         </div>
-                                        <div className="flex h-20 flex-col items-center justify-center rounded-xl bg-violet-500/10">
-                                            <span className="text-2xl font-bold text-violet-600">3</span>
+                                        <div className="flex h-20 flex-col items-center justify-center rounded-xl bg-lumiris-iris/10">
+                                            <span className="text-2xl font-bold text-lumiris-iris">3</span>
                                             <span className="text-muted-foreground text-xs">En cours</span>
                                         </div>
                                     </div>
@@ -96,7 +96,7 @@ export default function AtelierPage() {
                                 </div>
                             </div>
                             {/* Decorative glow */}
-                            <div className="pointer-events-none absolute -inset-8 -z-10 rounded-3xl bg-gradient-to-br from-cyan-500/10 via-transparent to-violet-500/10 blur-2xl" />
+                            <div className="pointer-events-none absolute -inset-8 -z-10 rounded-3xl bg-gradient-to-br from-lumiris-cyan/10 via-transparent to-lumiris-iris/10 blur-2xl" />
                         </div>
                     </div>
                 </div>
@@ -130,7 +130,7 @@ export default function AtelierPage() {
             <section className="relative overflow-hidden py-20 sm:py-28">
                 {/* Prismatic halo */}
                 <div className="pointer-events-none absolute inset-0 -z-10">
-                    <div className="from-cyan-500/8 via-violet-500/6 to-pink-500/8 absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br blur-3xl" />
+                    <div className="from-lumiris-cyan/8 via-lumiris-iris/6 to-lumiris-rose/8 absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br blur-3xl" />
                 </div>
 
                 <div className="mx-auto max-w-3xl px-6 text-center">

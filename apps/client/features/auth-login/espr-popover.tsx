@@ -9,7 +9,7 @@ export function EsprTimelinePopover() {
     return (
         <Popover>
             <PopoverTrigger className="text-muted-foreground hover:text-foreground mx-auto mt-8 flex items-center gap-1.5 text-xs transition-colors focus:outline-none">
-                <ShieldCheck className="text-lumiris-emerald h-3.5 w-3.5" />
+                <ShieldCheck className="text-lumiris-cyan h-3.5 w-3.5" />
                 Conforme ESPR · acte délégué textile attendu 2027 · application mi-2028
             </PopoverTrigger>
             <PopoverContent align="center" className="w-80">
@@ -20,7 +20,7 @@ export function EsprTimelinePopover() {
                 <ol className="mt-3 space-y-2.5">
                     {ESPR_TEXTILE_TIMELINE.map((milestone) => (
                         <li key={milestone.date} className="flex gap-3">
-                            <span className="text-lumiris-emerald shrink-0 font-mono text-xs font-semibold">
+                            <span className="text-lumiris-cyan shrink-0 font-mono text-xs font-semibold">
                                 {milestone.date}
                             </span>
                             <span className="text-foreground text-xs leading-relaxed">{milestone.label}</span>

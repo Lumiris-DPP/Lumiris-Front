@@ -1,5 +1,12 @@
-import type { DppFormDto } from '@lumiris/api-client';
-import type { CareInstructionCode, Fiber, GarmentCategory, GarmentKind, Passport } from '@lumiris/types';
+import type { DppFormDto, DppFormSummaryDto, DppStatus } from '@lumiris/api-client';
+import type {
+    CareInstructionCode,
+    Fiber,
+    GarmentCategory,
+    GarmentKind,
+    Passport,
+    PassportStatus,
+} from '@lumiris/types';
 import type { DraftPassport } from './draft-store';
 
 export { draftToPassport } from './draft-store';
@@ -14,6 +21,46 @@ const CATEGORY_TO_KIND: Record<string, GarmentKind> = {
     accessory: 'accessory',
     other: 'other',
 };
+
+/** Faithful 3-way mapping of the backend DPP lifecycle onto the local passport status. */
+const DPP_STATUS_TO_PASSPORT: Record<DppStatus, PassportStatus> = {
+    VALID: 'Published',
+    DRAFT: 'Draft',
+    INVALID: 'InCompletion',
+};
+
+export function passportStatusFromDpp(status: DppStatus): PassportStatus {
+    return DPP_STATUS_TO_PASSPORT[status] ?? 'InCompletion';
+}
+
+/**
+ * Lightweight adapter from a DPP list-summary (GET /api/dpp-forms) into a `Passport`.
+ * Carries enough for counts, status and list rows; enrich with {@link dppToPassport}
+ * once the full DPP is loaded when accurate scoring is needed.
+ */
+export function dppSummaryToPassport(dpp: DppFormSummaryDto, artisanId: string): Passport {
+    return {
+        id: dpp.id,
+        gs1: { gtin: '', serial: dpp.id, verificationUrl: '' },
+        status: passportStatusFromDpp(dpp.status),
+        createdAt: dpp.createdAt,
+        updatedAt: dpp.createdAt,
+        artisanId,
+        garment: {
+            kind: CATEGORY_TO_KIND[dpp.productCategory ?? ''] ?? 'other',
+            name: dpp.productName ?? undefined,
+            reference: dpp.sku ?? dpp.id,
+            mainPhotoUrl: '',
+            dimensions: {},
+            retailPrice: 0,
+            currency: 'EUR',
+        },
+        materials: [],
+        steps: [],
+        certifications: [],
+        warranty: { durationMonths: 0, terms: '' },
+    };
+}
 
 /**
  * Adapts a backend DPP form DTO into the local `Passport` model used by the

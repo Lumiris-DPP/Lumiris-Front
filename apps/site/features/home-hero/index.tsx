@@ -82,7 +82,7 @@ export function HomeHero() {
                                 </div>
                             </div>
                             {/* Decorative glow */}
-                            <div className="pointer-events-none absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-br from-cyan-500/10 via-transparent to-violet-500/10 blur-xl" />
+                            <div className="pointer-events-none absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-br from-lumiris-cyan/10 via-transparent to-lumiris-iris/10 blur-xl" />
                         </div>
                     </div>
                 </div>
@@ -90,7 +90,7 @@ export function HomeHero() {
                 {/* ESPR countdown banner */}
                 <div className="mt-16 lg:mt-24">
                     <div className="border-border bg-muted/30 inline-flex items-center gap-3 rounded-full border px-4 py-2">
-                        <span className="rounded-full bg-cyan-500/10 px-2.5 py-0.5 text-xs font-semibold text-cyan-600">
+                        <span className="rounded-full bg-lumiris-cyan/10 px-2.5 py-0.5 text-xs font-semibold text-lumiris-cyan">
                             ESPR
                         </span>
                         <span className="text-muted-foreground text-sm">

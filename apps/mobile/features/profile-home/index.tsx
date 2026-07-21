@@ -11,6 +11,7 @@ import {
     Info,
     LifeBuoy,
     LogOut,
+    Package,
     Settings as SettingsIcon,
     ShieldCheck,
     User,
@@ -105,7 +106,7 @@ function LoggedIn({ displayName, email, city }: LoggedInProps) {
                 <div className="flex items-center gap-4">
                     <span
                         aria-hidden
-                        className="from-lumiris-cyan to-lumiris-emerald bg-linear-to-br flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-base font-semibold text-white shadow-md"
+                        className="from-lumiris-cyan to-lumiris-iris bg-linear-to-br flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-base font-semibold text-white shadow-md"
                     >
                         {initial}
                     </span>
@@ -148,6 +149,7 @@ function LoggedIn({ displayName, email, city }: LoggedInProps) {
                 initial="initial"
                 animate="animate"
             >
+                <ActionLink href="/me/orders" Icon={Package} label="Mes commandes" />
                 <ActionLink href="/me/repairs" Icon={Wrench} label="Mes demandes" />
                 <ActionLink href="/me/documents" Icon={FileText} label="Mes documents" />
                 <ActionLink href="/me/settings" Icon={SettingsIcon} label="Réglages" />

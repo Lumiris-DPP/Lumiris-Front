@@ -15,6 +15,8 @@ export function useSubscription() {
         subscription: query.data?.subscription ?? null,
         quota: query.data?.quota ?? null,
         hasActiveSubscription: query.data?.hasActiveSubscription ?? false,
+        // ATELIER+ add-on actif (2ᵉ article Stripe) — signal réel côté abonnement.
+        atelierPlus: query.data?.atelierPlus ?? false,
         isRealMode: Boolean(token),
     };
 }

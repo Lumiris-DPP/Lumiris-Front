@@ -1,7 +1,8 @@
 'use client';
 
-import { Clock, Mail, Sparkles } from 'lucide-react';
+import { Clock, Mail } from 'lucide-react';
 import { Button } from '@lumiris/ui/components/button';
+import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { Card, CardContent } from '@lumiris/ui/components/card';
 import { toast } from '@lumiris/ui/components/sonner';
 import { signOut } from '@/lib/auth-store';
@@ -22,9 +23,7 @@ export function PendingScreen() {
             <header className="border-border bg-card border-b">
                 <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-6 py-5">
                     <div className="flex items-center gap-3">
-                        <div className="bg-lumiris-emerald flex h-9 w-9 items-center justify-center rounded-lg">
-                            <Sparkles className="text-primary-foreground h-4 w-4" />
-                        </div>
+                        <LumirisLogo className="h-9 w-auto" />
                         <div>
                             <p className="text-foreground text-sm font-semibold leading-none">LUMIRIS</p>
                             <p className="text-muted-foreground font-mono text-[10px] tracking-widest">ATELIER</p>

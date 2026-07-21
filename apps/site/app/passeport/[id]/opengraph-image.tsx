@@ -1,10 +1,20 @@
 import { ImageResponse } from 'next/og';
 import { mockPassportsPublic, passportPublicByIdOrSlug } from '@lumiris/mock-data';
 import { KIND_LABEL_FR } from '@lumiris/utils';
+import { OG_LOGO_DATA_URI } from '@/lib/og-logo';
 
 export const alt = 'Passeport LUMIRIS';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
+
+// Couleur du badge de grade = échelle Iris de marque (A=emerald … E=rose), pas un vert fixe.
+const GRADE_BG: Record<string, string> = {
+    A: '#0f8a50', // lumiris-emerald
+    B: '#0e6e88', // lumiris-cyan
+    C: '#7b2fe0', // lumiris-iris
+    D: '#cf7415', // lumiris-amber
+    E: '#c81f45', // lumiris-rose
+};
 
 export function generateStaticParams() {
     return mockPassportsPublic.map((view) => ({ id: view.passport.id }));
@@ -37,22 +47,8 @@ export default async function Image({ params }: OgProps) {
             }}
         >
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                <div
-                    style={{
-                        width: 36,
-                        height: 36,
-                        borderRadius: 8,
-                        background: 'linear-gradient(135deg,#10b981,#06b6d4,#f59e0b)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 700,
-                        fontSize: 18,
-                        color: '#0b1014',
-                    }}
-                >
-                    L
-                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element -- next/og renders via Satori, not the DOM */}
+                <img src={OG_LOGO_DATA_URI} width={51} height={36} alt="" />
                 <div style={{ display: 'flex', fontSize: 20, letterSpacing: 4, color: '#475569' }}>
                     LUMIRIS · PASSEPORT
                 </div>
@@ -79,7 +75,7 @@ export default async function Image({ params }: OgProps) {
                             width: 200,
                             height: 200,
                             borderRadius: 28,
-                            background: '#10b981',
+                            background: GRADE_BG[grade] ?? '#0e6e88',
                             color: '#fff',
                             fontWeight: 800,
                             fontSize: 140,

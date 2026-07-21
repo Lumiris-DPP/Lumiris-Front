@@ -36,15 +36,15 @@ export function PlanCard({ plan, isCurrent, isAnnual, hasActiveSubscription, dis
                 </p>
                 <ul className="text-muted-foreground flex-1 space-y-1.5 text-xs">
                     <li className="flex items-start gap-1.5">
-                        <Check className="text-lumiris-emerald mt-0.5 h-3 w-3 shrink-0" />
+                        <Check className="text-lumiris-cyan mt-0.5 h-3 w-3 shrink-0" />
                         {quotaLabel(plan)}
                     </li>
                     <li className="flex items-start gap-1.5">
-                        <Check className="text-lumiris-emerald mt-0.5 h-3 w-3 shrink-0" />
+                        <Check className="text-lumiris-cyan mt-0.5 h-3 w-3 shrink-0" />
                         Score Iris pré-calculé sur chaque pièce
                     </li>
                     <li className="flex items-start gap-1.5">
-                        <Check className="text-lumiris-emerald mt-0.5 h-3 w-3 shrink-0" />
+                        <Check className="text-lumiris-cyan mt-0.5 h-3 w-3 shrink-0" />
                         Page d’atelier publique + annuaire
                     </li>
                 </ul>

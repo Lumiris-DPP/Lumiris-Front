@@ -152,20 +152,7 @@
     }
 }
 
-/* Prismatic gradient — triade brand (cyan primaire → iris secondaire → rose tertiaire).
-   Utilisée en surface marketing/hero. Shimmer hérité par admin/mobile sans dommage. */
-.prismatic-bg {
-    background: linear-gradient(
-        135deg,
-        var(--lumiris-cyan),
-        var(--lumiris-iris),
-        var(--lumiris-rose),
-        var(--lumiris-cyan)
-    );
-    background-size: 300% 300%;
-    animation: prismatic-shift 8s ease-in-out infinite;
-}
-
+/* Prismatic gradient — triade brand (cyan → iris → rose), utilisée pour le texte dégradé. */
 .prismatic-text {
     background: linear-gradient(135deg, var(--lumiris-cyan), var(--lumiris-iris), var(--lumiris-rose));
     background-size: 200% 200%;

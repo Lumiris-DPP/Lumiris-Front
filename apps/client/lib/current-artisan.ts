@@ -3,9 +3,11 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { mockArtisanById } from '@lumiris/mock-data';
-import type { Artisan } from '@lumiris/types';
+import type { Artisan, ArtisanTier } from '@lumiris/types';
+import { ARTISAN_PASSPORT_LIMIT } from '@lumiris/types';
 import { signOut, useAuthStore } from './auth-store';
 import { useAuthArtisanId, useAuthUserName } from './use-auth';
+import { useSubscription } from './use-subscription';
 
 const FALLBACK_ID = 'art-marie';
 
@@ -15,10 +17,24 @@ if (!FALLBACK_RAW) {
 }
 const FALLBACK: Artisan = FALLBACK_RAW;
 
+/** Normalises the backend subscription tier string onto the local ArtisanTier. */
+export function artisanTierFromSubscription(tier: string | null | undefined): ArtisanTier {
+    switch ((tier ?? '').toLowerCase()) {
+        case 'studio':
+            return 'Studio';
+        case 'maison':
+            return 'Maison';
+        default:
+            return 'Solo';
+    }
+}
+
 export function useCurrentArtisan(): Artisan {
     const id = useAuthArtisanId();
     const userName = useAuthUserName();
     const router = useRouter();
+    // Live plan + quota (real mode only; the hook self-disables without a token).
+    const { subscription, quota } = useSubscription();
 
     const mockArtisan = id != null ? (mockArtisanById(id) ?? null) : null;
     const isRealMode = useAuthStore((s) => s.token != null);
@@ -35,15 +51,20 @@ export function useCurrentArtisan(): Artisan {
     // Demo mode: use mock data
     if (mockArtisan !== null) return mockArtisan;
 
-    // Real mode: construct a minimal Artisan from stored identity
+    // Real mode: construct a minimal Artisan from stored identity, with tier + quota
+    // driven by the live subscription (GET /api/subscription) — never hardcoded.
     if (id != null && isRealMode) {
+        const tier = artisanTierFromSubscription(subscription?.tier);
+        const passportLimit = quota?.unlimited
+            ? Number.POSITIVE_INFINITY
+            : (quota?.limit ?? ARTISAN_PASSPORT_LIMIT[tier]);
         return {
             id,
             displayName: userName ?? 'Mon Atelier',
             atelierName: userName ? `Atelier de ${userName}` : 'Mon Atelier',
             city: '',
             region: 'Île-de-France',
-            tier: 'Solo',
+            tier,
             plus: false,
             epvLabeled: false,
             ofgLabeled: false,
@@ -51,7 +72,7 @@ export function useCurrentArtisan(): Artisan {
             story: '',
             photoUrl: '',
             joinedAt: new Date().toISOString(),
-            passportLimit: 50,
+            passportLimit,
         };
     }
 

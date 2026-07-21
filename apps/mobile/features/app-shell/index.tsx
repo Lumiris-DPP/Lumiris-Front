@@ -69,6 +69,16 @@ function shouldHideTabBar(pathname: string): boolean {
     return false;
 }
 
+// Largeur maximale du cadre. La plupart des écrans gardent le format « téléphone » (max-w-md).
+// Le paiement et la facture s'élargissent sur grand écran (md+) pour présenter le formulaire et
+// le récapitulatif côte à côte / imprimer la facture proprement ; sur mobile ils restent au
+// format téléphone. Aucun autre écran n'est affecté.
+function shellMaxWidth(pathname: string): string {
+    if (pathname === '/checkout') return 'max-w-md md:max-w-4xl';
+    if (pathname.startsWith('/commande/') && pathname.endsWith('/facture')) return 'max-w-md md:max-w-3xl';
+    return 'max-w-md';
+}
+
 interface AppShellProps {
     children: ReactNode;
     hideTabBar?: boolean;
@@ -85,9 +95,11 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
     }, []);
 
     return (
-        <div className="bg-background relative mx-auto flex h-dvh max-w-md flex-col overflow-hidden">
+        <div
+            className={`bg-background relative mx-auto flex h-dvh flex-col overflow-hidden print:h-auto print:overflow-visible ${shellMaxWidth(pathname)}`}
+        >
             <OfflineBanner />
-            <div className="relative flex-1 overflow-hidden">
+            <div className="relative flex-1 overflow-hidden print:overflow-visible">
                 <AnimatePresence mode="wait" initial={false}>
                     <motion.div
                         key={pathname}

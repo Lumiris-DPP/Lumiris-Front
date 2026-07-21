@@ -113,7 +113,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
                     <button
                         type="button"
                         onClick={() => setForm((f) => ({ ...f, batchNumber: generateId('LOT') }))}
-                        className="border-border text-muted-foreground hover:border-lumiris-emerald hover:text-lumiris-emerald shrink-0 rounded-md border px-3 text-xs transition-colors"
+                        className="border-border text-muted-foreground hover:border-lumiris-cyan hover:text-lumiris-cyan shrink-0 rounded-md border px-3 text-xs transition-colors"
                     >
                         Générer
                     </button>
@@ -149,7 +149,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
                     <button
                         type="button"
                         onClick={() => setForm((f) => ({ ...f, gtin: generateId('EAN') }))}
-                        className="border-border text-muted-foreground hover:border-lumiris-emerald hover:text-lumiris-emerald shrink-0 rounded-md border px-3 text-xs transition-colors"
+                        className="border-border text-muted-foreground hover:border-lumiris-cyan hover:text-lumiris-cyan shrink-0 rounded-md border px-3 text-xs transition-colors"
                     >
                         Générer
                     </button>
@@ -169,7 +169,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
                     <button
                         type="button"
                         onClick={() => setForm((f) => ({ ...f, sku: generateId('SKU') }))}
-                        className="border-border text-muted-foreground hover:border-lumiris-emerald hover:text-lumiris-emerald shrink-0 rounded-md border px-3 text-xs transition-colors"
+                        className="border-border text-muted-foreground hover:border-lumiris-cyan hover:text-lumiris-cyan shrink-0 rounded-md border px-3 text-xs transition-colors"
                     >
                         Générer
                     </button>

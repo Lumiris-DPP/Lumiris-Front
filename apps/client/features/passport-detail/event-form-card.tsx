@@ -136,7 +136,7 @@ export function EventFormCard({ passportId }: { passportId: string }) {
                         />
                     </div>
                     {createEvent.isError && (
-                        <p className="text-sm text-red-500">L&apos;événement n&apos;a pas pu être enregistré.</p>
+                        <p className="text-sm text-lumiris-rose">L&apos;événement n&apos;a pas pu être enregistré.</p>
                     )}
                     <div className="flex justify-end">
                         <Button type="submit" disabled={!canSubmit || createEvent.isPending}>

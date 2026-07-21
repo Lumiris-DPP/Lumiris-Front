@@ -61,28 +61,28 @@ export function MethodePillars() {
                     {PILLARS.map((pillar, index) => {
                         const colorClasses = {
                             cyan: {
-                                bg: 'bg-cyan-500',
-                                light: 'bg-cyan-500/10',
-                                text: 'text-cyan-500',
-                                border: 'border-cyan-500/20',
+                                bg: 'bg-lumiris-cyan',
+                                light: 'bg-lumiris-cyan/10',
+                                text: 'text-lumiris-cyan',
+                                border: 'border-lumiris-cyan/20',
                             },
                             violet: {
-                                bg: 'bg-violet-500',
-                                light: 'bg-violet-500/10',
-                                text: 'text-violet-500',
-                                border: 'border-violet-500/20',
+                                bg: 'bg-lumiris-iris',
+                                light: 'bg-lumiris-iris/10',
+                                text: 'text-lumiris-iris',
+                                border: 'border-lumiris-iris/20',
                             },
                             emerald: {
-                                bg: 'bg-emerald-500',
-                                light: 'bg-emerald-500/10',
-                                text: 'text-emerald-500',
-                                border: 'border-emerald-500/20',
+                                bg: 'bg-lumiris-cyan',
+                                light: 'bg-lumiris-cyan/10',
+                                text: 'text-lumiris-cyan',
+                                border: 'border-lumiris-cyan/20',
                             },
                             amber: {
-                                bg: 'bg-amber-500',
-                                light: 'bg-amber-500/10',
-                                text: 'text-amber-500',
-                                border: 'border-amber-500/20',
+                                bg: 'bg-lumiris-amber',
+                                light: 'bg-lumiris-amber/10',
+                                text: 'text-lumiris-amber',
+                                border: 'border-lumiris-amber/20',
                             },
                         }[pillar.color];
 

@@ -31,6 +31,10 @@ export interface DetailView {
     warranty?: string | null;
     isRepairable?: boolean | null;
     endOfLifeInstructions?: string | null;
+
+    /** Ancrage blockchain (PENDING/ANCHORED/FAILED) — présent uniquement sur un DPP API publié. */
+    blockchainAnchorStatus?: string | null;
+    blockchainTxHash?: string | null;
 }
 
 /**
@@ -70,5 +74,8 @@ export function buildDetailView(passport: Passport, dpp: DppFormDto | null): Det
         warranty: dpp?.warrantyDescription ?? passport.warranty?.terms ?? null,
         isRepairable: dpp?.isRepairable ?? null,
         endOfLifeInstructions: dpp?.endOfLifeInstructions ?? null,
+
+        blockchainAnchorStatus: dpp?.blockchainAnchorStatus ?? null,
+        blockchainTxHash: dpp?.blockchainTxHash ?? null,
     };
 }

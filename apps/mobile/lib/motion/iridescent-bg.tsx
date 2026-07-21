@@ -14,7 +14,7 @@ export function IridescentBackground({ intensity = 'default' }: IridescentBackgr
             <motion.div
                 className="absolute -right-24 -top-24 h-[40vh] w-[40vh] rounded-full blur-[100px] motion-reduce:hidden"
                 style={{
-                    background: 'radial-gradient(circle, #06b6d4, #059669, transparent)',
+                    background: 'radial-gradient(circle, #06b6d4, #8021f3, transparent)',
                     opacity: opacityA,
                 }}
                 animate={{ rotate: 360 }}
@@ -23,7 +23,7 @@ export function IridescentBackground({ intensity = 'default' }: IridescentBackgr
             <motion.div
                 className="absolute -bottom-20 -left-20 h-[30vh] w-[30vh] rounded-full blur-[80px] motion-reduce:hidden"
                 style={{
-                    background: 'radial-gradient(circle, #059669, #06b6d4, transparent)',
+                    background: 'radial-gradient(circle, #8021f3, #06b6d4, transparent)',
                     opacity: opacityB,
                 }}
                 animate={{ rotate: -360 }}

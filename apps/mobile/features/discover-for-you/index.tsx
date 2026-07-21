@@ -6,14 +6,13 @@ import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, ArrowUpRight, Info, Sparkles } from 'lucide-react';
 import type { JournalCategory } from '@lumiris/types';
-import { mockArtisanById, mockPassports } from '@lumiris/mock-data';
+import { useMarketplaceSearch } from '@lumiris/api-client/react';
 import { GlassCard } from '@/lib/motion';
 import { useUser } from '@/lib/auth';
-import { useWardrobe } from '@/lib/wardrobe-storage';
+import { toMarketplaceItem, type MarketplaceItem } from '@/lib/marketplace';
 import { articlesForStyles } from '@/lib/discover/for-you';
 import { articleToFeedItem, JOURNAL_CATEGORIES_ORDERED, type DiscoverFeedItem } from '@/lib/discover/feed';
-import { ShopCard } from '@/features/shop/card';
-import { scorePassport } from '@/lib/passport-score';
+import { BoutiqueCard } from '@/features/boutique/card';
 import { HeroCard } from '@/features/discover/hero-card';
 import { CategoryRow } from '@/features/discover/category-row';
 import { CategoryChips, type CategoryFilter } from '@/features/discover/category-chips';
@@ -25,10 +24,13 @@ const MAX_PIECES = 6;
 export function DiscoverForYou() {
     const router = useRouter();
     const { user, isAuthenticated } = useUser();
-    const wardrobe = useWardrobe();
-    const [now] = useState(() => new Date());
     const [showStyleToast, setShowStyleToast] = useState(false);
     const [filter, setFilter] = useState<CategoryFilter>('all');
+
+    // Pièces recommandées : catalogue public RÉEL (mêmes données que la Boutique), tri neutre,
+    // curées sur les meilleurs scores Iris (A/B). Chaque carte mène à la fiche produit réelle
+    // (/boutique/[id]) → surface de recommandation branchée sur le vrai parcours d'achat.
+    const { data: marketplace, isLoading: piecesLoading } = useMarketplaceSearch();
 
     useEffect(() => {
         if (!isAuthenticated) router.replace('/auth');
@@ -58,39 +60,20 @@ export function DiscoverForYou() {
         [feed, filter],
     );
 
-    const scannedKinds = useMemo(() => {
-        const set = new Set<string>();
-        for (const item of wardrobe) {
-            if (item.kind !== 'lumiris-passport') continue;
-            const passport = mockPassports.find((p) => p.id === item.passportId);
-            if (passport) set.add(passport.garment.kind);
-        }
-        return set;
-    }, [wardrobe]);
-
-    const pieces = useMemo(() => {
-        if (scannedKinds.size === 0) return [];
-        return mockPassports
-            .filter((p) => p.status === 'Published' && scannedKinds.has(p.garment.kind))
-            .map((passport) => {
-                const score = scorePassport(passport, now);
-                const artisan = mockArtisanById(passport.artisanId);
-                return {
-                    passport,
-                    score,
-                    artisanName: artisan?.atelierName ?? '-',
-                    isFeatured: false,
-                };
-            })
-            .filter((row) => row.score.grade === 'A' || row.score.grade === 'B')
-            .sort((a, b) => b.score.total - a.score.total)
-            .slice(0, MAX_PIECES);
-    }, [scannedKinds, now]);
+    const pieces = useMemo<readonly MarketplaceItem[]>(
+        () =>
+            (marketplace?.items ?? [])
+                .filter((p) => p.inAppSale !== false)
+                .map(toMarketplaceItem)
+                .filter((it) => it.irisGrade === 'A' || it.irisGrade === 'B')
+                .slice(0, MAX_PIECES),
+        [marketplace],
+    );
 
     const subtitle =
         stylePrefs.length > 0
-            ? `Croisé avec ${stylePrefs.slice(0, 3).join(', ')} et tes scans récents`
-            : 'Croisé avec ton style et tes scans récents';
+            ? `Croisé avec ${stylePrefs.slice(0, 3).join(', ')}`
+            : 'Une sélection d’articles et de pièces pour toi';
 
     if (!isAuthenticated) return null;
 
@@ -144,7 +127,7 @@ export function DiscoverForYou() {
                     onFilterChange={setFilter}
                     stylePrefsEmpty={stylePrefsEmpty}
                 />
-                <PiecesSection pieces={pieces} hasScans={wardrobe.length > 0} />
+                <PiecesSection pieces={pieces} isLoading={piecesLoading} />
             </div>
         </div>
     );
@@ -253,35 +236,29 @@ function groupByCategory(items: readonly DiscoverFeedItem[]): Partial<Record<Jou
 }
 
 interface PiecesSectionProps {
-    pieces: ReadonlyArray<{
-        passport: (typeof mockPassports)[number];
-        score: ReturnType<typeof scorePassport>;
-        artisanName: string;
-        isFeatured: boolean;
-    }>;
-    hasScans: boolean;
+    pieces: readonly MarketplaceItem[];
+    isLoading: boolean;
 }
 
-function PiecesSection({ pieces, hasScans }: PiecesSectionProps) {
+function PiecesSection({ pieces, isLoading }: PiecesSectionProps) {
     return (
         <section className="mt-10">
             <h2 className="text-foreground px-1 text-base font-semibold tracking-tight">
                 Pièces qui pourraient te plaire
             </h2>
-            {!hasScans ? (
-                <EmptyHint
-                    text="Scanne quelques pièces pour qu'on apprenne ce que tu portes."
-                    href="/"
-                    cta="Scanner une pièce"
-                />
+            <p className="text-muted-foreground mt-0.5 px-1 text-xs">Sélectionnées dans la Boutique Lumiris.</p>
+            {isLoading ? (
+                <p className="text-muted-foreground mt-3 px-1 text-xs">Chargement des pièces…</p>
             ) : pieces.length === 0 ? (
-                <p className="text-muted-foreground mt-3 px-1 text-xs">
-                    Aucune pièce A/B disponible dans tes catégories scannées.
-                </p>
+                <EmptyHint
+                    text="Aucune pièce en vente pour le moment. Découvre la Boutique."
+                    href="/boutique"
+                    cta="Voir la Boutique"
+                />
             ) : (
                 <div className="mt-3 grid grid-cols-2 gap-3">
-                    {pieces.map((row, idx) => (
-                        <ShopCard key={row.passport.id} item={row} index={idx} />
+                    {pieces.map((item, idx) => (
+                        <BoutiqueCard key={item.id} item={item} index={idx} />
                     ))}
                 </div>
             )}

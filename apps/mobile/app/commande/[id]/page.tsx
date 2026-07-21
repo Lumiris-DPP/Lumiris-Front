@@ -1,10 +1,16 @@
 import { OrderConfirmation } from '@/features/order-confirmation';
 
-// L'écran de confirmation lit la commande réelle de l'acheteur (la plus récente) et poll
-// jusqu'à ce que le webhook Stripe la marque PAID. Le segment [id] ('latest' ou l'id du
-// PaymentIntent) sert uniquement d'URL de retour — la donnée vient du backend.
+// L'écran de confirmation lit le GROUPE de commande rattaché au PaymentIntent (toutes les
+// lignes + total réellement facturé par Stripe) et poll jusqu'à ce que le webhook le marque
+// PAID. Le segment [id] est le paymentIntentId ; la valeur spéciale « latest » (ou un retour
+// de redirection Stripe avec ?payment_intent=…) est résolue côté client.
 export const dynamic = 'force-dynamic';
 
-export default function OrderConfirmationPage() {
-    return <OrderConfirmation />;
+interface RouteProps {
+    params: Promise<{ id: string }>;
+}
+
+export default async function OrderConfirmationPage({ params }: RouteProps) {
+    const { id } = await params;
+    return <OrderConfirmation routeId={id} />;
 }

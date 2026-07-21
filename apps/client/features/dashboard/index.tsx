@@ -23,7 +23,9 @@ import { RecentPassports } from './recent-passports';
 
 export function Dashboard() {
     const artisan = useCurrentArtisan();
-    const passports = usePassports(artisan.id);
+    // Detailed = fetch each DPP's full data in real mode so Iris scores/grades reflect real
+    // materials & eco fields (never a fabricated E from an empty summary).
+    const passports = usePassports(artisan.id, { detailed: true });
 
     const now = useMemo(() => new Date(), []);
     const certificates = useMemo(() => loadMergedCertificates(artisan.id), [artisan.id]);

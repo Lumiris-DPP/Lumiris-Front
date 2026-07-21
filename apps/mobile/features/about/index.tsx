@@ -183,7 +183,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function ManifestoLine({ Icon, text }: { Icon: typeof ShieldCheck; text: string }) {
     return (
         <div className="flex items-start gap-3 [&:not(:last-child)]:mb-3">
-            <Icon className="text-lumiris-emerald mt-0.5 h-4 w-4 shrink-0" />
+            <Icon className="text-lumiris-cyan mt-0.5 h-4 w-4 shrink-0" />
             <p className="text-foreground/90 text-sm leading-relaxed">{text}</p>
         </div>
     );

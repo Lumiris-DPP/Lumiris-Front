@@ -262,7 +262,7 @@ function PrivacyLink() {
                 className="hover:bg-background/40 group flex items-center justify-between gap-3 px-4 py-3 transition-colors"
             >
                 <span className="inline-flex items-center gap-3">
-                    <ShieldCheck className="text-lumiris-emerald h-4 w-4" />
+                    <ShieldCheck className="text-lumiris-cyan h-4 w-4" />
                     <span className="flex flex-col">
                         <span className="text-foreground text-sm">Confidentialité &amp; données</span>
                         <span className="text-muted-foreground text-[11px]">

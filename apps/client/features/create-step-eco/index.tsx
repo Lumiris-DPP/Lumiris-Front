@@ -150,6 +150,14 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                     description: 'Vérifiez votre abonnement avant de publier.',
                 });
                 router.push('/subscription');
+            } else if (isApiError(err)) {
+                // The backend returns a precise reason on a 400, e.g. "Passeport incomplet :
+                // renseignez le nom du produit, …" — surface it (plus any field errors) instead
+                // of a generic message so the artisan knows exactly what to fix.
+                const fieldMessages = err.fields ? Object.values(err.fields).flat() : [];
+                toast.error('La publication a échoué', {
+                    description: fieldMessages.length > 0 ? fieldMessages.join(' · ') : err.message,
+                });
             } else {
                 toast.error('La publication a échoué. Réessayez.');
             }
@@ -289,7 +297,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                         <Button
                             onClick={handlePublish}
                             disabled={publishing || savingDraft || (form.recycledPct ?? 0) > 100}
-                            className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 gap-2 text-white"
+                            className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 gap-2 text-white"
                         >
                             <QrCode className="h-4 w-4" />
                             {publishing ? 'Publication…' : 'Publier et générer le QR Code'}

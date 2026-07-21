@@ -104,7 +104,7 @@ export function CompositionSection({ materials, onAdd, onRemove, onUpdate }: Com
             <button
                 type="button"
                 onClick={onAdd}
-                className="border-border text-muted-foreground hover:border-lumiris-emerald hover:text-lumiris-emerald flex items-center gap-1.5 rounded-md border border-dashed px-3 py-1.5 text-sm transition-colors"
+                className="border-border text-muted-foreground hover:border-lumiris-cyan hover:text-lumiris-cyan flex items-center gap-1.5 rounded-md border border-dashed px-3 py-1.5 text-sm transition-colors"
             >
                 <Plus className="h-3.5 w-3.5" /> Ajouter une fibre
             </button>
@@ -131,8 +131,8 @@ export function CareSymbolsSection({ care, onToggle }: CareSymbolsSectionProps) 
                             onClick={() => onToggle(s.code)}
                             className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
                                 checked
-                                    ? 'bg-lumiris-emerald/10 border-lumiris-emerald text-lumiris-emerald'
-                                    : 'border-border text-muted-foreground hover:border-lumiris-emerald/50'
+                                    ? 'bg-lumiris-cyan/10 border-lumiris-cyan text-lumiris-cyan'
+                                    : 'border-border text-muted-foreground hover:border-lumiris-cyan/50'
                             }`}
                         >
                             <Image

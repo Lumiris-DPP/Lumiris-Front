@@ -520,9 +520,9 @@ function WardrobeHealth({ grade, percentage, scoredCount }: WardrobeHealthProps)
                 <p className="text-muted-foreground mt-1 text-[11px]">
                     Score moyen calculé sur {scoredCount} item{scoredCount > 1 ? 's' : ''} avec DPP.
                 </p>
-                <div className="bg-lumiris-emerald/10 mt-2.5 inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1.5">
-                    <TrendingUp className="text-lumiris-emerald h-3 w-3" />
-                    <span className="text-lumiris-emerald text-[11px] font-medium">{tone}</span>
+                <div className="bg-lumiris-cyan/10 mt-2.5 inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1.5">
+                    <TrendingUp className="text-lumiris-cyan h-3 w-3" />
+                    <span className="text-lumiris-cyan text-[11px] font-medium">{tone}</span>
                 </div>
             </div>
         </motion.div>

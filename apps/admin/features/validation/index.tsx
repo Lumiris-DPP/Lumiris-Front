@@ -124,7 +124,7 @@ export function ValidationQueue() {
                                                     size="sm"
                                                     disabled={!canReject || rejectArtisan.isPending}
                                                     onClick={() => reject(req)}
-                                                    className="h-8 gap-1.5 bg-red-600 text-white hover:bg-red-700 disabled:opacity-40"
+                                                    className="h-8 gap-1.5 bg-lumiris-rose text-white hover:bg-lumiris-rose/90 disabled:opacity-40"
                                                 >
                                                     <XCircle className="h-3.5 w-3.5" />
                                                     Rejeter
@@ -133,7 +133,7 @@ export function ValidationQueue() {
                                                     size="sm"
                                                     disabled={!canVerify || verifyArtisan.isPending}
                                                     onClick={() => approve(req)}
-                                                    className="h-8 gap-1.5 bg-green-600 text-white hover:bg-green-700 disabled:opacity-40"
+                                                    className="h-8 gap-1.5 bg-lumiris-emerald text-white hover:bg-lumiris-emerald/90 disabled:opacity-40"
                                                 >
                                                     <CheckCircle2 className="h-3.5 w-3.5" />
                                                     Approuver
