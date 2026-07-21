@@ -14,7 +14,7 @@ export function Panier() {
     const multiSeller = sellerCount > 1;
 
     return (
-        <div className="bg-background flex h-full flex-col overflow-y-auto pb-40">
+        <div className="bg-background flex h-full flex-col overflow-y-auto pb-44">
             <motion.header
                 className="flex items-center gap-3 px-4 pb-3 pt-12"
                 initial={{ opacity: 0, y: -10 }}

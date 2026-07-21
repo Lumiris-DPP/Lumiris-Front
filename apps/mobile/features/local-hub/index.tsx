@@ -171,7 +171,7 @@ export function LocalHub({ artisans, repairers }: LocalHubProps) {
 
             <div className="relative min-h-0 flex-1">
                 {view === 'list' ? (
-                    <div className="absolute inset-0 overflow-y-auto">
+                    <div className="absolute inset-0 overflow-y-auto pb-28">
                         <ListView points={filtered} loading={loading} showMarketplaceBanner={kind === 'buy'} />
                     </div>
                 ) : (

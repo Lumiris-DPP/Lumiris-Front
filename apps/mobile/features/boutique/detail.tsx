@@ -96,7 +96,7 @@ function DetailBody({
     }, [product.id, onBuyNow]);
 
     return (
-        <div className="bg-background relative flex h-full flex-col overflow-y-auto pb-36">
+        <div className="bg-background relative flex h-full flex-col overflow-y-auto pb-44">
             <button
                 type="button"
                 onClick={onBack}
