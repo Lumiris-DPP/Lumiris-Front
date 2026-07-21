@@ -4,7 +4,9 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { mockArtisanById } from '@lumiris/mock-data';
 import { useArtisanMe } from '@lumiris/api-client/react';
+import { toast } from '@lumiris/ui/components/sonner';
 import { useAuthArtisanId, useAuthUserId, useAuthRole, useAuthToken, useAuthHydrated } from '@/lib/use-auth';
+import { signOut } from '@/lib/auth-store';
 import { useVerificationStore, type VerificationStatus } from '@/lib/verification-store';
 import { PendingScreen } from '@/features/verification-status/pending';
 import { RejectedScreen } from '@/features/verification-status/rejected';
@@ -28,6 +30,10 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     // KYB onboarding only applies to artisan accounts — other roles (consumer, repairer, admin)
     // have no ArtisanProfile at all, so GET /api/artisans/me would just 404 for them.
     const isArtisan = role === 'artisan';
+    // ATELIER is for artisan and repairer accounts only. `role === null` covers mock/demo-mode
+    // sessions that never went through `signInWithToken` — those don't carry a real role and
+    // must not be bounced by this real-mode-only check.
+    const isAllowedRole = role === null || role === 'artisan' || role === 'repairer';
 
     // Real mode: GET /api/artisans/me is the source of truth on every load, not local storage.
     // The backend auto-creates an empty ArtisanProfile row (status defaults to PENDING) for every
@@ -67,13 +73,22 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
             router.replace('/login');
             return;
         }
+        if (!isAllowedRole) {
+            signOut();
+            toast.error('Ce compte n’a pas accès à ATELIER', {
+                description: 'Utilisez VISION (consommateur) ou la console admin.',
+            });
+            router.replace('/login');
+            return;
+        }
         if (awaitingLiveCheck) return;
         if (status === 'unregistered') {
             router.replace('/onboarding');
         }
-    }, [hydrated, userId, status, router, awaitingLiveCheck]);
+    }, [hydrated, userId, isAllowedRole, status, router, awaitingLiveCheck]);
 
     if (!hydrated || !userId) return null;
+    if (!isAllowedRole) return null;
     if (awaitingLiveCheck) return null;
     if (status === 'unregistered') return null;
     if (status === 'pending') return <PendingScreen />;
