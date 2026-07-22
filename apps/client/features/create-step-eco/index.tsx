@@ -124,18 +124,9 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
 
     // Final validation: publish. When editing a draft, push edits (PUT) then publish it.
     const handlePublish = async () => {
-        if (!draft) return;
+        // Le bouton est désactivé quand publishBlocked ; la garde reste appliquée côté backend.
+        if (!draft || publishBlocked) return;
         persistForm();
-
-        if (publishBlocked) {
-            toast.error(
-                quota?.reason === 'QUOTA_EXCEEDED' ? 'Quota de passeports atteint' : 'Abonnement ATELIER requis',
-                { description: 'Enregistrez votre travail en brouillon, puis souscrivez pour le publier.' },
-            );
-            router.push('/subscription');
-            return;
-        }
-
         setPublishing(true);
 
         const payload = buildPayload(draft);
@@ -323,7 +314,14 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                         </Button>
                         <Button
                             onClick={handlePublish}
-                            disabled={publishing || savingDraft || (form.recycledPct ?? 0) > 100}
+                            disabled={publishBlocked || publishing || savingDraft || (form.recycledPct ?? 0) > 100}
+                            title={
+                                publishBlocked
+                                    ? quota?.reason === 'QUOTA_EXCEEDED'
+                                        ? 'Quota de passeports atteint'
+                                        : 'Abonnement ATELIER requis pour publier'
+                                    : undefined
+                            }
                             className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 gap-2 text-white"
                         >
                             <QrCode className="h-4 w-4" />

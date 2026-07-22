@@ -91,7 +91,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
         >
             {/* Date de fabrication */}
             <div className="space-y-2">
-                <Label htmlFor="manufactured-at">Date de fabrication / lancement du lot</Label>
+                <Label htmlFor="manufactured-at">Date de fabrication</Label>
                 <Input
                     id="manufactured-at"
                     type="date"
