@@ -85,3 +85,19 @@ export function garmentCategoryLabel(value: string | null | undefined): string {
     if (!value) return '—';
     return CATEGORY_BY_VALUE.get(value) ?? value;
 }
+
+const FIBER_BY_VALUE = new Map<string, string>(Object.entries(FIBER_LABEL));
+
+/** Résout le libellé d'une fibre issue de l'API (chaîne libre), avec repli sur la valeur brute puis « — ». */
+export function fiberLabel(value: string | null | undefined): string {
+    if (!value) return '—';
+    return FIBER_BY_VALUE.get(value) ?? value;
+}
+
+const KIND_BY_VALUE = new Map<string, string>(Object.entries(GARMENT_KIND_LABEL));
+
+/** Résout le libellé d'un type de vêtement issu de l'API (chaîne libre), avec repli sur la valeur brute puis « — ». */
+export function garmentKindLabel(value: string | null | undefined): string {
+    if (!value) return '—';
+    return KIND_BY_VALUE.get(value) ?? value;
+}

@@ -110,7 +110,11 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
                 </p>
             </div>
 
-            <PhotoField value={photoFile} onChange={setPhotoFile} />
+            <PhotoField
+                value={photoFile}
+                onChange={setPhotoFile}
+                existingUrl={draft?.existingDocs?.['PRODUCT_PHOTO']?.url}
+            />
 
             <SizesField selected={form.availableSizes ?? []} onToggle={toggleSize} />
 
@@ -123,12 +127,14 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
                     description="Un PDF sécurisé servant d'acte de propriété."
                     value={saleInvoiceFile}
                     onChange={setSaleInvoiceFile}
+                    existing={draft?.existingDocs?.['SALE_INVOICE']}
                 />
                 <DocUploadField
                     label="Fiche d'Identité / Carnet de Création"
                     description="Un document PDF qui immortalise les croquis d'intention du designer, le nombre d'heures de travail passées dans l'atelier, et le nom des artisans ayant façonné la pièce."
                     value={creationPassportFile}
                     onChange={setCreationPassportFile}
+                    existing={draft?.existingDocs?.['CREATION_PASSPORT']}
                 />
             </div>
         </WizardStepFrame>

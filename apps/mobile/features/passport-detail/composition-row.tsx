@@ -1,20 +1,9 @@
 'use client';
 
 import { Recycle, Leaf } from 'lucide-react';
-import type { Fiber, Material } from '@lumiris/types';
+import type { Material } from '@lumiris/types';
+import { FIBER_LABEL } from '@lumiris/scoring-ui';
 import { cn } from '@lumiris/ui/lib/cn';
-
-const FIBER_LABEL: Record<Fiber, string> = {
-    wool: 'Laine',
-    linen: 'Lin',
-    cotton: 'Coton',
-    silk: 'Soie',
-    hemp: 'Chanvre',
-    leather: 'Cuir',
-    cashmere: 'Cachemire',
-    'recycled-polyester': 'Polyester recyclé',
-    other: 'Autre',
-};
 
 const COUNTRY_FLAG: Record<string, string> = {
     FR: '🇫🇷',

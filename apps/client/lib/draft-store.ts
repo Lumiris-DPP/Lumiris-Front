@@ -20,6 +20,12 @@ export type WizardStep = 'product' | 'care' | 'traceability' | 'eco';
 
 export const WIZARD_STEPS: readonly WizardStep[] = ['product', 'care', 'traceability', 'eco'] as const;
 
+/** Descripteur d'un document déjà envoyé au backend (pas de `File` récupérable). */
+export interface ExistingDoc {
+    filename?: string | null;
+    url?: string | null;
+}
+
 export interface DraftPassport {
     id: string;
     // Set when this local draft mirrors an existing backend DRAFT being edited.
@@ -36,6 +42,11 @@ export interface DraftPassport {
     traceability: TraceabilityInfo;
     eco: EcoInfo;
     files: Partial<Record<string, File>>;
+    // Documents déjà stockés côté backend, indexés par DocumentType (PRODUCT_PHOTO inclus).
+    // Un `File` n'est ni sérialisable ni reconstructible : c'est ce descripteur qui permet aux
+    // champs d'upload d'afficher « déjà envoyé » à la reprise d'un brouillon. Un nouveau fichier
+    // dans `files` prime et remplacera le document au prochain PUT.
+    existingDocs?: Partial<Record<string, ExistingDoc>>;
     lastStep?: WizardStep;
     // Set true on rehydrate when this draft had uploaded files that couldn't be persisted
     // (File objects aren't serialisable) — the wizard uses it to prompt a re-upload.
@@ -97,61 +108,64 @@ function patch(state: DraftStoreState, id: string, fields: Partial<DraftPassport
 export const useDraftStore = create<DraftStoreState>()(
     persist(
         (set, get) => ({
-    drafts: {},
+            drafts: {},
 
-    createDraft: (artisanId, id) => {
-        const draftId = id ?? newId();
-        const now = new Date().toISOString();
-        const draft: DraftPassport = {
-            id: draftId,
-            artisanId,
-            createdAt: now,
-            updatedAt: now,
-            garment: emptyGarment(),
-            materials: [],
-            careInstructions: [],
-            certifications: [],
-            careNotes: '',
-            traceability: emptyTraceability(),
-            eco: {},
-            files: {},
-        };
-        set((s) => ({ ...s, drafts: { ...s.drafts, [draftId]: draft } }));
-        return draftId;
-    },
+            createDraft: (artisanId, id) => {
+                const draftId = id ?? newId();
+                const now = new Date().toISOString();
+                const draft: DraftPassport = {
+                    id: draftId,
+                    artisanId,
+                    createdAt: now,
+                    updatedAt: now,
+                    garment: emptyGarment(),
+                    materials: [],
+                    careInstructions: [],
+                    certifications: [],
+                    careNotes: '',
+                    traceability: emptyTraceability(),
+                    eco: {},
+                    files: {},
+                };
+                set((s) => ({ ...s, drafts: { ...s.drafts, [draftId]: draft } }));
+                return draftId;
+            },
 
-    getDraft: (id) => get().drafts[id],
+            getDraft: (id) => get().drafts[id],
 
-    setDraft: (id, fields) => set((s) => patch(s, id, fields)),
-    setGarment: (id, garment) => set((s) => patch(s, id, { garment })),
-    setMaterials: (id, materials) => set((s) => patch(s, id, { materials })),
-    setCareInstructions: (id, careInstructions) => set((s) => patch(s, id, { careInstructions })),
-    setCertifications: (id, certifications) => set((s) => patch(s, id, { certifications })),
-    setCareNotes: (id, careNotes) => set((s) => patch(s, id, { careNotes })),
-    setTraceability: (id, traceability) => set((s) => patch(s, id, { traceability })),
-    setEco: (id, eco) => set((s) => patch(s, id, { eco })),
-    setFile: (id, docType, file) =>
-        set((s) => {
-            const draft = s.drafts[id];
-            if (!draft) return s;
-            const files = { ...draft.files };
-            if (file === null) delete files[docType];
-            else files[docType] = file;
-            // Selecting a file resolves the "re-upload needed" prompt for this draft.
-            const filesDropped = file !== null ? false : draft.filesDropped;
-            return {
-                ...s,
-                drafts: { ...s.drafts, [id]: { ...draft, files, filesDropped, updatedAt: new Date().toISOString() } },
-            };
-        }),
-    setLastStep: (id, step) => set((s) => patch(s, id, { lastStep: step })),
-    clearFilesDropped: (id) => set((s) => patch(s, id, { filesDropped: false })),
+            setDraft: (id, fields) => set((s) => patch(s, id, fields)),
+            setGarment: (id, garment) => set((s) => patch(s, id, { garment })),
+            setMaterials: (id, materials) => set((s) => patch(s, id, { materials })),
+            setCareInstructions: (id, careInstructions) => set((s) => patch(s, id, { careInstructions })),
+            setCertifications: (id, certifications) => set((s) => patch(s, id, { certifications })),
+            setCareNotes: (id, careNotes) => set((s) => patch(s, id, { careNotes })),
+            setTraceability: (id, traceability) => set((s) => patch(s, id, { traceability })),
+            setEco: (id, eco) => set((s) => patch(s, id, { eco })),
+            setFile: (id, docType, file) =>
+                set((s) => {
+                    const draft = s.drafts[id];
+                    if (!draft) return s;
+                    const files = { ...draft.files };
+                    if (file === null) delete files[docType];
+                    else files[docType] = file;
+                    // Selecting a file resolves the "re-upload needed" prompt for this draft.
+                    const filesDropped = file !== null ? false : draft.filesDropped;
+                    return {
+                        ...s,
+                        drafts: {
+                            ...s.drafts,
+                            [id]: { ...draft, files, filesDropped, updatedAt: new Date().toISOString() },
+                        },
+                    };
+                }),
+            setLastStep: (id, step) => set((s) => patch(s, id, { lastStep: step })),
+            clearFilesDropped: (id) => set((s) => patch(s, id, { filesDropped: false })),
 
-    deleteDraft: (id) => {
-        const next = { ...get().drafts };
-        delete next[id];
-        set((s) => ({ ...s, drafts: next }));
-    },
+            deleteDraft: (id) => {
+                const next = { ...get().drafts };
+                delete next[id];
+                set((s) => ({ ...s, drafts: next }));
+            },
         }),
         {
             name: 'atelier-draft',

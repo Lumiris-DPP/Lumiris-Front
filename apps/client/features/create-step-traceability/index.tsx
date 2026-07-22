@@ -91,7 +91,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
         >
             {/* Date de fabrication */}
             <div className="space-y-2">
-                <Label htmlFor="manufactured-at">Date de fabrication / lancement du lot</Label>
+                <Label htmlFor="manufactured-at">Date de fabrication</Label>
                 <Input
                     id="manufactured-at"
                     type="date"
@@ -207,6 +207,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
                             setReachFile(file);
                             setFile(draftId, 'REACH_COMPLIANCE', file);
                         }}
+                        existing={draft?.existingDocs?.['REACH_COMPLIANCE']}
                     />
                 )}
             </div>
@@ -224,6 +225,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
                         setEuDeclarationFile(file);
                         setFile(draftId, 'EU_DOC_OF_CONFORMITY', file);
                     }}
+                    existing={draft?.existingDocs?.['EU_DOC_OF_CONFORMITY']}
                 />
 
                 <DocUploadField
@@ -234,6 +236,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
                         setTestReportsFile(file);
                         setFile(draftId, 'TEST_REPORTS', file);
                     }}
+                    existing={draft?.existingDocs?.['TEST_REPORTS']}
                 />
 
                 <DocUploadField
@@ -244,6 +247,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
                         setTransactionCertsFile(file);
                         setFile(draftId, 'TRANSACTION_CERTIFICATES', file);
                     }}
+                    existing={draft?.existingDocs?.['TRANSACTION_CERTIFICATES']}
                 />
 
                 <DocUploadField
@@ -254,6 +258,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
                         setOriginCertsFile(file);
                         setFile(draftId, 'ORIGIN_CERTIFICATES', file);
                     }}
+                    existing={draft?.existingDocs?.['ORIGIN_CERTIFICATES']}
                 />
             </div>
         </WizardStepFrame>

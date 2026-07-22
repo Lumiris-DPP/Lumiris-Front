@@ -49,14 +49,25 @@ export function CategoryField({
     );
 }
 
-export function PhotoField({ value, onChange }: { value: File | null; onChange: (file: File | null) => void }) {
-    const previewUrl = useMemo(() => (value ? URL.createObjectURL(value) : null), [value]);
+export function PhotoField({
+    value,
+    onChange,
+    existingUrl,
+}: {
+    value: File | null;
+    onChange: (file: File | null) => void;
+    /** Photo déjà stockée côté backend, affichée tant qu'aucun nouveau fichier ne la remplace. */
+    existingUrl?: string | null;
+}) {
+    const objectUrl = useMemo(() => (value ? URL.createObjectURL(value) : null), [value]);
 
     useEffect(() => {
         return () => {
-            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            if (objectUrl) URL.revokeObjectURL(objectUrl);
         };
-    }, [previewUrl]);
+    }, [objectUrl]);
+
+    const previewUrl = objectUrl ?? existingUrl ?? null;
 
     return (
         <div className="space-y-2 md:col-span-2">
@@ -72,17 +83,19 @@ export function PhotoField({ value, onChange }: { value: File | null; onChange: 
                             unoptimized
                             className="rounded-xl object-contain"
                         />
-                        <button
-                            type="button"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                onChange(null);
-                            }}
-                            className="bg-background/80 absolute right-2 top-2 rounded-full p-1"
-                            aria-label="Supprimer la photo"
-                        >
-                            <X className="h-4 w-4" />
-                        </button>
+                        {value && (
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    onChange(null);
+                                }}
+                                className="bg-background/80 absolute right-2 top-2 rounded-full p-1"
+                                aria-label="Supprimer la photo"
+                            >
+                                <X className="h-4 w-4" />
+                            </button>
+                        )}
                     </>
                 ) : (
                     <>

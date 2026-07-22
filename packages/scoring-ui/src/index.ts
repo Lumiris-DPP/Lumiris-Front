@@ -52,6 +52,8 @@ export {
     STAGE_LABEL,
     GARMENT_CATEGORY_LABEL,
     garmentCategoryLabel,
+    garmentKindLabel,
+    fiberLabel,
     CARE_SYMBOLS,
     careSymbol,
     type CareSymbol,

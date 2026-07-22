@@ -8,6 +8,7 @@ import { mockPassportById } from '@lumiris/mock-data';
 import type { IrisGrade } from '@lumiris/types';
 import { useApiClient } from '@lumiris/api-client/react';
 import type { DppFormDto, IrisScoreDto } from '@lumiris/api-client';
+import { fiberLabel } from '@lumiris/scoring-ui';
 import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { draftToPassport, useDraftStore } from '@/lib/draft-store';
 
@@ -22,18 +23,6 @@ const GRADE_HEX: Record<IrisGrade, string> = {
     C: '#7b2fe0', // lumiris-iris
     D: '#cf7415', // lumiris-amber
     E: '#c81f45', // lumiris-rose
-};
-
-const FIBER_LABEL_FR: Record<string, string> = {
-    cotton: 'Coton',
-    wool: 'Laine',
-    linen: 'Lin',
-    silk: 'Soie',
-    hemp: 'Chanvre',
-    cashmere: 'Cachemire',
-    leather: 'Cuir',
-    'recycled-polyester': 'Polyester recyclé',
-    other: 'Autre',
 };
 
 const CARE_SYMBOLS: Array<{ code: string; label: string; svgPath: string }> = [
@@ -232,9 +221,7 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                                 <tbody>
                                     {(dpp.materials ?? []).map((m, i) => (
                                         <tr key={i} className="border-b border-neutral-100">
-                                            <td className="py-1.5 pr-2 font-medium">
-                                                {FIBER_LABEL_FR[m.fiber] ?? m.fiber}
-                                            </td>
+                                            <td className="py-1.5 pr-2 font-medium">{fiberLabel(m.fiber)}</td>
                                             <td className="py-1.5 pr-2 font-mono">{m.percentage}%</td>
                                             <td className="py-1.5">{m.originCountry || '—'}</td>
                                         </tr>
@@ -308,11 +295,11 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                                     <dd className="flex items-center gap-1">
                                         {dpp.reachCompliant ? (
                                             <>
-                                                <CheckCircle className="h-3 w-3 text-lumiris-emerald" /> Oui
+                                                <CheckCircle className="text-lumiris-emerald h-3 w-3" /> Oui
                                             </>
                                         ) : (
                                             <>
-                                                <XCircle className="h-3 w-3 text-lumiris-rose" /> Non
+                                                <XCircle className="text-lumiris-rose h-3 w-3" /> Non
                                             </>
                                         )}
                                     </dd>
@@ -345,11 +332,11 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                                     <dd className="flex items-center gap-1">
                                         {dpp.isRepairable ? (
                                             <>
-                                                <CheckCircle className="h-3 w-3 text-lumiris-emerald" /> Oui
+                                                <CheckCircle className="text-lumiris-emerald h-3 w-3" /> Oui
                                             </>
                                         ) : (
                                             <>
-                                                <XCircle className="h-3 w-3 text-lumiris-rose" /> Non
+                                                <XCircle className="text-lumiris-rose h-3 w-3" /> Non
                                             </>
                                         )}
                                     </dd>

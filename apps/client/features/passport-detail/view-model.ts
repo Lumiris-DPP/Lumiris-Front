@@ -1,5 +1,6 @@
 import type { DppFormDto } from '@lumiris/api-client';
 import type { Passport } from '@lumiris/types';
+import { fiberLabel, garmentCategoryLabel, garmentKindLabel } from '@lumiris/scoring-ui';
 
 const PLACEHOLDER_PHOTO = '/default_product_picture.webp';
 
@@ -17,6 +18,7 @@ export interface DetailView {
     sizes: string[];
     colors: string[];
 
+    /** `fiber` porte le libellé FR déjà résolu, prêt à afficher. */
     materials: Array<{ fiber: string; percentage: number; originCountry?: string | null }>;
     careInstructions: string[];
     certifications: Array<{ name: string; customName?: string | null; licenseNumber?: string | null }>;
@@ -51,13 +53,16 @@ export function buildDetailView(passport: Passport, dpp: DppFormDto | null): Det
         apiStatus: dpp ? dpp.status : null,
 
         description: dpp?.productDescription ?? passport.garment.description,
-        category: dpp?.productCategory ?? passport.garment.kind,
+        // Libellés FR : l'API renvoie les valeurs techniques (`dress`, `cotton`…).
+        category: dpp?.productCategory
+            ? garmentCategoryLabel(dpp.productCategory)
+            : garmentKindLabel(passport.garment.kind),
         originCountry: dpp?.originCountry ?? passport.garment.originCountry,
         sizes: [...(dpp?.availableSizes ?? passport.garment.availableSizes ?? [])],
         colors: [...(dpp?.colors ?? passport.garment.colors ?? [])],
 
         materials: (dpp?.materials ?? passport.materials).map((m) => ({
-            fiber: String(m.fiber),
+            fiber: fiberLabel(String(m.fiber)),
             percentage: m.percentage,
             originCountry: m.originCountry ?? null,
         })),

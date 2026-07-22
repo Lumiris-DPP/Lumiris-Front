@@ -13,9 +13,11 @@ import { useStepNavigation } from '@/features/wizard-shell/use-step-navigation';
 import { DocUploadField } from '@/features/wizard-shell/doc-upload-field';
 import { useDraftStore } from '@/lib/draft-store';
 import { useAuthStore } from '@/lib/auth-store';
+import { useSubscription } from '@/lib/use-subscription';
 import { useCreateDppForm, useUpdateDppForm, usePublishDppForm } from '@lumiris/api-client/react';
 import { isApiError, dppFilesToParts } from '@lumiris/api-client';
 import { toast } from '@lumiris/ui/components/sonner';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export function CreateStepEco({ draftId }: { draftId: string }) {
@@ -29,6 +31,9 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
     const publishDpp = usePublishDppForm();
     const { goTo } = useStepNavigation(draftId);
     const router = useRouter();
+    // Le brouillon est libre ; seule la publication exige un abonnement dans le quota.
+    const { quota, isRealMode } = useSubscription();
+    const publishBlocked = isRealMode && quota?.canCreate === false;
 
     const [form, setForm] = useState<EcoInfo>(draft?.eco ?? {});
     const [publishing, setPublishing] = useState(false);
@@ -119,7 +124,8 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
 
     // Final validation: publish. When editing a draft, push edits (PUT) then publish it.
     const handlePublish = async () => {
-        if (!draft) return;
+        // Le bouton est désactivé quand publishBlocked ; la garde reste appliquée côté backend.
+        if (!draft || publishBlocked) return;
         persistForm();
         setPublishing(true);
 
@@ -238,6 +244,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                         setRepairManualFile(file);
                         setFile(draftId, 'REPAIR_MANUAL', file);
                     }}
+                    existing={draft?.existingDocs?.['REPAIR_MANUAL']}
                 />
             )}
 
@@ -265,6 +272,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                         setCareGuideFile(file);
                         setFile(draftId, 'CARE_GUIDE', file);
                     }}
+                    existing={draft?.existingDocs?.['CARE_GUIDE']}
                 />
 
                 <DocUploadField
@@ -275,11 +283,24 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                         setEndOfLifeFile(file);
                         setFile(draftId, 'END_OF_LIFE_GUIDE', file);
                     }}
+                    existing={draft?.existingDocs?.['END_OF_LIFE_GUIDE']}
                 />
             </div>
 
             {/* Boutons brouillon + publier */}
             <div className="border-border border-t pt-4">
+                {publishBlocked && (
+                    <p className="text-muted-foreground mb-3 text-xs">
+                        {quota?.reason === 'QUOTA_EXCEEDED'
+                            ? `Quota atteint (${quota?.used} / ${quota?.limit}). `
+                            : 'Aucun abonnement ATELIER actif. '}
+                        Vous pouvez enregistrer ce passeport en brouillon ; la publication nécessite un{' '}
+                        <Link href="/subscription" className="text-foreground underline underline-offset-2">
+                            abonnement
+                        </Link>
+                        .
+                    </p>
+                )}
                 <div className="flex items-center justify-between gap-4">
                     <Button variant="outline" onClick={handlePrev} disabled={publishing || savingDraft}>
                         Précédent
@@ -296,7 +317,14 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                         </Button>
                         <Button
                             onClick={handlePublish}
-                            disabled={publishing || savingDraft || (form.recycledPct ?? 0) > 100}
+                            disabled={publishBlocked || publishing || savingDraft || (form.recycledPct ?? 0) > 100}
+                            title={
+                                publishBlocked
+                                    ? quota?.reason === 'QUOTA_EXCEEDED'
+                                        ? 'Quota de passeports atteint'
+                                        : 'Abonnement ATELIER requis pour publier'
+                                    : undefined
+                            }
                             className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 gap-2 text-white"
                         >
                             <QrCode className="h-4 w-4" />

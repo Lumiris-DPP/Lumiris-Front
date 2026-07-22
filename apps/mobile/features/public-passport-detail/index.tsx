@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { useMarketplaceProductByDpp } from '@lumiris/api-client/react';
 import type { IrisGrade } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
+import { fiberLabel } from '@lumiris/scoring-ui';
 import type { OriginMapOriginPoint, OriginMapStepPoint } from '@lumiris/scoring-ui/components/origin-map';
 import { formatCents } from '@/lib/marketplace';
 import type { DppEventDto, DppEventActorType, DppFormDto, IrisScoreDto } from '@/lib/public-dpp-api';
@@ -25,18 +26,6 @@ const OriginMap = dynamic(() => import('@lumiris/scoring-ui/components/origin-ma
         </div>
     ),
 });
-
-const FIBER_LABELS: Record<string, string> = {
-    cotton: 'Coton',
-    wool: 'Laine',
-    linen: 'Lin',
-    silk: 'Soie',
-    hemp: 'Chanvre',
-    cashmere: 'Cachemire',
-    leather: 'Cuir',
-    'recycled-polyester': 'Polyester recyclé',
-    other: 'Autre',
-};
 
 const CATEGORY_LABELS: Record<string, string> = {
     top: 'Haut',
@@ -94,12 +83,7 @@ interface PublicPassportDetailProps {
     artisanSlug?: string | null;
 }
 
-export function PublicPassportDetail({
-    dpp,
-    irisScore,
-    events = [],
-    artisanSlug,
-}: PublicPassportDetailProps) {
+export function PublicPassportDetail({ dpp, irisScore, events = [], artisanSlug }: PublicPassportDetailProps) {
     const router = useRouter();
     const grade = irisScore?.grade as IrisGrade | undefined;
     const cssVar = grade ? GRADE_CSS_VAR[grade] : 'var(--color-lumiris-iris)';
@@ -132,7 +116,7 @@ export function PublicPassportDetail({
         () =>
             (dpp.materials ?? []).map((m, i) => ({
                 id: `material-${i}`,
-                label: FIBER_LABELS[m.fiber] ?? m.fiber,
+                label: fiberLabel(m.fiber),
                 country: m.originCountry,
                 latitude: m.latitude,
                 longitude: m.longitude,
@@ -333,8 +317,7 @@ export function PublicPassportDetail({
                                 <Label>Matières</Label>
                                 {(dpp.materials ?? []).map((m, i) => (
                                     <p key={i} className="text-foreground text-sm">
-                                        <span className="font-mono">{m.percentage}%</span>{' '}
-                                        {FIBER_LABELS[m.fiber] ?? m.fiber}
+                                        <span className="font-mono">{m.percentage}%</span> {fiberLabel(m.fiber)}
                                         {m.originCountry && (
                                             <span className="text-muted-foreground"> · {m.originCountry}</span>
                                         )}
@@ -506,11 +489,11 @@ function InfoRow({ label, value, fullWidth }: { label: string; value: ReactNode;
 
 function BooleanField({ value }: { value: boolean }) {
     return value ? (
-        <span className="flex items-center gap-1 text-sm text-lumiris-emerald">
+        <span className="text-lumiris-emerald flex items-center gap-1 text-sm">
             <CheckCircle className="h-3.5 w-3.5" /> Oui
         </span>
     ) : (
-        <span className="flex items-center gap-1 text-sm text-lumiris-rose">
+        <span className="text-lumiris-rose flex items-center gap-1 text-sm">
             <XCircle className="h-3.5 w-3.5" /> Non
         </span>
     );

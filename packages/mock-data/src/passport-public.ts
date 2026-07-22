@@ -40,6 +40,9 @@ function buildExcerpt(passport: Passport, artisan: Artisan): string {
     return `${productLabel} ${fibers}, ${artisan.atelierName} (${artisan.city}).`;
 }
 
+// Variante minuscule volontaire : ces libellés s'insèrent dans une phrase (« Pull 50% laine, … »),
+// contrairement au FIBER_LABEL de @lumiris/scoring-ui qui sert d'étiquette autonome. mock-data reste
+// sans dépendance UI, donc la table est dupliquée ici en connaissance de cause.
 const FIBER_LABEL_FR: Record<string, string> = {
     wool: 'laine',
     linen: 'lin',
