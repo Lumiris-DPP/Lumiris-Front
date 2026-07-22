@@ -17,7 +17,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@lumiris/ui/components/alert-dialog';
-import { Badge } from '@lumiris/ui/components/badge';
 import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import { Toaster, toast } from '@lumiris/ui/components/sonner';
@@ -115,16 +114,6 @@ export function PassportDetail({ passportId }: { passportId: string }) {
                                 <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Liste
                             </Link>
                         </Button>
-                        {view.apiStatus === 'DRAFT' && (
-                            <Badge
-                                variant="outline"
-                                className="border-lumiris-amber/40 text-lumiris-amber bg-lumiris-amber/5"
-                            >
-                                Brouillon
-                            </Badge>
-                        )}
-                        {view.apiStatus === 'VALID' && <Badge variant="default">Publié</Badge>}
-                        {view.apiStatus === 'INVALID' && <Badge variant="destructive">Invalide</Badge>}
                     </div>
 
                     <IdentityCard view={view} />
