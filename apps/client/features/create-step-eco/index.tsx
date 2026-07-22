@@ -244,6 +244,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                         setRepairManualFile(file);
                         setFile(draftId, 'REPAIR_MANUAL', file);
                     }}
+                    existing={draft?.existingDocs?.['REPAIR_MANUAL']}
                 />
             )}
 
@@ -271,6 +272,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                         setCareGuideFile(file);
                         setFile(draftId, 'CARE_GUIDE', file);
                     }}
+                    existing={draft?.existingDocs?.['CARE_GUIDE']}
                 />
 
                 <DocUploadField
@@ -281,6 +283,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                         setEndOfLifeFile(file);
                         setFile(draftId, 'END_OF_LIFE_GUIDE', file);
                     }}
+                    existing={draft?.existingDocs?.['END_OF_LIFE_GUIDE']}
                 />
             </div>
 

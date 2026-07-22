@@ -7,7 +7,7 @@ import type {
     Passport,
     PassportStatus,
 } from '@lumiris/types';
-import type { DraftPassport } from './draft-store';
+import type { DraftPassport, ExistingDoc } from './draft-store';
 
 export { draftToPassport } from './draft-store';
 
@@ -102,13 +102,28 @@ export function dppToPassport(dpp: DppFormDto, artisanId: string): Passport {
     };
 }
 
+/** Documents déjà stockés, indexés par DocumentType — la photo produit incluse. */
+function existingDocsOf(dpp: DppFormDto): Partial<Record<string, ExistingDoc>> {
+    const docs: Partial<Record<string, ExistingDoc>> = {};
+    if (dpp.mainPhotoUrl) {
+        docs.PRODUCT_PHOTO = { url: dpp.mainPhotoUrl, filename: null };
+    }
+    for (const doc of dpp.documents ?? []) {
+        if (!doc.documentType) continue;
+        docs[doc.documentType] = { filename: doc.filename ?? null, url: doc.url ?? null };
+    }
+    return docs;
+}
+
 /**
  * Reverse mapping: fills a local wizard draft from a backend DRAFT so it can be
- * edited. Uploaded files aren't recoverable as `File` objects and are left out —
- * the backend keeps existing documents when the PUT re-sends none.
+ * edited. Uploaded files aren't recoverable as `File` objects, so they are surfaced
+ * as `existingDocs` descriptors instead — the backend keeps the stored documents
+ * when the PUT re-sends none, and replaces them type by type when it does.
  */
 export function dppToDraftFields(dpp: DppFormDto): Partial<DraftPassport> {
     return {
+        existingDocs: existingDocsOf(dpp),
         garment: {
             kind: CATEGORY_TO_KIND[dpp.productCategory ?? ''] ?? 'other',
             name: dpp.productName ?? undefined,
