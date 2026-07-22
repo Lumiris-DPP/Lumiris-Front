@@ -18,7 +18,6 @@ const CATEGORY_OPTIONS: Array<{ value: string; label: string }> = [
 const DOCUMENTS: Array<{ key: KybDocumentLabel; title: string; hint: string }> = [
     { key: 'legal_representative_id_doc', title: "Pièce d'identité", hint: 'du représentant légal' },
     { key: 'kbis', title: 'Extrait KBIS', hint: 'de moins de 3 mois' },
-    { key: 'proof_of_address', title: 'Justificatif de domicile', hint: 'de moins de 3 mois' },
     { key: 'rib', title: 'RIB', hint: 'pour les versements' },
 ];
 
