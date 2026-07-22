@@ -315,12 +315,6 @@ export function KybComparisonDrawer({
                         expiresAt={kyb?.kbisExpiresAt}
                     />
                     <DocRow
-                        label="Justificatif de domicile"
-                        uploaded={Boolean(kyb?.proofOfAddressUploaded)}
-                        url={kyb?.proofOfAddressUrl}
-                        expiresAt={kyb?.proofOfAddressExpiresAt}
-                    />
-                    <DocRow
                         label="RIB"
                         uploaded={Boolean(kyb?.ribUploaded)}
                         url={kyb?.ribUrl}
