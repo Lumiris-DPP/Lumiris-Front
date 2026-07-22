@@ -221,26 +221,26 @@ export function BlockchainAnchorCard({ view }: { view: DetailView }) {
     const meta =
         status === 'ANCHORED'
             ? {
-                  label: 'Ancré',
-                  icon: <CheckCircle className="text-lumiris-emerald h-4 w-4" aria-hidden />,
-                  className: 'text-lumiris-emerald',
-                  description:
-                      'L’empreinte de ce passeport est scellée sur la blockchain Ethereum (Sepolia) — une preuve d’intégrité infalsifiable.',
-              }
+                label: 'Certifié',
+                icon: <CheckCircle className="text-lumiris-emerald h-4 w-4" aria-hidden />,
+                className: 'text-lumiris-emerald',
+                description:
+                    'Ce passeport est sécurisé et horodaté. Son authenticité est garantie de manière infalsifiable.',
+            }
             : status === 'FAILED'
-              ? {
-                    label: 'Échec de l’ancrage',
+                ? {
+                    label: 'Échec de la certification',
                     icon: <XCircle className="text-lumiris-rose h-4 w-4" aria-hidden />,
                     className: 'text-lumiris-rose',
                     description:
-                        'L’ancrage de l’empreinte sur la blockchain Ethereum (Sepolia) n’a pas abouti. Le passeport reste valide, mais aucune preuve d’intégrité on-chain n’est disponible pour l’instant.',
+                        'La certification numérique a échoué. Le passeport reste valide, mais sa preuve d’authenticité n’est pas disponible.',
                 }
-              : {
+                : {
                     label: 'En attente',
                     icon: <Clock className="text-lumiris-amber h-4 w-4" aria-hidden />,
                     className: 'text-lumiris-amber',
                     description:
-                        'L’empreinte de ce passeport n’est pas encore scellée sur la blockchain Ethereum (Sepolia). La preuve d’intégrité sera disponible dès la confirmation de la transaction.',
+                        'La certification de ce passeport est en attente.',
                 };
 
     const hash = view.blockchainTxHash;
@@ -248,7 +248,7 @@ export function BlockchainAnchorCard({ view }: { view: DetailView }) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Ancrage blockchain</CardTitle>
+                <CardTitle>Preuve d'existence numérique</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
                 <div className="flex items-center gap-2">
