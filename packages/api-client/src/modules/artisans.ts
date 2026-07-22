@@ -52,5 +52,8 @@ export function artisansApi(http: Http) {
         getPublicBySlug(slug: string): Promise<ArtisanPublicProfileResponse> {
             return http.request<ArtisanPublicProfileResponse>(`/v1/artisans/${slug}`);
         },
+        listPublished(): Promise<ArtisanPublicProfileResponse[]> {
+            return http.request<ArtisanPublicProfileResponse[]>('/v1/artisans');
+        },
     };
 }

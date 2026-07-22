@@ -4,8 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Clock, MapPin, Star, Store, Wrench } from 'lucide-react';
-import { IrisGrade } from '@lumiris/scoring-ui';
+import { MapPin, Star, Store, Wrench } from 'lucide-react';
 import { cn } from '@lumiris/ui/lib/cn';
 import type { LocalPoint } from './types';
 import { routes } from '@/lib/routes';
@@ -120,51 +119,17 @@ function Thumb({ point, isArtisan }: { point: LocalPoint; isArtisan: boolean }) 
 }
 
 function KpiRow({ point, isArtisan }: { point: LocalPoint; isArtisan: boolean }) {
-    if (isArtisan) {
-        return (
-            <div className="mt-0.5 flex items-center gap-3 text-[11px]">
-                {point.averageGrade ? (
-                    <span className="inline-flex items-center gap-1.5">
-                        <IrisGrade grade={point.averageGrade} size="sm" tone="solid" />
-                        <span className="text-muted-foreground">moyenne</span>
-                    </span>
-                ) : null}
-                {point.publishedPassports ? (
-                    <span className="inline-flex items-center gap-1 text-muted-foreground">
-                        <span className="font-mono font-semibold text-foreground tabular-nums">
-                            {point.publishedPassports}
-                        </span>
-                        passeport{point.publishedPassports > 1 ? 's' : ''}
-                    </span>
-                ) : null}
-            </div>
-        );
-    }
+    if (isArtisan || point.rating === undefined) return null;
 
     return (
         <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
-            {point.rating !== undefined ? (
-                <span className="inline-flex items-center gap-1">
-                    <Star className="h-3.5 w-3.5 fill-current text-lumiris-amber" strokeWidth={1.5} aria-hidden />
-                    <span className="font-mono font-semibold text-foreground tabular-nums">
-                        {point.rating.toFixed(1)}
-                    </span>
-                    {point.reviewCount !== undefined ? (
-                        <span className="font-mono text-muted-foreground tabular-nums">({point.reviewCount})</span>
-                    ) : null}
-                </span>
-            ) : null}
-            {point.avgDelayDays !== undefined ? (
-                <span className="inline-flex items-center gap-1 text-muted-foreground">
-                    <Clock className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
-                    <span className="font-mono tabular-nums">~{point.avgDelayDays} j</span>
-                </span>
-            ) : null}
-            {point.priceRange ? (
-                <span className="ml-auto font-mono text-xs font-semibold text-foreground tabular-nums">
-                    {point.priceRange.min}–{point.priceRange.max} €
-                </span>
-            ) : null}
+            <span className="inline-flex items-center gap-1">
+                <Star className="h-3.5 w-3.5 fill-current text-lumiris-amber" strokeWidth={1.5} aria-hidden />
+                <span className="font-mono font-semibold text-foreground tabular-nums">{point.rating.toFixed(1)}</span>
+                {point.reviewCount !== undefined ? (
+                    <span className="font-mono text-muted-foreground tabular-nums">({point.reviewCount})</span>
+                ) : null}
+            </span>
         </div>
     );
 }

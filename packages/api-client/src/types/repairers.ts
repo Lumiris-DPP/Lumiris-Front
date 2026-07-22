@@ -60,6 +60,8 @@ export interface RepairerSearchResult {
     city?: string;
     region?: string;
     distanceKm: number;
+    lat: number;
+    lng: number;
 }
 
 export interface RepairerSearchQuery {

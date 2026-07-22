@@ -13,6 +13,7 @@ import { isApiError } from '../core/errors';
 import type {
     ArtisanPhotoResponse,
     ArtisanProfileResponse,
+    ArtisanPublicProfileResponse,
     ArtisanRegisterRequest,
     ArtisanVitrineUpdateRequest,
 } from '../types/artisans';
@@ -152,5 +153,17 @@ export function usePublishArtisanVitrine(
             queryClient.setQueryData(artisanKeys.custom('me'), args[0]);
             return options?.onSuccess?.(...args);
         },
+    });
+}
+
+export function useArtisansDirectory(
+    options?: Omit<UseQueryOptions<ArtisanPublicProfileResponse[], Error>, 'queryKey' | 'queryFn'>,
+) {
+    const client = useApiClient();
+    return useQuery<ArtisanPublicProfileResponse[], Error>({
+        queryKey: artisanKeys.custom('directory'),
+        queryFn: () => client.artisans.listPublished(),
+        staleTime: 60 * 1000,
+        ...options,
     });
 }

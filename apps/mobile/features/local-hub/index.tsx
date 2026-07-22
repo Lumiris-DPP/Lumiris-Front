@@ -4,8 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
 import { MapPin, SlidersHorizontal } from 'lucide-react';
-import type { ArtisanWithSlug } from '@lumiris/mock-data';
-import type { Repairer } from '@lumiris/types';
+import { useArtisansDirectory, useRepairerSearch } from '@lumiris/api-client/react';
 import { cn } from '@lumiris/ui/lib/cn';
 import { useUserCoords } from '@/lib/geolocation/use-user-coords';
 import { hasSeenGeolocPrompt, markGeolocPromptSeen } from '@/lib/geolocation/permission-storage';
@@ -21,12 +20,12 @@ import { PermissionPrompt } from './permission-prompt';
 import type { LocalPoint } from './types';
 import { ViewToggle, type LocalView } from './view-toggle';
 
-export interface LocalHubProps {
-    artisans: readonly ArtisanWithSlug[];
-    repairers: readonly Repairer[];
-}
+// Paris, used as the repairer search origin until the user shares (or denies) their location —
+// the backend geo-search needs a lat/lng to query, unlike the artisan directory (no geo-search
+// backend yet, so it's a flat list regardless of position).
+const DEFAULT_COORDS = { lat: 48.8566, lng: 2.3522 };
 
-export function LocalHub({ artisans, repairers }: LocalHubProps) {
+export function LocalHub() {
     const online = useOnlineStatus();
     const { coords, status, request } = useUserCoords();
     const searchParams = useSearchParams();
@@ -39,17 +38,19 @@ export function LocalHub({ artisans, repairers }: LocalHubProps) {
     const [filterSheetOpen, setFilterSheetOpen] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [showGeolocPrompt, setShowGeolocPrompt] = useState(false);
-    const [loading, setLoading] = useState(true);
 
-    // Skeletons à l'entrée : simule le chargement de l'annuaire partenaires.
-    useEffect(() => {
-        const timer = setTimeout(() => setLoading(false), 450);
-        return () => clearTimeout(timer);
-    }, []);
+    const searchOrigin = coords ?? DEFAULT_COORDS;
+    const artisansQuery = useArtisansDirectory();
+    const repairersQuery = useRepairerSearch({
+        lat: searchOrigin.lat,
+        lng: searchOrigin.lng,
+        radiusKm: DISTANCE_MAX_KM,
+    });
+    const loading = artisansQuery.isLoading || repairersQuery.isLoading;
 
     const points = useMemo(
-        () => toLocalPoints(artisans, repairers, { userCoords: coords ?? undefined }),
-        [artisans, repairers, coords],
+        () => toLocalPoints(artisansQuery.data ?? [], repairersQuery.data ?? []),
+        [artisansQuery.data, repairersQuery.data],
     );
 
     const specialtyOptions = useMemo(() => {
@@ -157,7 +158,7 @@ export function LocalHub({ artisans, repairers }: LocalHubProps) {
                 <div className="mx-5 mb-3 flex shrink-0 items-center justify-between gap-2 rounded-2xl border border-border/40 bg-card/80 px-3 py-2 text-xs backdrop-blur-md">
                     <span className="inline-flex items-center gap-1.5 text-muted-foreground">
                         <MapPin className="h-3.5 w-3.5" aria-hidden />
-                        Position non partagée, tri par note.
+                        Position non partagée, résultats centrés sur Paris.
                     </span>
                     <button
                         type="button"
