@@ -1,11 +1,15 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeft, MapPin, Star, Wrench } from 'lucide-react';
+import { ArrowLeft, MapPin, MessageSquarePlus, Star, Wrench } from 'lucide-react';
+import { isApiError, useAddRepairerReview, useRepairerReviews } from '@lumiris/api-client/react';
 import { Badge } from '@lumiris/ui/components/badge';
+import { Button } from '@lumiris/ui/components/button';
+import { Input } from '@lumiris/ui/components/input';
+import { Label } from '@lumiris/ui/components/label';
 import type { PublicRepairerDto, RepairerReviewDto } from '@/lib/public-repairer-api';
 
 interface RepairerProfileProps {
@@ -13,16 +17,58 @@ interface RepairerProfileProps {
     reviews: readonly RepairerReviewDto[];
 }
 
-export function RepairerProfile({ repairer, reviews }: RepairerProfileProps) {
+export function RepairerProfile({ repairer, reviews: initialReviews }: RepairerProfileProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const forParam = searchParams.get('for');
     const title = repairer.companyName ?? repairer.displayName ?? 'Retoucheur';
 
+    const normalizedInitialReviews = useMemo(
+        () =>
+            initialReviews.map((r) => ({
+                id: r.id,
+                rating: r.rating,
+                comment: r.comment ?? undefined,
+                reviewerName: r.reviewerName ?? undefined,
+                createdAt: r.createdAt,
+            })),
+        [initialReviews],
+    );
+    const { data: reviews = normalizedInitialReviews } = useRepairerReviews(repairer.id, {
+        initialData: normalizedInitialReviews,
+    });
+    const addReview = useAddRepairerReview(repairer.id);
+    const [showReviewForm, setShowReviewForm] = useState(false);
+    const [rating, setRating] = useState(5);
+    const [reviewerName, setReviewerName] = useState('');
+    const [comment, setComment] = useState('');
+    const [reviewError, setReviewError] = useState<string | null>(null);
+
     const requestHref = useMemo(() => {
         const base = `/retoucheurs/${repairer.id}/request`;
         return forParam ? `${base}?for=${encodeURIComponent(forParam)}` : base;
     }, [repairer.id, forParam]);
+
+    function handleReviewSubmit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        if (reviewerName.trim().length === 0) {
+            setReviewError('Indique ton nom pour publier ton avis.');
+            return;
+        }
+        setReviewError(null);
+        addReview.mutate(
+            { rating, reviewerName: reviewerName.trim(), comment: comment.trim() || undefined },
+            {
+                onSuccess: () => {
+                    setShowReviewForm(false);
+                    setRating(5);
+                    setReviewerName('');
+                    setComment('');
+                },
+                onError: (err) => setReviewError(isApiError(err) ? err.message : "Impossible d'envoyer ton avis."),
+            },
+        );
+    }
 
     return (
         <div className="flex h-full flex-col overflow-y-auto bg-background pb-24">
@@ -118,11 +164,95 @@ export function RepairerProfile({ repairer, reviews }: RepairerProfileProps) {
                     </p>
                 </section>
 
-                {reviews.length > 0 ? (
-                    <section className="flex flex-col gap-2">
+                <section className="flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
                         <h2 className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
                             Avis ({reviews.length})
                         </h2>
+                        {!showReviewForm ? (
+                            <button
+                                type="button"
+                                onClick={() => setShowReviewForm(true)}
+                                className="text-lumiris-cyan inline-flex items-center gap-1 text-[11px] font-medium"
+                            >
+                                <MessageSquarePlus className="h-3.5 w-3.5" />
+                                Laisser un avis
+                            </button>
+                        ) : null}
+                    </div>
+
+                    {showReviewForm ? (
+                        <form
+                            onSubmit={handleReviewSubmit}
+                            className="border-border/60 bg-card flex flex-col gap-3 rounded-2xl border p-3"
+                        >
+                            <div className="flex items-center gap-1">
+                                {[1, 2, 3, 4, 5].map((value) => (
+                                    <button
+                                        key={value}
+                                        type="button"
+                                        onClick={() => setRating(value)}
+                                        aria-label={`${value} étoile${value > 1 ? 's' : ''}`}
+                                        className="p-0.5"
+                                    >
+                                        <Star
+                                            className={`h-5 w-5 ${
+                                                value <= rating
+                                                    ? 'text-lumiris-amber fill-current'
+                                                    : 'text-muted-foreground/40'
+                                            }`}
+                                        />
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                                <Label htmlFor="review-name" className="text-[11px]">
+                                    Ton nom
+                                </Label>
+                                <Input
+                                    id="review-name"
+                                    value={reviewerName}
+                                    onChange={(e) => setReviewerName(e.target.value)}
+                                    placeholder="Camille"
+                                    className="h-9 text-sm"
+                                />
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                                <Label htmlFor="review-comment" className="text-[11px]">
+                                    Commentaire (optionnel)
+                                </Label>
+                                <textarea
+                                    id="review-comment"
+                                    aria-label="Commentaire (optionnel)"
+                                    value={comment}
+                                    onChange={(e) => setComment(e.target.value)}
+                                    rows={3}
+                                    placeholder="Ton expérience avec ce retoucheur…"
+                                    className="border-border bg-background text-foreground placeholder:text-muted-foreground/60 focus:ring-lumiris-cyan/30 rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2"
+                                />
+                            </div>
+                            {reviewError ? (
+                                <p className="text-destructive text-xs" role="alert">
+                                    {reviewError}
+                                </p>
+                            ) : null}
+                            <div className="flex gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="flex-1"
+                                    onClick={() => setShowReviewForm(false)}
+                                >
+                                    Annuler
+                                </Button>
+                                <Button type="submit" disabled={addReview.isPending} className="flex-1">
+                                    {addReview.isPending ? 'Envoi…' : 'Publier'}
+                                </Button>
+                            </div>
+                        </form>
+                    ) : null}
+
+                    {reviews.length > 0 ? (
                         <ul className="flex flex-col gap-2">
                             {reviews.map((r) => (
                                 <li key={r.id} className="border-border/60 bg-card rounded-2xl border p-3">
@@ -143,8 +273,10 @@ export function RepairerProfile({ repairer, reviews }: RepairerProfileProps) {
                                 </li>
                             ))}
                         </ul>
-                    </section>
-                ) : null}
+                    ) : !showReviewForm ? (
+                        <p className="text-muted-foreground/70 text-xs italic">Aucun avis pour l&apos;instant.</p>
+                    ) : null}
+                </section>
             </div>
         </div>
     );
