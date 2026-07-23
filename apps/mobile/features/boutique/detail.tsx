@@ -1,9 +1,5 @@
-'use client';
-
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, BadgeCheck, Check, Info, MapPin, RotateCcw, ShieldCheck, Shirt, ShoppingCart, Truck } from 'lucide-react';
 import { isApiError, useApiClient, useMarketplaceProduct } from '@lumiris/api-client/react';
@@ -18,7 +14,7 @@ import { toast } from '@/lib/toast';
 const viewed = new Set<string>();
 
 export function BoutiqueDetail({ productId }: { productId: string }) {
-    const router = useRouter();
+    const navigate = useNavigate();
     const client = useApiClient();
     // Fiche produit publique unique (deep-link direct) : plus de scan du catalogue complet.
     const { data: dto, isLoading, error } = useMarketplaceProduct(productId);
@@ -57,7 +53,7 @@ export function BoutiqueDetail({ productId }: { productId: string }) {
                         : 'Impossible d’afficher cette pièce pour le moment. Réessaie.'}
                 </p>
                 <Link
-                    href="/boutique"
+                    to="/boutique"
                     className="bg-foreground text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
                 >
                     Retour à la Boutique
@@ -66,7 +62,7 @@ export function BoutiqueDetail({ productId }: { productId: string }) {
         );
     }
 
-    return <DetailBody product={product} onBack={() => router.back()} onBuyNow={() => router.push('/panier')} />;
+    return <DetailBody product={product} onBack={() => navigate(-1)} onBuyNow={() => navigate('/panier')} />;
 }
 
 function DetailBody({
@@ -108,7 +104,7 @@ function DetailBody({
 
             <div className="bg-muted relative flex h-72 w-full items-center justify-center">
                 {product.photoUrl ? (
-                    <Image src={product.photoUrl} alt={product.name} fill className="object-cover" unoptimized />
+                    <img src={product.photoUrl} alt={product.name} className="absolute inset-0 h-full w-full object-cover" />
                 ) : (
                     <Shirt className="text-muted-foreground/25 h-16 w-16" strokeWidth={1.25} aria-hidden />
                 )}

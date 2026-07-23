@@ -1,8 +1,5 @@
-'use client';
-
 import { useMemo } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Database, Download, ShieldCheck, Trash2, UserX } from 'lucide-react';
 import {
@@ -55,7 +52,7 @@ function Header() {
             animate="animate"
         >
             <Link
-                href="/me/settings"
+                to="/me/settings"
                 className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs"
             >
                 <ArrowLeft className="h-3.5 w-3.5" />
@@ -154,7 +151,7 @@ function RightsSection() {
     const { user, signOut } = useUser();
     const wardrobe = useWardrobe();
     const settings = useSettings();
-    const router = useRouter();
+    const navigate = useNavigate();
     const deleteAccount = useDeleteAccount();
 
     const exportPayload = useMemo(
@@ -208,7 +205,7 @@ function RightsSection() {
         wipeAllUserData();
         signOut();
         toast.success('Ton compte a été supprimé.');
-        router.push('/');
+        navigate('/');
     }
 
     const wardrobeCount = wardrobe.length;

@@ -1,6 +1,4 @@
-'use client';
-
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { ArrowRight, Store } from 'lucide-react';
 import { GRADE_LABEL, IrisGrade } from '@lumiris/scoring-ui';
 import type { Artisan, Passport, ScoreResult } from '@lumiris/types';
@@ -60,7 +58,7 @@ export function ScanResultModal({ passport, artisan, score, onClose, onOpen }: S
                                 <h3 className="text-foreground text-sm font-semibold">Alternatives artisanes</h3>
                             </div>
                             <Link
-                                href="/boutique"
+                                to="/boutique"
                                 className="text-primary inline-flex items-center gap-1 text-xs font-semibold"
                             >
                                 Voir le catalogue

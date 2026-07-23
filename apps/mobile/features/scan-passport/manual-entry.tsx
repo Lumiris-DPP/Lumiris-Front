@@ -1,7 +1,5 @@
-'use client';
-
 import { useCallback, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTitle } from '@lumiris/ui/components/sheet';
 
 const PUBLIC_CODE_URL_RE = /\/p\/([\w-]{8})\b/i;
@@ -33,7 +31,7 @@ interface ManualEntrySheetProps {
 }
 
 export function ManualEntrySheet({ open, onOpenChange }: ManualEntrySheetProps) {
-    const router = useRouter();
+    const navigate = useNavigate();
     const [value, setValue] = useState('');
     const settledRef = useRef(false);
 
@@ -44,11 +42,11 @@ export function ManualEntrySheet({ open, onOpenChange }: ManualEntrySheetProps) 
         settledRef.current = true;
         onOpenChange(false);
         if (dest.route === '/p/[code]') {
-            router.push(`/p/${dest.code}`);
+            navigate(`/p/${dest.code}`);
         } else {
-            router.push(`/passeport/${dest.id}`);
+            navigate(`/passeport/${dest.id}`);
         }
-    }, [router, value, onOpenChange]);
+    }, [navigate, value, onOpenChange]);
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
@@ -84,14 +82,14 @@ export function ManualEntrySheet({ open, onOpenChange }: ManualEntrySheetProps) 
 }
 
 export function ManualEntry() {
-    const router = useRouter();
+    const navigate = useNavigate();
     const [open, setOpen] = useState(true);
     return (
         <ManualEntrySheet
             open={open}
             onOpenChange={(next) => {
                 setOpen(next);
-                if (!next) router.back();
+                if (!next) navigate(-1);
             }}
         />
     );

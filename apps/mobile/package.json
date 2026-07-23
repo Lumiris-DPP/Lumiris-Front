@@ -4,17 +4,17 @@
     "private": true,
     "description": "LUMIRIS Mobile - mobile-optimized consumer view (Iris Scanner). Web first, Tauri-ready.",
     "scripts": {
-        "dev": "next dev --port 3002",
-        "dev:tauri": "next dev --port 1420",
-        "build": "next build",
-        "build:tauri": "BUILD_TARGET=tauri next build",
-        "start": "next start --port 3002",
+        "dev": "vite",
+        "build": "tsc --noEmit && vite build",
+        "preview": "vite preview",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "typecheck": "tsc --noEmit",
-        "clean": "rimraf .next .turbo"
+        "clean": "rimraf dist .turbo"
     },
     "dependencies": {
+        "@fontsource/geist-mono": "^5.3.0",
+        "@fontsource/inter": "^5.3.0",
         "@lumiris/api-client": "workspace:*",
         "@lumiris/core": "workspace:*",
         "@lumiris/mock-data": "workspace:*",
@@ -33,19 +33,23 @@
         "next": "^16.2.4",
         "react": "^19",
         "react-dom": "^19",
-        "react-leaflet": "^5.0.0"
+        "react-leaflet": "^5.0.0",
+        "react-router-dom": "^7.18.1"
     },
     "devDependencies": {
         "@lumiris/config": "workspace:*",
         "@tailwindcss/postcss": "^4.2.0",
+        "@tailwindcss/vite": "^4.3.3",
         "@tauri-apps/cli": "^2.1.0",
         "@types/leaflet": "^1.9.12",
         "@types/node": "^22.10.0",
         "@types/react": "^19",
         "@types/react-dom": "^19",
+        "@vitejs/plugin-react": "^6.0.4",
         "eslint": "^9.17.0",
         "postcss": "^8.5",
         "rimraf": "^6.0.1",
-        "typescript": "^5.7.3"
+        "typescript": "^5.7.3",
+        "vite": "^8.1.5"
     }
 }

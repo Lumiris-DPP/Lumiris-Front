@@ -1,7 +1,4 @@
-'use client';
-
-import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { useMemo } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { mockPassports } from '@lumiris/mock-data';
@@ -41,7 +38,7 @@ export function MarketplaceBanner() {
                     {previews.map(({ passport, score }) => (
                         <li key={passport.id} className="flex-1">
                             <Link
-                                href={`/passeport/${passport.id}`}
+                                to={`/passeport/${passport.id}`}
                                 aria-label={`${passport.garment.reference} - grade ${score.grade}`}
                                 className={cn(
                                     'border-border/40 bg-card relative block aspect-square overflow-hidden rounded-xl border',
@@ -49,12 +46,10 @@ export function MarketplaceBanner() {
                                 )}
                             >
                                 {passport.garment.mainPhotoUrl ? (
-                                    <Image
+                                    <img
                                         src={passport.garment.mainPhotoUrl}
                                         alt=""
-                                        fill
-                                        sizes="33vw"
-                                        className="object-cover"
+                                        className="absolute inset-0 h-full w-full object-cover"
                                     />
                                 ) : (
                                     <div
@@ -81,7 +76,7 @@ export function MarketplaceBanner() {
             ) : null}
 
             <Button asChild className="mt-4 w-full rounded-full">
-                <Link href="/boutique" aria-label="Parcourir tout le catalogue marketplace">
+                <Link to="/boutique" aria-label="Parcourir tout le catalogue marketplace">
                     <span>Parcourir tout le catalogue</span>
                     <ArrowRight className="h-4 w-4" aria-hidden />
                 </Link>

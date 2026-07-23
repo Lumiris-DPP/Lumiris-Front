@@ -1,12 +1,10 @@
-'use client';
-
 import { useCallback, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Tag, Leaf, Recycle, BookmarkPlus, BookmarkCheck, Share2, X } from 'lucide-react';
 import { CertificatesList } from '@lumiris/scoring-ui';
 import type { Certificate, ExternalDpp } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { computeExternalScore } from '@/lib/iris/external-score';
 import { addExternalDpp, removeFromWardrobe, useWardrobe } from '@/lib/wardrobe-storage';
 import { toast } from '@/lib/toast';
@@ -35,7 +33,7 @@ export interface ExternalDppDetailProps {
 }
 
 export function ExternalDppDetail({ dpp }: ExternalDppDetailProps) {
-    const router = useRouter();
+    const navigate = useNavigate();
     const [now] = useState(() => new Date());
     const score = useMemo(() => computeExternalScore(dpp, now), [dpp, now]);
     const [breakdownOpen, setBreakdownOpen] = useState(false);
@@ -170,7 +168,7 @@ export function ExternalDppDetail({ dpp }: ExternalDppDetailProps) {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ type: 'spring', stiffness: 380, damping: 32, delay: 0.4 }}
             >
-                <ActionButton onClick={() => router.back()} label="Fermer" Icon={X} />
+                <ActionButton onClick={() => navigate(-1)} label="Fermer" Icon={X} />
                 <ActionButton onClick={onShare} label="Partager" Icon={Share2} />
                 <ActionButton
                     onClick={onToggleSave}

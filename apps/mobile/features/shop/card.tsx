@@ -1,6 +1,4 @@
-'use client';
-
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Shirt, Sparkles } from 'lucide-react';
 import { gradeBackgroundSolid } from '@lumiris/scoring-ui';
@@ -29,7 +27,7 @@ export function ShopCard({ item, index }: ShopCardProps) {
             transition={{ delay: 0.05 + index * 0.03 }}
         >
             <Link
-                href={`/passeport/${passport.id}`}
+                to={`/passeport/${passport.id}`}
                 className={cn(
                     'bg-card group relative flex flex-col overflow-hidden rounded-2xl border text-left transition-all',
                     'border-border/60 hover:border-border',

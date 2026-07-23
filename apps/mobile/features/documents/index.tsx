@@ -1,8 +1,6 @@
-'use client';
-
 import { useCallback, useMemo, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ChevronRight, ExternalLink, FileText } from 'lucide-react';
 import { mockPassportById } from '@lumiris/mock-data';
@@ -47,7 +45,7 @@ function deriveLabelAndHref(item: WardrobeItem): { label: string; href: string |
 }
 
 export function MyDocuments() {
-    const router = useRouter();
+    const navigate = useNavigate();
     const wardrobe = useWardrobe();
     const { user } = useUser();
     const userId = user?.id ?? null;
@@ -100,7 +98,7 @@ export function MyDocuments() {
             >
                 <button
                     type="button"
-                    onClick={() => router.back()}
+                    onClick={() => navigate(-1)}
                     aria-label="Retour"
                     className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full border"
                 >
@@ -250,7 +248,7 @@ function DocumentCard({ row, onOpen }: { row: FlatDocument; onOpen: () => void }
 
             {row.href ? (
                 <Link
-                    href={row.href}
+                    to={row.href}
                     className="border-border/60 bg-background/60 text-muted-foreground hover:text-foreground flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-[11px]"
                 >
                     <span className="truncate">Rattaché à {row.label}</span>

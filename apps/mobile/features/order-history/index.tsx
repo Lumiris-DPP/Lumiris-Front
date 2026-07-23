@@ -1,6 +1,4 @@
-'use client';
-
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ChevronRight, FileText, LogIn, Package, ReceiptText } from 'lucide-react';
 import { useMyOrders } from '@lumiris/api-client/react';
@@ -77,7 +75,7 @@ export function OrderHistory() {
                 animate="animate"
             >
                 <Link
-                    href="/me"
+                    to="/me"
                     className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs"
                 >
                     <ArrowLeft className="h-3.5 w-3.5" />
@@ -102,7 +100,7 @@ export function OrderHistory() {
                     <GlassCard className="flex flex-col items-center gap-4 p-7 text-center" intensity="subtle">
                         <p className="text-foreground text-sm font-semibold">Connecte-toi pour voir tes commandes</p>
                         <Link
-                            href={`/auth/sign-in?returnTo=${ORDERS_RETURN}`}
+                            to={`/auth/sign-in?returnTo=${ORDERS_RETURN}`}
                             className="bg-foreground text-primary-foreground inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold"
                         >
                             <LogIn className="h-4 w-4" />
@@ -119,7 +117,7 @@ export function OrderHistory() {
                             Tes achats en Boutique apparaîtront ici, avec leur facture et leur garantie.
                         </p>
                         <Link
-                            href="/boutique"
+                            to="/boutique"
                             className="border-border text-foreground mt-1 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold"
                         >
                             Découvrir la Boutique
@@ -141,7 +139,7 @@ export function OrderHistory() {
                                     className="border-border/60 bg-card/60 overflow-hidden rounded-2xl border backdrop-blur-md"
                                 >
                                     <Link
-                                        href={`/commande/${row.paymentIntentId}`}
+                                        to={`/commande/${row.paymentIntentId}`}
                                         className="hover:bg-card/80 flex items-center justify-between gap-3 px-4 py-3 transition-colors"
                                     >
                                         <div className="min-w-0 flex-1">
@@ -161,7 +159,7 @@ export function OrderHistory() {
                                     </Link>
                                     {row.invoiceNumber ? (
                                         <Link
-                                            href={`/commande/${row.paymentIntentId}/facture`}
+                                            to={`/commande/${row.paymentIntentId}/facture`}
                                             className="border-border/60 text-muted-foreground hover:text-foreground flex items-center gap-1.5 border-t px-4 py-2 text-[11px] font-semibold transition-colors"
                                         >
                                             <FileText className="h-3.5 w-3.5" aria-hidden />

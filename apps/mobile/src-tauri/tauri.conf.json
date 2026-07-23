@@ -1,43 +1,30 @@
 {
     "$schema": "https://schema.tauri.app/config/2",
-    "productName": "Lumiris Mobile",
+    "productName": "Lumiris Vision",
     "version": "0.1.0",
     "identifier": "fr.lumiris.mobile",
     "build": {
-        "beforeDevCommand": "bun run dev:tauri",
+        "beforeDevCommand": "bun run dev",
         "devUrl": "http://localhost:1420",
-        "beforeBuildCommand": "bun run build:tauri",
-        "frontendDist": "../out"
+        "beforeBuildCommand": "bun run build",
+        "frontendDist": "../dist"
     },
     "app": {
         "windows": [
             {
                 "label": "main",
-                "title": "Lumiris Vision",
-                "width": 390,
-                "height": 844,
-                "minWidth": 360,
-                "minHeight": 640,
-                "resizable": true,
-                "fullscreen": false,
-                "center": true
+                "title": "Lumiris Vision"
             }
         ],
         "security": {
-            "csp": "default-src 'self'; img-src 'self' data: blob: https://*.tile.openstreetmap.org https://placehold.co; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' ipc: http://ipc.localhost https://*.tile.openstreetmap.org; media-src 'self' blob:"
+            "csp": "default-src 'self'; img-src 'self' data: blob: https://*.tile.openstreetmap.org https://placehold.co https://api.lumiris.eu https://*.lumiris.eu; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' ipc: http://ipc.localhost https://*.tile.openstreetmap.org https://api.lumiris.eu https://*.lumiris.eu; media-src 'self' blob:"
         }
     },
     "bundle": {
         "active": true,
-        "targets": "all",
+        "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png"],
         "category": "Lifestyle",
         "shortDescription": "Lumiris Vision - le scanner universel de DPP européens.",
-        "longDescription": "LUMIRIS Vision transforme votre téléphone en lentille de transparence : scannez n'importe quel passeport numérique de produit (textile, électronique, électroménager, mobilier, batterie) et lisez son score Iris V2 sur quatre piliers (40/25/25/10).",
-        "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
-        "linux": {
-            "deb": {
-                "depends": ["libwebkit2gtk-4.1-0", "libgtk-3-0"]
-            }
-        }
+        "longDescription": "LUMIRIS Vision transforme votre téléphone en lentille de transparence : scannez n'importe quel passeport numérique de produit (textile, électronique, électroménager, mobilier, batterie) et lisez son score Iris V2 sur quatre piliers (40/25/25/10)."
     }
 }

@@ -1,6 +1,4 @@
-'use client';
-
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Clock } from 'lucide-react';
 import { JOURNAL_CATEGORY_LABEL } from '@lumiris/types';
@@ -26,7 +24,7 @@ export function HeroCard({ item, delay = 0 }: HeroCardProps) {
             style={isE ? { filter: 'saturate(0.4)' } : undefined}
         >
             <Link
-                href={`/journal/${item.slug}`}
+                to={`/journal/${item.slug}`}
                 aria-label={`${item.title} - ${JOURNAL_CATEGORY_LABEL[item.category]} - grade ${item.grade}`}
                 className="group block"
             >

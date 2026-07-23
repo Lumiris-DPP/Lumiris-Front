@@ -1,7 +1,5 @@
-'use client';
-
 import { useMemo, useState } from 'react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Tag, TrendingUp, TrendingDown, Minus, ShieldCheck, ChevronRight } from 'lucide-react';
 import { CertificatesList, useUniqueCertificates } from '@lumiris/scoring-ui';
@@ -113,8 +111,7 @@ export function PassportDetail({ passport }: PassportDetailProps) {
                         <SectionHeading>Identité</SectionHeading>
                         {artisan ? (
                             <Link
-                                href={`/artisans/${artisan.slug}`}
-                                prefetch
+                                to={`/artisans/${artisan.slug}`}
                                 className="border-border bg-card hover:bg-muted/40 active:bg-muted/60 flex items-start gap-3 rounded-xl border p-4 transition-colors"
                             >
                                 <span className="bg-muted text-muted-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">

@@ -1,13 +1,8 @@
-'use client';
-
-import dynamic from 'next/dynamic';
+import { lazy, Suspense } from 'react';
 import type { LocalPoint } from './types';
 import type { UserCoords } from '@/lib/geolocation/use-user-coords';
 
-const MapClient = dynamic(() => import('./map-view.client').then((m) => m.MapClient), {
-    ssr: false,
-    loading: () => <div className="bg-card/40 absolute inset-0 animate-pulse" />,
-});
+const MapClient = lazy(() => import('./map-view.client').then((m) => ({ default: m.MapClient })));
 
 interface MapViewProps {
     points: readonly LocalPoint[];
@@ -19,7 +14,9 @@ interface MapViewProps {
 export function MapView(props: MapViewProps) {
     return (
         <div className="absolute inset-0">
-            <MapClient {...props} />
+            <Suspense fallback={<div className="bg-card/40 absolute inset-0 animate-pulse" />}>
+                <MapClient {...props} />
+            </Suspense>
         </div>
     );
 }

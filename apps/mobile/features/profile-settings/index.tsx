@@ -1,7 +1,5 @@
-'use client';
-
 import { useEffect, useId, useState } from 'react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ChevronRight, ShieldCheck } from 'lucide-react';
 import { Button } from '@lumiris/ui/components/button';
@@ -51,7 +49,7 @@ function Header() {
             animate="animate"
         >
             <Link
-                href="/me"
+                to="/me"
                 className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs"
             >
                 <ArrowLeft className="h-3.5 w-3.5" />
@@ -72,7 +70,7 @@ function NotConnectedNotice() {
                 asChild
                 className="bg-foreground text-background hover:bg-foreground/90 mt-4 h-10 rounded-full px-5 text-sm font-semibold"
             >
-                <Link href="/auth">Créer un compte</Link>
+                <Link to="/auth">Créer un compte</Link>
             </Button>
         </div>
     );
@@ -258,7 +256,7 @@ function PrivacyLink() {
     return (
         <Section title="Données">
             <Link
-                href="/me/privacy"
+                to="/me/privacy"
                 className="hover:bg-background/40 group flex items-center justify-between gap-3 px-4 py-3 transition-colors"
             >
                 <span className="inline-flex items-center gap-3">
@@ -281,7 +279,7 @@ function Footer() {
         <footer className="text-muted-foreground/70 mt-8 px-4 text-center text-[11px]">
             <p>LUMIRIS Vision · v{APP_VERSION} · Mode démo</p>
             <Link
-                href="/about"
+                to="/about"
                 className="hover:text-foreground mt-1 inline-flex items-center gap-1 underline-offset-4 hover:underline"
             >
                 À propos

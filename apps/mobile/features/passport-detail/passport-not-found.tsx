@@ -1,6 +1,4 @@
-'use client';
-
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ScanSearch, ArrowLeft } from 'lucide-react';
 
@@ -28,7 +26,7 @@ export function PassportNotFound({ passportId }: PassportNotFoundProps) {
                     </p>
                 </div>
                 <Link
-                    href="/"
+                    to="/"
                     className="border-border bg-card text-foreground inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium"
                 >
                     <ArrowLeft className="h-4 w-4" />

@@ -52,14 +52,16 @@ env-init: ## Génère apps/<app>/.env = .env.example.shared + .env.example (n'é
 	done
 
 ##@ Dev
-.PHONY: dev dev-admin dev-site dev-mobile dev-client
+.PHONY: dev dev-admin dev-site dev-mobile dev-mobile-web dev-client
 dev: ## Lance admin + site + mobile + client en parallèle (Turbo)
 	$(BUN) run dev
 dev-admin: ## Back-office uniquement (port 3001)
 	$(BUN) run dev:admin
 dev-site: ## Site public uniquement (port 3000)
 	$(BUN) run dev:site
-dev-mobile: ## Vue mobile uniquement (port 3002)
+dev-mobile: ## App mobile en DESKTOP (Tauri : fenêtre native + Vite interne)
+	cd $(MOBILE_DIR) && env -u LD_LIBRARY_PATH -u GTK_PATH -u GIO_MODULE_DIR $(BUN) x @tauri-apps/cli@latest dev
+dev-mobile-web: ## App mobile en web seul (Vite, http://localhost:1420) — rare
 	$(BUN) run dev:mobile
 dev-client: ## Workspace artisan B2B uniquement (port 3003)
 	$(BUN) run dev:client
@@ -120,21 +122,21 @@ lighthouse-desktop: ## Audit Lighthouse desktop profile (URL=http://localhost:30
 MOBILE_DIR := apps/mobile
 TAURI_DIR  := $(MOBILE_DIR)/src-tauri
 TAURI      := cd $(MOBILE_DIR) && $(BUN) x @tauri-apps/cli@latest
-.PHONY: tauri-init tauri-dev tauri-build tauri-android-init tauri-android-dev tauri-ios-init tauri-ios-dev
+API_URL ?= https://api.lumiris.eu
+.PHONY: tauri-init tauri-android-setup tauri-android-init tauri-android-dev tauri-android-build tauri-ios-init tauri-ios-dev
 tauri-init: ## Initialise Tauri 2.0 dans apps/mobile (one-shot)
 	@test ! -d "$(TAURI_DIR)" || { echo "[tauri-init] $(TAURI_DIR) existe déjà"; exit 1; }
 	$(TAURI) init
-	@echo "[tauri-init] OK · run 'make tauri-dev' pour démarrer"
-tauri-dev: ## Mode dev Tauri (HMR Next + bridge Rust)
-	@test -d "$(TAURI_DIR)" || { echo "[tauri-dev] lance d'abord 'make tauri-init'"; exit 1; }
-	$(TAURI) dev
-tauri-build: ## Build Tauri release (binaires natifs platform-specific)
-	@test -d "$(TAURI_DIR)" || { echo "[tauri-build] lance d'abord 'make tauri-init'"; exit 1; }
-	$(TAURI) build
-tauri-android-init: ## Bootstrap target Android (NDK requis)
+	@echo "[tauri-init] OK · run 'make tauri-android-init' pour la cible Android"
+tauri-android-setup: ## Installe les cibles Rust Android (SDK/NDK/JDK requis côté système)
+	rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
+tauri-android-init: ## Bootstrap target Android (NDK requis) → génère src-tauri/gen/android
 	$(TAURI) android init
 tauri-android-dev: ## Dev sur émulateur/device Android
 	$(TAURI) android dev
+tauri-android-build: ## Build l'APK Android release (API_URL=https://api.lumiris.eu par défaut)
+	cd $(MOBILE_DIR) && VITE_NEXT_PUBLIC_API_BASE_URL=$(API_URL) $(BUN) x @tauri-apps/cli@latest android build --apk
+	@echo "[tauri-android-build] APK → $(TAURI_DIR)/gen/android/app/build/outputs/apk/"
 tauri-ios-init: ## Bootstrap target iOS (Xcode requis, macOS only)
 	$(TAURI) ios init
 tauri-ios-dev: ## Dev sur simulateur/device iOS

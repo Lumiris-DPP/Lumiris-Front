@@ -1,8 +1,4 @@
-'use client';
-
-import Link from 'next/link';
-import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Clock, MapPin, Star, Store, Wrench } from 'lucide-react';
 import { IrisGrade } from '@lumiris/scoring-ui';
@@ -16,7 +12,7 @@ interface PointCardProps {
 
 export function PointCard({ point, index }: PointCardProps) {
     const prefersReduced = useReducedMotion();
-    const searchParams = useSearchParams();
+    const [searchParams] = useSearchParams();
     const isArtisan = point.kind === 'artisan';
     // Conserve le contexte "réparer ce passeport" (?for=) jusqu'au profil retoucheur.
     const forParam = searchParams.get('for');
@@ -34,7 +30,7 @@ export function PointCard({ point, index }: PointCardProps) {
             transition={{ duration: 0.3, delay: Math.min(0.04 * index, 0.2) }}
         >
             <Link
-                href={href}
+                to={href}
                 aria-label={ariaLabel}
                 className={cn(
                     'bg-card border-border/60 opal-shadow group relative flex gap-3 rounded-2xl border p-3.5',
@@ -92,13 +88,10 @@ function Thumb({ point, isArtisan }: { point: LocalPoint; isArtisan: boolean }) 
     if (isArtisan && point.photoUrl) {
         return (
             <div className="bg-muted relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
-                <Image
+                <img
                     src={point.photoUrl}
                     alt={`Atelier ${point.name}`}
-                    fill
-                    unoptimized
-                    sizes="64px"
-                    className="object-cover"
+                    className="absolute inset-0 h-full w-full object-cover"
                 />
             </div>
         );

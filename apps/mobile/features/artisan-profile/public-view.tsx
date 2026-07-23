@@ -1,13 +1,10 @@
-'use client';
-
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { ArtisanPublicProfileDto } from '@/lib/public-artisan-api';
 
 export function ArtisanPublicProfile({ artisan }: { artisan: ArtisanPublicProfileDto }) {
-    const router = useRouter();
+    const navigate = useNavigate();
     const title = artisan.atelierName ?? artisan.displayName ?? 'Atelier';
 
     return (
@@ -19,7 +16,7 @@ export function ArtisanPublicProfile({ artisan }: { artisan: ArtisanPublicProfil
             >
                 <button
                     type="button"
-                    onClick={() => router.back()}
+                    onClick={() => navigate(-1)}
                     aria-label="Retour"
                     className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full border"
                 >
@@ -42,7 +39,7 @@ export function ArtisanPublicProfile({ artisan }: { artisan: ArtisanPublicProfil
                     <div className="flex gap-2 overflow-x-auto">
                         {artisan.photoUrls.map((url) => (
                             <div key={url} className="relative h-40 w-40 shrink-0 overflow-hidden rounded-xl">
-                                <Image src={url} alt={title} fill sizes="160px" className="object-cover" />
+                                <img src={url} alt={title} className="absolute inset-0 h-full w-full object-cover" />
                             </div>
                         ))}
                     </div>

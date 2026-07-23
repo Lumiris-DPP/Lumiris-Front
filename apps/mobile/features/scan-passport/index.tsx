@@ -1,8 +1,5 @@
-'use client';
-
 import { useEffect, useRef, useState, useCallback } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, HelpCircle, Keyboard } from 'lucide-react';
 import { mockArtisanById } from '@lumiris/mock-data';
 import type { Passport } from '@lumiris/types';
@@ -22,7 +19,7 @@ const FRAME_INTERVAL_MS = 1000 / 30;
 type ProcessVideoFrame = typeof processVideoFrame;
 
 export function ScanPassport() {
-    const router = useRouter();
+    const navigate = useNavigate();
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const streamRef = useRef<MediaStream | null>(null);
@@ -100,7 +97,7 @@ export function ScanPassport() {
             if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(60);
             incrementScanCounter();
             stopCamera();
-            router.push(`/p/${result.code}`);
+            navigate(`/p/${result.code}`);
             return;
         }
         if (result.kind === 'external' || result.kind === 'unknown') {
@@ -114,7 +111,7 @@ export function ScanPassport() {
             return;
         }
         rafRef.current = requestAnimationFrame(tick);
-    }, [stopCamera]);
+    }, [stopCamera, navigate]);
 
     useEffect(() => {
         if (status === 'scanning') {
@@ -166,8 +163,8 @@ export function ScanPassport() {
     const onOpenMatch = useCallback(() => {
         if (!match) return;
         stopCamera();
-        router.push(`/passeport/${match.id}`);
-    }, [match, router, stopCamera]);
+        navigate(`/passeport/${match.id}`);
+    }, [match, navigate, stopCamera]);
 
     const [now] = useState(() => new Date());
     const matchScore = usePassportScore(match, now);
@@ -188,14 +185,14 @@ export function ScanPassport() {
             <header className="absolute left-0 right-0 top-0 z-20 flex items-center justify-between px-5 pt-12">
                 <button
                     type="button"
-                    onClick={() => router.back()}
+                    onClick={() => navigate(-1)}
                     aria-label="Retour"
                     className="text-foreground bg-card/70 inline-flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-md"
                 >
                     <ArrowLeft className="h-5 w-5" aria-hidden />
                 </button>
                 <Link
-                    href="/help"
+                    to="/help"
                     aria-label="Aide"
                     className="text-foreground bg-card/70 inline-flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-md"
                 >

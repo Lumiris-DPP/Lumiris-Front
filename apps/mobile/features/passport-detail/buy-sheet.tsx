@@ -1,7 +1,5 @@
-'use client';
-
 import { ExternalLink, Store } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { Button } from '@lumiris/ui/components/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@lumiris/ui/components/sheet';
 import type { Passport } from '@lumiris/types';
@@ -98,14 +96,14 @@ export function BuySheet({ open, onOpenChange, passport, artisan }: BuySheetProp
                     )}
 
                     <Button asChild variant="outline" className="w-full rounded-full">
-                        <Link href={`/artisans/${artisan.slug}`} onClick={() => onOpenChange(false)}>
+                        <Link to={`/artisans/${artisan.slug}`} onClick={() => onOpenChange(false)}>
                             Voir l&apos;atelier sur LUMIRIS
                         </Link>
                     </Button>
 
                     <p className="text-muted-foreground text-center text-[11px]">
                         Commission 3-7% -{' '}
-                        <Link href="/about" className="underline-offset-4 hover:underline">
+                        <Link to="/about" className="underline-offset-4 hover:underline">
                             voir À propos
                         </Link>
                     </p>

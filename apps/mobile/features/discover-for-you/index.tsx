@@ -1,8 +1,6 @@
-'use client';
-
 import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, ArrowUpRight, Info, Sparkles } from 'lucide-react';
 import type { JournalCategory } from '@lumiris/types';
@@ -22,7 +20,7 @@ const TOAST_DURATION_MS = 4000;
 const MAX_PIECES = 6;
 
 export function DiscoverForYou() {
-    const router = useRouter();
+    const navigate = useNavigate();
     const { user, isAuthenticated } = useUser();
     const [showStyleToast, setShowStyleToast] = useState(false);
     const [filter, setFilter] = useState<CategoryFilter>('all');
@@ -33,8 +31,8 @@ export function DiscoverForYou() {
     const { data: marketplace, isLoading: piecesLoading } = useMarketplaceSearch();
 
     useEffect(() => {
-        if (!isAuthenticated) router.replace('/auth');
-    }, [isAuthenticated, router]);
+        if (!isAuthenticated) navigate('/auth', { replace: true });
+    }, [isAuthenticated, navigate]);
 
     const stylePrefs = useMemo(() => user?.stylePrefs ?? [], [user]);
     const stylePrefsEmpty = isAuthenticated && stylePrefs.length === 0;
@@ -81,7 +79,7 @@ export function DiscoverForYou() {
         <div className="bg-background flex h-full flex-col">
             <motion.header className="px-5 pb-3 pt-12" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
                 <Link
-                    href="/discover"
+                    to="/discover"
                     className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs"
                 >
                     <ArrowLeft className="h-3.5 w-3.5" />
@@ -108,7 +106,7 @@ export function DiscoverForYou() {
                         <span>
                             Choisis ton style pour personnaliser{' '}
                             <Link
-                                href="/onboarding/profile"
+                                to="/onboarding/profile"
                                 className="text-foreground font-semibold underline-offset-2 hover:underline"
                             >
                                 renseigner
@@ -277,7 +275,7 @@ function EmptyHint({ text, href, cta }: EmptyHintProps) {
         <GlassCard intensity="subtle" className="mt-3 flex flex-col items-start gap-2 rounded-2xl p-4">
             <p className="text-muted-foreground text-xs leading-relaxed">{text}</p>
             <Link
-                href={href}
+                to={href}
                 className="text-foreground inline-flex items-center gap-1 text-xs font-semibold underline-offset-4 hover:underline"
             >
                 {cta}

@@ -1,7 +1,5 @@
-'use client';
-
 import { useMemo, useState } from 'react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Store, PackageOpen, ShoppingBag, WifiOff } from 'lucide-react';
 import { useMarketplaceSearch } from '@lumiris/api-client/react';
@@ -47,7 +45,7 @@ export function Boutique() {
                         <h1 className="text-foreground text-xl font-bold tracking-tight">Boutique</h1>
                     </div>
                     <Link
-                        href="/panier"
+                        to="/panier"
                         aria-label={`Panier${cartCount > 0 ? `, ${cartCount} article${cartCount > 1 ? 's' : ''}` : ''}`}
                         className="border-border bg-card text-foreground relative inline-flex h-9 w-9 items-center justify-center rounded-full border"
                     >

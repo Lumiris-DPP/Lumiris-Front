@@ -1,15 +1,11 @@
-'use client';
-
-import { useMemo } from 'react';
-import dynamic from 'next/dynamic';
+import { useMemo, lazy, Suspense } from 'react';
 import { CITY_COORDS } from '@lumiris/mock-data';
 import type { Repairer } from '@lumiris/types';
 import { isLumirisLocal } from '@/lib/repairers/badge';
 
-const RepairersMapClient = dynamic(() => import('./repairers-map.client').then((m) => m.RepairersMapClient), {
-    ssr: false,
-    loading: () => <MapPlaceholder />,
-});
+const RepairersMapClient = lazy(() =>
+    import('./repairers-map.client').then((m) => ({ default: m.RepairersMapClient })),
+);
 
 interface RepairersMapProps {
     repairers: readonly Repairer[];
@@ -51,7 +47,11 @@ export function RepairersMap({ repairers, activeId, onMarkerClick }: RepairersMa
         );
     }
 
-    return <RepairersMapClient pins={pins} activeId={activeId} onMarkerClick={onMarkerClick} />;
+    return (
+        <Suspense fallback={<MapPlaceholder />}>
+            <RepairersMapClient pins={pins} activeId={activeId} onMarkerClick={onMarkerClick} />
+        </Suspense>
+    );
 }
 
 function MapPlaceholder() {

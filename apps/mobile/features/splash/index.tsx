@@ -1,7 +1,5 @@
-'use client';
-
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { IridescentBackground } from '@/lib/motion';
@@ -16,7 +14,7 @@ interface SplashProps {
 }
 
 export function Splash({ children }: SplashProps) {
-    const router = useRouter();
+    const navigate = useNavigate();
     const [state, setState] = useState<SplashState>('pending');
 
     useEffect(() => {
@@ -24,7 +22,7 @@ export function Splash({ children }: SplashProps) {
 
         if (!completed) {
             setState('redirect');
-            router.replace('/onboarding');
+            navigate('/onboarding', { replace: true });
             return;
         }
 
@@ -38,7 +36,7 @@ export function Splash({ children }: SplashProps) {
 
         const timer = setTimeout(() => setState('done'), SPLASH_DURATION_MS);
         return () => clearTimeout(timer);
-    }, [router]);
+    }, [navigate]);
 
     if (state === 'done') {
         return <>{children}</>;

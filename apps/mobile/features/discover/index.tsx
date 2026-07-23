@@ -1,7 +1,5 @@
-'use client';
-
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import type { JournalCategory } from '@lumiris/types';
@@ -24,7 +22,7 @@ export interface DiscoverProps {
 
 export function Discover({ items }: DiscoverProps = {}) {
     const feed = useMemo(() => items ?? getDiscoverFeed(), [items]);
-    const router = useRouter();
+    const navigate = useNavigate();
     const { isAuthenticated } = useUser();
 
     const [filter, setFilter] = useState<CategoryFilter>('all');
@@ -58,7 +56,7 @@ export function Discover({ items }: DiscoverProps = {}) {
                     <Tabs
                         value="all"
                         onValueChange={(value) => {
-                            if (value === 'for-you') router.push('/discover/for-you');
+                            if (value === 'for-you') navigate('/discover/for-you');
                         }}
                         className="mt-4"
                     >

@@ -85,3 +85,6 @@ ansible/inventories/production.yml
 ansible/secrets.sops.yml
 .deployed-tag
 .secret-rotations.log
+
+# Built mobile APK (shipped via deploy, not git)
+apps/site/public/downloads/*.apk

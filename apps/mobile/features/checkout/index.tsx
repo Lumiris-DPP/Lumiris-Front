@@ -1,9 +1,6 @@
-'use client';
-
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, CreditCard, Loader2, Lock, LogIn, MapPin, ShieldCheck, Shirt, UserPlus } from 'lucide-react';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
@@ -38,7 +35,7 @@ function cartSignature(items: ReadonlyArray<{ product: { id: string }; quantity:
 }
 
 export function Checkout() {
-    const router = useRouter();
+    const navigate = useNavigate();
     const { user, isAuthenticated } = useUser();
     const client = useApiClient();
     const { items, subtotalCents, sellerCount, isLoading } = useCartDetails();
@@ -85,7 +82,7 @@ export function Checkout() {
                 <p className="text-foreground text-base font-semibold">Aucun article à régler</p>
                 <button
                     type="button"
-                    onClick={() => router.replace('/boutique')}
+                    onClick={() => navigate('/boutique', { replace: true })}
                     className="bg-foreground text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
                 >
                     Retour à la Boutique
@@ -110,14 +107,14 @@ export function Checkout() {
                 </div>
                 <div className="flex w-full max-w-xs flex-col gap-2">
                     <Link
-                        href={`/auth/sign-in?returnTo=${CHECKOUT_RETURN}`}
+                        to={`/auth/sign-in?returnTo=${CHECKOUT_RETURN}`}
                         className="bg-foreground text-primary-foreground inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold"
                     >
                         <LogIn className="h-4 w-4" />
                         Se connecter
                     </Link>
                     <Link
-                        href={`/auth/sign-in?mode=signup&returnTo=${CHECKOUT_RETURN}`}
+                        to={`/auth/sign-in?mode=signup&returnTo=${CHECKOUT_RETURN}`}
                         className="border-border text-foreground inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-semibold"
                     >
                         <UserPlus className="h-4 w-4" />
@@ -126,7 +123,7 @@ export function Checkout() {
                 </div>
                 <button
                     type="button"
-                    onClick={() => router.replace('/panier')}
+                    onClick={() => navigate('/panier', { replace: true })}
                     className="text-muted-foreground hover:text-foreground text-xs underline-offset-4 hover:underline"
                 >
                     Revenir au panier
@@ -142,7 +139,7 @@ export function Checkout() {
                 <p className="text-muted-foreground text-sm">{intentError}</p>
                 <button
                     type="button"
-                    onClick={() => router.replace('/panier')}
+                    onClick={() => navigate('/panier', { replace: true })}
                     className="bg-foreground text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
                 >
                     Retour au panier
@@ -190,13 +187,13 @@ export function Checkout() {
                 amountTotalCents={intent.amountTotalCents}
                 subtotalCents={subtotalCents}
                 defaultName={user?.displayName ?? ''}
-                onBack={() => router.back()}
+                onBack={() => navigate(-1)}
                 onPaid={(paymentIntentId) => {
                     intentCache.clear();
                     clearCart();
                     // Confirmation rattachée au PaymentIntent → total réel (articles + livraison)
                     // et toutes les lignes de la commande, via GET /api/orders/group/{pi}.
-                    router.replace(`/commande/${paymentIntentId}`);
+                    navigate(`/commande/${paymentIntentId}`, { replace: true });
                 }}
             />
         </Elements>
@@ -399,13 +396,10 @@ function RecapCard({
                         <li key={it.product.id} className="flex items-center gap-3">
                             <div className="bg-muted relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl">
                                 {it.product.photoUrl ? (
-                                    <Image
+                                    <img
                                         src={it.product.photoUrl}
                                         alt={it.product.name}
-                                        fill
-                                        sizes="48px"
-                                        className="object-cover"
-                                        unoptimized
+                                        className="absolute inset-0 h-full w-full object-cover"
                                     />
                                 ) : (
                                     <Shirt className="text-muted-foreground/30 h-5 w-5" strokeWidth={1.5} aria-hidden />
