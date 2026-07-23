@@ -1,8 +1,5 @@
-'use client';
-
 import { useMemo, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, Clock3, ScrollText, Wrench, X, XCircle } from 'lucide-react';
 import { mockPassportById, mockRepairerById } from '@lumiris/mock-data';
@@ -43,7 +40,7 @@ interface ResolvedRequest {
 }
 
 export function MyRepairs() {
-    const router = useRouter();
+    const navigate = useNavigate();
     const requests = useRepairRequests();
     const [detail, setDetail] = useState<RepairRequest | null>(null);
 
@@ -74,7 +71,7 @@ export function MyRepairs() {
             >
                 <button
                     type="button"
-                    onClick={() => router.back()}
+                    onClick={() => navigate(-1)}
                     aria-label="Retour"
                     className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full border"
                 >
@@ -148,7 +145,7 @@ function Empty() {
                 </p>
             </div>
             <Link
-                href="/local"
+                to="/local"
                 className="bg-foreground text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
             >
                 <Wrench className="h-4 w-4" />
@@ -279,7 +276,6 @@ function RequestDetailOverlay({
                     <ul className="mt-3 flex flex-wrap gap-2">
                         {request.photos.map((src, idx) => (
                             <li key={`${idx}-${src.length}`} className="h-16 w-16">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src={src}
                                     alt={`Pièce jointe ${idx + 1}`}

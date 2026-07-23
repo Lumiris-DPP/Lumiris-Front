@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { ArrowLeft, FileText, LifeBuoy, Mail, ShieldCheck, Sparkles } from 'lucide-react';
 import { LUMIRIS_WEIGHTS } from '@lumiris/core/scoring';
 import { SectionLabel } from '@/lib/section';
@@ -68,7 +68,7 @@ export function About() {
         <div className="relative flex h-full flex-col overflow-y-auto pb-28">
             <header className="px-5 pb-6 pt-[max(env(safe-area-inset-top),3rem)]">
                 <Link
-                    href="/me"
+                    to="/me"
                     className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs"
                 >
                     <ArrowLeft className="h-3.5 w-3.5" />
@@ -106,7 +106,7 @@ export function About() {
                     <p className="text-muted-foreground mt-4 text-xs leading-relaxed">
                         Algorithme open et déterministe - chaque score est reproductible à partir du passeport et des
                         coefficients ADEME / Higg / WFN publiés.{' '}
-                        <Link href="/about#scoring-doc" className="text-foreground underline-offset-4 hover:underline">
+                        <Link to="/about#scoring-doc" className="text-foreground underline-offset-4 hover:underline">
                             Documentation complète
                         </Link>
                         .
@@ -152,7 +152,7 @@ export function About() {
                                             {link.label}
                                         </a>
                                     ) : (
-                                        <Link href={link.href} className={className}>
+                                        <Link to={link.href} className={className}>
                                             <Icon className="text-muted-foreground h-4 w-4" />
                                             {link.label}
                                         </Link>

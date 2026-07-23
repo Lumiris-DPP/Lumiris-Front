@@ -1,5 +1,4 @@
-import Link from 'next/link';
-import Image from 'next/image';
+import { Link } from 'react-router-dom';
 import { ChevronLeft, Clock } from 'lucide-react';
 import { JOURNAL_CATEGORY_LABEL } from '@lumiris/types';
 import type { JournalArticlePublic } from '@lumiris/mock-data';
@@ -26,7 +25,7 @@ export function JournalArticle({ article }: JournalArticleProps) {
         <div className="bg-background relative flex h-full flex-col overflow-y-auto pb-28">
             <div className="sticky top-0 z-30 flex px-3 pt-3">
                 <Button asChild variant="outline" size="icon" className="bg-card/90 rounded-full backdrop-blur-md">
-                    <Link href="/discover" aria-label="Retour à Découvrir">
+                    <Link to="/discover" aria-label="Retour à Découvrir">
                         <ChevronLeft className="h-4 w-4" />
                     </Link>
                 </Button>
@@ -35,13 +34,11 @@ export function JournalArticle({ article }: JournalArticleProps) {
             <article className="mt-4 flex flex-col gap-5 px-5">
                 {article.coverImage ? (
                     <div className="relative aspect-video overflow-hidden rounded-2xl">
-                        <Image
+                        <img
                             src={article.coverImage}
                             alt={article.title}
-                            fill
-                            sizes="(max-width: 480px) 100vw, 480px"
                             loading="lazy"
-                            className="object-cover"
+                            className="absolute inset-0 h-full w-full object-cover"
                         />
                     </div>
                 ) : (
@@ -106,7 +103,7 @@ export function JournalArticleNotFound() {
             <p className="text-foreground text-lg font-semibold">Article introuvable</p>
             <p className="text-muted-foreground text-sm">Cet article n&apos;existe pas ou a été retiré du Journal.</p>
             <Button asChild variant="outline" size="sm" className="rounded-full">
-                <Link href="/discover">
+                <Link to="/discover">
                     <ChevronLeft className="h-4 w-4" />
                     Retour à Découvrir
                 </Link>

@@ -1,7 +1,5 @@
-'use client';
-
 import { useState } from 'react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { CalendarCheck, CheckCircle2 } from 'lucide-react';
 import type { Repairer, RepairerSpecialty } from '@lumiris/types';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@lumiris/ui/components/sheet';
@@ -83,7 +81,7 @@ export function BookingSheet({ repairer, open, onOpenChange }: BookingSheetProps
                         </SheetHeader>
                         <div className="flex w-full flex-col gap-2">
                             <Link
-                                href="/me/repairs"
+                                to="/me/repairs"
                                 className="bg-foreground text-background inline-flex h-12 w-full items-center justify-center rounded-full text-sm font-semibold"
                             >
                                 Voir mes demandes

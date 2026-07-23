@@ -1,7 +1,5 @@
-'use client';
-
 import { useId, useMemo, useState, type FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@lumiris/ui/components/button';
 import { Input } from '@lumiris/ui/components/input';
@@ -14,7 +12,7 @@ const STYLE_OPTIONS: readonly string[] = ['Casual', 'Formel', 'Streetwear', 'Vin
 const MAX_STYLE_PREFS = 3;
 
 export function OnboardingProfile() {
-    const router = useRouter();
+    const navigate = useNavigate();
     const { user, isAuthenticated, updateUser } = useUser();
     const cityId = useId();
     const datalistId = useId();
@@ -43,15 +41,15 @@ export function OnboardingProfile() {
             city: trimmed.length > 0 ? trimmed : undefined,
             stylePrefs: stylePrefs.length > 0 ? [...stylePrefs] : undefined,
         });
-        router.push('/');
+        navigate('/');
     }
 
     function handleSkip(): void {
-        router.push('/');
+        navigate('/');
     }
 
     if (!isAuthenticated) {
-        router.replace('/auth');
+        navigate('/auth', { replace: true });
         return null;
     }
 

@@ -1,7 +1,5 @@
-'use client';
-
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Archive,
@@ -131,8 +129,8 @@ function buildRow(item: WardrobeItem, now: Date): VaultRow | null {
 }
 
 export function Vault() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const items = useWardrobe();
     const compareIds = useCompare();
     const [now] = useState(() => new Date());
@@ -266,10 +264,10 @@ export function Vault() {
                 toggleCompare(row.passport.id);
                 return;
             }
-            if (row.kind === 'scored') router.push(`/passeport/${row.passport.id}`);
-            if (row.kind === 'public-dpp') router.push(`/p/${row.publicCode}`);
+            if (row.kind === 'scored') navigate(`/passeport/${row.passport.id}`);
+            if (row.kind === 'public-dpp') navigate(`/p/${row.publicCode}`);
         },
-        [compareMode, router],
+        [compareMode, navigate],
     );
 
     const onChipTap = useCallback((grade: IrisGrade) => {
@@ -280,7 +278,7 @@ export function Vault() {
         return (
             <div className="bg-background flex h-full flex-col overflow-y-auto pt-12">
                 <PurchasedItems />
-                <VaultEmpty onScan={() => router.push('/')} onAdd={() => router.push('/vault/add')} />
+                <VaultEmpty onScan={() => navigate('/')} onAdd={() => navigate('/vault/add')} />
             </div>
         );
     }
@@ -307,7 +305,7 @@ export function Vault() {
                 <div className="flex items-center gap-2">
                     <button
                         type="button"
-                        onClick={() => router.push('/vault/add')}
+                        onClick={() => navigate('/vault/add')}
                         aria-label="Ajouter un produit"
                         className="border-border bg-card text-foreground inline-flex h-8 w-8 items-center justify-center rounded-full border"
                     >

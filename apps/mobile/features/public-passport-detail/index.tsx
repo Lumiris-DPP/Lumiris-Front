@@ -1,12 +1,7 @@
-'use client';
-
-import { type ReactNode, useMemo } from 'react';
-import Image from 'next/image';
-import dynamic from 'next/dynamic';
-import Link from 'next/link';
+import { type ReactNode, lazy, Suspense, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle, XCircle, FileText, ArrowLeft, Download, Heart, ExternalLink, ShoppingBag } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useMarketplaceProductByDpp } from '@lumiris/api-client/react';
 import type { IrisGrade } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
@@ -18,14 +13,9 @@ import { addPublicDpp, removePublicDpp, useWardrobe } from '@/lib/wardrobe-stora
 import { toast } from '@/lib/toast';
 import { GRADE_TEXT, GRADE_BORDER, GRADE_BG_SOFT, GRADE_CSS_VAR } from '@/features/passport-detail/grade-classes';
 
-const OriginMap = dynamic(() => import('@lumiris/scoring-ui/components/origin-map').then((m) => m.OriginMap), {
-    ssr: false,
-    loading: () => (
-        <div className="border-border bg-card text-muted-foreground flex h-72 items-center justify-center rounded-2xl border text-xs italic">
-            Chargement de la carte…
-        </div>
-    ),
-});
+const OriginMap = lazy(() =>
+    import('@lumiris/scoring-ui/components/origin-map').then((m) => ({ default: m.OriginMap })),
+);
 
 const CATEGORY_LABELS: Record<string, string> = {
     top: 'Haut',
@@ -84,7 +74,7 @@ interface PublicPassportDetailProps {
 }
 
 export function PublicPassportDetail({ dpp, irisScore, events = [], artisanSlug }: PublicPassportDetailProps) {
-    const router = useRouter();
+    const navigate = useNavigate();
     const grade = irisScore?.grade as IrisGrade | undefined;
     const cssVar = grade ? GRADE_CSS_VAR[grade] : 'var(--color-lumiris-iris)';
 
@@ -158,7 +148,7 @@ export function PublicPassportDetail({ dpp, irisScore, events = [], artisanSlug 
 
                 <button
                     type="button"
-                    onClick={() => router.back()}
+                    onClick={() => navigate(-1)}
                     aria-label="Retour"
                     className="bg-card/70 absolute left-4 top-12 inline-flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md"
                 >
@@ -226,7 +216,7 @@ export function PublicPassportDetail({ dpp, irisScore, events = [], artisanSlug 
                         transition={{ duration: 0.4, delay: LAYER_DELAY * 0.5 }}
                     >
                         <Link
-                            href={`/boutique/${buyProduct.id}`}
+                            to={`/boutique/${buyProduct.id}`}
                             className="bg-primary text-primary-foreground flex items-center justify-between gap-3 rounded-2xl px-4 py-3.5 text-sm font-semibold shadow-sm transition-opacity active:opacity-90"
                         >
                             <span className="inline-flex items-center gap-2">
@@ -242,12 +232,11 @@ export function PublicPassportDetail({ dpp, irisScore, events = [], artisanSlug 
                 <Section delay={LAYER_DELAY * 1} title="Le Produit">
                     {dpp.mainPhotoUrl && (
                         <div className="border-border mx-auto w-1/2 overflow-hidden rounded-xl border">
-                            <Image
+                            <img
                                 src={dpp.mainPhotoUrl}
                                 alt={dpp.productName ?? 'Photo produit'}
                                 width={240}
                                 height={240}
-                                unoptimized
                                 className="aspect-square w-full object-contain"
                             />
                         </div>
@@ -301,7 +290,7 @@ export function PublicPassportDetail({ dpp, irisScore, events = [], artisanSlug 
                 {/* Artisan */}
                 {artisanSlug && (
                     <Link
-                        href={`/artisans/${artisanSlug}`}
+                        to={`/artisans/${artisanSlug}`}
                         className="border-border bg-card hover:bg-muted/40 flex items-center justify-between rounded-2xl border p-4 transition-colors"
                     >
                         <span className="text-foreground text-sm font-semibold">Voir la vitrine de l&apos;artisan</span>
@@ -335,7 +324,7 @@ export function PublicPassportDetail({ dpp, irisScore, events = [], artisanSlug 
                                                 key={s.code}
                                                 className="border-border flex items-center gap-2 rounded-lg border px-2.5 py-2"
                                             >
-                                                <Image
+                                                <img
                                                     src={s.svgPath}
                                                     alt=""
                                                     aria-hidden
@@ -447,7 +436,9 @@ export function PublicPassportDetail({ dpp, irisScore, events = [], artisanSlug 
 
                 {(originPoints.length > 0 || stepPoints.length > 0) && (
                     <Section delay={LAYER_DELAY * 7} title="Origine et parcours">
-                        <OriginMap origins={originPoints} steps={stepPoints} />
+                        <Suspense fallback={null}>
+                            <OriginMap origins={originPoints} steps={stepPoints} />
+                        </Suspense>
                     </Section>
                 )}
 

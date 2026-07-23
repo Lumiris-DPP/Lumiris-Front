@@ -1,6 +1,3 @@
-'use client';
-
-import Image from 'next/image';
 import type { IrisGrade, JournalCategory } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
 
@@ -21,17 +18,14 @@ const CATEGORY_ACCENT: Record<JournalCategory, string> = {
     reglementation: 'var(--lumiris-rose)',
 };
 
-export function CoverImage({ src, alt, category, grade, sizes, className, priority = false }: CoverImageProps) {
+export function CoverImage({ src, alt, category, grade, className, priority = false }: CoverImageProps) {
     if (src) {
         return (
-            <Image
+            <img
                 src={src}
                 alt={alt}
-                fill
-                sizes={sizes}
-                priority={priority}
                 loading={priority ? undefined : 'lazy'}
-                className={cn('object-cover', className)}
+                className={cn('absolute inset-0 h-full w-full object-cover', className)}
             />
         );
     }

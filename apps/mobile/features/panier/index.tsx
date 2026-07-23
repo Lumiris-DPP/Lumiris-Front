@@ -1,14 +1,10 @@
-'use client';
-
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Loader2, Minus, Plus, Shirt, ShoppingBag, Trash2, Truck } from 'lucide-react';
-import Image from 'next/image';
 import { formatCents, removeFromCart, setCartQuantity, useCartDetails } from '@/lib/marketplace';
 
 export function Panier() {
-    const router = useRouter();
+    const navigate = useNavigate();
     const { items, subtotalCents, count, sellerCount, missingCount, isLoading } = useCartDetails();
     const empty = items.length === 0;
     const multiSeller = sellerCount > 1;
@@ -22,7 +18,7 @@ export function Panier() {
             >
                 <button
                     type="button"
-                    onClick={() => router.back()}
+                    onClick={() => navigate(-1)}
                     aria-label="Retour"
                     className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full border"
                 >
@@ -66,18 +62,15 @@ export function Panier() {
                                     className="border-border/60 bg-card opal-shadow flex gap-3 rounded-2xl border p-3"
                                 >
                                     <Link
-                                        href={`/boutique/${product.id}`}
+                                        to={`/boutique/${product.id}`}
                                         aria-label={product.name}
                                         className="bg-muted relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl"
                                     >
                                         {product.photoUrl ? (
-                                            <Image
+                                            <img
                                                 src={product.photoUrl}
                                                 alt={product.name}
-                                                fill
-                                                sizes="80px"
-                                                className="object-cover"
-                                                unoptimized
+                                                className="absolute inset-0 h-full w-full object-cover"
                                             />
                                         ) : (
                                             <Shirt
@@ -89,7 +82,7 @@ export function Panier() {
                                     </Link>
 
                                     <div className="flex min-w-0 flex-1 flex-col">
-                                        <Link href={`/boutique/${product.id}`} className="min-w-0">
+                                        <Link to={`/boutique/${product.id}`} className="min-w-0">
                                             <p className="text-foreground truncate text-sm font-semibold">
                                                 {product.name}
                                             </p>
@@ -185,7 +178,7 @@ function CartSummary({ subtotalCents, disabled }: { subtotalCents: number; disab
                 </span>
             ) : (
                 <Link
-                    href="/checkout"
+                    to="/checkout"
                     className="bg-foreground text-primary-foreground flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold"
                 >
                     Passer la commande
@@ -212,7 +205,7 @@ function EmptyCart() {
                 </p>
             </div>
             <Link
-                href="/boutique"
+                to="/boutique"
                 className="bg-foreground text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
             >
                 <ShoppingBag className="h-4 w-4" />

@@ -16,6 +16,12 @@ ENV NEXT_TELEMETRY_DISABLED=1
 COPY . .
 RUN --mount=type=cache,target=/root/.bun/install/cache \
     bun install --frozen-lockfile
+
+# Public env inlined into the bundle at build time (Next.js bakes NEXT_PUBLIC_*).
+ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+ARG NEXT_PUBLIC_SENTRY_DSN=
+ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+ENV NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN}
 RUN NODE_ENV=production bun run --filter @lumiris/client build
 
 # ── runtime ── Node distroless, uniquement le bundle standalone ──────────────

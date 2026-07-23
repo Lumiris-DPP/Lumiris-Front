@@ -1,7 +1,5 @@
-'use client';
-
 import { useCallback, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { X, Share2, GitCompareArrows, BookmarkPlus, BookmarkCheck, ShoppingBag, FileText } from 'lucide-react';
 import { cn } from '@lumiris/ui/lib/cn';
@@ -20,7 +18,7 @@ interface ActionBarProps {
 }
 
 export function ActionBar({ passport, artisan, isSaved, documents }: ActionBarProps) {
-    const router = useRouter();
+    const navigate = useNavigate();
     const [buyOpen, setBuyOpen] = useState(false);
     const [docsOpen, setDocsOpen] = useState(false);
 
@@ -43,8 +41,8 @@ export function ActionBar({ passport, artisan, isSaved, documents }: ActionBarPr
     }, [passport.id, passport.garment.reference]);
 
     const onCompare = useCallback(() => {
-        router.push(`/vault?compareWith=${encodeURIComponent(passport.id)}`);
-    }, [router, passport.id]);
+        navigate(`/vault?compareWith=${encodeURIComponent(passport.id)}`);
+    }, [navigate, passport.id]);
 
     const onToggleSave = useCallback(() => {
         if (isSaved) removeLumirisPassport(passport.id);
@@ -63,7 +61,7 @@ export function ActionBar({ passport, artisan, isSaved, documents }: ActionBarPr
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ type: 'spring', stiffness: 380, damping: 32, delay: 0.4 }}
             >
-                <ActionButton onClick={() => router.back()} label="Fermer" Icon={X} />
+                <ActionButton onClick={() => navigate(-1)} label="Fermer" Icon={X} />
                 <ActionButton onClick={onShare} label="Partager" Icon={Share2} />
                 <ActionButton onClick={onCompare} label="Comparer" Icon={GitCompareArrows} />
                 <ActionButton

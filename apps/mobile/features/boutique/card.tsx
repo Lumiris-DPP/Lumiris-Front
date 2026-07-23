@@ -1,7 +1,4 @@
-'use client';
-
-import Link from 'next/link';
-import Image from 'next/image';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Shirt, BadgeCheck } from 'lucide-react';
 import { IrisGrade } from '@lumiris/scoring-ui';
@@ -26,8 +23,7 @@ export function BoutiqueCard({ item, index, featured = false }: BoutiqueCardProp
             transition={{ delay: 0.04 + index * 0.03 }}
         >
             <Link
-                href={`/boutique/${item.id}`}
-                prefetch
+                to={`/boutique/${item.id}`}
                 className={cn(
                     'bg-card group relative flex overflow-hidden rounded-2xl border text-left transition-colors',
                     'border-border/60 hover:border-border opal-shadow',
@@ -42,13 +38,10 @@ export function BoutiqueCard({ item, index, featured = false }: BoutiqueCardProp
                     )}
                 >
                     {item.photoUrl ? (
-                        <Image
+                        <img
                             src={item.photoUrl}
                             alt={item.name}
-                            fill
-                            sizes="(max-width: 448px) 50vw, 224px"
-                            className="object-cover"
-                            unoptimized
+                            className="absolute inset-0 h-full w-full object-cover"
                         />
                     ) : (
                         <Shirt className="text-muted-foreground/25 h-10 w-10" strokeWidth={1.5} aria-hidden />

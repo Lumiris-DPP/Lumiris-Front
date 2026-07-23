@@ -1,7 +1,5 @@
-'use client';
-
 import { useState, type FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Armchair, BatteryCharging, Plus, Puzzle, Refrigerator, Shirt, Smartphone } from 'lucide-react';
 import { cn } from '@lumiris/ui/lib/cn';
@@ -24,7 +22,7 @@ const SECTOR_ICON: Record<WardrobeSector, typeof Shirt> = {
 };
 
 export function VaultAdd() {
-    const router = useRouter();
+    const navigate = useNavigate();
     const [sector, setSector] = useState<WardrobeSector>('textile');
     const [productName, setProductName] = useState('');
     const [brand, setBrand] = useState('');
@@ -46,7 +44,7 @@ export function VaultAdd() {
             notes: notes.trim() || undefined,
         });
         toast.success('Produit ajouté à ton inventaire');
-        router.push('/vault');
+        navigate('/vault');
     }
 
     return (
@@ -58,7 +56,7 @@ export function VaultAdd() {
             >
                 <button
                     type="button"
-                    onClick={() => router.back()}
+                    onClick={() => navigate(-1)}
                     aria-label="Retour"
                     className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full border"
                 >

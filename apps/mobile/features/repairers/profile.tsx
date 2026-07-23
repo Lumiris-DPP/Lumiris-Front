@@ -1,8 +1,5 @@
-'use client';
-
 import { useMemo, useState } from 'react';
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Award, CalendarCheck, Clock, Mail, MapPin, Phone, Star, Wrench } from 'lucide-react';
 import { Badge } from '@lumiris/ui/components/badge';
@@ -30,8 +27,8 @@ interface RepairerProfileProps {
 }
 
 export function RepairerProfile({ repairer }: RepairerProfileProps) {
-    const router = useRouter();
-    const searchParams = useSearchParams();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const forParam = searchParams.get('for');
     const isLocal = isLumirisLocal(repairer);
     const slug = repairerSlug(repairer);
@@ -51,7 +48,7 @@ export function RepairerProfile({ repairer }: RepairerProfileProps) {
             >
                 <button
                     type="button"
-                    onClick={() => router.push(forParam ? `/local?for=${encodeURIComponent(forParam)}` : '/local')}
+                    onClick={() => navigate(forParam ? `/local?for=${encodeURIComponent(forParam)}` : '/local')}
                     aria-label="Retour"
                     className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full border"
                 >
@@ -135,7 +132,7 @@ export function RepairerProfile({ repairer }: RepairerProfileProps) {
                         Prendre rendez-vous
                     </button>
                     <Link
-                        href={requestHref}
+                        to={requestHref}
                         className="border-border bg-card text-foreground inline-flex items-center justify-center gap-2 rounded-full border px-5 py-2.5 text-xs font-medium active:scale-95"
                     >
                         <Wrench className="h-3.5 w-3.5" />

@@ -1,7 +1,5 @@
-'use client';
-
 import { useState, type ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { motion, type PanInfo } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Archive, ScanLine, Sparkles } from 'lucide-react';
 import { Button } from '@lumiris/ui/components/button';
@@ -39,7 +37,7 @@ const SLIDES: readonly Slide[] = [
 const SWIPE_THRESHOLD = 60;
 
 export function Onboarding() {
-    const router = useRouter();
+    const navigate = useNavigate();
     const [index, setIndex] = useState(0);
     const isLast = index === SLIDES.length - 1;
 
@@ -50,7 +48,7 @@ export function Onboarding() {
 
     function finish(): void {
         markOnboardingCompleted();
-        router.push('/auth');
+        navigate('/auth');
     }
 
     function handleDragEnd(_: unknown, info: PanInfo): void {

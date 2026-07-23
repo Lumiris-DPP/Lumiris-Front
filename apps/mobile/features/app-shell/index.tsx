@@ -1,8 +1,5 @@
-'use client';
-
 import { useEffect, type ReactNode } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Scan, Archive, MapPin, ShoppingBag, User } from 'lucide-react';
 import { fadeInOut, SPRING_INDICATOR, SPRING_TAB } from '@/lib/motion';
@@ -85,7 +82,7 @@ interface AppShellProps {
 }
 
 export function AppShell({ children, hideTabBar = false }: AppShellProps) {
-    const pathname = usePathname() ?? '/';
+    const pathname = useLocation().pathname ?? '/';
     const activeTab = activeTabFor(pathname);
     const tabBarHidden = hideTabBar || shouldHideTabBar(pathname);
     const cartCount = useCartCount();
@@ -131,8 +128,7 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
                                 return (
                                     <Link
                                         key={id}
-                                        href={href}
-                                        prefetch
+                                        to={href}
                                         aria-current={active ? 'page' : undefined}
                                         className={`relative flex flex-col items-center gap-0.5 px-2 py-1.5 transition-colors ${
                                             active ? 'text-lumiris-cyan' : 'text-muted-foreground'

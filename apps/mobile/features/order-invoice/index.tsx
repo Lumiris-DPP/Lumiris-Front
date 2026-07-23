@@ -1,7 +1,5 @@
-'use client';
-
 import { useEffect, useRef } from 'react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { ArrowLeft, Loader2, LogIn, Printer } from 'lucide-react';
 import { useOrderGroup } from '@lumiris/api-client/react';
 import { useUser } from '@/lib/auth/use-user';
@@ -43,7 +41,7 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
             <div className="bg-background flex h-full flex-col items-center justify-center gap-5 px-8 text-center">
                 <p className="text-foreground text-base font-semibold">Connecte-toi pour voir ta facture</p>
                 <Link
-                    href={`/auth/sign-in?returnTo=${INVOICE_RETURN(paymentIntentId)}`}
+                    to={`/auth/sign-in?returnTo=${INVOICE_RETURN(paymentIntentId)}`}
                     className="bg-foreground text-primary-foreground inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold"
                 >
                     <LogIn className="h-4 w-4" />
@@ -69,7 +67,7 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
                     Impossible de charger cette commande pour le moment. Réessaie dans un instant.
                 </p>
                 <Link
-                    href="/me/orders"
+                    to="/me/orders"
                     className="bg-foreground text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
                 >
                     Mes commandes
@@ -85,7 +83,7 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
             {/* Barre d'action — écran uniquement (masquée à l'impression). */}
             <div className="facture-no-print mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 pb-3 pt-12 md:px-6">
                 <Link
-                    href={`/commande/${paymentIntentId}`}
+                    to={`/commande/${paymentIntentId}`}
                     className="border-border bg-card text-foreground inline-flex h-9 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold"
                 >
                     <ArrowLeft className="h-4 w-4" />

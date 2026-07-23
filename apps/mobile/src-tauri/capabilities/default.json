@@ -1,7 +1,7 @@
 {
     "$schema": "../gen/schemas/desktop-schema.json",
     "identifier": "default",
-    "description": "Default capability for the Lumiris Mobile shell - only exposes the compute_score command and core window controls.",
+    "description": "Default capability for Lumiris Vision — exposes compute_score and core APIs (desktop preview + Android).",
     "windows": ["main"],
     "permissions": ["core:default"]
 }

@@ -1,6 +1,4 @@
-'use client';
-
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import {
     Armchair,
     BatteryCharging,
@@ -40,7 +38,7 @@ const SECTOR_ICON: Record<WardrobeSector, typeof Shirt> = {
 };
 
 export function ItemActionsSheet({ open, onOpenChange, target }: ItemActionsSheetProps) {
-    const router = useRouter();
+    const navigate = useNavigate();
 
     if (!target) return null;
 
@@ -48,7 +46,7 @@ export function ItemActionsSheet({ open, onOpenChange, target }: ItemActionsShee
 
     const onRescan = () => {
         close();
-        router.push('/');
+        navigate('/');
     };
 
     const onRemove = () => {
@@ -59,7 +57,7 @@ export function ItemActionsSheet({ open, onOpenChange, target }: ItemActionsShee
     const onFindRetoucheur = () => {
         if (!target.passport) return;
         close();
-        router.push(`/local?for=${encodeURIComponent(target.passport.id)}`);
+        navigate(`/local?for=${encodeURIComponent(target.passport.id)}`);
     };
 
     const Icon = SECTOR_ICON[target.sector];

@@ -3,3 +3,7 @@
 /gen
 /.cargo
 /WixTools
+
+# Signing key (never commit)
+*.jks
+keystore.properties

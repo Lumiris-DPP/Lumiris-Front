@@ -1,8 +1,5 @@
-'use client';
-
 import { useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ImagePlus, Send, X } from 'lucide-react';
 import { mockPassportById } from '@lumiris/mock-data';
@@ -35,7 +32,7 @@ interface RepairRequestFormProps {
 }
 
 export function RepairRequestForm({ repairer, prefillPassportId }: RepairRequestFormProps) {
-    const router = useRouter();
+    const navigate = useNavigate();
     const wardrobe = useWardrobe();
 
     const wardrobePassports = useMemo(
@@ -114,7 +111,7 @@ export function RepairRequestForm({ repairer, prefillPassportId }: RepairRequest
         });
 
         setToast(true);
-        window.setTimeout(() => router.push('/me/repairs'), 700);
+        window.setTimeout(() => navigate('/me/repairs'), 700);
     }
 
     const canSubmit = !submitting && description.trim().length > 0;
@@ -128,7 +125,7 @@ export function RepairRequestForm({ repairer, prefillPassportId }: RepairRequest
             >
                 <button
                     type="button"
-                    onClick={() => router.back()}
+                    onClick={() => navigate(-1)}
                     aria-label="Retour"
                     className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full border"
                 >
@@ -218,7 +215,6 @@ export function RepairRequestForm({ repairer, prefillPassportId }: RepairRequest
                     <ul className="flex flex-wrap gap-2">
                         {photos.map((src, idx) => (
                             <li key={`${idx}-${src.length}`} className="relative h-20 w-20">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src={src}
                                     alt={`Pièce jointe ${idx + 1}`}
@@ -291,13 +287,10 @@ function PassportRow({ passport, onClear }: { passport: Passport; onClear: () =>
         <div className="border-border/60 bg-card flex items-center gap-3 rounded-2xl border p-3">
             <div className="bg-secondary/40 relative h-14 w-14 shrink-0 overflow-hidden rounded-xl">
                 {passport.garment.mainPhotoUrl ? (
-                    <Image
+                    <img
                         src={passport.garment.mainPhotoUrl}
                         alt={passport.garment.reference}
-                        fill
-                        unoptimized
-                        sizes="56px"
-                        className="object-cover"
+                        className="absolute inset-0 h-full w-full object-cover"
                     />
                 ) : null}
             </div>

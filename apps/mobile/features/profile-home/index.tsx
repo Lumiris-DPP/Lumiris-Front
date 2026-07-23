@@ -1,9 +1,6 @@
-'use client';
-
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     ChevronRight,
@@ -55,11 +52,11 @@ function LoggedOut() {
                         asChild
                         className="bg-foreground text-background hover:bg-foreground/90 mt-6 h-11 w-full rounded-full text-sm font-semibold"
                     >
-                        <Link href="/auth">Créer un compte</Link>
+                        <Link to="/auth">Créer un compte</Link>
                     </Button>
 
                     <Link
-                        href="/about"
+                        to="/about"
                         className="text-muted-foreground hover:text-foreground mt-4 text-xs underline-offset-4 hover:underline"
                     >
                         À propos de LUMIRIS
@@ -77,7 +74,7 @@ interface LoggedInProps {
 }
 
 function LoggedIn({ displayName, email, city }: LoggedInProps) {
-    const router = useRouter();
+    const navigate = useNavigate();
     const stats = useWardrobeStats();
     const { signOut } = useUser();
     const [signingOut, setSigningOut] = useState(false);
@@ -90,7 +87,7 @@ function LoggedIn({ displayName, email, city }: LoggedInProps) {
         if (signingOut) return;
         setSigningOut(true);
         signOut();
-        router.push('/');
+        navigate('/');
     }
 
     return (
@@ -224,7 +221,7 @@ function ActionLink({ href, Icon, label, external = false }: ActionLinkProps) {
 
     return (
         <li>
-            <Link href={href} className={className}>
+            <Link to={href} className={className}>
                 {content}
             </Link>
         </li>

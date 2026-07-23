@@ -1,7 +1,5 @@
-'use client';
-
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { MapPin, SlidersHorizontal } from 'lucide-react';
 import type { ArtisanWithSlug } from '@lumiris/mock-data';
@@ -29,7 +27,7 @@ export interface LocalHubProps {
 export function LocalHub({ artisans, repairers }: LocalHubProps) {
     const online = useOnlineStatus();
     const { coords, status, request } = useUserCoords();
-    const searchParams = useSearchParams();
+    const [searchParams] = useSearchParams();
     // Arrivée depuis "Réparer cette pièce" (?for=) → on cible d'emblée les retoucheurs.
     const forParam = searchParams.get('for');
 

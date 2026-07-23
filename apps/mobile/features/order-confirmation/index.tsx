@@ -1,8 +1,5 @@
-'use client';
-
 import { Suspense, useEffect, useState } from 'react';
-import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Clock, FileText, Loader2, LogIn, Mail, ShieldCheck, Sparkles } from 'lucide-react';
 import { useMyOrders, useOrderGroup, useWardrobe } from '@lumiris/api-client/react';
@@ -26,7 +23,7 @@ export function OrderConfirmation({ routeId }: { routeId: string }) {
 
 function OrderConfirmationInner({ routeId }: { routeId: string }) {
     const { isAuthenticated } = useUser();
-    const searchParams = useSearchParams();
+    const [searchParams] = useSearchParams();
     const [startedAt] = useState(() => Date.now());
     const [pollExpired, setPollExpired] = useState(false);
 
@@ -90,7 +87,7 @@ function OrderConfirmationInner({ routeId }: { routeId: string }) {
                     </p>
                 </div>
                 <Link
-                    href={`/auth/sign-in?returnTo=${CONFIRM_RETURN}`}
+                    to={`/auth/sign-in?returnTo=${CONFIRM_RETURN}`}
                     className="bg-foreground text-primary-foreground inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold"
                 >
                     <LogIn className="h-4 w-4" />
@@ -229,7 +226,7 @@ function OrderConfirmationInner({ routeId }: { routeId: string }) {
             <div className="mt-8 flex flex-col gap-2 px-4">
                 {group?.invoiceNumber && targetPi ? (
                     <Link
-                        href={`/commande/${targetPi}/facture`}
+                        to={`/commande/${targetPi}/facture`}
                         className="border-border text-foreground flex w-full items-center justify-center gap-2 rounded-full border py-3 text-sm font-semibold"
                     >
                         <FileText className="h-4 w-4" />
@@ -237,13 +234,13 @@ function OrderConfirmationInner({ routeId }: { routeId: string }) {
                     </Link>
                 ) : null}
                 <Link
-                    href="/garde-robe"
+                    to="/garde-robe"
                     className="bg-foreground text-primary-foreground flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold"
                 >
                     Voir ma Garde-Robe
                 </Link>
                 <Link
-                    href="/boutique"
+                    to="/boutique"
                     className="border-border text-foreground flex w-full items-center justify-center gap-2 rounded-full border py-3 text-sm font-semibold"
                 >
                     Continuer mes achats

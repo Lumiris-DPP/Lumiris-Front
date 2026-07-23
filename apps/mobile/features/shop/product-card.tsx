@@ -1,7 +1,5 @@
-'use client';
-
 import { useState } from 'react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ExternalLink, ShoppingBag, Shirt } from 'lucide-react';
 import { IrisGrade } from '@lumiris/scoring-ui';
@@ -61,7 +59,6 @@ export function ProductCard({ item, index, source = 'shop' }: ProductCardProps) 
         <>
             <div className="bg-secondary/50 relative flex h-28 items-center justify-center overflow-hidden">
                 {photo && !photoFailed ? (
-                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                         src={photo}
                         alt=""
@@ -115,7 +112,7 @@ export function ProductCard({ item, index, source = 'shop' }: ProductCardProps) 
         >
             {inApp ? (
                 <Link
-                    href={`/boutique/${item.id}`}
+                    to={`/boutique/${item.id}`}
                     className={className}
                     aria-label={`Voir « ${item.name} » dans la Boutique`}
                 >
