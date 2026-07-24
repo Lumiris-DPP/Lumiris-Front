@@ -1,30 +1,28 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useTrackEvent } from '@lumiris/api-client/react';
-import {
-    fetchPublicDppEvents,
-    fetchPublicDppForm,
-    type DppEventDto,
-    type DppFormPublicDto,
-} from '@/lib/public-dpp-api';
+import { useApiClient, useTrackEvent } from '@lumiris/api-client/react';
+import type { DppEventDto, DppFormPublicDto } from '@lumiris/api-client';
 import { PublicPassportDetail } from '@/features/public-passport-detail';
 
-export function PassportView({ code }: { code: string }) {
+export function PassportView({ code, accessToken }: { code: string; accessToken?: string | null }) {
     const [data, setData] = useState<DppFormPublicDto | null>(null);
     const [events, setEvents] = useState<DppEventDto[]>([]);
     const [notFound, setNotFound] = useState(false);
+    const api = useApiClient();
     const trackEvent = useTrackEvent();
     const tracked = useRef(false);
 
     useEffect(() => {
-        fetchPublicDppForm(code)
+        api.dpp
+            .getPublic(code, accessToken)
             .then(setData)
             .catch(() => setNotFound(true));
-        fetchPublicDppEvents(code)
+        api.dpp
+            .listPublicEvents(code)
             .then(setEvents)
             .catch(() => setEvents([]));
-    }, [code]);
+    }, [code, accessToken, api]);
 
     useEffect(() => {
         if (!data || tracked.current) return;
@@ -59,6 +57,7 @@ export function PassportView({ code }: { code: string }) {
                 irisScore={data.irisScore}
                 events={events}
                 artisanSlug={data.artisanSlug}
+                accessLevel={data.accessLevel}
             />
         </div>
     );

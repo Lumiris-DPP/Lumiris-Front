@@ -39,7 +39,7 @@ import {
 import { DocumentsCard } from './documents-card';
 import { EventFormCard } from './event-form-card';
 import { EventHistoryCard } from './event-history-card';
-import { QrCodeCard } from './QrCodeCard';
+import { AccessQrCard } from './access-qr-card';
 import { buildDetailView } from './view-model';
 
 export function PassportDetail({ passportId }: { passportId: string }) {
@@ -146,7 +146,13 @@ export function PassportDetail({ passportId }: { passportId: string }) {
                         ) : (
                             <div className="space-y-4">
                                 <IrisScoreCard dppId={passportId} />
-                                {apiDpp.publicCode && <QrCodeCard publicCode={apiDpp.publicCode} />}
+                                {apiDpp.publicCode && (
+                                    <AccessQrCard
+                                        dppId={passportId}
+                                        publicCode={apiDpp.publicCode}
+                                        documents={apiDpp.documents ?? []}
+                                    />
+                                )}
                             </div>
                         )}
                     </aside>

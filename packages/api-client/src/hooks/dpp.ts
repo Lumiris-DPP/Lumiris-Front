@@ -11,6 +11,7 @@ import {
 import { createKeys } from '../core/keys';
 import { CACHE_TIMES } from '../core/cache';
 import type {
+    DppAccessToken,
     DppEventDto,
     DppEventPayload,
     DppFilePart,
@@ -71,6 +72,20 @@ export function useCreateDppEvent(
             void queryClient.invalidateQueries({ queryKey: dppKeys.custom('events', id) });
             return options?.onSuccess?.(...args);
         },
+    });
+}
+
+/** Les trois QR du passeport. Dérivés du code public, donc stables : ils ne s'invalident jamais. */
+export function useDppAccessTokens(
+    id: string,
+    options?: Omit<UseQueryOptions<DppAccessToken[], Error>, 'queryKey' | 'queryFn'>,
+) {
+    const client = useApiClient();
+    return useQuery<DppAccessToken[], Error>({
+        queryKey: dppKeys.custom('access-tokens', id),
+        queryFn: () => client.dpp.listAccessTokens(id),
+        staleTime: CACHE_TIMES.DETAIL,
+        ...options,
     });
 }
 

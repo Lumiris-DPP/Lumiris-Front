@@ -4,12 +4,14 @@ import type { DppScoreInput, IrisGrade, ScoreReason, ScoreResult } from '@lumiri
 import type { Http } from '../core/http';
 import { parseOr } from '../core/validate';
 import {
+    dppAccessTokenSchema,
     dppEventDtoSchema,
     dppFormCreatedDtoSchema,
     dppFormDtoSchema,
     dppFormPublicDtoSchema,
     dppFormSummaryDtoSchema,
     irisScoreDtoSchema,
+    type DppAccessToken,
     type DppEventDto,
     type DppEventPayload,
     type DppFilePart,
@@ -23,6 +25,7 @@ import {
 
 const dppFormSummaryListSchema = z.array(dppFormSummaryDtoSchema);
 const dppEventListSchema = z.array(dppEventDtoSchema);
+const dppAccessTokenListSchema = z.array(dppAccessTokenSchema);
 
 const FIXED_WEIGHTS = { transparency: 0.4, craftsmanship: 0.25, impact: 0.25, repairability: 0.1 } as const;
 
@@ -113,8 +116,17 @@ export function dppApi(http: Http) {
                 ),
             );
         },
-        async getPublic(code: string): Promise<DppFormPublicDto> {
-            return parseOr(dppFormPublicDtoSchema, await http.request(`/public/dpp_forms/${code}`));
+        /** @param accessToken token de laissez-passer porté par un QR d'accès élargi. */
+        async getPublic(code: string, accessToken?: string | null): Promise<DppFormPublicDto> {
+            const query = accessToken ? `?k=${encodeURIComponent(accessToken)}` : '';
+            return parseOr(dppFormPublicDtoSchema, await http.request(`/public/dpp_forms/${code}${query}`));
+        },
+        /** Historique de garde d'un passeport scanné — route publique, indexée par code, pas par id. */
+        async listPublicEvents(code: string): Promise<DppEventDto[]> {
+            return parseOr(dppEventListSchema, await http.request(`/public/dpp_forms/${code}/events`));
+        },
+        async listAccessTokens(id: string): Promise<DppAccessToken[]> {
+            return parseOr(dppAccessTokenListSchema, await http.request(`/api/dpp-forms/${id}/access-tokens`));
         },
     };
 }

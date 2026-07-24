@@ -1,14 +1,24 @@
 import { type ReactNode, lazy, Suspense, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle, XCircle, FileText, ArrowLeft, Download, Heart, ExternalLink, ShoppingBag } from 'lucide-react';
+import {
+    CheckCircle,
+    XCircle,
+    FileText,
+    ArrowLeft,
+    Download,
+    Heart,
+    ExternalLink,
+    ShieldCheck,
+    ShoppingBag,
+} from 'lucide-react';
 import { useMarketplaceProductByDpp } from '@lumiris/api-client/react';
 import type { IrisGrade } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
 import { fiberLabel } from '@lumiris/scoring-ui';
 import type { OriginMapOriginPoint, OriginMapStepPoint } from '@lumiris/scoring-ui/components/origin-map';
 import { formatCents } from '@/lib/marketplace';
-import type { DppEventDto, DppEventActorType, DppFormDto, IrisScoreDto } from '@/lib/public-dpp-api';
+import type { DppAccessLevel, DppEventDto, DppEventActorType, DppFormDto, IrisScoreDto } from '@lumiris/api-client';
 import { addPublicDpp, removePublicDpp, useWardrobe } from '@/lib/wardrobe-storage';
 import { toast } from '@/lib/toast';
 import { GRADE_TEXT, GRADE_BORDER, GRADE_BG_SOFT, GRADE_CSS_VAR } from '@/features/passport-detail/grade-classes';
@@ -66,20 +76,60 @@ const ACTOR_LABELS: Record<DppEventActorType, string> = {
 
 const LAYER_DELAY = 0.12;
 
+/**
+ * Regroupement d'affichage des documents. L'ordre place le public en tête : c'est ce que la
+ * plupart des porteurs verront, les blocs élargis n'apparaissant qu'avec le QR correspondant.
+ */
+const DOC_GROUPS: Array<{ visibility: string; title: string; audience: string }> = [
+    { visibility: 'PUBLIC_USERS', title: 'Documents publics', audience: 'Accessibles à tous' },
+    {
+        visibility: 'CIRCULAR_OPERATORS',
+        title: 'Réparation & fin de vie',
+        audience: 'Réservés aux réparateurs et recycleurs',
+    },
+    { visibility: 'AUTHORITIES', title: 'Conformité', audience: 'Réservés aux autorités compétentes' },
+];
+
+const ACCESS_BANNERS: Record<string, { title: string; body: string; className: string }> = {
+    CIRCULAR_OPERATORS: {
+        title: 'Accès réparation',
+        body: 'Ce QR ouvre les documents techniques réservés aux réparateurs et recycleurs.',
+        className: 'border-lumiris-amber/40 bg-lumiris-amber/5 text-lumiris-amber',
+    },
+    AUTHORITIES: {
+        title: 'Accès autorités',
+        body: 'Ce QR ouvre les documents de conformité réservés aux autorités compétentes.',
+        className: 'border-lumiris-iris/40 bg-lumiris-iris/5 text-lumiris-iris',
+    },
+};
+
 interface PublicPassportDetailProps {
     dpp: DppFormDto;
-    irisScore: IrisScoreDto | null;
+    irisScore?: IrisScoreDto | null;
     events?: DppEventDto[];
     artisanSlug?: string | null;
+    accessLevel?: DppAccessLevel | null;
 }
 
-export function PublicPassportDetail({ dpp, irisScore, events = [], artisanSlug }: PublicPassportDetailProps) {
+export function PublicPassportDetail({
+    dpp,
+    irisScore,
+    events = [],
+    artisanSlug,
+    accessLevel,
+}: PublicPassportDetailProps) {
     const navigate = useNavigate();
     const grade = irisScore?.grade as IrisGrade | undefined;
     const cssVar = grade ? GRADE_CSS_VAR[grade] : 'var(--color-lumiris-iris)';
 
+    // Un brouillon n'a pas de code public. Cette vue n'est atteignable que par scan, donc le cas ne
+    // se produit pas — mais la garde-robe s'indexe sur ce code, alors on n'invente rien quand il
+    // manque : l'ajout est simplement indisponible.
+    const publicCode = dpp.publicCode ?? null;
+
     const wardrobe = useWardrobe();
-    const isSaved = wardrobe.some((it) => it.kind === 'public-dpp' && it.publicCode === dpp.publicCode);
+    const isSaved =
+        publicCode !== null && wardrobe.some((it) => it.kind === 'public-dpp' && it.publicCode === publicCode);
 
     // Pont scan → achat : si une annonce Boutique publiée est rattachée à ce passeport (par son
     // formId), on propose de l'acheter en direct. Un 404 (aucune annonce) laisse `buyProduct`
@@ -87,12 +137,13 @@ export function PublicPassportDetail({ dpp, irisScore, events = [], artisanSlug 
     const { data: buyProduct } = useMarketplaceProductByDpp(dpp.id);
 
     const onToggleSaved = () => {
+        if (publicCode === null) return;
         if (isSaved) {
-            removePublicDpp(dpp.publicCode);
+            removePublicDpp(publicCode);
             toast.info('Retiré de ta garde-robe');
         } else {
             addPublicDpp({
-                publicCode: dpp.publicCode,
+                publicCode,
                 productName: dpp.productName ?? 'Produit sans nom',
                 grade: irisScore?.grade,
             });
@@ -100,7 +151,14 @@ export function PublicPassportDetail({ dpp, irisScore, events = [], artisanSlug 
         }
     };
 
-    const publicDocs = (dpp.documents ?? []).filter((d) => d.visibility === 'PUBLIC_USERS');
+    // Le backend ne sert déjà que les documents du périmètre résolu ; ce regroupement est
+    // d'affichage, pas de sécurité — il nomme la provenance de chaque bloc.
+    const docGroups = DOC_GROUPS.map((group) => ({
+        ...group,
+        documents: (dpp.documents ?? []).filter((d) => d.visibility === group.visibility),
+    })).filter((group) => group.documents.length > 0);
+
+    const banner = accessLevel ? ACCESS_BANNERS[accessLevel] : undefined;
 
     const originPoints: OriginMapOriginPoint[] = useMemo(
         () =>
@@ -155,18 +213,21 @@ export function PublicPassportDetail({ dpp, irisScore, events = [], artisanSlug 
                     <ArrowLeft className="h-4 w-4" aria-hidden />
                 </button>
 
-                <button
-                    type="button"
-                    onClick={onToggleSaved}
-                    aria-label={isSaved ? 'Retirer de ma garde-robe' : 'Ajouter à ma garde-robe'}
-                    aria-pressed={isSaved}
-                    className={cn(
-                        'absolute right-4 top-12 inline-flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md transition-colors',
-                        isSaved ? 'bg-lumiris-rose/15 text-lumiris-rose' : 'bg-card/70 text-foreground',
-                    )}
-                >
-                    <Heart className={cn('h-4 w-4', isSaved && 'fill-current')} aria-hidden />
-                </button>
+                {/* Sans code public, la garde-robe n'a pas de clé : un bouton muet vaut moins qu'aucun. */}
+                {publicCode !== null && (
+                    <button
+                        type="button"
+                        onClick={onToggleSaved}
+                        aria-label={isSaved ? 'Retirer de ma garde-robe' : 'Ajouter à ma garde-robe'}
+                        aria-pressed={isSaved}
+                        className={cn(
+                            'absolute right-4 top-12 inline-flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md transition-colors',
+                            isSaved ? 'bg-lumiris-rose/15 text-lumiris-rose' : 'bg-card/70 text-foreground',
+                        )}
+                    >
+                        <Heart className={cn('h-4 w-4', isSaved && 'fill-current')} aria-hidden />
+                    </button>
+                )}
 
                 <div className="relative z-10 flex flex-col items-center gap-3">
                     {grade ? (
@@ -208,6 +269,17 @@ export function PublicPassportDetail({ dpp, irisScore, events = [], artisanSlug 
             </header>
 
             <div className="flex flex-col gap-5 px-4">
+                {/* Le porteur d'un QR élargi doit savoir qu'il voit plus que le grand public. */}
+                {banner && (
+                    <div className={cn('flex items-start gap-2.5 rounded-2xl border px-3.5 py-3', banner.className)}>
+                        <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
+                        <div className="min-w-0">
+                            <p className="text-[13px] font-semibold">{banner.title}</p>
+                            <p className="text-foreground/70 text-[11px] leading-relaxed">{banner.body}</p>
+                        </div>
+                    </div>
+                )}
+
                 {/* Pont scan → achat : visible seulement si une annonce Boutique est publiée. */}
                 {buyProduct ? (
                     <motion.div
@@ -376,28 +448,31 @@ export function PublicPassportDetail({ dpp, irisScore, events = [], artisanSlug 
                     </div>
                 </Section>
 
-                {/* Documents publics */}
-                {publicDocs.length > 0 && (
-                    <Section delay={LAYER_DELAY * 5} title="Documents publics">
+                {/* Documents, groupés par niveau d'accès */}
+                {docGroups.map((group, groupIndex) => (
+                    <Section key={group.visibility} delay={LAYER_DELAY * (5 + groupIndex)} title={group.title}>
+                        <p className="text-muted-foreground mb-2 text-[11px]">{group.audience}</p>
                         <div className="space-y-1.5">
-                            {publicDocs.map((doc) => (
+                            {group.documents.map((doc) => (
                                 <div
                                     key={doc.fileId}
                                     className="border-border flex items-center gap-2.5 rounded-xl border px-3 py-2.5"
                                 >
                                     <FileText className="text-muted-foreground h-4 w-4 shrink-0" />
                                     <div className="min-w-0 flex-1">
-                                        <p className="text-foreground truncate text-sm font-medium">{doc.filename}</p>
+                                        <p className="text-foreground truncate text-sm font-medium">
+                                            {doc.filename ?? 'Document'}
+                                        </p>
                                         <p className="text-muted-foreground truncate text-[11px]">
-                                            {DOC_TYPE_LABELS[doc.documentType] ?? doc.documentType}
+                                            {DOC_TYPE_LABELS[doc.documentType ?? ''] ?? doc.documentType}
                                         </p>
                                     </div>
                                     <a
-                                        href={doc.url}
-                                        download={doc.filename}
+                                        href={doc.url ?? undefined}
+                                        download={doc.filename ?? undefined}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        aria-label={`Télécharger ${doc.filename}`}
+                                        aria-label={`Télécharger ${doc.filename ?? 'le document'}`}
                                         className="border-border bg-card text-foreground hover:bg-muted/40 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-colors active:scale-95"
                                     >
                                         <Download className="h-3.5 w-3.5" aria-hidden />
@@ -406,7 +481,7 @@ export function PublicPassportDetail({ dpp, irisScore, events = [], artisanSlug 
                             ))}
                         </div>
                     </Section>
-                )}
+                ))}
 
                 {events.length > 0 && (
                     <Section delay={LAYER_DELAY * 6} title="Historique">
@@ -443,7 +518,8 @@ export function PublicPassportDetail({ dpp, irisScore, events = [], artisanSlug 
                 )}
 
                 <p className="text-muted-foreground mt-2 border-t pt-4 font-mono text-[10px] leading-relaxed">
-                    Code : {dpp.publicCode} / {new Date(dpp.createdAt).toLocaleDateString('fr-FR')}
+                    {publicCode !== null && `Code : ${publicCode} / `}
+                    {new Date(dpp.createdAt).toLocaleDateString('fr-FR')}
                 </p>
             </div>
         </div>

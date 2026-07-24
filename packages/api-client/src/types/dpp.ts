@@ -166,9 +166,27 @@ export const dppFormSummaryDtoSchema = z.object({
 });
 export type DppFormSummaryDto = z.infer<typeof dppFormSummaryDtoSchema>;
 
+// ── QR d'accès ───────────────────────────────────────────────────────────────
+
+/** Cumulatif : AUTHORITIES couvre aussi les documents circulaires et publics. */
+export const dppAccessLevelSchema = z.enum(['PUBLIC', 'CIRCULAR_OPERATORS', 'AUTHORITIES']);
+export type DppAccessLevel = z.infer<typeof dppAccessLevelSchema>;
+
+// GET /api/dpp-forms/{id}/access-tokens — les trois QR du passeport. Permanents et dérivés du code
+// public : le même passeport rend toujours les mêmes jetons, un QR perdu se réimprime.
+export const dppAccessTokenSchema = z.object({
+    accessLevel: dppAccessLevelSchema,
+    /** `null` pour PUBLIC, dont le QR ne porte que le code public. */
+    token: z.string().nullish(),
+});
+export type DppAccessToken = z.infer<typeof dppAccessTokenSchema>;
+
 // GET /public/dpp_forms/{code} — public read of a published DPP with its score.
 export const dppFormPublicDtoSchema = z.object({
     dpp: dppFormDtoSchema,
     irisScore: irisScoreDtoSchema.nullish(),
+    artisanSlug: z.string().nullish(),
+    /** Périmètre effectivement servi, jamais celui demandé : un jeton forgé retombe sur PUBLIC. */
+    accessLevel: dppAccessLevelSchema.nullish(),
 });
 export type DppFormPublicDto = z.infer<typeof dppFormPublicDtoSchema>;
