@@ -97,7 +97,9 @@ export function ScanPassport() {
             if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(60);
             incrementScanCounter();
             stopCamera();
-            navigate(`/p/${result.code}`);
+            // Le jeton d'un QR d'accès élargi suit jusqu'à la vue, qui le rejoue vers l'API.
+            const query = result.accessToken ? `?k=${encodeURIComponent(result.accessToken)}` : '';
+            navigate(`/p/${result.code}${query}`);
             return;
         }
         if (result.kind === 'external' || result.kind === 'unknown') {
