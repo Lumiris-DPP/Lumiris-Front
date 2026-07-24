@@ -4,15 +4,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Archive,
     Armchair,
+    BadgeCheck,
     BatteryCharging,
     Check,
     GitCompareArrows,
     MoreHorizontal,
+    PenLine,
     Plus,
     Puzzle,
     Refrigerator,
     ScanQrCode,
+    ShieldCheck,
     Shirt,
+    ShoppingBag,
     Smartphone,
     SlidersHorizontal,
     TrendingUp,
@@ -20,7 +24,10 @@ import {
 import { GRADE_LABEL, gradeBackgroundSolid, gradeColorVar } from '@lumiris/scoring-ui';
 import { mockArtisanById, mockPassportById } from '@lumiris/mock-data';
 import type { GarmentKind, IrisGrade, Passport, ScoreResult } from '@lumiris/types';
+import { useWardrobe as useBackendWardrobe } from '@lumiris/api-client/react';
+import type { WardrobeItemDto } from '@lumiris/api-client';
 import { cn } from '@lumiris/ui/lib/cn';
+import { useUser } from '@/lib/auth/use-user';
 import { scorePassport } from '@/lib/passport-score';
 import { useWardrobe, type WardrobeItem, type WardrobeSector } from '@/lib/wardrobe-storage';
 import { getGradeDistribution, getOverallScore } from '@/lib/iris/wardrobe-stats';
@@ -29,7 +36,6 @@ import { toast } from '@/lib/toast';
 import { ComparisonOverlay, type VaultItem } from './comparison-overlay';
 import { FiltersSheet, VAULT_DEFAULT_FILTERS, type VaultFilters } from './filters-sheet';
 import { ItemActionsSheet } from './item-actions-sheet';
-import { PurchasedItems } from './purchased-items';
 
 const GRADES: readonly IrisGrade[] = ['A', 'B', 'C', 'D', 'E'];
 const GRADE_RANK: Record<IrisGrade, number> = { A: 5, B: 4, C: 3, D: 2, E: 1 };
@@ -76,13 +82,55 @@ interface PublicDppRow {
     publicCode: string;
 }
 
-type VaultRow = ScoredVaultRow | PublicDppRow | ManualVaultRow;
+/** Pièce achetée sur la marketplace (backend). Provenance « achat » — passeport + facture + garantie. */
+interface PurchasedVaultRow {
+    kind: 'purchased';
+    key: string;
+    addedAt: string;
+    sector: WardrobeSector;
+    label: string;
+    sublabel: string;
+    publicCode: string | null;
+    invoiceNumber: string | null;
+    warrantyDescription: string | null;
+}
+
+type VaultRow = ScoredVaultRow | PublicDppRow | ManualVaultRow | PurchasedVaultRow;
+
+/** Provenance d'une pièce — la distinction que voit l'utilisateur (achat vs ajout avec/sans DPP). */
+type Provenance = 'purchased' | 'dpp' | 'manual';
+
+function rowProvenance(row: VaultRow): Provenance {
+    if (row.kind === 'purchased') return 'purchased';
+    if (row.kind === 'scored' || row.kind === 'public-dpp') return 'dpp';
+    return 'manual';
+}
 
 function rowGrade(row: VaultRow): IrisGrade | null {
     if (row.kind === 'scored') return row.score.grade;
     if (row.kind === 'public-dpp') return row.grade;
     return null;
 }
+
+const SUBLABEL_PURCHASED = 'Acheté sur la marketplace';
+
+const PROVENANCE_BADGE: Record<Provenance, { label: string; Icon: typeof ShoppingBag; className: string }> = {
+    purchased: {
+        label: 'Acheté',
+        Icon: ShoppingBag,
+        className: 'border-lumiris-emerald/25 bg-lumiris-emerald/10 text-lumiris-emerald',
+    },
+    dpp: {
+        label: 'Passeport',
+        Icon: BadgeCheck,
+        className: 'border-primary/20 bg-primary/5 text-primary',
+    },
+    manual: {
+        label: 'Sans DPP',
+        Icon: PenLine,
+        className: 'border-border bg-background/80 text-muted-foreground',
+    },
+};
 
 function buildRow(item: WardrobeItem, now: Date): VaultRow | null {
     if (item.kind === 'lumiris-passport') {
@@ -128,10 +176,26 @@ function buildRow(item: WardrobeItem, now: Date): VaultRow | null {
     return null;
 }
 
+function buildPurchasedRow(item: WardrobeItemDto): PurchasedVaultRow {
+    return {
+        kind: 'purchased',
+        key: `purchase:${item.id}`,
+        addedAt: item.acquiredAt ?? '',
+        sector: 'textile',
+        label: item.productName ?? 'Pièce achetée',
+        sublabel: SUBLABEL_PURCHASED,
+        publicCode: item.dppPublicCode ?? null,
+        invoiceNumber: item.invoiceNumber ?? null,
+        warrantyDescription: item.warrantyDescription ?? null,
+    };
+}
+
 export function Vault() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const { isAuthenticated } = useUser();
     const items = useWardrobe();
+    const { data: purchased = [] } = useBackendWardrobe({ enabled: isAuthenticated });
     const compareIds = useCompare();
     const [now] = useState(() => new Date());
     const [compareMode, setCompareMode] = useState(false);
@@ -139,12 +203,15 @@ export function Vault() {
     const [showComparison, setShowComparison] = useState(false);
     const [filtersOpen, setFiltersOpen] = useState(false);
     const [filters, setFilters] = useState<VaultFilters>(VAULT_DEFAULT_FILTERS);
-    const [actionsTarget, setActionsTarget] = useState<VaultRow | null>(null);
+    const [actionsTarget, setActionsTarget] = useState<Exclude<VaultRow, PurchasedVaultRow> | null>(null);
 
-    const rows = useMemo<readonly VaultRow[]>(
-        () => items.map((it) => buildRow(it, now)).filter((r): r is VaultRow => r !== null),
-        [items, now],
-    );
+    // Une seule grille : les achats marketplace (backend) rejoignent l'inventaire local. Chaque
+    // carte porte un badge de provenance — Acheté / Passeport / Sans DPP.
+    const rows = useMemo<readonly VaultRow[]>(() => {
+        const local = items.map((it) => buildRow(it, now)).filter((r): r is VaultRow => r !== null);
+        const bought = purchased.map(buildPurchasedRow);
+        return [...bought, ...local];
+    }, [items, purchased, now]);
 
     const scoredRows = useMemo(() => rows.filter((r): r is ScoredVaultRow => r.kind === 'scored'), [rows]);
     const grades = useMemo(() => rows.map(rowGrade).filter((g): g is IrisGrade => g !== null), [rows]);
@@ -165,7 +232,13 @@ export function Vault() {
                 new Set(
                     rows
                         .map((r) => r.sublabel)
-                        .filter((s) => s !== '-' && s !== 'Sans marque' && s !== 'Passeport numérique'),
+                        .filter(
+                            (s) =>
+                                s !== '-' &&
+                                s !== 'Sans marque' &&
+                                s !== 'Passeport numérique' &&
+                                s !== SUBLABEL_PURCHASED,
+                        ),
                 ),
             ),
         [rows],
@@ -266,6 +339,10 @@ export function Vault() {
             }
             if (row.kind === 'scored') navigate(`/passeport/${row.passport.id}`);
             if (row.kind === 'public-dpp') navigate(`/p/${row.publicCode}`);
+            if (row.kind === 'purchased') {
+                if (row.publicCode) navigate(`/p/${row.publicCode}`);
+                else navigate('/me/orders');
+            }
         },
         [compareMode, navigate],
     );
@@ -277,7 +354,6 @@ export function Vault() {
     if (rows.length === 0) {
         return (
             <div className="bg-background flex h-full flex-col overflow-y-auto pt-12">
-                <PurchasedItems />
                 <VaultEmpty onScan={() => navigate('/')} onAdd={() => navigate('/vault/add')} />
             </div>
         );
@@ -292,7 +368,7 @@ export function Vault() {
     return (
         <div className="bg-background flex h-full flex-col">
             <motion.header
-                className="flex items-center justify-between px-5 pb-4 pt-12"
+                className="flex items-center justify-between px-5 pt-12 pb-4"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
             >
@@ -326,7 +402,7 @@ export function Vault() {
                         <SlidersHorizontal className="h-3.5 w-3.5" />
                         {hasActiveFilters ? (
                             <span
-                                className="bg-lumiris-cyan absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full"
+                                className="bg-lumiris-cyan absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full"
                                 aria-hidden
                             />
                         ) : null}
@@ -347,8 +423,6 @@ export function Vault() {
                     </button>
                 </div>
             </motion.header>
-
-            <PurchasedItems />
 
             <div className="flex-1 overflow-y-auto px-5 pb-28">
                 {grades.length > 0 ? (
@@ -385,7 +459,9 @@ export function Vault() {
                                 compareMode={compareMode}
                                 isSelected={row.kind === 'scored' && compareIds.includes(row.passport.id)}
                                 onTap={() => onCardTap(row)}
-                                onOpenActions={() => setActionsTarget(row)}
+                                onOpenActions={() => {
+                                    if (row.kind !== 'purchased') setActionsTarget(row);
+                                }}
                             />
                         ))}
                     </AnimatePresence>
@@ -584,14 +660,18 @@ interface VaultCardProps {
 function VaultCard({ row, index, compareMode, isSelected, onTap, onOpenActions }: VaultCardProps) {
     const Icon = SECTOR_ICON[row.sector];
     const grade = rowGrade(row);
+    const provenance = rowProvenance(row);
+    const badge = PROVENANCE_BADGE[provenance];
     const isE = grade === 'E';
     const isA = grade === 'A';
+    // Un achat ne s'ajoute ni ne se retire manuellement (il vient du backend) → pas de menu d'actions.
+    const hasActions = provenance !== 'purchased';
     const cardStyle: React.CSSProperties = {
         ...(isE ? { filter: 'saturate(0.4) brightness(0.92)' } : {}),
         ...(isA ? { animation: 'iris-grade-a-glow 3s ease-in-out infinite' } : {}),
     };
 
-    const ariaLabel = grade ? `${row.label} - grade ${grade}` : `${row.label} - sans passeport`;
+    const ariaLabel = grade ? `${row.label} - ${badge.label} - grade ${grade}` : `${row.label} - ${badge.label}`;
 
     return (
         <motion.div
@@ -610,36 +690,42 @@ function VaultCard({ row, index, compareMode, isSelected, onTap, onOpenActions }
                 {compareMode ? (
                     <div
                         className={cn(
-                            'absolute left-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full border-2 transition-all',
+                            'absolute top-2 left-2 z-10 flex h-6 w-6 items-center justify-center rounded-full border-2 transition-all',
                             isSelected ? 'border-lumiris-cyan bg-lumiris-cyan' : 'border-border bg-card/90',
                         )}
                         aria-hidden
                     >
                         {isSelected ? <Check className="text-primary-foreground h-3 w-3" /> : null}
                     </div>
-                ) : null}
+                ) : (
+                    <span
+                        className={cn(
+                            'absolute top-2 left-2 z-10 inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[9px] font-semibold backdrop-blur-sm',
+                            badge.className,
+                        )}
+                    >
+                        <badge.Icon className="h-2.5 w-2.5" strokeWidth={2} aria-hidden />
+                        {badge.label}
+                    </span>
+                )}
 
                 <div className="bg-secondary/50 relative flex h-28 items-center justify-center">
                     <Icon className="text-muted-foreground/25 h-9 w-9" aria-hidden />
                     {grade ? (
                         <div
                             className={cn(
-                                'text-primary-foreground absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold',
+                                'text-primary-foreground absolute top-2 right-2 inline-flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold',
                                 gradeBackgroundSolid(grade),
                             )}
                             aria-label={`Iris grade ${grade}`}
                         >
                             {grade}
                         </div>
-                    ) : (
-                        <div className="border-border bg-background/80 text-muted-foreground absolute right-2 top-2 inline-flex h-7 items-center justify-center rounded-full border px-2 text-[10px] font-semibold">
-                            DIY
-                        </div>
-                    )}
+                    ) : null}
                 </div>
 
                 <div className="p-3">
-                    <h4 className="text-foreground truncate text-xs font-semibold leading-tight">{row.label}</h4>
+                    <h4 className="text-foreground truncate text-xs leading-tight font-semibold">{row.label}</h4>
                     <p className="text-muted-foreground mt-0.5 truncate text-[11px]">{row.sublabel}</p>
                     {row.kind === 'scored' ? (
                         <p className="text-foreground mt-1 text-xs font-bold">
@@ -648,13 +734,27 @@ function VaultCard({ row, index, compareMode, isSelected, onTap, onOpenActions }
                         </p>
                     ) : row.kind === 'public-dpp' ? (
                         <p className="text-muted-foreground/70 mt-1 font-mono text-[11px]">{row.publicCode}</p>
+                    ) : row.kind === 'purchased' ? (
+                        <div className="mt-1 flex flex-col gap-0.5">
+                            {row.invoiceNumber ? (
+                                <p className="text-muted-foreground/70 truncate font-mono text-[10px]">
+                                    {row.invoiceNumber}
+                                </p>
+                            ) : null}
+                            {row.warrantyDescription ? (
+                                <p className="text-muted-foreground inline-flex items-center gap-1 text-[10px]">
+                                    <ShieldCheck className="text-lumiris-emerald h-3 w-3 shrink-0" aria-hidden />
+                                    <span className="truncate">{row.warrantyDescription}</span>
+                                </p>
+                            ) : null}
+                        </div>
                     ) : (
                         <p className="text-muted-foreground/70 mt-1 text-[11px]">Sans DPP</p>
                     )}
                 </div>
             </button>
 
-            {!compareMode ? (
+            {!compareMode && hasActions ? (
                 <button
                     type="button"
                     onClick={(e) => {
@@ -662,7 +762,7 @@ function VaultCard({ row, index, compareMode, isSelected, onTap, onOpenActions }
                         onOpenActions();
                     }}
                     aria-label={`Actions pour ${row.label}`}
-                    className="border-border bg-background/80 text-foreground hover:bg-background absolute bottom-2 right-2 inline-flex h-7 w-7 items-center justify-center rounded-full border backdrop-blur-md active:scale-95"
+                    className="border-border bg-background/80 text-foreground hover:bg-background absolute right-2 bottom-2 inline-flex h-7 w-7 items-center justify-center rounded-full border backdrop-blur-md active:scale-95"
                 >
                     <MoreHorizontal className="h-3.5 w-3.5" />
                 </button>
