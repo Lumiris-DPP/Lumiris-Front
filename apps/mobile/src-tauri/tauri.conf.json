@@ -17,7 +17,8 @@
             }
         ],
         "security": {
-            "csp": "default-src 'self'; img-src 'self' data: blob: https://*.tile.openstreetmap.org https://placehold.co https://api.lumiris.eu https://*.lumiris.eu; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' ipc: http://ipc.localhost https://*.tile.openstreetmap.org https://api.lumiris.eu https://*.lumiris.eu; media-src 'self' blob:"
+            "csp": "default-src 'self'; img-src 'self' data: blob: https://*.tile.openstreetmap.org https://placehold.co https://api.lumiris.eu https://*.lumiris.eu https://*.stripe.com; style-src 'self' 'unsafe-inline'; script-src 'self' https://js.stripe.com https://m.stripe.network; frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://m.stripe.network; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' ipc: http://ipc.localhost https://*.tile.openstreetmap.org https://api.lumiris.eu https://*.lumiris.eu https://api.stripe.com https://maps.stripe.com https://m.stripe.network https://r.stripe.com; media-src 'self' blob:",
+            "devCsp": "default-src 'self'; img-src 'self' data: blob: http://localhost:* http://10.0.2.2:* https://*.tile.openstreetmap.org https://placehold.co https://api.lumiris.eu https://*.lumiris.eu https://*.stripe.com; style-src 'self' 'unsafe-inline'; script-src 'self' https://js.stripe.com https://m.stripe.network; frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://m.stripe.network; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' ipc: http://ipc.localhost http://localhost:* ws://localhost:* http://10.0.2.2:* ws://10.0.2.2:* https://*.tile.openstreetmap.org https://api.lumiris.eu https://*.lumiris.eu https://api.stripe.com https://maps.stripe.com https://m.stripe.network https://r.stripe.com; media-src 'self' blob:"
         }
     },
     "bundle": {
