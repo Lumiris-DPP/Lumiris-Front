@@ -75,7 +75,7 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
 
     const set = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((f) => ({ ...f, [key]: value }));
 
-    const onSubmit = (event: React.FormEvent) => {
+    const onSubmit = (event: React.SyntheticEvent) => {
         event.preventDefault();
         if (!form.name.trim()) {
             toast.error('Le nom du produit est requis.');

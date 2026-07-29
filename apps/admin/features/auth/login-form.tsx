@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type SyntheticEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Button } from '@lumiris/ui/components/button';
@@ -47,7 +47,7 @@ export function LoginForm() {
         emailRef.current?.focus();
     }, []);
 
-    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (submitting) return;
         setError(null);
@@ -85,9 +85,9 @@ export function LoginForm() {
 
     return (
         <div className="w-full max-w-sm space-y-4">
-            <form onSubmit={handleSubmit} noValidate className="border-border bg-card space-y-6 rounded-2xl border p-8">
+            <form onSubmit={handleSubmit} noValidate className="space-y-6 rounded-2xl border border-border bg-card p-8">
                 <div>
-                    <h1 className="text-foreground text-lg font-semibold">Connexion</h1>
+                    <h1 className="text-lg font-semibold text-foreground">Connexion</h1>
                 </div>
 
                 <div className="space-y-2">
@@ -121,7 +121,7 @@ export function LoginForm() {
                             type="button"
                             onClick={() => setShowPassword((prev) => !prev)}
                             aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-                            className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3"
+                            className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
                         >
                             {showPassword ? (
                                 <EyeOff className="h-4 w-4" aria-hidden />
@@ -132,7 +132,7 @@ export function LoginForm() {
                     </div>
                 </div>
 
-                <Label className="text-muted-foreground gap-2 text-sm font-normal">
+                <Label className="gap-2 text-sm font-normal text-muted-foreground">
                     <Checkbox checked={rememberMe} onCheckedChange={(value) => setRememberMe(value === true)} />
                     Se souvenir 7 jours
                 </Label>
@@ -150,7 +150,7 @@ export function LoginForm() {
                 <div
                     role="alert"
                     aria-live="polite"
-                    className={cn('text-lumiris-rose text-sm', error ? 'opacity-100' : 'sr-only opacity-0')}
+                    className={cn('text-sm text-lumiris-rose', error ? 'opacity-100' : 'sr-only opacity-0')}
                 >
                     {error ? ERROR_LABELS[error] : null}
                 </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState, type SyntheticEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { CheckCircle2, ShieldCheck } from 'lucide-react';
 import { LumirisLogo } from '@lumiris/ui/components/logo';
@@ -79,7 +79,7 @@ export default function OnboardingPage() {
     if (!isArtisan) return null;
     if (token && me.isLoading) return null;
 
-    function handleSiretSubmit(e: FormEvent) {
+    function handleSiretSubmit(e: SyntheticEvent) {
         e.preventDefault();
         if (!userId) return;
         const clean = siret.replace(/\s/g, '');
@@ -102,7 +102,7 @@ export default function OnboardingPage() {
         );
     }
 
-    function handleDeclarationSubmit(e: FormEvent) {
+    function handleDeclarationSubmit(e: SyntheticEvent) {
         e.preventDefault();
         if (!userId) return;
         signDeclaration.mutate(undefined, {
@@ -117,13 +117,13 @@ export default function OnboardingPage() {
     }
 
     return (
-        <div className="bg-background flex min-h-screen flex-col">
-            <header className="border-border bg-card border-b">
+        <div className="flex min-h-screen flex-col bg-background">
+            <header className="border-b border-border bg-card">
                 <div className="mx-auto flex max-w-6xl items-center gap-3 px-6 py-5">
                     <LumirisLogo className="h-9 w-auto" />
                     <div>
-                        <p className="text-foreground text-sm font-semibold leading-none">LUMIRIS</p>
-                        <p className="text-muted-foreground font-mono text-[10px] tracking-widest">ATELIER</p>
+                        <p className="text-sm leading-none font-semibold text-foreground">LUMIRIS</p>
+                        <p className="font-mono text-[10px] tracking-widest text-muted-foreground">ATELIER</p>
                     </div>
                 </div>
             </header>
@@ -132,20 +132,20 @@ export default function OnboardingPage() {
                 {/* Stepper */}
                 <div className="mb-8 flex items-center gap-3">
                     <StepDot active={step === 'siret'} done={step === 'declaration'} label="SIRET" />
-                    <div className="bg-border h-px flex-1" />
+                    <div className="h-px flex-1 bg-border" />
                     <StepDot active={step === 'declaration'} done={false} label="Déclaration" />
                 </div>
 
                 {step === 'siret' && (
-                    <Card className="bg-card rounded-2xl px-7 py-8 shadow-xl">
-                        <h1 className="text-foreground text-xl font-semibold tracking-tight">Numéro SIRET</h1>
-                        <p className="text-muted-foreground mt-1 text-sm">
+                    <Card className="rounded-2xl bg-card px-7 py-8 shadow-xl">
+                        <h1 className="text-xl font-semibold tracking-tight text-foreground">Numéro SIRET</h1>
+                        <p className="mt-1 text-sm text-muted-foreground">
                             Entrez le numéro SIRET de votre atelier pour initialiser votre compte.
                         </p>
 
                         <form onSubmit={handleSiretSubmit} className="mt-6 flex flex-col gap-4">
                             <div className="flex flex-col gap-1.5">
-                                <Label htmlFor="siret" className="text-foreground/80 text-xs font-semibold">
+                                <Label htmlFor="siret" className="text-xs font-semibold text-foreground/80">
                                     Numéro SIRET (14 chiffres)
                                 </Label>
                                 <Input
@@ -164,7 +164,7 @@ export default function OnboardingPage() {
                                     autoFocus
                                 />
                                 {siretError && (
-                                    <p className="text-destructive text-xs" role="alert">
+                                    <p className="text-xs text-destructive" role="alert">
                                         {siretError}
                                     </p>
                                 )}
@@ -173,7 +173,7 @@ export default function OnboardingPage() {
                             <Button
                                 type="submit"
                                 disabled={registerArtisan.isPending}
-                                className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 mt-1 h-10 w-full text-white disabled:opacity-60"
+                                className="mt-1 h-10 w-full bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90 disabled:opacity-60"
                             >
                                 {registerArtisan.isPending ? 'Vérification…' : 'Continuer'}
                             </Button>
@@ -182,24 +182,24 @@ export default function OnboardingPage() {
                 )}
 
                 {step === 'declaration' && (
-                    <Card className="bg-card rounded-2xl px-7 py-8 shadow-xl">
-                        <h1 className="text-foreground text-xl font-semibold tracking-tight">
+                    <Card className="rounded-2xl bg-card px-7 py-8 shadow-xl">
+                        <h1 className="text-xl font-semibold tracking-tight text-foreground">
                             Déclaration sur l&apos;honneur
                         </h1>
-                        <p className="text-muted-foreground mt-1 text-sm">
+                        <p className="mt-1 text-sm text-muted-foreground">
                             Lisez attentivement et certifiez l&apos;exactitude de vos informations.
                         </p>
 
-                        <div className="border-border bg-muted/30 mt-5 rounded-lg border p-4 text-sm leading-relaxed">
-                            <p className="text-foreground font-medium">Déclaration sur l&apos;honneur</p>
-                            <p className="text-muted-foreground mt-2 text-[13px]">
+                        <div className="mt-5 rounded-lg border border-border bg-muted/30 p-4 text-sm leading-relaxed">
+                            <p className="font-medium text-foreground">Déclaration sur l&apos;honneur</p>
+                            <p className="mt-2 text-[13px] text-muted-foreground">
                                 Je soussigné(e), artisan enregistré sous le numéro SIRET{' '}
-                                <span className="text-foreground font-mono font-semibold">
+                                <span className="font-mono font-semibold text-foreground">
                                     {siret.replace(/\s/g, '').replace(/(\d{3})(?=\d)/g, '$1 ')}
                                 </span>
                                 , déclare sur l&apos;honneur que :
                             </p>
-                            <ul className="text-muted-foreground mt-2 list-inside list-disc space-y-1 text-[13px]">
+                            <ul className="mt-2 list-inside list-disc space-y-1 text-[13px] text-muted-foreground">
                                 <li>Les informations renseignées sont exactes et sincères.</li>
                                 <li>Je suis bien titulaire de l&apos;activité artisanale déclarée.</li>
                                 <li>Je m&apos;engage à signaler toute modification de ma situation.</li>
@@ -207,7 +207,7 @@ export default function OnboardingPage() {
                                     J&apos;ai pris connaissance des Conditions Générales d&apos;Utilisation de LUMIRIS.
                                 </li>
                             </ul>
-                            <p className="text-muted-foreground mt-3 text-[12px] italic">
+                            <p className="mt-3 text-[12px] text-muted-foreground italic">
                                 Toute fausse déclaration m&apos;expose aux sanctions prévues par l&apos;article 441-1 du
                                 Code pénal.
                             </p>
@@ -239,7 +239,7 @@ export default function OnboardingPage() {
                                 <Button
                                     type="submit"
                                     disabled={!certified || signDeclaration.isPending}
-                                    className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 flex-1 text-white disabled:opacity-40"
+                                    className="flex-1 bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90 disabled:opacity-40"
                                 >
                                     <CheckCircle2 className="mr-1.5 h-4 w-4" />
                                     {signDeclaration.isPending ? 'Envoi…' : "Finaliser l'inscription"}
@@ -249,8 +249,8 @@ export default function OnboardingPage() {
                     </Card>
                 )}
 
-                <div className="text-muted-foreground mt-6 flex items-center justify-center gap-1.5 text-xs">
-                    <ShieldCheck className="text-lumiris-cyan h-3.5 w-3.5" />
+                <div className="mt-6 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                    <ShieldCheck className="h-3.5 w-3.5 text-lumiris-cyan" />
                     Vos données sont protégées — conformité RGPD
                 </div>
             </main>
@@ -267,13 +267,13 @@ function StepDot({ active, done, label }: { active: boolean; done: boolean; labe
                     done
                         ? 'bg-lumiris-cyan text-white'
                         : active
-                          ? 'border-lumiris-cyan bg-lumiris-cyan/10 text-lumiris-cyan border-2'
-                          : 'bg-muted text-muted-foreground border-border border',
+                          ? 'border-2 border-lumiris-cyan bg-lumiris-cyan/10 text-lumiris-cyan'
+                          : 'border border-border bg-muted text-muted-foreground',
                 ].join(' ')}
             >
                 {done ? <CheckCircle2 className="h-4 w-4" /> : active ? '●' : '○'}
             </div>
-            <span className="text-muted-foreground text-[10px] font-medium uppercase tracking-wider">{label}</span>
+            <span className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">{label}</span>
         </div>
     );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type SyntheticEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { toast } from '@lumiris/ui/components/sonner';
@@ -33,7 +33,7 @@ export function useLoginForm() {
         emailInputRef.current?.focus();
     }, []);
 
-    async function submit(event: FormEvent<HTMLFormElement>) {
+    async function submit(event: SyntheticEvent<HTMLFormElement>) {
         event.preventDefault();
         const parsed = LoginSchema.safeParse({ email, password });
         if (!parsed.success) {

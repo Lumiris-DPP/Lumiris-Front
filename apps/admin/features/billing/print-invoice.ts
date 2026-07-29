@@ -2,8 +2,6 @@ import type { Subscription } from '@lumiris/types';
 import { PRICE_LINES } from '@/lib/pricing';
 
 export function openInvoiceWindow(sub: Subscription) {
-    const win = window.open('', '_blank', 'noopener,noreferrer,width=720,height=900');
-    if (!win) return;
     const now = new Date();
     const invoiceNo = `LMR-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}-${sub.id.slice(-5).toUpperCase()}`;
     const tierLabel =
@@ -56,6 +54,12 @@ export function openInvoiceWindow(sub: Subscription) {
   <p class="small">Document généré par LUMIRIS Back-office · stub V1.</p>
   <script>setTimeout(() => window.print(), 250);</script>
 </body></html>`;
-    win.document.write(html);
-    win.document.close();
+    // document.write est déprécié : on sert la facture via un Blob, que la fenêtre imprime seule.
+    const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+    const win = window.open(url, '_blank', 'noopener,noreferrer,width=720,height=900');
+    if (!win) {
+        URL.revokeObjectURL(url);
+        return;
+    }
+    win.addEventListener('pagehide', () => URL.revokeObjectURL(url), { once: true });
 }

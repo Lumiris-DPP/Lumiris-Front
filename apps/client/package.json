@@ -33,7 +33,7 @@
     },
     "devDependencies": {
         "@lumiris/config": "workspace:*",
-        "@tailwindcss/postcss": "^4.2.0",
+        "@tailwindcss/postcss": "^4.3.3",
         "@types/node": "^22.10.0",
         "@types/react": "^19",
         "@types/react-dom": "^19",

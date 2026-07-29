@@ -24,12 +24,12 @@ export default function PrintLabelPage({ params }: PageProps) {
         <div className="bg-white text-neutral-900">
             <div className="mx-auto flex min-h-screen w-[80mm] flex-col items-center justify-center gap-3 p-4 print:min-h-0">
                 <LumirisLogo title="" className="h-6 w-auto" />
-                <p className="font-mono text-[10px] uppercase tracking-widest">LUMIRIS · Iris</p>
+                <p className="font-mono text-[10px] tracking-widest uppercase">LUMIRIS · Iris</p>
                 <p className="text-center text-sm font-semibold">{passport.garment.reference}</p>
                 <div className="rounded-md border border-neutral-300 bg-white p-2">
-                    <QRCodeCanvas value={passport.gs1.verificationUrl} size={180} includeMargin level="M" />
+                    <QRCodeCanvas value={passport.gs1.verificationUrl} size={180} marginSize={4} level="M" />
                 </div>
-                <p className="break-all text-center font-mono text-[8px]">{passport.gs1.verificationUrl}</p>
+                <p className="text-center font-mono text-[8px] break-all">{passport.gs1.verificationUrl}</p>
                 <p className="text-[10px] text-neutral-600">{passport.garment.kind}</p>
             </div>
         </div>

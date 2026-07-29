@@ -11,9 +11,7 @@
         "typecheck": "tsc --noEmit",
         "test": "bun test",
         "test:cov": "bun test --coverage --coverage-reporter=text --coverage-reporter=lcov --coverage-dir=coverage",
-        "storybook": "storybook dev -p 6006",
-        "storybook:build": "storybook build",
-        "clean": "rimraf .next .turbo coverage storybook-static"
+        "clean": "rimraf .next .turbo coverage"
     },
     "dependencies": {
         "@lumiris/api-client": "workspace:*",
@@ -34,8 +32,7 @@
     "devDependencies": {
         "@happy-dom/global-registrator": "^15.11.0",
         "@lumiris/config": "workspace:*",
-        "@tailwindcss/postcss": "^4.2.0",
-        "@testing-library/react": "^16.1.0",
+        "@tailwindcss/postcss": "^4.3.3",
         "@types/bun": "^1.1.14",
         "@types/node": "^22.10.0",
         "@types/react": "^19",

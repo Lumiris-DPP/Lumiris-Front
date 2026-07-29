@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, type SyntheticEvent } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { z } from 'zod';
 import type { UserRole } from '@lumiris/types';
@@ -49,7 +49,7 @@ export function StepCredentials({ role, onBack, onSuccess }: StepCredentialsProp
         setErrors((prev) => ({ ...prev, [key]: undefined }));
     }
 
-    async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
         e.preventDefault();
         const parsed = CredentialsSchema.safeParse(fields);
         if (!parsed.success) {
@@ -82,20 +82,20 @@ export function StepCredentials({ role, onBack, onSuccess }: StepCredentialsProp
                 <button
                     type="button"
                     onClick={onBack}
-                    className="text-muted-foreground hover:text-foreground mb-4 flex items-center gap-1 text-xs transition-colors"
+                    className="mb-4 flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
                 >
                     <ChevronLeft className="h-3.5 w-3.5" />
                     Retour
                 </button>
-                <h2 className="text-foreground text-lg font-semibold">Vos informations</h2>
-                <p className="text-muted-foreground mt-1 text-sm">
+                <h2 className="text-lg font-semibold text-foreground">Vos informations</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
                     Compte <span className="font-medium">{ROLE_LABEL[role]}</span>
                 </p>
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
                 <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="reg-name" className="text-foreground/80 text-xs font-semibold">
+                    <Label htmlFor="reg-name" className="text-xs font-semibold text-foreground/80">
                         Nom complet
                     </Label>
                     <Input
@@ -108,14 +108,14 @@ export function StepCredentials({ role, onBack, onSuccess }: StepCredentialsProp
                         aria-invalid={errors.name ? true : undefined}
                     />
                     {errors.name && (
-                        <p className="text-destructive text-xs" role="alert">
+                        <p className="text-xs text-destructive" role="alert">
                             {errors.name}
                         </p>
                     )}
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="reg-email" className="text-foreground/80 text-xs font-semibold">
+                    <Label htmlFor="reg-email" className="text-xs font-semibold text-foreground/80">
                         Adresse e-mail
                     </Label>
                     <Input
@@ -129,14 +129,14 @@ export function StepCredentials({ role, onBack, onSuccess }: StepCredentialsProp
                         aria-invalid={errors.email ? true : undefined}
                     />
                     {errors.email && (
-                        <p className="text-destructive text-xs" role="alert">
+                        <p className="text-xs text-destructive" role="alert">
                             {errors.email}
                         </p>
                     )}
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="reg-password" className="text-foreground/80 text-xs font-semibold">
+                    <Label htmlFor="reg-password" className="text-xs font-semibold text-foreground/80">
                         Mot de passe
                     </Label>
                     <Input
@@ -149,14 +149,14 @@ export function StepCredentials({ role, onBack, onSuccess }: StepCredentialsProp
                         aria-invalid={errors.password ? true : undefined}
                     />
                     {errors.password && (
-                        <p className="text-destructive text-xs" role="alert">
+                        <p className="text-xs text-destructive" role="alert">
                             {errors.password}
                         </p>
                     )}
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="reg-confirm" className="text-foreground/80 text-xs font-semibold">
+                    <Label htmlFor="reg-confirm" className="text-xs font-semibold text-foreground/80">
                         Confirmer le mot de passe
                     </Label>
                     <Input
@@ -169,7 +169,7 @@ export function StepCredentials({ role, onBack, onSuccess }: StepCredentialsProp
                         aria-invalid={errors.confirm ? true : undefined}
                     />
                     {errors.confirm && (
-                        <p className="text-destructive text-xs" role="alert">
+                        <p className="text-xs text-destructive" role="alert">
                             {errors.confirm}
                         </p>
                     )}
@@ -178,7 +178,7 @@ export function StepCredentials({ role, onBack, onSuccess }: StepCredentialsProp
                 <Button
                     type="submit"
                     disabled={registerMutation.isPending}
-                    className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 mt-1 h-10 w-full text-white"
+                    className="mt-1 h-10 w-full bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90"
                 >
                     {registerMutation.isPending ? 'Création…' : 'Créer mon compte'}
                 </Button>
