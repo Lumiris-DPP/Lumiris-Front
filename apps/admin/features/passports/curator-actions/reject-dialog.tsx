@@ -71,7 +71,7 @@ export function RejectDialog({ passport, open, onOpenChange, onAfterAction }: Re
                     className="min-h-24"
                 />
                 <div className="space-y-1.5">
-                    <p className="text-muted-foreground text-[10px] uppercase tracking-wider">Tags</p>
+                    <p className="text-[10px] tracking-wider text-muted-foreground uppercase">Tags</p>
                     <div className="flex flex-wrap gap-1.5">
                         {FLAG_TAGS.map((tag) => {
                             const active = tags.includes(tag);
@@ -103,7 +103,7 @@ export function RejectDialog({ passport, open, onOpenChange, onAfterAction }: Re
                         checked={confirmed}
                         onCheckedChange={(v) => setConfirmed(v === true)}
                     />
-                    <label htmlFor="reject-confirm" className="text-foreground cursor-pointer">
+                    <label htmlFor="reject-confirm" className="cursor-pointer text-foreground">
                         Je confirme le rejet
                     </label>
                 </div>

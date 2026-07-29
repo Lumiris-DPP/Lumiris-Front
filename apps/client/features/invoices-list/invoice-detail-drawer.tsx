@@ -65,8 +65,8 @@ function DetailTab({ invoice }: { invoice: InvoiceView }) {
             <div className="grid grid-cols-2 gap-3">
                 {rows.map((row) => (
                     <div key={row.label} className="flex flex-col gap-0.5">
-                        <span className="text-muted-foreground text-[10px] uppercase tracking-wider">{row.label}</span>
-                        <span className={row.mono ? 'text-foreground font-mono text-xs' : 'text-foreground'}>
+                        <span className="text-[10px] tracking-wider text-muted-foreground uppercase">{row.label}</span>
+                        <span className={row.mono ? 'font-mono text-xs text-foreground' : 'text-foreground'}>
                             {row.value}
                         </span>
                     </div>
@@ -75,8 +75,8 @@ function DetailTab({ invoice }: { invoice: InvoiceView }) {
             <DocumentPreview invoice={invoice} />
             {invoice.notes ? (
                 <div>
-                    <p className="text-muted-foreground text-[10px] uppercase tracking-wider">Notes</p>
-                    <p className="text-foreground mt-1 whitespace-pre-wrap text-sm">{invoice.notes}</p>
+                    <p className="text-[10px] tracking-wider text-muted-foreground uppercase">Notes</p>
+                    <p className="mt-1 text-sm whitespace-pre-wrap text-foreground">{invoice.notes}</p>
                 </div>
             ) : null}
         </div>
@@ -88,18 +88,18 @@ function DocumentPreview({ invoice }: { invoice: InvoiceView }) {
     if (!src) return null;
     const isImage = isImageSrc(src);
     return (
-        <div className="border-border bg-muted/40 rounded-lg border p-3">
+        <div className="rounded-lg border border-border bg-muted/40 p-3">
             {isImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={src} alt={`Facture ${invoice.id}`} className="max-h-60 w-full rounded-md object-contain" />
             ) : (
                 <div className="flex items-center gap-3">
-                    <FileText className="text-muted-foreground h-7 w-7 shrink-0" />
+                    <FileText className="h-7 w-7 shrink-0 text-muted-foreground" />
                     <a
                         href={src}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-lumiris-cyan inline-flex items-center gap-1 text-sm hover:underline"
+                        className="inline-flex items-center gap-1 text-sm text-lumiris-cyan hover:underline"
                     >
                         Ouvrir le document <ExternalLink className="h-3 w-3" />
                     </a>
@@ -111,7 +111,7 @@ function DocumentPreview({ invoice }: { invoice: InvoiceView }) {
 
 function LinkedPassportsTab({ linked }: { linked: ReadonlyArray<{ id: string; reference: string; status: string }> }) {
     if (linked.length === 0) {
-        return <p className="text-muted-foreground text-sm">Aucun passeport rattaché à cette facture.</p>;
+        return <p className="text-sm text-muted-foreground">Aucun passeport rattaché à cette facture.</p>;
     }
     return (
         <div className="space-y-2">
@@ -119,11 +119,11 @@ function LinkedPassportsTab({ linked }: { linked: ReadonlyArray<{ id: string; re
                 <Link
                     key={p.id}
                     href={`/passports/${p.id}`}
-                    className="border-border bg-card hover:bg-muted/40 flex items-center justify-between rounded-lg border p-3 transition-colors"
+                    className="flex items-center justify-between rounded-lg border border-border bg-card p-3 transition-colors hover:bg-muted/40"
                 >
                     <div className="min-w-0">
-                        <p className="text-foreground truncate text-sm font-medium">{p.reference}</p>
-                        <p className="text-muted-foreground font-mono text-xs">{p.id}</p>
+                        <p className="truncate text-sm font-medium text-foreground">{p.reference}</p>
+                        <p className="font-mono text-xs text-muted-foreground">{p.id}</p>
                     </div>
                     <Badge variant="outline" className="text-[10px]">
                         {p.status}
@@ -138,7 +138,7 @@ function OcrTab({ invoice, onRescan }: { invoice: InvoiceView; onRescan: () => v
     return (
         <div className="space-y-3">
             <div className="flex items-center justify-between">
-                <p className="text-muted-foreground text-xs">Champs extraits par l’OCR — lecture seule.</p>
+                <p className="text-xs text-muted-foreground">Champs extraits par l’OCR — lecture seule.</p>
                 {invoice.isLocal ? (
                     <Button size="sm" variant="outline" onClick={onRescan}>
                         <RefreshCcw className="mr-1.5 h-3.5 w-3.5" /> Re-scanner
@@ -146,7 +146,7 @@ function OcrTab({ invoice, onRescan }: { invoice: InvoiceView; onRescan: () => v
                 ) : null}
             </div>
             {invoice.fibers.length === 0 ? (
-                <p className="text-muted-foreground border-border bg-muted/30 rounded-md border p-3 text-sm">
+                <p className="rounded-md border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
                     Aucune fibre extraite.
                 </p>
             ) : (
@@ -162,7 +162,7 @@ function OcrTab({ invoice, onRescan }: { invoice: InvoiceView; onRescan: () => v
                         {invoice.fibers.map((f, i) => (
                             <TableRow key={i}>
                                 <TableCell className="capitalize">{f.fiber}</TableCell>
-                                <TableCell className="text-muted-foreground text-xs">{f.label ?? '—'}</TableCell>
+                                <TableCell className="text-xs text-muted-foreground">{f.label ?? '—'}</TableCell>
                                 <TableCell className="text-right font-mono text-xs">{f.pct}%</TableCell>
                             </TableRow>
                         ))}

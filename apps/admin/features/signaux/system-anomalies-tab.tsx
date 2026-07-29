@@ -79,16 +79,16 @@ export function SystemAnomaliesTab() {
 
     if (anomalies.length === 0) {
         return (
-            <p className="text-muted-foreground p-6 text-center text-xs">
+            <p className="p-6 text-center text-xs text-muted-foreground">
                 Aucune anomalie détectée sur la période analysée.
             </p>
         );
     }
 
     return (
-        <div className="border-lumiris-rose/30 bg-lumiris-rose/5 space-y-3 rounded-xl border p-4">
+        <div className="space-y-3 rounded-xl border border-lumiris-rose/30 bg-lumiris-rose/5 p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="text-lumiris-rose inline-flex items-center gap-2 text-sm font-semibold">
+                <div className="inline-flex items-center gap-2 text-sm font-semibold text-lumiris-rose">
                     <AlertTriangle className="h-4 w-4" /> Anomalies ({visibleAnomalies.length}/{anomalies.length})
                 </div>
                 <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as AnomalyStatusFilter)}>
@@ -104,7 +104,7 @@ export function SystemAnomaliesTab() {
                 </Select>
             </div>
             {visibleAnomalies.length === 0 ? (
-                <p className="text-muted-foreground text-xs">Aucune anomalie ne correspond au filtre courant.</p>
+                <p className="text-xs text-muted-foreground">Aucune anomalie ne correspond au filtre courant.</p>
             ) : (
                 <ul className="space-y-2">
                     {visibleAnomalies.map((a) => {
@@ -112,9 +112,9 @@ export function SystemAnomaliesTab() {
                         const status: AnomalyReviewStatus = review?.status ?? 'unreviewed';
                         const statusMeta = ANOMALY_STATUS_LABEL[status];
                         return (
-                            <li key={a.id} className="border-border bg-background rounded-lg border p-3 text-xs">
+                            <li key={a.id} className="rounded-lg border border-border bg-background p-3 text-xs">
                                 <div className="flex flex-wrap items-baseline justify-between gap-2">
-                                    <p className="text-foreground font-medium">{a.title}</p>
+                                    <p className="font-medium text-foreground">{a.title}</p>
                                     <div className="flex items-center gap-1.5">
                                         <Badge variant="outline" className="font-mono text-[10px]">
                                             {ANOMALY_RULE_LABEL[a.rule]}
@@ -138,15 +138,15 @@ export function SystemAnomaliesTab() {
                                         </Badge>
                                     </div>
                                 </div>
-                                <p className="text-muted-foreground mt-1">{a.detail}</p>
+                                <p className="mt-1 text-muted-foreground">{a.detail}</p>
                                 {a.relatedIds.length > 0 ? (
-                                    <p className="text-muted-foreground/70 mt-1 font-mono text-[10px]">
+                                    <p className="mt-1 font-mono text-[10px] text-muted-foreground/70">
                                         identifiants : {a.relatedIds.slice(0, 6).join(', ')}
                                         {a.relatedIds.length > 6 ? '…' : ''}
                                     </p>
                                 ) : null}
                                 {review?.status === 'escalated' && review.reason ? (
-                                    <p className="text-lumiris-rose/90 mt-1 italic">
+                                    <p className="mt-1 text-lumiris-rose/90 italic">
                                         Escaladé par {review.reviewedBy} : “{review.reason}”
                                     </p>
                                 ) : null}
@@ -167,7 +167,7 @@ export function SystemAnomaliesTab() {
                                         onClick={() => setEscalating(a)}
                                         disabled={status === 'escalated'}
                                         aria-label={`Escalader l'anomalie ${a.title}`}
-                                        className="border-lumiris-rose/40 text-lumiris-rose h-7 gap-1 text-[11px]"
+                                        className="h-7 gap-1 border-lumiris-rose/40 text-[11px] text-lumiris-rose"
                                     >
                                         <ShieldAlert className="h-3 w-3" aria-hidden /> Escalader
                                     </Button>

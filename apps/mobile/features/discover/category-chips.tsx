@@ -27,7 +27,7 @@ export function CategoryChips({ categories, value, onChange, compact = false, st
     return (
         <div
             className={cn(
-                'bg-background/85 -mx-4 border-b border-transparent backdrop-blur-md transition-[padding,border-color]',
+                '-mx-4 border-b border-transparent bg-background/85 backdrop-blur-md transition-[padding,border-color]',
                 sticky && 'sticky top-0 z-20',
                 compact ? 'border-border/40 px-4 py-2' : 'px-4 py-3',
             )}
@@ -35,7 +35,7 @@ export function CategoryChips({ categories, value, onChange, compact = false, st
             <div
                 role="tablist"
                 aria-label="Filtrer par catégorie"
-                className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                className="flex [scrollbar-width:none] gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
             >
                 {chips.map((chip) => {
                     const active = chip.key === value;
@@ -48,10 +48,10 @@ export function CategoryChips({ categories, value, onChange, compact = false, st
                             onClick={() => onChange(chip.key)}
                             className={cn(
                                 'inline-flex shrink-0 items-center rounded-full border px-3 py-1.5 text-xs font-medium transition-all',
-                                'focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
+                                'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:outline-none',
                                 active
-                                    ? 'bg-foreground text-background border-transparent shadow-sm'
-                                    : 'bg-card/40 text-muted-foreground border-border/60 hover:text-foreground hover:bg-card/70',
+                                    ? 'border-transparent bg-foreground text-background shadow-sm'
+                                    : 'border-border/60 bg-card/40 text-muted-foreground hover:bg-card/70 hover:text-foreground',
                             )}
                         >
                             {chip.label}

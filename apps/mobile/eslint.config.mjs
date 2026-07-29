@@ -1,8 +1,8 @@
-import react from '@lumiris/config/eslint/react';
+import next from '@lumiris/config/eslint/next';
 
 export default [
-    ...react,
+    ...next,
     {
-        ignores: ['dist/**', 'node_modules/**', 'public/**'],
+        ignores: ['.next/**', 'out/**', 'node_modules/**', 'public/**'],
     },
 ];

@@ -7,10 +7,18 @@ import base from './base.mjs';
 export default [
     ...base,
     {
+        files: ['**/*.{js,jsx,ts,tsx}'],
+        plugins: {
+            'react-hooks': reactHooksPlugin,
+        },
+        rules: {
+            ...reactHooksPlugin.configs.recommended.rules,
+        },
+    },
+    {
         files: ['**/*.{jsx,tsx}'],
         plugins: {
             react: reactPlugin,
-            'react-hooks': reactHooksPlugin,
             'jsx-a11y': jsxA11yPlugin,
         },
         settings: {
@@ -19,7 +27,6 @@ export default [
         rules: {
             ...reactPlugin.configs.recommended.rules,
             ...reactPlugin.configs['jsx-runtime'].rules,
-            ...reactHooksPlugin.configs.recommended.rules,
             ...jsxA11yPlugin.configs.recommended.rules,
             'react/self-closing-comp': ['error', { component: true, html: true }],
             'react/no-danger': 'warn',

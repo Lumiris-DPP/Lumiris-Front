@@ -70,7 +70,7 @@ export function PassportTable({ rows, onSelect, selectedIds, onToggleSelected, o
     const someSelected = !allSelected && pageIds.some((id) => selectedIds.has(id));
 
     return (
-        <div className="border-border bg-card overflow-hidden rounded-xl border">
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
             <Table>
                 <TableHeader stickyHeader>
                     <TableRow>
@@ -106,10 +106,10 @@ export function PassportTable({ rows, onSelect, selectedIds, onToggleSelected, o
                                         aria-label={`Sélectionner ${row.passport.garment.reference}`}
                                     />
                                     <div className="min-w-0">
-                                        <p className="text-foreground truncate text-sm font-medium">
+                                        <p className="truncate text-sm font-medium text-foreground">
                                             {row.passport.garment.reference}
                                         </p>
-                                        <p className="text-muted-foreground truncate text-[10px]">
+                                        <p className="truncate text-[10px] text-muted-foreground">
                                             {row.passport.garment.kind} · {row.passport.id}
                                         </p>
                                     </div>

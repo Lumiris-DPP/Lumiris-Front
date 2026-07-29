@@ -32,7 +32,7 @@ export function ScoreReasonsList({
     ...rest
 }: ScoreReasonsListProps) {
     if (reasons.length === 0) {
-        return <p className={cn('text-muted-foreground text-sm', className as string)}>{emptyLabel}</p>;
+        return <p className={cn('text-sm text-muted-foreground', className as string)}>{emptyLabel}</p>;
     }
 
     const visible = limit ? reasons.slice(0, limit) : reasons;
@@ -50,7 +50,7 @@ export function ScoreReasonsList({
                             aria-hidden
                         />
                         <div className="min-w-0 flex-1">
-                            <span className={cn('mr-2 text-[10px] font-semibold uppercase tracking-wider', axisColor)}>
+                            <span className={cn('mr-2 text-[10px] font-semibold tracking-wider uppercase', axisColor)}>
                                 {AXIS_LABEL[reason.axis]}
                             </span>
                             <span className="text-foreground">{reason.message}</span>
@@ -58,7 +58,7 @@ export function ScoreReasonsList({
                     </li>
                 );
             })}
-            {overflow > 0 ? <li className="text-muted-foreground pl-5 text-xs italic">+ {overflow} de plus</li> : null}
+            {overflow > 0 ? <li className="pl-5 text-xs text-muted-foreground italic">+ {overflow} de plus</li> : null}
         </ul>
     );
 }

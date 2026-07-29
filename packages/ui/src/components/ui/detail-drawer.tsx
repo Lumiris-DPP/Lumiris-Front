@@ -40,15 +40,15 @@ function DetailDrawer({
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent side="right" className={cn('flex h-full w-full flex-col gap-0 p-0', widthClass[width])}>
-                <SheetHeader className="border-border border-b px-5 py-4">
-                    <SheetTitle className="text-foreground text-base font-medium">{title}</SheetTitle>
+                <SheetHeader className="border-b border-border px-5 py-4">
+                    <SheetTitle className="text-base font-medium text-foreground">{title}</SheetTitle>
                     {subtitle ? (
-                        <SheetDescription className="text-muted-foreground text-sm">{subtitle}</SheetDescription>
+                        <SheetDescription className="text-sm text-muted-foreground">{subtitle}</SheetDescription>
                     ) : null}
                 </SheetHeader>
                 {tabs && tabs.length > 0 ? (
                     <Tabs defaultValue={tabs[0]?.value} className="flex h-full min-h-0 flex-col">
-                        <div className="border-border border-b px-5 pt-3">
+                        <div className="border-b border-border px-5 pt-3">
                             <TabsList>
                                 {tabs.map((tab) => (
                                     <TabsTrigger key={tab.value} value={tab.value}>
@@ -69,7 +69,7 @@ function DetailDrawer({
                     <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">{children}</div>
                 )}
                 {footer ? (
-                    <div className="border-border bg-background sticky bottom-0 border-t px-5 py-3">{footer}</div>
+                    <div className="sticky bottom-0 border-t border-border bg-background px-5 py-3">{footer}</div>
                 ) : null}
             </SheetContent>
         </Sheet>

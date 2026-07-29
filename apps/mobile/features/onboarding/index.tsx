@@ -1,5 +1,7 @@
+'use client';
+
 import { useState, type ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { motion, type PanInfo } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Archive, ScanLine, Sparkles } from 'lucide-react';
 import { Button } from '@lumiris/ui/components/button';
@@ -37,7 +39,7 @@ const SLIDES: readonly Slide[] = [
 const SWIPE_THRESHOLD = 60;
 
 export function Onboarding() {
-    const navigate = useNavigate();
+    const router = useRouter();
     const [index, setIndex] = useState(0);
     const isLast = index === SLIDES.length - 1;
 
@@ -48,7 +50,7 @@ export function Onboarding() {
 
     function finish(): void {
         markOnboardingCompleted();
-        navigate('/auth');
+        router.push('/auth');
     }
 
     function handleDragEnd(_: unknown, info: PanInfo): void {
@@ -57,14 +59,14 @@ export function Onboarding() {
     }
 
     return (
-        <div className="relative flex h-full flex-col px-6 pb-10 pt-[max(env(safe-area-inset-top),3rem)]">
+        <div className="relative flex h-full flex-col px-6 pt-[max(env(safe-area-inset-top),3rem)] pb-10">
             <IridescentBackground intensity="subtle" />
 
             <header className="flex items-center justify-end">
                 <button
                     type="button"
                     onClick={finish}
-                    className="text-muted-foreground hover:text-foreground rounded-full px-3 py-1 text-xs font-medium transition-colors"
+                    className="rounded-full px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
                 >
                     Passer
                 </button>
@@ -95,7 +97,7 @@ export function Onboarding() {
                     variant="ghost"
                     onClick={() => goTo(index - 1)}
                     disabled={index === 0}
-                    className="text-foreground/80 hover:bg-foreground/5 h-11 rounded-full px-4 text-sm disabled:opacity-30"
+                    className="h-11 rounded-full px-4 text-sm text-foreground/80 hover:bg-foreground/5 disabled:opacity-30"
                     aria-label="Slide précédente"
                 >
                     <ArrowLeft className="h-4 w-4" />
@@ -105,7 +107,7 @@ export function Onboarding() {
                     <Button
                         type="button"
                         onClick={finish}
-                        className="bg-foreground text-background hover:bg-foreground/90 h-11 flex-1 rounded-full text-sm font-semibold"
+                        className="h-11 flex-1 rounded-full bg-foreground text-sm font-semibold text-background hover:bg-foreground/90"
                     >
                         Continuer
                     </Button>
@@ -113,7 +115,7 @@ export function Onboarding() {
                     <Button
                         type="button"
                         onClick={() => goTo(index + 1)}
-                        className="bg-foreground text-background hover:bg-foreground/90 h-11 flex-1 rounded-full text-sm font-semibold"
+                        className="h-11 flex-1 rounded-full bg-foreground text-sm font-semibold text-background hover:bg-foreground/90"
                     >
                         Suivant
                         <ArrowRight className="ml-2 h-4 w-4" />
@@ -141,13 +143,13 @@ function SlideCard({ slide, index }: SlideCardProps): ReactNode {
             <GlassCard className="flex flex-col items-center p-7 text-center">
                 <span
                     aria-hidden
-                    className="border-border/60 bg-background/60 mb-5 flex h-16 w-16 items-center justify-center rounded-full border"
+                    className="mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-border/60 bg-background/60"
                 >
-                    <Icon className="text-foreground/80 h-7 w-7" strokeWidth={1.5} />
+                    <Icon className="h-7 w-7 text-foreground/80" strokeWidth={1.5} />
                 </span>
-                <p className="text-muted-foreground text-[10px] font-semibold uppercase tracking-[0.28em]">{eyebrow}</p>
-                <h2 className="text-foreground mt-2 text-xl font-bold tracking-tight">{title}</h2>
-                <p className="text-muted-foreground mt-3 text-sm leading-relaxed">{body}</p>
+                <p className="text-[10px] font-semibold tracking-[0.28em] text-muted-foreground uppercase">{eyebrow}</p>
+                <h2 className="mt-2 text-xl font-bold tracking-tight text-foreground">{title}</h2>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{body}</p>
             </GlassCard>
         </motion.div>
     );
@@ -173,7 +175,7 @@ function Dots({ count, active, onSelect }: DotsProps) {
                         aria-label={`Aller à la slide ${i + 1}`}
                         onClick={() => onSelect(i)}
                         className={`h-1.5 rounded-full transition-all ${
-                            isActive ? 'bg-foreground w-6' : 'bg-foreground/25 w-1.5'
+                            isActive ? 'w-6 bg-foreground' : 'w-1.5 bg-foreground/25'
                         }`}
                     >
                         <span className="sr-only">Slide {i + 1}</span>

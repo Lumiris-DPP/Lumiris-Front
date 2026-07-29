@@ -29,12 +29,12 @@ export function MarketplaceProducts() {
                     onClick={() => setConvertOpen(true)}
                     disabled={sellBlocked}
                     title={sellBlocked ? 'Abonnement ATELIER requis pour vendre' : undefined}
-                    className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 text-white"
+                    className="bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90"
                 >
                     <Wand2 className="mr-1.5 h-4 w-4" /> Convertir un DPP en produit
                 </Button>
                 {sellBlocked && (
-                    <p className="text-muted-foreground text-xs">
+                    <p className="text-xs text-muted-foreground">
                         Abonnement ATELIER requis pour vendre.{' '}
                         <Link href="/subscription" className="text-lumiris-cyan underline">
                             Voir l&apos;abonnement
@@ -68,14 +68,14 @@ function SellerConnectBanner() {
         });
 
     return (
-        <div className="border-lumiris-amber/40 bg-lumiris-amber/10 flex flex-col gap-3 rounded-xl border p-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-3 rounded-xl border border-lumiris-amber/40 bg-lumiris-amber/10 p-4 md:flex-row md:items-center md:justify-between">
             <div className="flex items-start gap-2.5 text-sm">
-                <EyeOff className="text-lumiris-amber mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                <EyeOff className="mt-0.5 h-4 w-4 shrink-0 text-lumiris-amber" aria-hidden />
                 <div>
-                    <p className="text-foreground font-medium">
+                    <p className="font-medium text-foreground">
                         Vos produits publiés ne sont pas encore visibles par les acheteurs
                     </p>
-                    <p className="text-muted-foreground text-xs">
+                    <p className="text-xs text-muted-foreground">
                         Tant que les paiements ne sont pas activés, vos fiches restent masquées dans la Marketplace.
                         Activez Stripe Connect pour les rendre visibles et vendre en direct — commission plateforme
                         d’environ 5 %, payout net versé à l’atelier.
@@ -85,7 +85,7 @@ function SellerConnectBanner() {
             <Button
                 onClick={activate}
                 disabled={onboarding.isPending}
-                className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 shrink-0 gap-1.5 text-white"
+                className="shrink-0 gap-1.5 bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90"
             >
                 {onboarding.isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -119,13 +119,13 @@ function SellerStatsCards() {
     return (
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {cards.map(({ label, value, icon: Icon, hint }) => (
-                <div key={label} className="bg-card rounded-xl border p-4">
-                    <div className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium">
+                <div key={label} className="rounded-xl border bg-card p-4">
+                    <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                         <Icon className="h-3.5 w-3.5" />
                         {label}
                     </div>
-                    <p className="text-foreground mt-1 text-2xl font-semibold tabular-nums">{value}</p>
-                    <p className="text-muted-foreground mt-0.5 text-[11px]">{hint}</p>
+                    <p className="mt-1 text-2xl font-semibold text-foreground tabular-nums">{value}</p>
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">{hint}</p>
                 </div>
             ))}
         </div>

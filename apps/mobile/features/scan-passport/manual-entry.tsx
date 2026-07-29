@@ -1,8 +1,12 @@
-import { useCallback, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Sheet, SheetContent, SheetTitle } from '@lumiris/ui/components/sheet';
+'use client';
 
-const PUBLIC_CODE_URL_RE = /\/p\/([\w-]{8})\b/i;
+import { useCallback, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Sheet, SheetContent, SheetTitle } from '@lumiris/ui/components/sheet';
+import { routes } from '@/lib/routes';
+
+const PUBLIC_CODE_QUERY_RE = /\/p\/?\?(?:[^#]*&)?c=([\w-]{8})\b/i;
+const PUBLIC_CODE_PATH_RE = /\/p\/([\w-]{8})\b/i;
 const PASSPORT_URL_RE = /lumiris\.(?:fr|com)\/passeport\/([\w-]+)/i;
 const PUBLIC_CODE_RE = /^[A-Z0-9]{8}$/i;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -13,7 +17,7 @@ function resolveDestination(input: string): Destination {
     const trimmed = input.trim();
     if (!trimmed) return null;
 
-    const publicUrlMatch = trimmed.match(PUBLIC_CODE_URL_RE);
+    const publicUrlMatch = trimmed.match(PUBLIC_CODE_QUERY_RE) ?? trimmed.match(PUBLIC_CODE_PATH_RE);
     if (publicUrlMatch?.[1]) return { route: '/p/[code]', code: publicUrlMatch[1].toUpperCase() };
 
     const passportUrlMatch = trimmed.match(PASSPORT_URL_RE);
@@ -31,7 +35,7 @@ interface ManualEntrySheetProps {
 }
 
 export function ManualEntrySheet({ open, onOpenChange }: ManualEntrySheetProps) {
-    const navigate = useNavigate();
+    const router = useRouter();
     const [value, setValue] = useState('');
     const settledRef = useRef(false);
 
@@ -42,17 +46,17 @@ export function ManualEntrySheet({ open, onOpenChange }: ManualEntrySheetProps) 
         settledRef.current = true;
         onOpenChange(false);
         if (dest.route === '/p/[code]') {
-            navigate(`/p/${dest.code}`);
+            router.push(routes.publicPassport(dest.code));
         } else {
-            navigate(`/passeport/${dest.id}`);
+            router.push(`/passeport/${dest.id}`);
         }
-    }, [navigate, value, onOpenChange]);
+    }, [router, value, onOpenChange]);
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent
                 side="bottom"
-                className="mx-auto max-w-md rounded-t-3xl px-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] pt-8"
+                className="mx-auto max-w-md rounded-t-3xl px-6 pt-8 pb-[max(env(safe-area-inset-bottom),1.5rem)]"
             >
                 <SheetTitle className="sr-only">Saisir un code passeport</SheetTitle>
                 <input
@@ -74,7 +78,7 @@ export function ManualEntrySheet({ open, onOpenChange }: ManualEntrySheetProps) 
                     autoCapitalize="off"
                     spellCheck={false}
                     aria-label="Identifiant ou URL du passeport"
-                    className="border-border bg-background text-foreground placeholder:text-muted-foreground/60 focus:border-foreground h-14 w-full rounded-2xl border px-4 font-mono text-sm outline-none"
+                    className="h-14 w-full rounded-2xl border border-border bg-background px-4 font-mono text-sm text-foreground outline-none placeholder:text-muted-foreground/60 focus:border-foreground"
                 />
             </SheetContent>
         </Sheet>
@@ -82,14 +86,14 @@ export function ManualEntrySheet({ open, onOpenChange }: ManualEntrySheetProps) 
 }
 
 export function ManualEntry() {
-    const navigate = useNavigate();
+    const router = useRouter();
     const [open, setOpen] = useState(true);
     return (
         <ManualEntrySheet
             open={open}
             onOpenChange={(next) => {
                 setOpen(next);
-                if (!next) navigate(-1);
+                if (!next) router.back();
             }}
         />
     );

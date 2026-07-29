@@ -13,7 +13,7 @@ import { cn } from '@lumiris/ui/lib/cn';
 import { INCOMPLETION_FULL_LABEL, PASSPORT_STATUS_LABEL } from '@/lib/passport-status';
 
 export function SectionTitle({ children }: { children: React.ReactNode }) {
-    return <h2 className="text-foreground text-base font-semibold">{children}</h2>;
+    return <h2 className="text-base font-semibold text-foreground">{children}</h2>;
 }
 
 export function formatDimensions(g: Passport['garment']): string | null {
@@ -30,12 +30,12 @@ export function IncompletionBanner() {
     return (
         <div
             role="status"
-            className="border-lumiris-amber/40 bg-lumiris-amber/10 text-foreground flex items-start gap-3 rounded-2xl border p-4"
+            className="flex items-start gap-3 rounded-2xl border border-lumiris-amber/40 bg-lumiris-amber/10 p-4 text-foreground"
         >
-            <AlertTriangle className="text-lumiris-amber mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-lumiris-amber" aria-hidden />
             <div className="text-sm">
                 <p className="font-medium">{INCOMPLETION_FULL_LABEL} — certains champs ESPR/AGEC manquent encore.</p>
-                <p className="text-muted-foreground mt-0.5 text-xs">
+                <p className="mt-0.5 text-xs text-muted-foreground">
                     Le score est plafonné à D tant que la fiche n&apos;est pas finalisée.
                 </p>
             </div>
@@ -55,8 +55,8 @@ export function PreviewHero({
     grade: ScoreResult['grade'];
 }) {
     return (
-        <section className="border-border/60 bg-card relative overflow-hidden rounded-2xl border">
-            <div className="bg-muted relative aspect-video w-full">
+        <section className="relative overflow-hidden rounded-2xl border border-border/60 bg-card">
+            <div className="relative aspect-video w-full bg-muted">
                 {passport.garment.mainPhotoUrl ? (
                     <Image
                         src={passport.garment.mainPhotoUrl}
@@ -68,20 +68,20 @@ export function PreviewHero({
                         priority
                     />
                 ) : (
-                    <div className="text-muted-foreground absolute inset-0 flex items-center justify-center text-xs">
+                    <div className="absolute inset-0 flex items-center justify-center text-xs text-muted-foreground">
                         Photo manquante
                     </div>
                 )}
                 {passport.status === 'InCompletion' && (
-                    <div className="border-lumiris-amber/50 bg-lumiris-amber/95 text-background absolute right-3 top-3 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider shadow-sm">
+                    <div className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full border border-lumiris-amber/50 bg-lumiris-amber/95 px-2 py-0.5 text-[10px] font-semibold tracking-wider text-background uppercase shadow-sm">
                         <AlertTriangle className="h-3 w-3" aria-hidden />
                         {PASSPORT_STATUS_LABEL.InCompletion}
                     </div>
                 )}
-                <div className="bg-linear-to-t absolute inset-x-0 bottom-0 h-2/5 from-black/70 via-black/30 to-transparent" />
-                <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-3">
+                <div className="absolute inset-x-0 bottom-0 h-2/5 bg-linear-to-t from-black/70 via-black/30 to-transparent" />
+                <div className="absolute right-3 bottom-3 left-3 flex items-end justify-between gap-3">
                     <div className="min-w-0 text-white drop-shadow-sm">
-                        <p className="text-[11px] font-medium uppercase tracking-widest opacity-90">par</p>
+                        <p className="text-[11px] font-medium tracking-widest uppercase opacity-90">par</p>
                         <p className="truncate text-base font-semibold sm:text-lg">{artisan.displayName}</p>
                         {artisan.atelierName && <p className="truncate text-xs opacity-90">{artisan.atelierName}</p>}
                     </div>
@@ -102,14 +102,14 @@ export function ProductHeader({
     dimensions: string | null;
 }) {
     return (
-        <section className="border-border/60 bg-card rounded-2xl border p-5">
-            <p className="text-muted-foreground font-mono text-[11px] uppercase tracking-wider">{kindLabel}</p>
-            <h1 className="text-foreground mt-1 text-2xl font-semibold leading-tight">
+        <section className="rounded-2xl border border-border/60 bg-card p-5">
+            <p className="font-mono text-[11px] tracking-wider text-muted-foreground uppercase">{kindLabel}</p>
+            <h1 className="mt-1 text-2xl leading-tight font-semibold text-foreground">
                 {passport.garment.reference || 'Pièce sans référence'}
             </h1>
-            <div className="text-muted-foreground mt-3 flex flex-wrap items-baseline gap-x-4 gap-y-1 text-sm">
+            <div className="mt-3 flex flex-wrap items-baseline gap-x-4 gap-y-1 text-sm text-muted-foreground">
                 {passport.garment.retailPrice > 0 && (
-                    <span className="text-foreground text-lg font-semibold">
+                    <span className="text-lg font-semibold text-foreground">
                         {passport.garment.retailPrice} {passport.garment.currency}
                     </span>
                 )}
@@ -124,10 +124,10 @@ export function ScoreCard({ passport, score }: { passport: Passport; score: Scor
         <Card>
             <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
                 <div>
-                    <p className="text-muted-foreground text-[11px] uppercase tracking-wider">Note globale</p>
-                    <p className="text-foreground mt-1 font-mono text-2xl font-semibold">
+                    <p className="text-[11px] tracking-wider text-muted-foreground uppercase">Note globale</p>
+                    <p className="mt-1 font-mono text-2xl font-semibold text-foreground">
                         {score.total.toFixed(1)}
-                        <span className="text-muted-foreground/70 ml-0.5 text-sm font-normal">/ 100</span>
+                        <span className="ml-0.5 text-sm font-normal text-muted-foreground/70">/ 100</span>
                     </p>
                 </div>
                 <IrisGrade grade={score.grade} size="lg" tone="solid" />
@@ -137,7 +137,7 @@ export function ScoreCard({ passport, score }: { passport: Passport; score: Scor
                 {score.cap?.applied && <ScoreCapWarning cap={score.cap} />}
                 <Separator />
                 <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground text-xs">Champs ESPR / AGEC</span>
+                    <span className="text-xs text-muted-foreground">Champs ESPR / AGEC</span>
                     <MissingFieldsBadge passport={passport} showWhenComplete />
                 </div>
             </CardContent>
@@ -148,13 +148,13 @@ export function ScoreCard({ passport, score }: { passport: Passport; score: Scor
 export function WarrantyNote({ warranty }: { warranty: Passport['warranty'] }) {
     if (warranty.durationMonths <= 0) return null;
     return (
-        <div className="border-lumiris-cyan/30 bg-lumiris-cyan/5 rounded-2xl border p-4">
-            <p className="text-lumiris-cyan text-xs font-semibold uppercase tracking-wider">
+        <div className="rounded-2xl border border-lumiris-cyan/30 bg-lumiris-cyan/5 p-4">
+            <p className="text-xs font-semibold tracking-wider text-lumiris-cyan uppercase">
                 Garantie {Math.round(warranty.durationMonths / 12)} an{warranty.durationMonths >= 24 ? 's' : ''}
             </p>
-            {warranty.terms && <p className="text-foreground/90 mt-1 text-sm">{warranty.terms}</p>}
+            {warranty.terms && <p className="mt-1 text-sm text-foreground/90">{warranty.terms}</p>}
             {warranty.repairabilityCommitment && (
-                <p className="text-muted-foreground mt-1 text-xs italic">{warranty.repairabilityCommitment}</p>
+                <p className="mt-1 text-xs text-muted-foreground italic">{warranty.repairabilityCommitment}</p>
             )}
         </div>
     );
@@ -166,18 +166,18 @@ export function MaterialRow({ material, now }: { material: Material; now: Date }
     const country = material.originCountry || supplier?.country;
     const flag = flagEmoji(country);
     return (
-        <li className="border-border bg-card rounded-2xl border p-4">
+        <li className="rounded-2xl border border-border bg-card p-4">
             <div className="flex items-baseline justify-between gap-3">
                 <div className="min-w-0">
-                    <p className="text-foreground truncate text-sm font-semibold">{FIBER_LABEL[material.fiber]}</p>
-                    <p className="text-muted-foreground mt-0.5 truncate text-xs">
+                    <p className="truncate text-sm font-semibold text-foreground">{FIBER_LABEL[material.fiber]}</p>
+                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
                         {flag && <span aria-hidden>{flag}</span>}
                         {flag ? ' ' : ''}
                         {supplierName}
                         {country ? ` · ${country}` : ''}
                     </p>
                 </div>
-                <span className="text-foreground font-mono text-base font-bold">{material.percentage}%</span>
+                <span className="font-mono text-base font-bold text-foreground">{material.percentage}%</span>
             </div>
             {material.certifications.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-1.5">
@@ -190,7 +190,7 @@ export function MaterialRow({ material, now }: { material: Material; now: Date }
                                 key={cert.id}
                                 variant="outline"
                                 className={cn(
-                                    'text-foreground gap-1 font-mono text-[10px]',
+                                    'gap-1 font-mono text-[10px] text-foreground',
                                     expired && 'border-lumiris-rose/40 bg-lumiris-rose/10',
                                     unverified && 'border-lumiris-amber/40 bg-lumiris-amber/10',
                                     !expired && !unverified && 'border-lumiris-emerald/40 bg-lumiris-emerald/10',

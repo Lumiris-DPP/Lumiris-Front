@@ -48,7 +48,7 @@ export function RetoucheurTable({ rows, overlays, onSelect, cityFilter, onResetF
         );
     }
     return (
-        <div className="border-border bg-card overflow-hidden rounded-xl border">
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -78,8 +78,8 @@ export function RetoucheurTable({ rows, overlays, onSelect, cityFilter, onResetF
                                             </AvatarFallback>
                                         </Avatar>
                                         <div>
-                                            <p className="text-foreground text-sm">{r.displayName}</p>
-                                            <p className="text-muted-foreground inline-flex items-center gap-1 text-[10px]">
+                                            <p className="text-sm text-foreground">{r.displayName}</p>
+                                            <p className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
                                                 <MapPin className="h-2.5 w-2.5" aria-hidden />
                                                 {r.atelierName ?? ''} · {r.city}
                                             </p>
@@ -94,21 +94,21 @@ export function RetoucheurTable({ rows, overlays, onSelect, cityFilter, onResetF
                                             </Badge>
                                         ))}
                                         {overflowSpecs > 0 ? (
-                                            <Badge variant="outline" className="text-muted-foreground text-[10px]">
+                                            <Badge variant="outline" className="text-[10px] text-muted-foreground">
                                                 +{overflowSpecs}
                                             </Badge>
                                         ) : null}
                                     </div>
                                 </TableCell>
                                 <TableCell>
-                                    <p className="text-foreground font-mono text-sm">{r.avgDelayDays} j</p>
-                                    <p className="text-muted-foreground font-mono text-[10px]">
+                                    <p className="font-mono text-sm text-foreground">{r.avgDelayDays} j</p>
+                                    <p className="font-mono text-[10px] text-muted-foreground">
                                         {r.priceRange.min}–{r.priceRange.max} €
                                     </p>
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex items-center gap-1 font-mono text-xs">
-                                        <Star className="text-lumiris-amber h-3 w-3 fill-current" aria-hidden />
+                                        <Star className="h-3 w-3 fill-current text-lumiris-amber" aria-hidden />
                                         {r.avgRating.toFixed(1)}
                                         <span className="text-muted-foreground">({r.reviewCount})</span>
                                     </div>

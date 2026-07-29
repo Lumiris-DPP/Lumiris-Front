@@ -44,8 +44,8 @@ export function ScoreSheet({ open, onOpenChange, score }: ScoreSheetProps) {
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent side="bottom" className="mx-auto max-h-[85vh] max-w-md overflow-y-auto rounded-t-2xl pb-8">
-                <SheetHeader className="pb-1 pt-5">
-                    <SheetTitle className="text-foreground text-base">Détail du score Iris V2</SheetTitle>
+                <SheetHeader className="pt-5 pb-1">
+                    <SheetTitle className="text-base text-foreground">Détail du score Iris V2</SheetTitle>
                     <SheetDescription>
                         Score total {score.total.toFixed(1)} / 100 - réparti sur 4 piliers.
                     </SheetDescription>
@@ -71,16 +71,16 @@ export function ScoreSheet({ open, onOpenChange, score }: ScoreSheetProps) {
                                 <div className="flex items-baseline justify-between gap-2">
                                     <p
                                         className={cn(
-                                            'text-xs font-semibold uppercase tracking-wider',
+                                            'text-xs font-semibold tracking-wider uppercase',
                                             AXIS_TEXT[axis],
                                         )}
                                     >
                                         {AXIS_LABEL[axis]} ·{' '}
-                                        <span className="text-muted-foreground font-mono lowercase">
+                                        <span className="font-mono text-muted-foreground lowercase">
                                             {(weight * 100).toFixed(0)}%
                                         </span>
                                     </p>
-                                    <span className="text-foreground font-mono text-xs">
+                                    <span className="font-mono text-xs text-foreground">
                                         {weighted} / {cap.toFixed(0)}
                                     </span>
                                 </div>
@@ -90,7 +90,7 @@ export function ScoreSheet({ open, onOpenChange, score }: ScoreSheetProps) {
                                     aria-valuemin={0}
                                     aria-valuemax={100}
                                     aria-label={`${AXIS_LABEL[axis]} - ${value.toFixed(0)} sur 100`}
-                                    className="bg-muted h-2 overflow-hidden rounded-full"
+                                    className="h-2 overflow-hidden rounded-full bg-muted"
                                 >
                                     <div
                                         className={cn('h-full rounded-full transition-[width]', AXIS_BAR_BG[axis])}
@@ -105,7 +105,7 @@ export function ScoreSheet({ open, onOpenChange, score }: ScoreSheetProps) {
                     })}
                 </ul>
 
-                <p className="text-muted-foreground border-border/50 border-t px-4 pt-4 text-[11px] italic leading-relaxed">
+                <p className="border-t border-border/50 px-4 pt-4 text-[11px] leading-relaxed text-muted-foreground italic">
                     LUMIRIS ne peut pas être payé pour modifier ce score. Les coefficients sont publics et identiques
                     pour tous les passeports.
                 </p>

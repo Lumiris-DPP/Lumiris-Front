@@ -48,13 +48,13 @@ export function AtelierAddons() {
                     transition={{ duration: 0.5 }}
                     className="mb-10 text-center"
                 >
-                    <span className="inline-block rounded-full bg-lumiris-rose/10 px-3 py-1 text-xs font-medium uppercase tracking-wider text-lumiris-rose">
+                    <span className="inline-block rounded-full bg-lumiris-rose/10 px-3 py-1 text-xs font-medium tracking-wider text-lumiris-rose uppercase">
                         Options
                     </span>
-                    <h2 className="text-foreground mt-4 text-2xl font-bold tracking-tight sm:text-3xl">
+                    <h2 className="mt-4 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                         Boostez votre visibilite
                     </h2>
-                    <p className="text-muted-foreground mx-auto mt-3 max-w-lg">
+                    <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
                         Des modules complementaires pour aller plus loin.
                     </p>
                 </motion.div>
@@ -69,7 +69,7 @@ export function AtelierAddons() {
                             transition={{ duration: 0.4, delay: index * 0.1 }}
                         >
                             <div
-                                className={`bg-card relative h-full overflow-hidden rounded-2xl border-2 p-6 transition-all hover:shadow-lg ${
+                                className={`relative h-full overflow-hidden rounded-2xl border-2 bg-card p-6 transition-all hover:shadow-lg ${
                                     addon.color === 'violet'
                                         ? 'border-lumiris-iris/30 hover:border-lumiris-iris/50'
                                         : 'border-lumiris-rose/30 hover:border-lumiris-rose/50'
@@ -77,7 +77,7 @@ export function AtelierAddons() {
                             >
                                 {/* Background decoration */}
                                 <div
-                                    className={`pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full blur-3xl ${
+                                    className={`pointer-events-none absolute -top-20 -right-20 h-40 w-40 rounded-full blur-3xl ${
                                         addon.color === 'violet' ? 'bg-lumiris-iris/10' : 'bg-lumiris-rose/10'
                                     }`}
                                 />
@@ -97,17 +97,19 @@ export function AtelierAddons() {
                                             />
                                         </div>
                                         <div>
-                                            <h3 className="text-foreground text-lg font-bold">{addon.name}</h3>
+                                            <h3 className="text-lg font-bold text-foreground">{addon.name}</h3>
                                             <div className="flex items-baseline gap-1.5">
                                                 <span
                                                     className={`text-lg font-bold ${
-                                                        addon.color === 'violet' ? 'text-lumiris-iris' : 'text-lumiris-rose'
+                                                        addon.color === 'violet'
+                                                            ? 'text-lumiris-iris'
+                                                            : 'text-lumiris-rose'
                                                     }`}
                                                 >
                                                     {addon.monthly} EUR
                                                 </span>
-                                                <span className="text-muted-foreground text-sm">/mois</span>
-                                                <span className="text-muted-foreground text-xs">
+                                                <span className="text-sm text-muted-foreground">/mois</span>
+                                                <span className="text-xs text-muted-foreground">
                                                     ou {addon.yearly} EUR/an
                                                 </span>
                                             </div>
@@ -116,7 +118,7 @@ export function AtelierAddons() {
                                 </div>
 
                                 {/* Description */}
-                                <p className="text-muted-foreground relative mb-5 text-sm leading-relaxed">
+                                <p className="relative mb-5 text-sm leading-relaxed text-muted-foreground">
                                     {addon.description}
                                 </p>
 
@@ -126,12 +128,16 @@ export function AtelierAddons() {
                                         <li key={feature} className="flex items-start gap-2.5 text-sm">
                                             <div
                                                 className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
-                                                    addon.color === 'violet' ? 'bg-lumiris-iris/10' : 'bg-lumiris-rose/10'
+                                                    addon.color === 'violet'
+                                                        ? 'bg-lumiris-iris/10'
+                                                        : 'bg-lumiris-rose/10'
                                                 }`}
                                             >
                                                 <Check
                                                     className={`h-3 w-3 ${
-                                                        addon.color === 'violet' ? 'text-lumiris-iris' : 'text-lumiris-rose'
+                                                        addon.color === 'violet'
+                                                            ? 'text-lumiris-iris'
+                                                            : 'text-lumiris-rose'
                                                     }`}
                                                 />
                                             </div>

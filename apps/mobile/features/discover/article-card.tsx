@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+'use client';
+
+import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import { JOURNAL_CATEGORY_LABEL } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
@@ -29,7 +31,7 @@ export function ArticleCard({ item, index, layout = 'horizontal' }: ArticleCardP
             style={isE ? { filter: 'saturate(0.4)' } : undefined}
         >
             <Link
-                to={`/journal/${item.slug}`}
+                href={`/journal/${item.slug}`}
                 aria-label={`${item.title} - ${JOURNAL_CATEGORY_LABEL[item.category]} - grade ${item.grade}`}
                 className="group block"
             >
@@ -37,7 +39,7 @@ export function ArticleCard({ item, index, layout = 'horizontal' }: ArticleCardP
                     whileTap={prefersReduced ? undefined : { scale: 0.98 }}
                     className="flex flex-col gap-2.5"
                 >
-                    <div className="border-border/40 bg-card/60 relative aspect-square overflow-hidden rounded-2xl border">
+                    <div className="relative aspect-square overflow-hidden rounded-2xl border border-border/40 bg-card/60">
                         <CoverImage
                             src={item.coverImage}
                             alt={item.title}
@@ -48,7 +50,7 @@ export function ArticleCard({ item, index, layout = 'horizontal' }: ArticleCardP
                         <span
                             aria-label={`Grade ${item.grade}`}
                             className={cn(
-                                'text-primary-foreground absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-md font-mono text-[11px] font-bold shadow-md',
+                                'absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-md font-mono text-[11px] font-bold text-primary-foreground shadow-md',
                                 GRADE_CONFIG[item.grade].bgClass,
                             )}
                         >
@@ -56,10 +58,10 @@ export function ArticleCard({ item, index, layout = 'horizontal' }: ArticleCardP
                         </span>
                     </div>
                     <div className="flex flex-col gap-1">
-                        <h3 className="text-foreground line-clamp-2 text-sm font-semibold leading-snug">
+                        <h3 className="line-clamp-2 text-sm leading-snug font-semibold text-foreground">
                             {item.title}
                         </h3>
-                        <p className="text-muted-foreground text-[11px]">
+                        <p className="text-[11px] text-muted-foreground">
                             {item.author} · {item.readTime}
                         </p>
                     </div>

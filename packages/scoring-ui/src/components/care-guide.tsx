@@ -23,10 +23,10 @@ export function CareGuide({ care, warranty, className, ...rest }: CareGuideProps
                 {ITEMS.map(({ key, label, svgPath }) => {
                     const value = care?.[key];
                     return (
-                        <li key={key} className="border-border/60 bg-card flex gap-3 rounded-2xl border p-3">
+                        <li key={key} className="flex gap-3 rounded-2xl border border-border/60 bg-card p-3">
                             <img src={svgPath} alt="" aria-hidden className="mt-0.5 h-4 w-4 shrink-0" />
                             <div className="min-w-0">
-                                <p className="text-foreground text-xs font-semibold uppercase tracking-wider">
+                                <p className="text-xs font-semibold tracking-wider text-foreground uppercase">
                                     {label}
                                 </p>
                                 <p
@@ -44,13 +44,13 @@ export function CareGuide({ care, warranty, className, ...rest }: CareGuideProps
             </ul>
 
             {warranty ? (
-                <div className="border-lumiris-emerald/30 bg-lumiris-emerald/5 flex flex-col gap-1 rounded-2xl border p-4">
-                    <p className="text-lumiris-emerald text-xs font-semibold uppercase tracking-wider">
+                <div className="flex flex-col gap-1 rounded-2xl border border-lumiris-emerald/30 bg-lumiris-emerald/5 p-4">
+                    <p className="text-xs font-semibold tracking-wider text-lumiris-emerald uppercase">
                         Garantie {Math.round(warranty.durationMonths / 12)} an{warranty.durationMonths >= 24 ? 's' : ''}
                     </p>
-                    <p className="text-foreground/90 text-sm">{warranty.terms}</p>
+                    <p className="text-sm text-foreground/90">{warranty.terms}</p>
                     {warranty.repairabilityCommitment ? (
-                        <p className="text-muted-foreground mt-1 text-xs italic">{warranty.repairabilityCommitment}</p>
+                        <p className="mt-1 text-xs text-muted-foreground italic">{warranty.repairabilityCommitment}</p>
                     ) : null}
                 </div>
             ) : null}

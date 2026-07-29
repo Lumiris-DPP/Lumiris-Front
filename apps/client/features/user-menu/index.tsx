@@ -53,8 +53,8 @@ export function UserMenu({ artisan }: UserMenuProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel className="flex flex-col gap-0.5">
-                    <span className="text-foreground text-sm font-semibold">{artisan.displayName}</span>
-                    <span className="text-muted-foreground text-xs font-normal">{artisan.atelierName}</span>
+                    <span className="text-sm font-semibold text-foreground">{artisan.displayName}</span>
+                    <span className="text-xs font-normal text-muted-foreground">{artisan.atelierName}</span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>

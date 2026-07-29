@@ -1,5 +1,7 @@
+'use client';
+
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { CalendarCheck, CheckCircle2 } from 'lucide-react';
 import type { Repairer, RepairerSpecialty } from '@lumiris/types';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@lumiris/ui/components/sheet';
@@ -65,31 +67,31 @@ export function BookingSheet({ repairer, open, onOpenChange }: BookingSheetProps
         <Sheet open={open} onOpenChange={handleOpenChange}>
             <SheetContent
                 side="bottom"
-                className="mx-auto max-h-[85vh] max-w-md overflow-y-auto rounded-t-3xl px-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] pt-6"
+                className="mx-auto max-h-[85vh] max-w-md overflow-y-auto rounded-t-3xl px-6 pt-6 pb-[max(env(safe-area-inset-bottom),1.5rem)]"
             >
                 {submitted ? (
                     <div className="flex flex-col items-center gap-5 py-6 text-center">
-                        <span className="bg-lumiris-emerald/10 text-lumiris-emerald inline-flex h-16 w-16 items-center justify-center rounded-full">
+                        <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-lumiris-emerald/10 text-lumiris-emerald">
                             <CheckCircle2 className="h-8 w-8" strokeWidth={1.5} aria-hidden />
                         </span>
                         <SheetHeader className="items-center px-0 text-center">
                             <SheetTitle className="text-lg">Demande envoyée</SheetTitle>
-                            <SheetDescription className="text-pretty text-sm">
+                            <SheetDescription className="text-sm text-pretty">
                                 {repairer.displayName} te recontactera pour confirmer le rendez-vous et établir un
                                 devis.
                             </SheetDescription>
                         </SheetHeader>
                         <div className="flex w-full flex-col gap-2">
                             <Link
-                                to="/me/repairs"
-                                className="bg-foreground text-background inline-flex h-12 w-full items-center justify-center rounded-full text-sm font-semibold"
+                                href="/me/repairs"
+                                className="inline-flex h-12 w-full items-center justify-center rounded-full bg-foreground text-sm font-semibold text-background"
                             >
                                 Voir mes demandes
                             </Link>
                             <button
                                 type="button"
                                 onClick={() => handleOpenChange(false)}
-                                className="text-muted-foreground hover:text-foreground inline-flex h-11 w-full items-center justify-center text-sm font-medium"
+                                className="inline-flex h-11 w-full items-center justify-center text-sm font-medium text-muted-foreground hover:text-foreground"
                             >
                                 Fermer
                             </button>
@@ -99,7 +101,7 @@ export function BookingSheet({ repairer, open, onOpenChange }: BookingSheetProps
                     <>
                         <SheetHeader className="px-0 text-left">
                             <SheetTitle className="flex items-center gap-2 text-base">
-                                <CalendarCheck className="text-primary h-4 w-4" strokeWidth={1.5} aria-hidden />
+                                <CalendarCheck className="h-4 w-4 text-primary" strokeWidth={1.5} aria-hidden />
                                 Prendre rendez-vous
                             </SheetTitle>
                             <SheetDescription className="text-xs">
@@ -109,7 +111,7 @@ export function BookingSheet({ repairer, open, onOpenChange }: BookingSheetProps
 
                         <div className="mt-5 flex flex-col gap-5">
                             <fieldset className="flex flex-col gap-2">
-                                <legend className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+                                <legend className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                                     Prestation
                                 </legend>
                                 <ul className="flex flex-wrap gap-1.5">
@@ -123,7 +125,7 @@ export function BookingSheet({ repairer, open, onOpenChange }: BookingSheetProps
                                                     onClick={() => setSpecialty(s)}
                                                     className={cn(
                                                         'inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
-                                                        'focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
+                                                        'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:outline-none',
                                                         active
                                                             ? 'border-primary bg-primary/10 text-primary'
                                                             : 'border-border/60 bg-card text-muted-foreground hover:text-foreground',
@@ -138,7 +140,7 @@ export function BookingSheet({ repairer, open, onOpenChange }: BookingSheetProps
                             </fieldset>
 
                             <fieldset className="flex flex-col gap-2">
-                                <legend className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+                                <legend className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                                     Message
                                 </legend>
                                 <textarea
@@ -148,9 +150,9 @@ export function BookingSheet({ repairer, open, onOpenChange }: BookingSheetProps
                                     rows={4}
                                     placeholder="Décris ta demande : pièce concernée, type de retouche, délai souhaité."
                                     aria-label="Message de demande de rendez-vous"
-                                    className="border-border bg-card text-foreground placeholder:text-muted-foreground/60 focus:ring-primary/30 rounded-2xl border px-3 py-2.5 text-sm outline-none focus:ring-2"
+                                    className="rounded-2xl border border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary/30"
                                 />
-                                <p className="text-muted-foreground/70 text-right font-mono text-[10px] tabular-nums">
+                                <p className="text-right font-mono text-[10px] text-muted-foreground/70 tabular-nums">
                                     {message.length}/{MAX_MESSAGE}
                                 </p>
                             </fieldset>
@@ -159,11 +161,11 @@ export function BookingSheet({ repairer, open, onOpenChange }: BookingSheetProps
                                 type="button"
                                 onClick={handleSubmit}
                                 disabled={message.trim().length === 0}
-                                className="bg-foreground text-background inline-flex h-12 w-full items-center justify-center rounded-full text-sm font-semibold active:scale-[0.98] disabled:opacity-50"
+                                className="inline-flex h-12 w-full items-center justify-center rounded-full bg-foreground text-sm font-semibold text-background active:scale-[0.98] disabled:opacity-50"
                             >
                                 Envoyer la demande
                             </button>
-                            <p className="text-muted-foreground/80 text-center text-[10px]">
+                            <p className="text-center text-[10px] text-muted-foreground/80">
                                 Demande sans engagement. Le retoucheur te recontacte pour le devis.
                             </p>
                         </div>

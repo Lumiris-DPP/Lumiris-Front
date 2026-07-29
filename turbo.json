@@ -7,7 +7,7 @@
         "build": {
             "dependsOn": ["^build", "topo"],
             "inputs": ["$TURBO_DEFAULT$", "!**/*.md", "!**/*.test.{ts,tsx}", "!**/__tests__/**"],
-            "outputs": [".next/**", "!.next/cache/**", "dist/**", "build/**"],
+            "outputs": [".next/**", "!.next/cache/**", "out/**", "dist/**", "build/**"],
             "env": ["NEXT_PUBLIC_*"]
         },
         "dev": {

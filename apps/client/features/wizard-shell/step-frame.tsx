@@ -43,9 +43,9 @@ export function WizardStepFrame({
             hideNav={hideNav}
         >
             {filesDropped && (
-                <div className="border-lumiris-amber/40 bg-lumiris-amber/10 mb-4 flex items-start gap-2 rounded-lg border px-4 py-3 text-sm">
-                    <Info className="text-lumiris-amber mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-                    <p className="text-muted-foreground flex-1">
+                <div className="mb-4 flex items-start gap-2 rounded-lg border border-lumiris-amber/40 bg-lumiris-amber/10 px-4 py-3 text-sm">
+                    <Info className="mt-0.5 h-4 w-4 shrink-0 text-lumiris-amber" aria-hidden />
+                    <p className="flex-1 text-muted-foreground">
                         Vos informations ont bien été restaurées. En revanche, les documents que vous aviez téléversés
                         doivent être re-sélectionnés : les fichiers ne sont pas conservés après un rafraîchissement de
                         la page.
@@ -54,7 +54,7 @@ export function WizardStepFrame({
                         type="button"
                         onClick={() => clearFilesDropped(draftId)}
                         aria-label="Masquer ce message"
-                        className="text-muted-foreground hover:text-foreground shrink-0"
+                        className="shrink-0 text-muted-foreground hover:text-foreground"
                     >
                         <X className="h-4 w-4" />
                     </button>

@@ -8,7 +8,7 @@ export default function AuthedLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <div className="bg-background min-h-screen">
+        <div className="min-h-screen bg-background">
             <Sidebar />
             <TopBar />
             <main className="ml-60 pt-14">

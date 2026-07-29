@@ -121,9 +121,7 @@ export function migrateAnonCartToUser(userId: string): void {
         const existing = merged.get(line.productId);
         merged.set(
             line.productId,
-            existing
-                ? { ...existing, quantity: Math.max(existing.quantity, line.quantity) }
-                : line,
+            existing ? { ...existing, quantity: Math.max(existing.quantity, line.quantity) } : line,
         );
     }
 

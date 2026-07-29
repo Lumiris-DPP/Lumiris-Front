@@ -23,14 +23,14 @@ export function HomeStats() {
                     {stats.map((stat, index) => (
                         <div key={stat.label} className="flex items-center gap-2">
                             {index > 0 && (
-                                <span className="text-muted-foreground/30 mr-2 hidden text-2xl sm:mr-4 sm:inline">
+                                <span className="mr-2 hidden text-2xl text-muted-foreground/30 sm:mr-4 sm:inline">
                                     ·
                                 </span>
                             )}
-                            <span className="text-foreground font-mono text-2xl font-bold sm:text-3xl">
+                            <span className="font-mono text-2xl font-bold text-foreground sm:text-3xl">
                                 {stat.value}
                             </span>
-                            <span className="text-muted-foreground text-sm">{stat.label}</span>
+                            <span className="text-sm text-muted-foreground">{stat.label}</span>
                         </div>
                     ))}
                 </motion.div>

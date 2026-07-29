@@ -53,20 +53,20 @@ export function BreakdownSection({ passport, score }: BreakdownSectionProps) {
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_240px]">
                 <div className="space-y-4">
                     {score.cap?.applied ? <ScoreCapWarning cap={score.cap} /> : null}
-                    <div className="border-border bg-card rounded-xl border p-5">
+                    <div className="rounded-xl border border-border bg-card p-5">
                         <ScoreBreakdown breakdown={score.breakdown} weights={score.weights} />
                     </div>
                 </div>
 
                 <aside className="space-y-3">
-                    <div className="border-border bg-card flex flex-col items-center gap-2 rounded-xl border p-4">
+                    <div className="flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-4">
                         <IrisGrade grade={score.grade} size="xl" shape="square" />
-                        <p className="text-muted-foreground text-[11px]">
+                        <p className="text-[11px] text-muted-foreground">
                             {score.cap?.applied ? 'Grade plafonné' : 'Grade calculé'}
                         </p>
-                        <p className="text-foreground font-mono text-lg">{score.total.toFixed(1)} / 100</p>
+                        <p className="font-mono text-lg text-foreground">{score.total.toFixed(1)} / 100</p>
                     </div>
-                    <div className="border-border bg-card flex items-center justify-between rounded-xl border p-3 text-xs">
+                    <div className="flex items-center justify-between rounded-xl border border-border bg-card p-3 text-xs">
                         <span className="text-muted-foreground">Champs manquants</span>
                         <MissingFieldsBadge passport={passport} showWhenComplete />
                     </div>
@@ -74,8 +74,8 @@ export function BreakdownSection({ passport, score }: BreakdownSectionProps) {
             </div>
 
             {score.reasons.length > 0 ? (
-                <div className="border-border bg-card rounded-xl border p-5">
-                    <p className="text-foreground mb-3 text-sm font-semibold">Justifications</p>
+                <div className="rounded-xl border border-border bg-card p-5">
+                    <p className="mb-3 text-sm font-semibold text-foreground">Justifications</p>
                     <ReasonList reasons={visibleReasons} />
                 </div>
             ) : null}
@@ -83,13 +83,13 @@ export function BreakdownSection({ passport, score }: BreakdownSectionProps) {
             <Button variant="outline" size="sm" onClick={() => setFieldsOpen(true)} className="gap-1.5">
                 <FileCheck2 className="h-3.5 w-3.5" aria-hidden />
                 Voir détail ESPR / AGEC
-                <span className="text-muted-foreground ml-1 font-mono text-[10px]">
+                <span className="ml-1 font-mono text-[10px] text-muted-foreground">
                     {completedCount}/{fieldRows.length}
                 </span>
             </Button>
 
             <Sheet open={fieldsOpen} onOpenChange={setFieldsOpen}>
-                <SheetContent side="right" className="w-160 sm:max-w-160 max-w-[95vw]">
+                <SheetContent side="right" className="w-160 max-w-[95vw] sm:max-w-160">
                     <SheetHeader>
                         <SheetTitle>Champs obligatoires ESPR / AGEC</SheetTitle>
                         <SheetDescription>
@@ -110,7 +110,7 @@ export function BreakdownSection({ passport, score }: BreakdownSectionProps) {
                                     readOnly
                                     tabIndex={-1}
                                     aria-hidden
-                                    className="accent-lumiris-emerald h-3.5 w-3.5"
+                                    className="h-3.5 w-3.5 accent-lumiris-emerald"
                                 />
                                 <Badge variant="outline" className="font-mono text-[10px]">
                                     {row.family}
@@ -118,7 +118,7 @@ export function BreakdownSection({ passport, score }: BreakdownSectionProps) {
                                 <code
                                     className={cn(
                                         'truncate',
-                                        row.present ? 'text-muted-foreground' : 'text-foreground font-medium',
+                                        row.present ? 'text-muted-foreground' : 'font-medium text-foreground',
                                     )}
                                 >
                                     {row.path}
@@ -136,7 +136,7 @@ function ReasonList({ reasons }: { reasons: ReadonlyArray<ScoreResult['reasons']
     return (
         <ul className="space-y-1.5 text-xs">
             {reasons.map((r, i) => (
-                <li key={i} className="text-muted-foreground inline-flex items-baseline gap-2">
+                <li key={i} className="inline-flex items-baseline gap-2 text-muted-foreground">
                     <Badge
                         variant="outline"
                         className={cn(

@@ -52,7 +52,7 @@ export function LabelsTab() {
 
     return (
         <div className="space-y-1">
-            <p className="text-muted-foreground mb-4 text-sm">
+            <p className="mb-4 text-sm text-muted-foreground">
                 EPV et OFG influencent le sous-score Savoir-faire (axe 25%). Les autres labels enrichissent la fiche
                 publique.
             </p>
@@ -69,7 +69,7 @@ export function LabelsTab() {
                                     <span className={cn('h-2 w-2 rounded-full', label.dot)} aria-hidden="true" />
                                     <div>
                                         <p className="text-sm font-medium">{label.name}</p>
-                                        <p className="text-muted-foreground text-xs">{label.description}</p>
+                                        <p className="text-xs text-muted-foreground">{label.description}</p>
                                     </div>
                                 </div>
                                 <Switch
@@ -113,7 +113,7 @@ export function LabelsTab() {
                                                 </label>
                                             </Button>
                                             {extra?.certificateName && (
-                                                <span className="text-muted-foreground truncate font-mono text-xs">
+                                                <span className="truncate font-mono text-xs text-muted-foreground">
                                                     {extra.certificateName}
                                                 </span>
                                             )}

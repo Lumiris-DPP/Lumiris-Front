@@ -20,7 +20,7 @@ export function GlassCard({ className, intensity = 'default', children, ...rest 
     return (
         <div
             className={cn(
-                'border-border/40 bg-card/70 relative rounded-3xl border shadow-lg',
+                'relative rounded-3xl border border-border/40 bg-card/70 shadow-lg',
                 BLUR[intensity],
                 className,
             )}

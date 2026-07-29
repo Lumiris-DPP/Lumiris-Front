@@ -12,17 +12,17 @@ const LAST_REVIEWED = '2026-05-15';
 
 export default function CguPage() {
     return (
-        <main className="bg-background min-h-screen pb-24 pt-28">
+        <main className="min-h-screen bg-background pt-28 pb-24">
             <header className="mx-auto max-w-3xl px-6">
                 <div className="flex items-center gap-3">
                     <Scale className="text-grade-c h-6 w-6" aria-hidden="true" />
-                    <h1 className="text-foreground text-3xl font-semibold tracking-tight sm:text-4xl">
+                    <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
                         Conditions générales (CGU / CGV)
                     </h1>
                 </div>
-                <p className="text-muted-foreground mt-3 text-sm">
+                <p className="mt-3 text-sm text-muted-foreground">
                     Version provisoire — à finaliser avant la mise en production publique. Dernière revue&nbsp;:{' '}
-                    <span className="text-foreground font-mono">
+                    <span className="font-mono text-foreground">
                         {new Date(LAST_REVIEWED).toLocaleDateString('fr-FR', {
                             day: 'numeric',
                             month: 'long',
@@ -35,8 +35,8 @@ export default function CguPage() {
 
             <section className="mx-auto mt-10 max-w-3xl space-y-8 px-6 text-sm leading-relaxed">
                 <div>
-                    <h2 className="text-foreground text-base font-semibold">Objet</h2>
-                    <p className="text-muted-foreground mt-2">
+                    <h2 className="text-base font-semibold text-foreground">Objet</h2>
+                    <p className="mt-2 text-muted-foreground">
                         Les présentes conditions encadrent l&apos;usage du site lumiris.fr et la souscription aux offres
                         LUMIRIS — ATELIER (abonnements artisans), ATELIER+ (add-on), LOCAL (retoucheurs) et l&apos;API
                         Enterprise pour les marques. Le détail tarifaire et les modalités d&apos;engagement seront
@@ -45,8 +45,8 @@ export default function CguPage() {
                 </div>
 
                 <div>
-                    <h2 className="text-foreground text-base font-semibold">Propriété intellectuelle</h2>
-                    <p className="text-muted-foreground mt-2">
+                    <h2 className="text-base font-semibold text-foreground">Propriété intellectuelle</h2>
+                    <p className="mt-2 text-muted-foreground">
                         Le code source de l&apos;algorithme de scoring Iris (40 / 25 / 25 / 10) est public et auditable
                         (cf.{' '}
                         <a href="/charte-independance" className="text-foreground underline-offset-4 hover:underline">
@@ -58,8 +58,8 @@ export default function CguPage() {
                 </div>
 
                 <div>
-                    <h2 className="text-foreground text-base font-semibold">Responsabilité</h2>
-                    <p className="text-muted-foreground mt-2">
+                    <h2 className="text-base font-semibold text-foreground">Responsabilité</h2>
+                    <p className="mt-2 text-muted-foreground">
                         Les passeports DPP affichés sur lumiris.fr sont publiés sous la responsabilité de l&apos;artisan
                         émetteur. LUMIRIS contrôle la cohérence algorithmique du score Iris mais ne se substitue pas à
                         l&apos;artisan dans la véracité des données déclaratives (origine, certifications, composition).
@@ -67,8 +67,8 @@ export default function CguPage() {
                 </div>
 
                 <div>
-                    <h2 className="text-foreground text-base font-semibold">Contact</h2>
-                    <p className="text-muted-foreground mt-2">
+                    <h2 className="text-base font-semibold text-foreground">Contact</h2>
+                    <p className="mt-2 text-muted-foreground">
                         Pour toute question relative aux CGU / CGV&nbsp;:{' '}
                         <a
                             href="mailto:legal@lumiris.fr"

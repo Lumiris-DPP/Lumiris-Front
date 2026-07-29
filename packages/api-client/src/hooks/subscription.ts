@@ -94,9 +94,7 @@ export function useChangePlan(
 }
 
 // ATELIER+ add-on : ajoute le 2ᵉ article Stripe à l'abonnement de base actif.
-export function useAddAtelierPlus(
-    options?: Omit<UseMutationOptions<SubscriptionStateDto, Error, void>, 'mutationFn'>,
-) {
+export function useAddAtelierPlus(options?: Omit<UseMutationOptions<SubscriptionStateDto, Error, void>, 'mutationFn'>) {
     const client = useApiClient();
     const queryClient = useQueryClient();
     return useMutation<SubscriptionStateDto, Error, void>({

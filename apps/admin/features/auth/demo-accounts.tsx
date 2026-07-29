@@ -24,15 +24,15 @@ export function DemoAccountsHelper({ onSelect }: DemoAccountsHelperProps) {
     if (process.env.NODE_ENV === 'production') return null;
 
     return (
-        <div className="text-muted-foreground space-y-1.5 px-2 text-xs">
-            <p className="font-mono uppercase tracking-wider">Démo · cliquer pour pré-remplir</p>
+        <div className="space-y-1.5 px-2 text-xs text-muted-foreground">
+            <p className="font-mono tracking-wider uppercase">Démo · cliquer pour pré-remplir</p>
             <ul className="space-y-0.5">
                 {DEMO_ACCOUNTS.map((account) => (
                     <li key={account.email}>
                         <button
                             type="button"
                             onClick={() => onSelect(account.email)}
-                            className="hover:text-foreground text-left font-mono transition-colors"
+                            className="text-left font-mono transition-colors hover:text-foreground"
                         >
                             {account.email} <span className="text-muted-foreground/60">({account.label})</span>
                         </button>

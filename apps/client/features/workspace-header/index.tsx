@@ -26,7 +26,7 @@ export function WorkspaceHeader({ title, actions }: WorkspaceHeaderProps) {
     const { subscription, quota, isRealMode } = useSubscription();
 
     return (
-        <header className="border-border bg-card sticky top-0 z-20 border-b">
+        <header className="sticky top-0 z-20 border-b border-border bg-card">
             {/* Hauteur alignée sur le bloc logo de la sidebar (px-5 py-5) pour la cohérence. */}
             <div className="flex items-center gap-3 px-5 py-5 md:gap-4">
                 <Button
@@ -40,7 +40,7 @@ export function WorkspaceHeader({ title, actions }: WorkspaceHeaderProps) {
                 </Button>
 
                 <div className="min-w-0 flex-1">
-                    <h1 className="text-foreground truncate text-xl font-semibold tracking-tight">{title}</h1>
+                    <h1 className="truncate text-xl font-semibold tracking-tight text-foreground">{title}</h1>
                 </div>
 
                 <div className="flex items-center gap-2 md:gap-3">

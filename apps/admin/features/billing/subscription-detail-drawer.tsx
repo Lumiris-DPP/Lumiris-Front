@@ -70,7 +70,7 @@ function DetailDrawerBody({ subscription: sub, onClose }: { subscription: Subscr
         {
             label: 'Moyen de paiement',
             value: (
-                <span className="text-muted-foreground inline-flex items-center gap-1.5 font-mono text-[11px]">
+                <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
                     <CreditCard className="h-3 w-3" />
                     {sub.paymentMethod.brand.toUpperCase()} ····{sub.paymentMethod.last4}
                 </span>
@@ -107,8 +107,8 @@ function DetailDrawerBody({ subscription: sub, onClose }: { subscription: Subscr
         <div className="grid grid-cols-2 gap-3 text-sm">
             {detailRows.map((row) => (
                 <div key={row.label} className="flex flex-col gap-0.5">
-                    <span className="text-muted-foreground text-[10px] uppercase tracking-wider">{row.label}</span>
-                    <span className={row.mono ? 'text-foreground font-mono text-sm' : 'text-foreground text-sm'}>
+                    <span className="text-[10px] tracking-wider text-muted-foreground uppercase">{row.label}</span>
+                    <span className={row.mono ? 'font-mono text-sm text-foreground' : 'text-sm text-foreground'}>
                         {row.value}
                     </span>
                 </div>
@@ -118,7 +118,7 @@ function DetailDrawerBody({ subscription: sub, onClose }: { subscription: Subscr
 
     const invoicesTab =
         invoices.length === 0 ? (
-            <p className="text-muted-foreground py-6 text-center text-xs">Aucun prélèvement enregistré.</p>
+            <p className="py-6 text-center text-xs text-muted-foreground">Aucun prélèvement enregistré.</p>
         ) : (
             <Table>
                 <TableHeader>
@@ -200,7 +200,7 @@ function DetailDrawerBody({ subscription: sub, onClose }: { subscription: Subscr
                     </AlertDialogHeader>
                     <div className="space-y-1.5">
                         <Label htmlFor="dunning-typed-name" className="text-[11px]">
-                            Tapez le nom exact : <span className="text-foreground font-mono">{sub.displayName}</span>
+                            Tapez le nom exact : <span className="font-mono text-foreground">{sub.displayName}</span>
                         </Label>
                         <Input
                             id="dunning-typed-name"

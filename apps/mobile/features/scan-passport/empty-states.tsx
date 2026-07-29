@@ -17,20 +17,20 @@ function EmptyShell({ Icon, title, message, primary, secondary }: EmptyShellProp
     return (
         <div
             role="alert"
-            className="bg-background absolute inset-0 z-30 flex flex-col items-center justify-center gap-5 px-8 text-center"
+            className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-5 bg-background px-8 text-center"
         >
-            <span className="bg-muted text-foreground inline-flex h-14 w-14 items-center justify-center rounded-2xl">
+            <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-muted text-foreground">
                 <Icon className="h-6 w-6" strokeWidth={1.5} aria-hidden />
             </span>
             <div className="flex flex-col gap-1.5">
-                <h2 className="text-foreground text-lg font-semibold tracking-tight">{title}</h2>
-                <p className="text-muted-foreground mx-auto max-w-xs text-pretty text-sm leading-relaxed">{message}</p>
+                <h2 className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
+                <p className="mx-auto max-w-xs text-sm leading-relaxed text-pretty text-muted-foreground">{message}</p>
             </div>
             <div className="flex w-full max-w-xs flex-col gap-2">
                 <button
                     type="button"
                     onClick={primary.onClick}
-                    className="bg-foreground text-background inline-flex h-14 w-full items-center justify-center rounded-full px-6 text-sm font-semibold active:scale-[0.98]"
+                    className="inline-flex h-14 w-full items-center justify-center rounded-full bg-foreground px-6 text-sm font-semibold text-background active:scale-[0.98]"
                 >
                     {primary.label}
                 </button>
@@ -38,7 +38,7 @@ function EmptyShell({ Icon, title, message, primary, secondary }: EmptyShellProp
                     <button
                         type="button"
                         onClick={secondary.onClick}
-                        className="text-muted-foreground hover:text-foreground inline-flex h-11 w-full items-center justify-center text-sm font-medium"
+                        className="inline-flex h-11 w-full items-center justify-center text-sm font-medium text-muted-foreground hover:text-foreground"
                     >
                         {secondary.label}
                     </button>

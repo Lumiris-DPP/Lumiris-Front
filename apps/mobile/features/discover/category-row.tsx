@@ -20,10 +20,10 @@ export function CategoryRow({ category, items, baseIndex = 0 }: CategoryRowProps
     return (
         <section aria-labelledby={headingId} className="mt-8">
             <div className="mb-3 flex items-baseline justify-between px-1">
-                <h2 id={headingId} className="text-foreground text-base font-semibold tracking-tight">
+                <h2 id={headingId} className="text-base font-semibold tracking-tight text-foreground">
                     {label}
                 </h2>
-                <span className="text-muted-foreground text-[11px]">
+                <span className="text-[11px] text-muted-foreground">
                     {items.length} {items.length === 1 ? 'article' : 'articles'}
                 </span>
             </div>
@@ -36,7 +36,7 @@ export function CategoryRow({ category, items, baseIndex = 0 }: CategoryRowProps
                 </div>
             ) : (
                 <div
-                    className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                    className="-mx-4 flex [scrollbar-width:none] gap-3 overflow-x-auto px-4 pb-2 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
                     style={{ scrollSnapType: 'x mandatory' }}
                 >
                     {items.map((item, i) => (

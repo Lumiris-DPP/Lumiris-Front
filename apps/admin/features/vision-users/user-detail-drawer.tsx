@@ -37,8 +37,8 @@ function fmt(iso: string): string {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <div>
-            <p className="text-muted-foreground text-[10px] uppercase tracking-wider">{label}</p>
-            <div className="text-foreground mt-0.5">{children}</div>
+            <p className="text-[10px] tracking-wider text-muted-foreground uppercase">{label}</p>
+            <div className="mt-0.5 text-foreground">{children}</div>
         </div>
     );
 }
@@ -101,7 +101,7 @@ function IdentityTab({
 
     return (
         <div className="space-y-4 text-xs">
-            <section className="border-border bg-card grid grid-cols-2 gap-3 rounded-xl border p-3">
+            <section className="grid grid-cols-2 gap-3 rounded-xl border border-border bg-card p-3">
                 <Field label="Email">{user.email ?? '-'}</Field>
                 <Field label="Prénom">{user.name ?? '-'}</Field>
                 <Field label="Ville">{user.city ?? '-'}</Field>
@@ -134,7 +134,7 @@ function IdentityTab({
                     })}
                 </section>
             ) : null}
-            <section className="border-border bg-card flex flex-wrap gap-2 rounded-xl border p-3">
+            <section className="flex flex-wrap gap-2 rounded-xl border border-border bg-card p-3">
                 <Field label="Consents">
                     <div className="mt-1 flex flex-wrap gap-1">
                         {user.consentNewsletter ? (
@@ -148,7 +148,7 @@ function IdentityTab({
                             </Badge>
                         ) : null}
                         {!user.consentNewsletter && !user.consentAffiliation ? (
-                            <span className="text-muted-foreground/70 font-mono text-[10px]">aucun</span>
+                            <span className="font-mono text-[10px] text-muted-foreground/70">aucun</span>
                         ) : null}
                     </div>
                 </Field>
@@ -187,17 +187,17 @@ function WardrobeTab({ user }: { user: MockVisionUser }) {
 
     return (
         <div className="space-y-4 text-xs">
-            <div className="border-border bg-card rounded-xl border p-3">
-                <p className="text-muted-foreground text-[10px] uppercase tracking-wider">Inventaire global</p>
+            <div className="rounded-xl border border-border bg-card p-3">
+                <p className="text-[10px] tracking-wider text-muted-foreground uppercase">Inventaire global</p>
                 <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
                     {ESPR_CATEGORIES.map((cat) => {
                         const count = breakdown.find((b) => b.category === cat)?.count ?? 0;
                         return (
                             <div
                                 key={cat}
-                                className="bg-muted/30 flex items-baseline justify-between rounded-md px-2 py-1.5"
+                                className="flex items-baseline justify-between rounded-md bg-muted/30 px-2 py-1.5"
                             >
-                                <span className="text-foreground text-[11px]">{ESPR_CATEGORY_LABEL[cat]}</span>
+                                <span className="text-[11px] text-foreground">{ESPR_CATEGORY_LABEL[cat]}</span>
                                 <span
                                     className={cn(
                                         'font-mono text-xs font-semibold',
@@ -212,7 +212,7 @@ function WardrobeTab({ user }: { user: MockVisionUser }) {
                 </div>
             </div>
             <section>
-                <h3 className="text-foreground mb-2 text-sm font-semibold">{ESPR_CATEGORY_LABEL.textile}</h3>
+                <h3 className="mb-2 text-sm font-semibold text-foreground">{ESPR_CATEGORY_LABEL.textile}</h3>
                 {textileItems.length === 0 ? (
                     <EmptyState icon={Shirt} title="Garde-Robe vide" description="Aucun passeport textile." />
                 ) : (
@@ -229,7 +229,7 @@ function DocumentsTab({ user }: { user: MockVisionUser }) {
         return <p className="text-muted-foreground italic">Aucun document joint.</p>;
     }
     return (
-        <div className="border-border bg-card overflow-hidden rounded-xl border">
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -247,7 +247,7 @@ function DocumentsTab({ user }: { user: MockVisionUser }) {
                                     {DOCUMENT_TYPE_LABEL[doc.type]}
                                 </Badge>
                             </TableCell>
-                            <TableCell className="text-foreground text-[11px]">{doc.productLabel}</TableCell>
+                            <TableCell className="text-[11px] text-foreground">{doc.productLabel}</TableCell>
                             <TableCell className="font-mono text-[11px]">{fmt(doc.uploadedAt)}</TableCell>
                             <TableCell className="text-right font-mono text-[11px]">
                                 {formatBytes(doc.sizeBytes)}
@@ -271,8 +271,8 @@ function RgpdTab({
 }) {
     return (
         <div className="space-y-4 text-xs">
-            <div className="border-lumiris-rose/30 bg-lumiris-rose/5 space-y-3 rounded-xl border p-4">
-                <h3 className="text-lumiris-rose inline-flex items-center gap-1 text-sm font-semibold">
+            <div className="space-y-3 rounded-xl border border-lumiris-rose/30 bg-lumiris-rose/5 p-4">
+                <h3 className="inline-flex items-center gap-1 text-sm font-semibold text-lumiris-rose">
                     <ShieldAlert className="h-4 w-4" /> Actions RGPD
                 </h3>
                 <p className="text-foreground">
@@ -282,7 +282,7 @@ function RgpdTab({
             </div>
 
             {user.rgpdRequests && user.rgpdRequests.length > 0 ? (
-                <ul className="border-border bg-card divide-border divide-y rounded-xl border">
+                <ul className="divide-y divide-border rounded-xl border border-border bg-card">
                     {user.rgpdRequests.map((req, i) => (
                         <li
                             key={`${req.kind}-${req.requestedAt}-${i}`}

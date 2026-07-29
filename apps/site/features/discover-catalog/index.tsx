@@ -127,8 +127,8 @@ export function DiscoverCatalog() {
                 transition={{ duration: 0.5 }}
                 className="mb-8"
             >
-                <h1 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">Decouvrir</h1>
-                <p className="text-muted-foreground mt-2 text-lg">
+                <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Decouvrir</h1>
+                <p className="mt-2 text-lg text-muted-foreground">
                     Explorez les pieces tracees et les ateliers artisans partenaires.
                 </p>
             </motion.div>
@@ -150,7 +150,7 @@ export function DiscoverCatalog() {
                     <div className="mb-6 space-y-4">
                         {/* Grade pills */}
                         <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-muted-foreground text-sm">Score :</span>
+                            <span className="text-sm text-muted-foreground">Score :</span>
                             {GRADES.map((grade) => (
                                 <button
                                     key={grade}
@@ -168,7 +168,7 @@ export function DiscoverCatalog() {
 
                         {/* Category chips */}
                         <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-muted-foreground text-sm">Categorie :</span>
+                            <span className="text-sm text-muted-foreground">Categorie :</span>
                             {CATEGORIES.map((cat) => (
                                 <button
                                     key={cat.key}
@@ -186,14 +186,14 @@ export function DiscoverCatalog() {
 
                         {/* Reset + count */}
                         <div className="flex items-center justify-between">
-                            <p className="text-muted-foreground text-sm">
+                            <p className="text-sm text-muted-foreground">
                                 <strong className="text-foreground">{filteredPieces.length}</strong> piece
                                 {filteredPieces.length !== 1 ? 's' : ''}
                             </p>
                             {hasPiecesFilters && (
                                 <button
                                     onClick={resetPiecesFilters}
-                                    className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm transition-colors"
+                                    className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                                 >
                                     <X className="h-3.5 w-3.5" />
                                     Reinitialiser
@@ -213,24 +213,24 @@ export function DiscoverCatalog() {
                                     transition={{ duration: 0.3, delay: index * 0.02 }}
                                 >
                                     <Link href={`/passeport/${item.passport.id}`} className="group block">
-                                        <div className="bg-card border-border overflow-hidden rounded-xl border transition-shadow hover:shadow-lg">
+                                        <div className="overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-lg">
                                             <div className="relative aspect-[4/5]">
                                                 <div className="absolute inset-0 bg-gradient-to-br from-slate-100 via-lumiris-cyan/10 to-lumiris-iris/10" />
-                                                <div className="absolute left-2.5 top-2.5">
+                                                <div className="absolute top-2.5 left-2.5">
                                                     <IrisGrade grade={item.irisScore?.grade ?? 'B'} size="sm" />
                                                 </div>
                                             </div>
                                             <div className="p-3">
-                                                <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                                                <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                                                     {item.artisan.atelierName}
                                                 </p>
-                                                <p className="text-foreground mt-0.5 truncate text-sm font-medium">
+                                                <p className="mt-0.5 truncate text-sm font-medium text-foreground">
                                                     {item.passport.garment.reference}
                                                 </p>
                                                 <Link
                                                     href={`/artisans/${item.artisan.id}`}
                                                     onClick={(e) => e.stopPropagation()}
-                                                    className="text-lumiris-cyan hover:text-lumiris-cyan/80 mt-2 inline-flex items-center gap-1 text-xs transition-colors"
+                                                    className="mt-2 inline-flex items-center gap-1 text-xs text-lumiris-cyan transition-colors hover:text-lumiris-cyan/80"
                                                 >
                                                     Voir l&apos;atelier
                                                     <ArrowRight className="h-3 w-3" />
@@ -248,7 +248,7 @@ export function DiscoverCatalog() {
                             </p>
                             <button
                                 onClick={resetPiecesFilters}
-                                className="text-lumiris-cyan hover:text-lumiris-cyan/80 mt-3 text-sm font-medium transition-colors"
+                                className="mt-3 text-sm font-medium text-lumiris-cyan transition-colors hover:text-lumiris-cyan/80"
                             >
                                 Reinitialiser les filtres
                             </button>
@@ -265,7 +265,7 @@ export function DiscoverCatalog() {
                             <select
                                 value={selectedRegion}
                                 onChange={(e) => setSelectedRegion(e.target.value)}
-                                className="bg-muted text-foreground rounded-lg px-3 py-2 text-sm"
+                                className="rounded-lg bg-muted px-3 py-2 text-sm text-foreground"
                             >
                                 <option value="">Toutes les regions</option>
                                 {REGIONS.map((region) => (
@@ -277,7 +277,7 @@ export function DiscoverCatalog() {
                             <select
                                 value={selectedCertification}
                                 onChange={(e) => setSelectedCertification(e.target.value)}
-                                className="bg-muted text-foreground rounded-lg px-3 py-2 text-sm"
+                                className="rounded-lg bg-muted px-3 py-2 text-sm text-foreground"
                             >
                                 <option value="">Toutes certifications</option>
                                 {CERTIFICATIONS.map((cert) => (
@@ -290,7 +290,7 @@ export function DiscoverCatalog() {
 
                         {/* Speciality chips */}
                         <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-muted-foreground text-sm">Specialites :</span>
+                            <span className="text-sm text-muted-foreground">Specialites :</span>
                             {SPECIALITIES.slice(0, 8).map((spec) => (
                                 <button
                                     key={spec}
@@ -308,14 +308,14 @@ export function DiscoverCatalog() {
 
                         {/* Reset + count */}
                         <div className="flex items-center justify-between">
-                            <p className="text-muted-foreground text-sm">
+                            <p className="text-sm text-muted-foreground">
                                 <strong className="text-foreground">{filteredAteliers.length}</strong> atelier
                                 {filteredAteliers.length !== 1 ? 's' : ''}
                             </p>
                             {hasAteliersFilters && (
                                 <button
                                     onClick={resetAteliersFilters}
-                                    className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm transition-colors"
+                                    className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                                 >
                                     <X className="h-3.5 w-3.5" />
                                     Reinitialiser
@@ -329,9 +329,9 @@ export function DiscoverCatalog() {
                         <div className="space-y-10">
                             {ateliersByRegion.map(([region, artisans]) => (
                                 <div key={region}>
-                                    <h3 className="text-foreground mb-4 text-lg font-semibold">
+                                    <h3 className="mb-4 text-lg font-semibold text-foreground">
                                         {region}{' '}
-                                        <span className="text-muted-foreground font-normal">({artisans.length})</span>
+                                        <span className="font-normal text-muted-foreground">({artisans.length})</span>
                                     </h3>
                                     <div className="grid gap-4 sm:grid-cols-2">
                                         {artisans.map((artisan, index) => {
@@ -344,16 +344,16 @@ export function DiscoverCatalog() {
                                                     transition={{ duration: 0.3, delay: index * 0.03 }}
                                                 >
                                                     <Link href={`/artisans/${artisan.slug}`} className="group block">
-                                                        <div className="bg-card border-border rounded-xl border p-4 transition-shadow hover:shadow-lg">
+                                                        <div className="rounded-xl border border-border bg-card p-4 transition-shadow hover:shadow-lg">
                                                             <div className="flex gap-4">
                                                                 <div className="h-16 w-16 shrink-0 rounded-lg bg-gradient-to-br from-slate-200 to-slate-300" />
                                                                 <div className="flex-1">
                                                                     <div className="flex items-start justify-between gap-2">
                                                                         <div>
-                                                                            <p className="text-foreground font-semibold">
+                                                                            <p className="font-semibold text-foreground">
                                                                                 {artisan.atelierName}
                                                                             </p>
-                                                                            <p className="text-muted-foreground flex items-center gap-1 text-sm">
+                                                                            <p className="flex items-center gap-1 text-sm text-muted-foreground">
                                                                                 <MapPin className="h-3 w-3" />
                                                                                 {artisan.city}
                                                                             </p>
@@ -373,7 +373,7 @@ export function DiscoverCatalog() {
                                                                             </div>
                                                                         )}
                                                                     </div>
-                                                                    <p className="text-muted-foreground mt-2 text-xs">
+                                                                    <p className="mt-2 text-xs text-muted-foreground">
                                                                         {artisanPieces.length} piece
                                                                         {artisanPieces.length !== 1 ? 's' : ''} tracee
                                                                         {artisanPieces.length !== 1 ? 's' : ''}
@@ -396,7 +396,7 @@ export function DiscoverCatalog() {
                             </p>
                             <button
                                 onClick={resetAteliersFilters}
-                                className="text-lumiris-cyan hover:text-lumiris-cyan/80 mt-3 text-sm font-medium transition-colors"
+                                className="mt-3 text-sm font-medium text-lumiris-cyan transition-colors hover:text-lumiris-cyan/80"
                             >
                                 Reinitialiser les filtres
                             </button>
@@ -410,7 +410,7 @@ export function DiscoverCatalog() {
                 {activeTab === 'pieces' ? (
                     <button
                         onClick={() => setActiveTab('ateliers')}
-                        className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm transition-colors"
+                        className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                         Decouvrir les ateliers partenaires
                         <ArrowRight className="h-4 w-4" />
@@ -418,7 +418,7 @@ export function DiscoverCatalog() {
                 ) : (
                     <button
                         onClick={() => setActiveTab('pieces')}
-                        className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm transition-colors"
+                        className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                         Voir les pieces tracees
                         <ArrowRight className="h-4 w-4" />

@@ -1,11 +1,15 @@
-import { useMemo, lazy, Suspense } from 'react';
+'use client';
+
+import { useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { CITY_COORDS } from '@lumiris/mock-data';
 import type { Repairer } from '@lumiris/types';
 import { isLumirisLocal } from '@/lib/repairers/badge';
 
-const RepairersMapClient = lazy(() =>
-    import('./repairers-map.client').then((m) => ({ default: m.RepairersMapClient })),
-);
+const RepairersMapClient = dynamic(() => import('./repairers-map.client').then((m) => m.RepairersMapClient), {
+    ssr: false,
+    loading: () => <MapPlaceholder />,
+});
 
 interface RepairersMapProps {
     repairers: readonly Repairer[];
@@ -39,7 +43,7 @@ export function RepairersMap({ repairers, activeId, onMarkerClick }: RepairersMa
     if (pins.length === 0) {
         return (
             <div
-                className="border-border bg-card text-muted-foreground flex items-center justify-center rounded-2xl border text-[11px] italic"
+                className="flex items-center justify-center rounded-2xl border border-border bg-card text-[11px] text-muted-foreground italic"
                 style={{ height: 220 }}
             >
                 Aucun atelier à afficher sur la carte.
@@ -47,17 +51,13 @@ export function RepairersMap({ repairers, activeId, onMarkerClick }: RepairersMa
         );
     }
 
-    return (
-        <Suspense fallback={<MapPlaceholder />}>
-            <RepairersMapClient pins={pins} activeId={activeId} onMarkerClick={onMarkerClick} />
-        </Suspense>
-    );
+    return <RepairersMapClient pins={pins} activeId={activeId} onMarkerClick={onMarkerClick} />;
 }
 
 function MapPlaceholder() {
     return (
         <div
-            className="border-border bg-card text-muted-foreground flex items-center justify-center rounded-2xl border text-[11px] italic"
+            className="flex items-center justify-center rounded-2xl border border-border bg-card text-[11px] text-muted-foreground italic"
             style={{ height: 220 }}
         >
             Chargement de la carte…

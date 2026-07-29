@@ -26,7 +26,7 @@ export function EventHistoryCard({ passportId }: { passportId: string }) {
             </CardHeader>
             <CardContent>
                 {events.length === 0 ? (
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                         {eventsQuery.isLoading ? 'Chargement…' : 'Aucun événement enregistré.'}
                     </p>
                 ) : (
@@ -34,14 +34,14 @@ export function EventHistoryCard({ passportId }: { passportId: string }) {
                         {events.map((event) => (
                             <li key={event.id} className="flex flex-col gap-0.5">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-muted-foreground text-[11px] uppercase tracking-wider">
+                                    <span className="text-[11px] tracking-wider text-muted-foreground uppercase">
                                         {formatDateFr(event.occurredAt)}
                                     </span>
                                     <Badge variant="secondary" className="text-xs">
                                         {ACTOR_LABELS[event.actorType]}
                                     </Badge>
                                 </div>
-                                <span className="text-foreground whitespace-pre-wrap text-sm">{event.description}</span>
+                                <span className="text-sm whitespace-pre-wrap text-foreground">{event.description}</span>
                             </li>
                         ))}
                     </ul>

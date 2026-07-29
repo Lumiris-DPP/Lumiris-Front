@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { ArrowLeft, FileText, LifeBuoy, Mail, ShieldCheck, Sparkles } from 'lucide-react';
 import { LUMIRIS_WEIGHTS } from '@lumiris/core/scoring';
 import { SectionLabel } from '@/lib/section';
@@ -66,21 +66,21 @@ const LEGAL: readonly LegalLink[] = [
 export function About() {
     return (
         <div className="relative flex h-full flex-col overflow-y-auto pb-28">
-            <header className="px-5 pb-6 pt-[max(env(safe-area-inset-top),3rem)]">
+            <header className="px-5 pt-[max(env(safe-area-inset-top),3rem)] pb-6">
                 <Link
-                    to="/me"
-                    className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs"
+                    href="/me"
+                    className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
                 >
                     <ArrowLeft className="h-3.5 w-3.5" />
                     Profil
                 </Link>
 
                 <div className="mt-6 flex flex-col items-center text-center">
-                    <p className="text-muted-foreground text-[11px] font-semibold uppercase tracking-[0.32em]">
+                    <p className="text-[11px] font-semibold tracking-[0.32em] text-muted-foreground uppercase">
                         Lumiris
                     </p>
-                    <h1 className="text-foreground mt-1 text-3xl font-bold tracking-tight">Vision</h1>
-                    <p className="text-muted-foreground mt-3 text-sm">Scanne. Comprends. Choisis bien.</p>
+                    <h1 className="mt-1 text-3xl font-bold tracking-tight text-foreground">Vision</h1>
+                    <p className="mt-3 text-sm text-muted-foreground">Scanne. Comprends. Choisis bien.</p>
                 </div>
             </header>
 
@@ -103,10 +103,10 @@ export function About() {
                             <PillarCard key={p.label} pillar={p} />
                         ))}
                     </div>
-                    <p className="text-muted-foreground mt-4 text-xs leading-relaxed">
+                    <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
                         Algorithme open et déterministe - chaque score est reproductible à partir du passeport et des
                         coefficients ADEME / Higg / WFN publiés.{' '}
-                        <Link to="/about#scoring-doc" className="text-foreground underline-offset-4 hover:underline">
+                        <Link href="/about#scoring-doc" className="text-foreground underline-offset-4 hover:underline">
                             Documentation complète
                         </Link>
                         .
@@ -114,7 +114,7 @@ export function About() {
                 </Section>
 
                 <Section title="Le DPP textile">
-                    <p className="text-foreground/90 text-sm leading-relaxed">
+                    <p className="text-sm leading-relaxed text-foreground/90">
                         Le passeport produit numérique (DPP) deviendra obligatoire pour toute pièce textile mise sur le
                         marché européen. Le registre central DPP entre en vigueur le <strong>19 juillet 2026</strong>,
                         et l&apos;acte délégué textile précisant les champs obligatoires arrive <strong>mi-2028</strong>
@@ -127,10 +127,10 @@ export function About() {
                     <ul className="flex flex-col gap-3">
                         {TEAM.map((role) => (
                             <li key={role.title} className="flex items-start gap-3">
-                                <span className="bg-foreground/10 mt-1 inline-flex h-1.5 w-1.5 shrink-0 rounded-full" />
+                                <span className="mt-1 inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-foreground/10" />
                                 <div>
-                                    <p className="text-foreground text-sm font-semibold">{role.title}</p>
-                                    <p className="text-muted-foreground text-xs">{role.detail}</p>
+                                    <p className="text-sm font-semibold text-foreground">{role.title}</p>
+                                    <p className="text-xs text-muted-foreground">{role.detail}</p>
                                 </div>
                             </li>
                         ))}
@@ -148,12 +148,12 @@ export function About() {
                                 <li key={link.label}>
                                     {isMail ? (
                                         <a href={link.href} className={className}>
-                                            <Icon className="text-muted-foreground h-4 w-4" />
+                                            <Icon className="h-4 w-4 text-muted-foreground" />
                                             {link.label}
                                         </a>
                                     ) : (
-                                        <Link to={link.href} className={className}>
-                                            <Icon className="text-muted-foreground h-4 w-4" />
+                                        <Link href={link.href} className={className}>
+                                            <Icon className="h-4 w-4 text-muted-foreground" />
                                             {link.label}
                                         </Link>
                                     )}
@@ -163,7 +163,7 @@ export function About() {
                     </ul>
                 </Section>
 
-                <p className="text-muted-foreground/70 mt-2 text-center text-[11px]">
+                <p className="mt-2 text-center text-[11px] text-muted-foreground/70">
                     LUMIRIS Vision · v0.1.0 · Mode démo
                 </p>
             </div>
@@ -175,7 +175,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     return (
         <section className="flex flex-col gap-3">
             <SectionLabel title={title} />
-            <div className="border-border/60 bg-card/60 rounded-2xl border p-4 backdrop-blur-md">{children}</div>
+            <div className="rounded-2xl border border-border/60 bg-card/60 p-4 backdrop-blur-md">{children}</div>
         </section>
     );
 }
@@ -183,8 +183,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function ManifestoLine({ Icon, text }: { Icon: typeof ShieldCheck; text: string }) {
     return (
         <div className="flex items-start gap-3 [&:not(:last-child)]:mb-3">
-            <Icon className="text-lumiris-cyan mt-0.5 h-4 w-4 shrink-0" />
-            <p className="text-foreground/90 text-sm leading-relaxed">{text}</p>
+            <Icon className="mt-0.5 h-4 w-4 shrink-0 text-lumiris-cyan" />
+            <p className="text-sm leading-relaxed text-foreground/90">{text}</p>
         </div>
     );
 }
@@ -192,10 +192,10 @@ function ManifestoLine({ Icon, text }: { Icon: typeof ShieldCheck; text: string 
 function PillarCard({ pillar }: { pillar: ScorePillar }) {
     const percent = Math.round(pillar.weight * 100);
     return (
-        <div className="border-border/60 bg-background/40 flex flex-col gap-1.5 rounded-xl border p-3">
+        <div className="flex flex-col gap-1.5 rounded-xl border border-border/60 bg-background/40 p-3">
             <p className={`${pillar.accent} font-mono text-xl font-bold`}>{percent}%</p>
-            <p className="text-foreground text-xs font-semibold">{pillar.label}</p>
-            <p className="text-muted-foreground text-[11px] leading-snug">{pillar.description}</p>
+            <p className="text-xs font-semibold text-foreground">{pillar.label}</p>
+            <p className="text-[11px] leading-snug text-muted-foreground">{pillar.description}</p>
         </div>
     );
 }

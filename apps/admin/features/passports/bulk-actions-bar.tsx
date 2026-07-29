@@ -61,18 +61,18 @@ export function BulkActionsBar({ rows, selectedIds, onClear }: BulkActionsBarPro
 
     return (
         <TooltipProvider>
-            <div className="border-lumiris-cyan/30 bg-lumiris-cyan/5 flex flex-wrap items-center gap-2 rounded-xl border p-3">
-                <span id="bulk-validate-hint" className="text-foreground text-xs font-medium">
+            <div className="flex flex-wrap items-center gap-2 rounded-xl border border-lumiris-cyan/30 bg-lumiris-cyan/5 p-3">
+                <span id="bulk-validate-hint" className="text-xs font-medium text-foreground">
                     {selectedIds.size} sélectionné(s)
                 </span>
-                <span className="text-muted-foreground text-[10px]">· {eligible.length} éligible(s)</span>
+                <span className="text-[10px] text-muted-foreground">· {eligible.length} éligible(s)</span>
                 <div className="ml-auto flex flex-wrap gap-2">
                     {canCurate ? (
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
                                     size="sm"
-                                    className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 text-primary-foreground gap-1.5"
+                                    className="gap-1.5 bg-lumiris-emerald text-primary-foreground hover:bg-lumiris-emerald/90"
                                     disabled={eligible.length === 0}
                                     onClick={() => setValidateOpen(true)}
                                     aria-describedby="bulk-validate-hint"
@@ -160,7 +160,7 @@ function BulkValidateDialog({ rows, open, onOpenChange, onDone }: BulkDialogProp
                     <AlertDialogTitle>Valider {rows.length} passeport(s)</AlertDialogTitle>
                     <AlertDialogDescription>Grade ≥ B et PendingReview uniquement.</AlertDialogDescription>
                 </AlertDialogHeader>
-                <ul className="border-border bg-muted/30 max-h-48 space-y-1 overflow-y-auto rounded-xl border p-3 text-xs">
+                <ul className="max-h-48 space-y-1 overflow-y-auto rounded-xl border border-border bg-muted/30 p-3 text-xs">
                     {rows.map((r) => (
                         <li key={r.passport.id} className="font-mono text-[11px]">
                             · {r.passport.garment.reference}

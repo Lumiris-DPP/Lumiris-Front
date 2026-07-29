@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { onCLS, onFCP, onFID, onINP, onLCP, onTTFB } from 'web-vitals';
+import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals';
 
 import { initWebVitals } from './web-vitals';
 import type { AppName } from './types';
@@ -35,7 +35,6 @@ export function WebVitals({ app, endpoint, sampleRate, pathname }: WebVitalsProp
 
         onCLS(reporter);
         onFCP(reporter);
-        onFID(reporter);
         onINP(reporter);
         onLCP(reporter);
         onTTFB(reporter);

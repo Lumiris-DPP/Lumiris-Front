@@ -162,14 +162,14 @@ function BlogInner() {
                             size="sm"
                             variant="ghost"
                             onClick={() => setEditingId(null)}
-                            className="text-muted-foreground -ml-2"
+                            className="-ml-2 text-muted-foreground"
                         >
                             ← Retour à la liste
                         </Button>
-                        <h2 className="text-foreground mt-1 text-xl font-semibold">
+                        <h2 className="mt-1 text-xl font-semibold text-foreground">
                             {editing.title || 'Nouvel article'}
                         </h2>
-                        <p className="text-muted-foreground text-xs">
+                        <p className="text-xs text-muted-foreground">
                             {BLOG_CATEGORY_LABEL[editing.category]} · <StatusBadge status={editing.status} />
                         </p>
                     </div>
@@ -223,7 +223,7 @@ function BlogInner() {
                             </AlertDialogTitle>
                             <AlertDialogDescription>
                                 L&apos;article sera publié immédiatement. Slug{' '}
-                                <code className="bg-muted rounded px-1 font-mono">{publishTarget?.slug}</code>.
+                                <code className="rounded bg-muted px-1 font-mono">{publishTarget?.slug}</code>.
                                 L&apos;action est tracée dans l&apos;audit log.
                             </AlertDialogDescription>
                         </AlertDialogHeader>
@@ -262,11 +262,11 @@ function BlogInner() {
         <div className="space-y-5">
             <div className="flex items-baseline justify-between gap-3">
                 <div>
-                    <h2 className="text-foreground text-xl font-semibold">
-                        <BookOpen className="text-lumiris-cyan mr-1.5 inline h-5 w-5" />
+                    <h2 className="text-xl font-semibold text-foreground">
+                        <BookOpen className="mr-1.5 inline h-5 w-5 text-lumiris-cyan" />
                         Blog - Journal LUMIRIS
                     </h2>
-                    <p className="text-muted-foreground mt-1 text-sm">
+                    <p className="mt-1 text-sm text-muted-foreground">
                         {articles.length} articles · 5 catégories · workflow Draft → Review → Published.
                     </p>
                 </div>
@@ -275,9 +275,9 @@ function BlogInner() {
                 </Button>
             </div>
 
-            <div className="border-border bg-card flex flex-wrap items-center gap-2 rounded-xl border p-3">
-                <div className="min-w-55 relative flex-1">
-                    <Search className="text-muted-foreground/60 absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2" />
+            <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card p-3">
+                <div className="relative min-w-55 flex-1">
+                    <Search className="absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/60" />
                     <Input
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
@@ -342,7 +342,7 @@ function BlogInner() {
                 </Select>
             </div>
 
-            <div className="border-border bg-card overflow-hidden rounded-xl border">
+            <div className="overflow-hidden rounded-xl border border-border bg-card">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -367,10 +367,10 @@ function BlogInner() {
                             return (
                                 <TableRow key={a.id} onClick={() => setEditingId(a.id)} className="cursor-pointer">
                                     <TableCell>
-                                        <p className="text-foreground text-sm font-medium">
+                                        <p className="text-sm font-medium text-foreground">
                                             {a.title || '- Sans titre -'}
                                         </p>
-                                        <p className="text-muted-foreground line-clamp-1 text-[11px]">{a.excerpt}</p>
+                                        <p className="line-clamp-1 text-[11px] text-muted-foreground">{a.excerpt}</p>
                                     </TableCell>
                                     <TableCell>
                                         <Badge variant="outline" className="font-mono text-[10px]">
@@ -380,12 +380,12 @@ function BlogInner() {
                                     <TableCell>
                                         <StatusBadge status={a.status} />
                                         {a.scheduledAt && a.status === 'Scheduled' ? (
-                                            <p className="text-lumiris-cyan mt-0.5 font-mono text-[10px]">
+                                            <p className="mt-0.5 font-mono text-[10px] text-lumiris-cyan">
                                                 {new Date(a.scheduledAt).toLocaleDateString('fr-FR')}
                                             </p>
                                         ) : null}
                                         {errors.length > 0 ? (
-                                            <p className="text-lumiris-amber mt-0.5 font-mono text-[10px]">
+                                            <p className="mt-0.5 font-mono text-[10px] text-lumiris-amber">
                                                 {errors.length} bloquant{errors.length > 1 ? 's' : ''}
                                             </p>
                                         ) : null}
@@ -400,12 +400,12 @@ function BlogInner() {
                                                         {linkedArtisan.displayName.slice(0, 2).toUpperCase()}
                                                     </AvatarFallback>
                                                 </Avatar>
-                                                <span className="text-foreground text-xs">
+                                                <span className="text-xs text-foreground">
                                                     {linkedArtisan.atelierName}
                                                 </span>
                                             </div>
                                         ) : (
-                                            <span className="text-muted-foreground/50 text-xs">-</span>
+                                            <span className="text-xs text-muted-foreground/50">-</span>
                                         )}
                                     </TableCell>
                                     <TableCell className="text-right font-mono text-[11px]">
@@ -424,7 +424,7 @@ function BlogInner() {
                                                 <Archive className="h-3.5 w-3.5" />
                                             </Button>
                                         ) : a.status === 'Draft' ? (
-                                            <Trash2 className="text-muted-foreground/30 ml-auto h-3.5 w-3.5" />
+                                            <Trash2 className="ml-auto h-3.5 w-3.5 text-muted-foreground/30" />
                                         ) : null}
                                     </TableCell>
                                 </TableRow>
@@ -432,7 +432,7 @@ function BlogInner() {
                         })}
                         {filtered.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={7} className="text-muted-foreground py-8 text-center text-xs">
+                                <TableCell colSpan={7} className="py-8 text-center text-xs text-muted-foreground">
                                     Aucun article ne correspond aux filtres.
                                 </TableCell>
                             </TableRow>

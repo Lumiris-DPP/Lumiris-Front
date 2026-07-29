@@ -1,5 +1,7 @@
-import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+'use client';
+
+import { useState, type SyntheticEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Armchair, BatteryCharging, Plus, Puzzle, Refrigerator, Shirt, Smartphone } from 'lucide-react';
 import { cn } from '@lumiris/ui/lib/cn';
@@ -22,7 +24,7 @@ const SECTOR_ICON: Record<WardrobeSector, typeof Shirt> = {
 };
 
 export function VaultAdd() {
-    const navigate = useNavigate();
+    const router = useRouter();
     const [sector, setSector] = useState<WardrobeSector>('textile');
     const [productName, setProductName] = useState('');
     const [brand, setBrand] = useState('');
@@ -32,7 +34,7 @@ export function VaultAdd() {
 
     const canSubmit = !submitting && productName.trim().length > 0;
 
-    function onSubmit(event: FormEvent<HTMLFormElement>): void {
+    function onSubmit(event: SyntheticEvent<HTMLFormElement>): void {
         event.preventDefault();
         if (!canSubmit) return;
         setSubmitting(true);
@@ -44,27 +46,27 @@ export function VaultAdd() {
             notes: notes.trim() || undefined,
         });
         toast.success('Produit ajouté à ton inventaire');
-        navigate('/vault');
+        router.push('/vault');
     }
 
     return (
-        <div className="bg-background flex h-full flex-col overflow-y-auto pb-28">
+        <div className="flex h-full flex-col overflow-y-auto bg-background pb-28">
             <motion.header
-                className="flex items-center gap-3 px-4 pb-3 pt-12"
+                className="flex items-center gap-3 px-4 pt-12 pb-3"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
             >
                 <button
                     type="button"
-                    onClick={() => navigate(-1)}
+                    onClick={() => router.back()}
                     aria-label="Retour"
-                    className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full border"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground"
                 >
                     <ArrowLeft className="h-4 w-4" />
                 </button>
                 <div className="min-w-0 flex-1">
-                    <h1 className="text-foreground truncate text-base font-bold">Ajouter un produit</h1>
-                    <p className="text-muted-foreground truncate text-xs">
+                    <h1 className="truncate text-base font-bold text-foreground">Ajouter un produit</h1>
+                    <p className="truncate text-xs text-muted-foreground">
                         Enregistre une pièce sans DPP dans ton inventaire personnel.
                     </p>
                 </div>
@@ -72,7 +74,7 @@ export function VaultAdd() {
 
             <form onSubmit={onSubmit} className="flex flex-col gap-5 px-4">
                 <fieldset className="flex flex-col gap-2">
-                    <legend className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+                    <legend className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                         Secteur
                     </legend>
                     <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Secteur du produit">
@@ -102,7 +104,7 @@ export function VaultAdd() {
                 </fieldset>
 
                 <fieldset className="flex flex-col gap-2">
-                    <legend className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+                    <legend className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                         Nom du produit
                     </legend>
                     <Input
@@ -116,7 +118,7 @@ export function VaultAdd() {
                 </fieldset>
 
                 <fieldset className="flex flex-col gap-2">
-                    <legend className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+                    <legend className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                         Marque (optionnel)
                     </legend>
                     <Input
@@ -129,7 +131,7 @@ export function VaultAdd() {
                 </fieldset>
 
                 <fieldset className="flex flex-col gap-2">
-                    <legend className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+                    <legend className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                         Date d&apos;achat (optionnel)
                     </legend>
                     <Input
@@ -141,7 +143,7 @@ export function VaultAdd() {
                 </fieldset>
 
                 <fieldset className="flex flex-col gap-2">
-                    <legend className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+                    <legend className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                         Notes (optionnel)
                     </legend>
                     <Textarea
@@ -152,7 +154,7 @@ export function VaultAdd() {
                         placeholder="Taille, couleur, achat de seconde main, garantie restante…"
                         aria-label="Notes"
                     />
-                    <p className="text-muted-foreground/70 text-right font-mono text-[10px]">
+                    <p className="text-right font-mono text-[10px] text-muted-foreground/70">
                         {notes.length}/{MAX_NOTES}
                     </p>
                 </fieldset>
@@ -160,13 +162,13 @@ export function VaultAdd() {
                 <button
                     type="submit"
                     disabled={!canSubmit}
-                    className="bg-foreground text-primary-foreground inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold disabled:opacity-50"
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50"
                 >
                     <Plus className="h-4 w-4" />
                     Ajouter à l&apos;inventaire
                 </button>
 
-                <p className="text-muted-foreground/80 text-center text-[10px]">
+                <p className="text-center text-[10px] text-muted-foreground/80">
                     Cette pièce reste personnelle - elle ne crée pas de DPP et n&apos;est pas publiée sur LUMIRIS.
                 </p>
             </form>

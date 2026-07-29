@@ -33,10 +33,10 @@ export function MethodeGovernance() {
                     transition={{ duration: 0.5 }}
                     className="mb-12 text-center"
                 >
-                    <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                         Gouvernance et audit
                     </h2>
-                    <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg">
+                    <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
                         Comment nous garantissons l&apos;intégrité de la méthodologie dans le temps.
                     </p>
                 </motion.div>
@@ -50,12 +50,12 @@ export function MethodeGovernance() {
                             viewport={{ once: true, margin: '-50px' }}
                             transition={{ duration: 0.4, delay: index * 0.1 }}
                         >
-                            <div className="bg-card border-border h-full rounded-xl border p-6 text-center">
-                                <div className="bg-muted mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl">
-                                    <item.icon className="text-foreground h-6 w-6" />
+                            <div className="h-full rounded-xl border border-border bg-card p-6 text-center">
+                                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
+                                    <item.icon className="h-6 w-6 text-foreground" />
                                 </div>
-                                <h3 className="text-foreground font-semibold">{item.title}</h3>
-                                <p className="text-muted-foreground mt-2 text-sm leading-relaxed">{item.description}</p>
+                                <h3 className="font-semibold text-foreground">{item.title}</h3>
+                                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
                             </div>
                         </motion.div>
                     ))}
@@ -71,7 +71,7 @@ export function MethodeGovernance() {
                 >
                     <Link
                         href="/charte-independance"
-                        className="text-lumiris-cyan hover:text-lumiris-cyan/80 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-lumiris-cyan transition-colors hover:text-lumiris-cyan/80"
                     >
                         Lire notre charte d&apos;indépendance
                         <ArrowRight className="h-4 w-4" />

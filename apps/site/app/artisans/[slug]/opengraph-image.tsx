@@ -36,7 +36,7 @@ export default async function Image({ params }: OgProps) {
             }}
         >
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                {/* eslint-disable-next-line @next/next/no-img-element -- next/og renders via Satori, not the DOM */}
+                {}
                 <img src={OG_LOGO_DATA_URI} width={51} height={36} alt="" />
                 <div style={{ display: 'flex', fontSize: 20, letterSpacing: 4, color: '#475569' }}>
                     LUMIRIS · ARTISAN {tier ? `· ${tier.toUpperCase()}` : ''}

@@ -113,7 +113,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
                     <button
                         type="button"
                         onClick={() => setForm((f) => ({ ...f, batchNumber: generateId('LOT') }))}
-                        className="border-border text-muted-foreground hover:border-lumiris-cyan hover:text-lumiris-cyan shrink-0 rounded-md border px-3 text-xs transition-colors"
+                        className="shrink-0 rounded-md border border-border px-3 text-xs text-muted-foreground transition-colors hover:border-lumiris-cyan hover:text-lumiris-cyan"
                     >
                         Générer
                     </button>
@@ -130,7 +130,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
                     value={form.quantity ?? 1}
                     onChange={(e) => setForm((f) => ({ ...f, quantity: Math.max(1, Number(e.target.value) || 1) }))}
                 />
-                <p className="text-muted-foreground text-[11px]">
+                <p className="text-[11px] text-muted-foreground">
                     Combien de pièces pour ce passeport. Sert de stock initial si vous convertissez ce DPP en produit.
                 </p>
             </div>
@@ -149,7 +149,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
                     <button
                         type="button"
                         onClick={() => setForm((f) => ({ ...f, gtin: generateId('EAN') }))}
-                        className="border-border text-muted-foreground hover:border-lumiris-cyan hover:text-lumiris-cyan shrink-0 rounded-md border px-3 text-xs transition-colors"
+                        className="shrink-0 rounded-md border border-border px-3 text-xs text-muted-foreground transition-colors hover:border-lumiris-cyan hover:text-lumiris-cyan"
                     >
                         Générer
                     </button>
@@ -169,7 +169,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
                     <button
                         type="button"
                         onClick={() => setForm((f) => ({ ...f, sku: generateId('SKU') }))}
-                        className="border-border text-muted-foreground hover:border-lumiris-cyan hover:text-lumiris-cyan shrink-0 rounded-md border px-3 text-xs transition-colors"
+                        className="shrink-0 rounded-md border border-border px-3 text-xs text-muted-foreground transition-colors hover:border-lumiris-cyan hover:text-lumiris-cyan"
                     >
                         Générer
                     </button>
@@ -177,7 +177,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
             </div>
 
             {/* Conformité REACH */}
-            <div className="border-border bg-muted/30 space-y-3 rounded-lg border p-4 md:col-span-2">
+            <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-4 md:col-span-2">
                 <div className="flex items-start gap-3">
                     <Checkbox
                         id="reach"
@@ -186,12 +186,12 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
                         className="mt-0.5"
                     />
                     <div className="space-y-1">
-                        <label htmlFor="reach" className="cursor-pointer text-sm font-medium leading-snug">
+                        <label htmlFor="reach" className="cursor-pointer text-sm leading-snug font-medium">
                             Je certifie que ce produit respecte les réglementations européennes REACH (absence de
                             colorants azoïques interdits et substances toxiques).{' '}
                             <span className="text-destructive">*</span>
                         </label>
-                        <p className="text-muted-foreground text-[11px]">
+                        <p className="text-[11px] text-muted-foreground">
                             Obligatoire pour vendre en Europe. Vos fournisseurs de tissus doivent vous fournir cette
                             garantie.
                         </p>
@@ -213,7 +213,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
             </div>
 
             {/* Documents techniques */}
-            <div className="border-border space-y-4 rounded-lg border p-4 md:col-span-2">
+            <div className="space-y-4 rounded-lg border border-border p-4 md:col-span-2">
                 <p className="text-sm font-medium">Documents de conformité & traçabilité</p>
 
                 <DocUploadField

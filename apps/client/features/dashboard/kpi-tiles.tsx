@@ -37,12 +37,12 @@ function KpiCard({ label, value, hint, suffix = '' }: KpiCardProps) {
     return (
         <Card>
             <CardContent className="p-5">
-                <p className="text-muted-foreground text-[11px] font-medium uppercase tracking-wider">{label}</p>
-                <p className="text-foreground mt-2 font-mono text-3xl font-semibold tabular-nums">
+                <p className="text-[11px] font-medium tracking-wider text-muted-foreground uppercase">{label}</p>
+                <p className="mt-2 font-mono text-3xl font-semibold text-foreground tabular-nums">
                     {value}
-                    {suffix && <span className="text-muted-foreground/70 ml-1 text-sm font-normal">{suffix}</span>}
+                    {suffix && <span className="ml-1 text-sm font-normal text-muted-foreground/70">{suffix}</span>}
                 </p>
-                <p className="text-muted-foreground mt-1 text-xs">{hint}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
             </CardContent>
         </Card>
     );

@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+'use client';
+
+import Link from 'next/link';
 import { ArrowRight, Store } from 'lucide-react';
 import { GRADE_LABEL, IrisGrade } from '@lumiris/scoring-ui';
 import type { Artisan, Passport, ScoreResult } from '@lumiris/types';
@@ -31,41 +33,41 @@ export function ScanResultModal({ passport, artisan, score, onClose, onOpen }: S
         <Sheet defaultOpen onOpenChange={(open) => (open ? null : onClose())}>
             <SheetContent
                 side="bottom"
-                className="mx-auto max-h-[82vh] max-w-md overflow-y-auto rounded-t-3xl px-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] pt-8"
+                className="mx-auto max-h-[82vh] max-w-md overflow-y-auto rounded-t-3xl px-6 pt-8 pb-[max(env(safe-area-inset-bottom),1.5rem)]"
             >
                 <SheetTitle className="sr-only">Passeport détecté</SheetTitle>
                 <div className="flex flex-col items-center gap-5">
                     <IrisGrade grade={score.grade} size="xl" tone="solid" shape="pill" />
                     <div className="flex flex-col items-center gap-1 text-center">
-                        <p className="text-foreground text-base font-semibold">{passport.garment.reference}</p>
-                        <p className="text-muted-foreground text-sm">{subLabel}</p>
-                        <p className="text-muted-foreground/80 text-sm">{GRADE_LABEL[score.grade]}</p>
+                        <p className="text-base font-semibold text-foreground">{passport.garment.reference}</p>
+                        <p className="text-sm text-muted-foreground">{subLabel}</p>
+                        <p className="text-sm text-muted-foreground/80">{GRADE_LABEL[score.grade]}</p>
                     </div>
                     <button
                         type="button"
                         onClick={onOpen}
-                        className="bg-foreground text-background hover:bg-foreground/90 inline-flex h-14 w-full items-center justify-center rounded-2xl text-sm font-semibold"
+                        className="inline-flex h-14 w-full items-center justify-center rounded-2xl bg-foreground text-sm font-semibold text-background hover:bg-foreground/90"
                     >
                         Ouvrir le passeport
                     </button>
                 </div>
 
                 {showAlternatives ? (
-                    <section className="border-border/60 mt-6 border-t pt-5">
+                    <section className="mt-6 border-t border-border/60 pt-5">
                         <div className="mb-3 flex items-center justify-between gap-3">
                             <div className="flex items-center gap-2">
-                                <Store className="text-primary h-4 w-4" strokeWidth={1.5} aria-hidden />
-                                <h3 className="text-foreground text-sm font-semibold">Alternatives artisanes</h3>
+                                <Store className="h-4 w-4 text-primary" strokeWidth={1.5} aria-hidden />
+                                <h3 className="text-sm font-semibold text-foreground">Alternatives artisanes</h3>
                             </div>
                             <Link
-                                to="/boutique"
-                                className="text-primary inline-flex items-center gap-1 text-xs font-semibold"
+                                href="/boutique"
+                                className="inline-flex items-center gap-1 text-xs font-semibold text-primary"
                             >
                                 Voir le catalogue
                                 <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
                             </Link>
                         </div>
-                        <p className="text-muted-foreground mb-3 text-pretty text-xs leading-relaxed">
+                        <p className="mb-3 text-xs leading-relaxed text-pretty text-muted-foreground">
                             Cette pièce est peu transparente. Voici des alternatives au passeport vérifié, à score Iris
                             égal ou supérieur.
                         </p>
@@ -83,7 +85,7 @@ export function ScanResultModal({ passport, artisan, score, onClose, onOpen }: S
                                 ))}
                             </ul>
                         ) : (
-                            <p className="text-muted-foreground text-xs">
+                            <p className="text-xs text-muted-foreground">
                                 Aucune alternative disponible pour l’instant.
                             </p>
                         )}
@@ -99,7 +101,7 @@ function SuggestionSkeleton() {
         <ul className="-mx-1 flex gap-3 overflow-hidden px-1 pb-1">
             {Array.from({ length: 3 }).map((_, i) => (
                 <li key={i} className="w-40 shrink-0">
-                    <div className="bg-card border-border/60 h-44 animate-pulse rounded-2xl border" />
+                    <div className="h-44 animate-pulse rounded-2xl border border-border/60 bg-card" />
                 </li>
             ))}
         </ul>
@@ -112,7 +114,7 @@ function SuggestionSkeleton() {
 function SuggestionError({ online, onRetry }: { online: boolean; onRetry: () => void }) {
     return (
         <div className="flex flex-col items-start gap-1.5">
-            <p className="text-muted-foreground text-xs">
+            <p className="text-xs text-muted-foreground">
                 {online
                     ? 'Impossible de charger les alternatives pour le moment.'
                     : 'Vous êtes hors-ligne — les alternatives nécessitent une connexion.'}
@@ -121,7 +123,7 @@ function SuggestionError({ online, onRetry }: { online: boolean; onRetry: () => 
                 <button
                     type="button"
                     onClick={onRetry}
-                    className="text-foreground text-xs font-semibold underline-offset-4 hover:underline"
+                    className="text-xs font-semibold text-foreground underline-offset-4 hover:underline"
                 >
                     Réessayer
                 </button>

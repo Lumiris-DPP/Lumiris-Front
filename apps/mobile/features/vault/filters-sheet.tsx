@@ -101,8 +101,8 @@ export function FiltersSheet({
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent side="bottom" className="mx-auto max-h-[85vh] max-w-md overflow-y-auto rounded-t-2xl pb-8">
-                <SheetHeader className="pb-3 pt-5">
-                    <SheetTitle className="text-foreground text-base">Filtres &amp; tri</SheetTitle>
+                <SheetHeader className="pt-5 pb-3">
+                    <SheetTitle className="text-base text-foreground">Filtres &amp; tri</SheetTitle>
                     <SheetDescription>Affine ton inventaire.</SheetDescription>
                 </SheetHeader>
 
@@ -140,7 +140,7 @@ export function FiltersSheet({
                                     const checked = draft.kinds.includes(kind);
                                     return (
                                         <li key={kind}>
-                                            <label className="border-border bg-card hover:bg-muted/30 flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 text-sm">
+                                            <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-card px-3 py-2.5 text-sm hover:bg-muted/30">
                                                 <Checkbox
                                                     checked={checked}
                                                     onCheckedChange={() => toggleKind(kind)}
@@ -190,7 +190,7 @@ export function FiltersSheet({
                             {SORT_OPTIONS.map((opt) => (
                                 <label
                                     key={opt.value}
-                                    className="border-border bg-card hover:bg-muted/30 flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 text-sm"
+                                    className="flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-card px-3 py-2.5 text-sm hover:bg-muted/30"
                                 >
                                     <RadioGroupItem value={opt.value} />
                                     <span className="text-foreground">{opt.label}</span>
@@ -199,18 +199,18 @@ export function FiltersSheet({
                         </RadioGroup>
                     </Section>
 
-                    <div className="border-border/50 flex items-center justify-between gap-3 border-t pt-4">
+                    <div className="flex items-center justify-between gap-3 border-t border-border/50 pt-4">
                         <button
                             type="button"
                             onClick={reset}
-                            className="text-foreground/70 hover:text-foreground inline-flex items-center rounded-full px-4 py-2 text-sm font-medium"
+                            className="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium text-foreground/70 hover:text-foreground"
                         >
                             Réinitialiser
                         </button>
                         <button
                             type="button"
                             onClick={apply}
-                            className="bg-foreground text-primary-foreground inline-flex flex-1 items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold active:scale-95"
+                            className="inline-flex flex-1 items-center justify-center rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-primary-foreground active:scale-95"
                         >
                             Appliquer
                         </button>

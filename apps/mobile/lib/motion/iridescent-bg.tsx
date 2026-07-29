@@ -12,7 +12,7 @@ export function IridescentBackground({ intensity = 'default' }: IridescentBackgr
     return (
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
             <motion.div
-                className="absolute -right-24 -top-24 h-[40vh] w-[40vh] rounded-full blur-[100px] motion-reduce:hidden"
+                className="absolute -top-24 -right-24 h-[40vh] w-[40vh] rounded-full blur-[100px] motion-reduce:hidden"
                 style={{
                     background: 'radial-gradient(circle, #06b6d4, #8021f3, transparent)',
                     opacity: opacityA,

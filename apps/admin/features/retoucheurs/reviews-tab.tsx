@@ -81,16 +81,16 @@ export function ReviewsTab({ retoucheur, overlay, canModerate, onPatchOverlay, o
                 return (
                     <div
                         key={rev.id}
-                        className={cn('border-border bg-card rounded-xl border p-3', isHidden && 'opacity-60')}
+                        className={cn('rounded-xl border border-border bg-card p-3', isHidden && 'opacity-60')}
                     >
                         <div className="flex items-baseline justify-between">
-                            <p className="text-foreground font-medium">{rev.author}</p>
+                            <p className="font-medium text-foreground">{rev.author}</p>
                             <span className="font-mono text-[10px]">
-                                <Star className="text-lumiris-amber inline h-3 w-3 fill-current" /> {rev.rating}/5 ·{' '}
+                                <Star className="inline h-3 w-3 fill-current text-lumiris-amber" /> {rev.rating}/5 ·{' '}
                                 {rev.ts}
                             </span>
                         </div>
-                        <p className="text-foreground mt-1.5">{rev.text}</p>
+                        <p className="mt-1.5 text-foreground">{rev.text}</p>
                         {isHidden ? (
                             <div className="mt-2 space-y-1.5">
                                 <p className="text-muted-foreground italic">Avis masqué — raison : {hidden[rev.id]}</p>
@@ -99,7 +99,7 @@ export function ReviewsTab({ retoucheur, overlay, canModerate, onPatchOverlay, o
                                     variant="ghost"
                                     onClick={() => handlePublish(rev.id)}
                                     disabled={!canModerate}
-                                    className="text-lumiris-emerald h-7 text-[11px]"
+                                    className="h-7 text-[11px] text-lumiris-emerald"
                                 >
                                     Publier
                                 </Button>
@@ -110,7 +110,7 @@ export function ReviewsTab({ retoucheur, overlay, canModerate, onPatchOverlay, o
                                 variant="ghost"
                                 onClick={() => setPendingHideId(rev.id)}
                                 disabled={!canModerate}
-                                className="text-lumiris-rose mt-2 h-7 text-[11px]"
+                                className="mt-2 h-7 text-[11px] text-lumiris-rose"
                             >
                                 Masquer
                             </Button>

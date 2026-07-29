@@ -30,7 +30,7 @@ export function AttentionBlock({
             <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium">À traiter</CardTitle>
             </CardHeader>
-            <CardContent className="divide-border divide-y">
+            <CardContent className="divide-y divide-border">
                 <Row
                     icon={<Clock className="h-4 w-4 text-lumiris-amber" />}
                     label="Certifs qui expirent"
@@ -48,7 +48,7 @@ export function AttentionBlock({
                 <div className="flex items-center justify-between py-2.5">
                     <div className="flex items-center gap-2">
                         <BarChart3 className="h-4 w-4 text-lumiris-cyan" />
-                        <span className="text-foreground text-sm">Quota du plan</span>
+                        <span className="text-sm text-foreground">Quota du plan</span>
                     </div>
                     <div className="flex items-center gap-3">
                         <span className="font-mono text-xs tabular-nums">
@@ -56,7 +56,7 @@ export function AttentionBlock({
                         </span>
                         {!unlimited && <Progress value={Math.min(100, quota.percent)} className="h-1.5 w-24" />}
                         {overThreshold && (
-                            <Link href="/subscription" className="text-lumiris-cyan text-xs hover:underline">
+                            <Link href="/subscription" className="text-xs text-lumiris-cyan hover:underline">
                                 Mettre à niveau →
                             </Link>
                         )}
@@ -64,8 +64,8 @@ export function AttentionBlock({
                 </div>
                 {esprWindowOpen && (
                     <div className="flex items-center gap-2 py-2.5">
-                        <ShieldCheck className="text-lumiris-cyan h-4 w-4" />
-                        <span className="text-foreground text-sm">
+                        <ShieldCheck className="h-4 w-4 text-lumiris-cyan" />
+                        <span className="text-sm text-foreground">
                             ESPR — DPP textile obligatoire mi-2028. {publishedCount} passeport
                             {publishedCount > 1 ? 's' : ''} prêt{publishedCount > 1 ? 's' : ''}.
                         </span>
@@ -88,15 +88,15 @@ function Row({ icon, label, count, href, emptyLabel }: RowProps) {
     return (
         <Link
             href={href}
-            className="hover:bg-muted/40 -mx-2 flex items-center justify-between rounded-md px-2 py-2.5 transition-colors"
+            className="-mx-2 flex items-center justify-between rounded-md px-2 py-2.5 transition-colors hover:bg-muted/40"
         >
             <div className="flex items-center gap-2">
                 {icon}
-                <span className="text-foreground text-sm">{label}</span>
+                <span className="text-sm text-foreground">{label}</span>
             </div>
             <span
                 className={
-                    count === 0 ? 'text-muted-foreground text-xs' : 'text-foreground font-mono text-sm font-medium'
+                    count === 0 ? 'text-xs text-muted-foreground' : 'font-mono text-sm font-medium text-foreground'
                 }
             >
                 {count === 0 ? emptyLabel : count}

@@ -55,7 +55,7 @@ function DataTableFilters({ search, filters, advanced, onReset, rightSlot, class
             {search ? (
                 <div className="relative w-full md:w-[280px]">
                     <Search
-                        className="text-muted-foreground pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2"
+                        className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground"
                         aria-hidden
                     />
                     <Input
@@ -94,7 +94,7 @@ function DataTableFilters({ search, filters, advanced, onReset, rightSlot, class
                         </Button>
                     </SheetTrigger>
                     <SheetContent side="right" className="w-full sm:max-w-md">
-                        <SheetHeader className="border-border border-b">
+                        <SheetHeader className="border-b border-border">
                             <SheetTitle>{advanced.title ?? 'Filtres avancés'}</SheetTitle>
                             {advanced.description ? <SheetDescription>{advanced.description}</SheetDescription> : null}
                         </SheetHeader>
@@ -103,7 +103,7 @@ function DataTableFilters({ search, filters, advanced, onReset, rightSlot, class
                 </Sheet>
             ) : null}
             {onReset && hasActiveFilter ? (
-                <Button variant="ghost" size="sm" onClick={onReset} className="text-muted-foreground gap-1">
+                <Button variant="ghost" size="sm" onClick={onReset} className="gap-1 text-muted-foreground">
                     <X className="size-3.5" aria-hidden />
                     Réinitialiser
                 </Button>

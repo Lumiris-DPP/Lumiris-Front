@@ -70,7 +70,7 @@ export function RepairersMapClient({ pins, activeId, onMarkerClick }: RepairersM
     }, [activeId]);
 
     return (
-        <div className="border-border relative overflow-hidden rounded-2xl border" style={{ height: 220 }}>
+        <div className="relative overflow-hidden rounded-2xl border border-border" style={{ height: 220 }}>
             <MapContainer
                 center={initial}
                 zoom={6}

@@ -14,7 +14,7 @@ export function RecentPassports({ items }: { items: readonly ScoredPassport[] })
             <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                     <CardTitle>Derniers passeports</CardTitle>
-                    <p className="text-muted-foreground text-xs">5 plus récemment modifiés</p>
+                    <p className="text-xs text-muted-foreground">5 plus récemment modifiés</p>
                 </div>
                 <Button variant="ghost" size="sm" asChild>
                     <Link href="/passports">
@@ -22,9 +22,9 @@ export function RecentPassports({ items }: { items: readonly ScoredPassport[] })
                     </Link>
                 </Button>
             </CardHeader>
-            <CardContent className="divide-border divide-y">
+            <CardContent className="divide-y divide-border">
                 {items.length === 0 ? (
-                    <p className="text-muted-foreground py-6 text-center text-sm">
+                    <p className="py-6 text-center text-sm text-muted-foreground">
                         <FileText className="mx-auto mb-2 h-6 w-6 opacity-40" />
                         Aucun passeport - démarrez par la création.
                     </p>
@@ -33,20 +33,20 @@ export function RecentPassports({ items }: { items: readonly ScoredPassport[] })
                         <Link
                             key={passport.id}
                             href={`/passports/${passport.id}`}
-                            className="hover:bg-muted/50 -mx-3 flex items-center gap-4 rounded-md px-3 py-3 transition-colors"
+                            className="-mx-3 flex items-center gap-4 rounded-md px-3 py-3 transition-colors hover:bg-muted/50"
                         >
                             <IrisGrade grade={score.grade} size="sm" />
                             <div className="min-w-0 flex-1">
-                                <p className="text-foreground truncate text-sm font-medium">
+                                <p className="truncate text-sm font-medium text-foreground">
                                     {passport.garment.reference || 'Brouillon sans référence'}
                                 </p>
-                                <p className="text-muted-foreground text-xs">
+                                <p className="text-xs text-muted-foreground">
                                     {passport.garment.kind} · modifié le {formatDateFr(passport.updatedAt)}
                                 </p>
                             </div>
                             <AtelierStatusBadge status={passport.status} />
                             <MissingFieldsBadge passport={passport} className="hidden lg:inline-flex" />
-                            <span className="text-muted-foreground hidden font-mono text-xs sm:inline">
+                            <span className="hidden font-mono text-xs text-muted-foreground sm:inline">
                                 {score.total.toFixed(1)}/100
                             </span>
                         </Link>

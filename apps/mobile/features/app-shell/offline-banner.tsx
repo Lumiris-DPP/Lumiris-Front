@@ -13,7 +13,7 @@ export function OfflineBanner() {
                 <motion.div
                     role="status"
                     aria-live="polite"
-                    className="bg-lumiris-amber/15 text-lumiris-amber border-lumiris-amber/30 flex items-center justify-center gap-2 border-b px-4 py-2 text-[11px] font-medium leading-tight"
+                    className="flex items-center justify-center gap-2 border-b border-lumiris-amber/30 bg-lumiris-amber/15 px-4 py-2 text-[11px] leading-tight font-medium text-lumiris-amber"
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}

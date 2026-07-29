@@ -8,7 +8,7 @@ export function ListSkeleton({ count = 5 }: ListSkeletonProps) {
     return (
         <ul className="flex flex-col gap-4" aria-hidden>
             {Array.from({ length: count }, (_, i) => (
-                <li key={i} className="bg-card border-border/60 opal-shadow flex gap-3 rounded-2xl border p-3.5">
+                <li key={i} className="opal-shadow flex gap-3 rounded-2xl border border-border/60 bg-card p-3.5">
                     <Skeleton className="h-16 w-16 shrink-0 rounded-xl" />
                     <div className="flex flex-1 flex-col gap-2 py-1">
                         <Skeleton className="h-4 w-2/3" />

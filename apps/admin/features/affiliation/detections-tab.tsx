@@ -230,7 +230,7 @@ export function DetectionsTab({
                     description="Aucune fraude ni anomalie active ne correspond aux filtres."
                 />
             ) : (
-                <ul className="border-border bg-card divide-border divide-y rounded-xl border">
+                <ul className="divide-y divide-border rounded-xl border border-border bg-card">
                     {filtered.map((item) =>
                         item.kind === 'fraud' ? (
                             <FraudCaseCard key={item.id} item={item} onOpen={() => setOpenCaseId(item.case.event.id)} />
@@ -241,9 +241,9 @@ export function DetectionsTab({
                 </ul>
             )}
 
-            <div className="border-border bg-card flex flex-wrap items-center gap-3 rounded-xl border p-3 text-xs">
-                <Label htmlFor="anon-threshold" className="text-foreground inline-flex items-center gap-2">
-                    <AlertTriangle className="text-lumiris-amber h-3.5 w-3.5" aria-hidden /> Seuil anonymisation auto
+            <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-3 text-xs">
+                <Label htmlFor="anon-threshold" className="inline-flex items-center gap-2 text-foreground">
+                    <AlertTriangle className="h-3.5 w-3.5 text-lumiris-amber" aria-hidden /> Seuil anonymisation auto
                 </Label>
                 <Input
                     id="anon-threshold"
@@ -253,7 +253,7 @@ export function DetectionsTab({
                     onChange={(e) => setThresholdDraft(e.target.value)}
                     className="h-8 w-20 font-mono text-xs"
                 />
-                <span className="text-muted-foreground text-[11px]">
+                <span className="text-[11px] text-muted-foreground">
                     jours (défaut : {ANONYMISATION_THRESHOLD_DAYS} j).
                 </span>
                 <Button
@@ -324,14 +324,14 @@ function FraudCaseCard({ item, onOpen }: { item: Extract<DetectionItem, { kind: 
             <button
                 type="button"
                 onClick={onOpen}
-                className="hover:bg-muted/40 flex w-full items-start gap-3 px-4 py-3 text-left"
+                className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-muted/40"
             >
-                <TriangleAlert className="text-lumiris-rose mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0 text-lumiris-rose" aria-hidden />
                 <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-baseline gap-2">
                         <Badge
                             variant="outline"
-                            className="border-lumiris-rose/40 text-lumiris-rose font-mono text-[10px]"
+                            className="border-lumiris-rose/40 font-mono text-[10px] text-lumiris-rose"
                         >
                             Fraude
                         </Badge>
@@ -341,9 +341,9 @@ function FraudCaseCard({ item, onOpen }: { item: Extract<DetectionItem, { kind: 
                         >
                             {FRAUD_PATTERN_LABEL[fraudCase.pattern]}
                         </Badge>
-                        <p className="text-foreground text-sm">{fraudCase.event.beneficiaryDisplayName}</p>
+                        <p className="text-sm text-foreground">{fraudCase.event.beneficiaryDisplayName}</p>
                     </div>
-                    <p className="text-muted-foreground mt-0.5 font-mono text-[11px]">
+                    <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">
                         {fraudCase.event.id} · {fraudCase.event.commission.amountEur.toFixed(2)} € ·{' '}
                         {new Date(fraudCase.event.occurredAt).toLocaleString('fr-FR')}
                     </p>
@@ -351,7 +351,7 @@ function FraudCaseCard({ item, onOpen }: { item: Extract<DetectionItem, { kind: 
                 <Badge variant="outline" className={cn('font-mono text-[10px]', FRAUD_STATUS_TONE[status])}>
                     {FRAUD_STATUS_LABEL[status]}
                 </Badge>
-                <ChevronRight className="text-muted-foreground mt-1 h-3.5 w-3.5" aria-hidden />
+                <ChevronRight className="mt-1 h-3.5 w-3.5 text-muted-foreground" aria-hidden />
             </button>
         </li>
     );
@@ -377,7 +377,7 @@ function AnomalyCard({
                 <div className="flex flex-wrap items-baseline gap-2">
                     <Badge
                         variant="outline"
-                        className="border-lumiris-amber/40 text-lumiris-amber font-mono text-[10px]"
+                        className="border-lumiris-amber/40 font-mono text-[10px] text-lumiris-amber"
                     >
                         Anomalie
                     </Badge>
@@ -392,10 +392,10 @@ function AnomalyCard({
                     >
                         {alert.partnerName}
                     </Badge>
-                    <p className="text-foreground text-sm">{alert.title}</p>
+                    <p className="text-sm text-foreground">{alert.title}</p>
                 </div>
-                <p className="text-muted-foreground mt-0.5 text-[11px]">{alert.detail}</p>
-                <p className="text-muted-foreground mt-0.5 font-mono text-[10px]">
+                <p className="mt-0.5 text-[11px] text-muted-foreground">{alert.detail}</p>
+                <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">
                     {new Date(alert.occurredAt).toLocaleString('fr-FR')} · {alert.eventIds.length} évén.
                 </p>
             </div>
@@ -406,7 +406,7 @@ function AnomalyCard({
             ) : (
                 <Badge
                     variant="outline"
-                    className="border-lumiris-emerald/40 text-lumiris-emerald font-mono text-[10px]"
+                    className="border-lumiris-emerald/40 font-mono text-[10px] text-lumiris-emerald"
                 >
                     Résolu
                 </Badge>
@@ -418,7 +418,7 @@ function AnomalyCard({
 function Kpi({ label, value, tone }: { label: string; value: string; tone: string }) {
     return (
         <div>
-            <p className="text-muted-foreground text-[10px] uppercase tracking-wider">{label}</p>
+            <p className="text-[10px] tracking-wider text-muted-foreground uppercase">{label}</p>
             <p className={cn('mt-1 font-mono text-2xl font-semibold', tone)}>{value}</p>
         </div>
     );

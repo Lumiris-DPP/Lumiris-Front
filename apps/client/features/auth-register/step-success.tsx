@@ -20,13 +20,13 @@ export function StepSuccess({ name }: StepSuccessProps) {
 
     return (
         <div className="flex flex-col items-center gap-6 py-4 text-center">
-            <div className="bg-lumiris-emerald/10 flex h-16 w-16 items-center justify-center rounded-full">
-                <CheckCircle2 className="text-lumiris-emerald h-8 w-8" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-lumiris-emerald/10">
+                <CheckCircle2 className="h-8 w-8 text-lumiris-emerald" />
             </div>
 
             <div>
-                <h2 className="text-foreground text-lg font-semibold">Bienvenue {firstName} !</h2>
-                <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+                <h2 className="text-lg font-semibold text-foreground">Bienvenue {firstName} !</h2>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                     Votre compte a été créé avec succès.
                     <br />
                     Vous allez être redirigé vers le tableau de bord…
@@ -35,7 +35,7 @@ export function StepSuccess({ name }: StepSuccessProps) {
 
             <Button
                 onClick={() => router.replace('/dashboard')}
-                className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 h-10 w-full text-white"
+                className="h-10 w-full bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90"
             >
                 Aller au tableau de bord
             </Button>

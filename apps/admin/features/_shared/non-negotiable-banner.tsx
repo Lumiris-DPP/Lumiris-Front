@@ -14,7 +14,7 @@ export function NonNegotiableBanner({ rule, className }: NonNegotiableBannerProp
             role="note"
             aria-label="Règle non-négociable LUMIRIS"
             className={cn(
-                'border-lumiris-amber/30 bg-lumiris-amber/5 text-lumiris-amber flex h-9 items-center gap-2 rounded-md border px-3 text-xs font-medium',
+                'flex h-9 items-center gap-2 rounded-md border border-lumiris-amber/30 bg-lumiris-amber/5 px-3 text-xs font-medium text-lumiris-amber',
                 className,
             )}
         >

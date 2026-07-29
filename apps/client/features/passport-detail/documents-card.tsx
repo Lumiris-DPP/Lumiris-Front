@@ -27,12 +27,12 @@ function DocumentRow({ doc }: { doc: DppFormDocument }) {
     return (
         <div className="flex items-center justify-between gap-3 rounded-lg border px-3 py-2.5">
             <div className="flex min-w-0 items-center gap-2.5">
-                <FileText className="text-muted-foreground h-4 w-4 shrink-0" />
+                <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <div className="min-w-0">
-                    <p className="text-foreground truncate text-sm font-medium">
+                    <p className="truncate text-sm font-medium text-foreground">
                         {DOC_TYPE_LABELS[doc.documentType ?? ''] ?? doc.documentType}
                     </p>
-                    <p className="text-muted-foreground truncate text-[11px]">{doc.filename}</p>
+                    <p className="truncate text-[11px] text-muted-foreground">{doc.filename}</p>
                 </div>
             </div>
             {doc.url && (
@@ -41,7 +41,7 @@ function DocumentRow({ doc }: { doc: DppFormDocument }) {
                     download={doc.filename ?? undefined}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-foreground shrink-0 transition-colors"
+                    className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
                     aria-label={`Télécharger ${doc.filename ?? 'le document'}`}
                 >
                     <Download className="h-4 w-4" />
@@ -66,8 +66,8 @@ export function DocumentsCard({ documents }: { documents: DppFormDocument[] }) {
                     return (
                         <div key={key} className="space-y-2">
                             <div>
-                                <p className="text-foreground text-sm font-medium">{label}</p>
-                                <p className="text-muted-foreground text-[11px]">{description}</p>
+                                <p className="text-sm font-medium text-foreground">{label}</p>
+                                <p className="text-[11px] text-muted-foreground">{description}</p>
                             </div>
                             <div className="space-y-1.5">
                                 {group.map((doc, i) => (

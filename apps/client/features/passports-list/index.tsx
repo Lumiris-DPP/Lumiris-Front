@@ -30,11 +30,11 @@ export function PassportsList() {
     }, [dppForms, search, statusFilter]);
 
     if (loading) {
-        return <div className="text-muted-foreground p-8 text-sm">Chargement…</div>;
+        return <div className="p-8 text-sm text-muted-foreground">Chargement…</div>;
     }
 
     if (error) {
-        return <div className="text-destructive p-8 text-sm">Erreur : {error.message}</div>;
+        return <div className="p-8 text-sm text-destructive">Erreur : {error.message}</div>;
     }
 
     if (dppForms.length === 0) {
@@ -45,7 +45,7 @@ export function PassportsList() {
                     title="Vous n'avez pas encore de passeport"
                     description="Créez votre premier passeport numérique produit pour documenter une pièce textile et générer son QR."
                 >
-                    <CreatePassportCta className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 text-white">
+                    <CreatePassportCta className="bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90">
                         Créer mon premier passeport
                     </CreatePassportCta>
                 </EmptyState>
@@ -89,7 +89,7 @@ export function PassportsList() {
 
             <DppTable rows={filtered} />
 
-            <p className="text-muted-foreground text-xs">
+            <p className="text-xs text-muted-foreground">
                 {filtered.length} DPP{filtered.length !== 1 ? 's' : ''} affiché{filtered.length !== 1 ? 's' : ''}
                 {dppForms.length !== filtered.length && ` sur ${dppForms.length}`}
             </p>

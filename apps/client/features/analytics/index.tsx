@@ -56,7 +56,7 @@ export function Analytics() {
             </div>
 
             {isLoading || !data ? (
-                <p className="text-muted-foreground text-sm">Chargement…</p>
+                <p className="text-sm text-muted-foreground">Chargement…</p>
             ) : (
                 <>
                     <StatsTotals totals={data.totals} />

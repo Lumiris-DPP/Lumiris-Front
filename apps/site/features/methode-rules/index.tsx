@@ -54,13 +54,13 @@ export function MethodeRules() {
                     transition={{ duration: 0.5 }}
                     className="mb-12 text-center"
                 >
-                    <span className="bg-foreground/5 text-muted-foreground inline-block rounded-full px-3 py-1 text-xs font-medium uppercase tracking-wider">
+                    <span className="inline-block rounded-full bg-foreground/5 px-3 py-1 text-xs font-medium tracking-wider text-muted-foreground uppercase">
                         Integrite
                     </span>
-                    <h2 className="text-foreground mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+                    <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                         6 regles non negociables
                     </h2>
-                    <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg">
+                    <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
                         Ces principes garantissent l&apos;integrite du score Iris.
                     </p>
                 </motion.div>
@@ -74,14 +74,14 @@ export function MethodeRules() {
                             viewport={{ once: true, margin: '-50px' }}
                             transition={{ duration: 0.4, delay: index * 0.05 }}
                         >
-                            <div className="bg-card border-border h-full rounded-xl border p-5 transition-shadow hover:shadow-md">
+                            <div className="h-full rounded-xl border border-border bg-card p-5 transition-shadow hover:shadow-md">
                                 <div
                                     className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl ${rule.color.split(' ')[0]}`}
                                 >
                                     <rule.icon className={`h-5 w-5 ${rule.color.split(' ')[1]}`} />
                                 </div>
-                                <h3 className="text-foreground font-semibold">{rule.title}</h3>
-                                <p className="text-muted-foreground mt-2 text-sm leading-relaxed">{rule.description}</p>
+                                <h3 className="font-semibold text-foreground">{rule.title}</h3>
+                                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{rule.description}</p>
                             </div>
                         </motion.div>
                     ))}

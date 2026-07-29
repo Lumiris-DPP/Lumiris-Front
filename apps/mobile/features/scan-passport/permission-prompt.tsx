@@ -11,16 +11,16 @@ export function PermissionPrompt({ onActivate }: PermissionPromptProps) {
         <div
             role="dialog"
             aria-labelledby="camera-prompt-title"
-            className="bg-background absolute inset-0 z-30 flex flex-col items-center justify-center gap-6 px-8 text-center"
+            className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-6 bg-background px-8 text-center"
         >
-            <Camera className="text-foreground/80 h-10 w-10" aria-hidden />
-            <p id="camera-prompt-title" className="text-foreground max-w-xs text-base font-medium leading-snug">
+            <Camera className="h-10 w-10 text-foreground/80" aria-hidden />
+            <p id="camera-prompt-title" className="max-w-xs text-base leading-snug font-medium text-foreground">
                 Autoriser la caméra pour scanner un passeport produit.
             </p>
             <button
                 type="button"
                 onClick={onActivate}
-                className="bg-foreground text-background hover:bg-foreground/90 inline-flex h-14 w-full max-w-xs items-center justify-center rounded-full px-6 text-sm font-semibold"
+                className="inline-flex h-14 w-full max-w-xs items-center justify-center rounded-full bg-foreground px-6 text-sm font-semibold text-background hover:bg-foreground/90"
             >
                 Autoriser
             </button>

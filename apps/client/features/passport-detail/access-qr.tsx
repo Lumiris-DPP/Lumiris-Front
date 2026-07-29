@@ -45,7 +45,7 @@ export function AccessQr({ url, filename, size = 160 }: AccessQrProps) {
     return (
         <div ref={containerRef} className="flex flex-col items-center gap-3">
             <div className="rounded-lg border bg-white p-3">
-                <QRCodeCanvas value={url} size={size} level="M" includeMargin={false} />
+                <QRCodeCanvas value={url} size={size} level="M" />
                 <div className="hidden">
                     <QRCodeSVG value={url} size={size} level="M" />
                 </div>

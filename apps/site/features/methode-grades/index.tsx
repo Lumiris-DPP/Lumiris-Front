@@ -73,15 +73,15 @@ export function MethodeGrades() {
                     transition={{ duration: 0.5 }}
                     className="mb-14 text-center"
                 >
-                    <p className="text-muted-foreground mb-4 font-mono text-xs uppercase tracking-[0.25em]">
+                    <p className="mb-4 font-mono text-xs tracking-[0.25em] text-muted-foreground uppercase">
                         Grades Iris
                     </p>
-                    <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                         Du score 0 — 100 à une lettre lisible
                     </h2>
-                    <p className="text-muted-foreground mx-auto mt-4 max-w-xl text-base leading-relaxed">
+                    <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
                         Cinq paliers, des seuils gravés dans le code et publics.
-                        <span className="text-foreground font-medium">
+                        <span className="font-medium text-foreground">
                             {' '}
                             Pas de A+ : la perfection mesurée n&apos;existe pas.
                         </span>
@@ -96,32 +96,32 @@ export function MethodeGrades() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, margin: '-40px' }}
                             transition={{ duration: 0.5, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                            className={`bg-card group relative flex min-h-[260px] flex-col overflow-hidden rounded-3xl border ${item.border} transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg`}
+                            className={`group relative flex min-h-[260px] flex-col overflow-hidden rounded-3xl border bg-card ${item.border} transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg`}
                         >
                             {/* Halo gradient en arrière-plan, visible au hover */}
                             <div
                                 aria-hidden
-                                className={`pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-25 ${item.bg}`}
+                                className={`pointer-events-none absolute -top-12 -right-12 h-40 w-40 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-25 ${item.bg}`}
                             />
 
                             {/* Header — lettre géante + threshold mono */}
                             <div className="relative px-6 pt-8">
                                 <div className="flex items-baseline justify-between">
                                     <span
-                                        className={`text-[5.5rem] font-black leading-none tracking-tight sm:text-[6rem] ${item.text}`}
+                                        className={`text-[5.5rem] leading-none font-black tracking-tight sm:text-[6rem] ${item.text}`}
                                     >
                                         {item.grade}
                                     </span>
-                                    <span className="text-muted-foreground/60 font-mono text-xs tabular-nums">
+                                    <span className="font-mono text-xs text-muted-foreground/60 tabular-nums">
                                         {item.threshold}
                                     </span>
                                 </div>
                             </div>
 
                             {/* Body — label + description */}
-                            <div className="relative flex-1 px-6 pb-8 pt-8">
+                            <div className="relative flex-1 px-6 pt-8 pb-8">
                                 <p className={`text-base font-semibold ${item.text}`}>{item.label}</p>
-                                <p className="text-muted-foreground mt-2 text-xs leading-relaxed">{item.description}</p>
+                                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{item.description}</p>
                             </div>
                         </motion.article>
                     ))}

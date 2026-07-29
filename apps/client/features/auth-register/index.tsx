@@ -35,13 +35,13 @@ export function RegisterForm() {
                                     i < stepIndex
                                         ? 'bg-lumiris-cyan text-white'
                                         : i === stepIndex
-                                          ? 'bg-lumiris-cyan ring-lumiris-cyan/30 text-white ring-2 ring-offset-1'
+                                          ? 'bg-lumiris-cyan text-white ring-2 ring-lumiris-cyan/30 ring-offset-1'
                                           : 'bg-muted text-muted-foreground'
                                 }`}
                             >
                                 {i + 1}
                             </div>
-                            <span className="text-muted-foreground text-[10px] font-medium uppercase tracking-wide">
+                            <span className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
                                 {STEP_LABELS[s]}
                             </span>
                         </div>

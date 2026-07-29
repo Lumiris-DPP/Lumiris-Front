@@ -68,8 +68,11 @@ interface WardrobeStats {
 
 export function useWardrobeStats(now: Date = new Date()): WardrobeStats {
     const items = useWardrobe();
+    // Le scoring est recalculé une fois par jour : `now` par défaut change à chaque rendu,
+    // seule la date (jour) doit invalider le mémo.
     const dayKey = now.toISOString().slice(0, 10);
     return useMemo(() => {
+        const scoredAt = new Date(dayKey);
         const grades: IrisGrade[] = [];
         let co2Avoided = 0;
         let waterSaved = 0;
@@ -77,7 +80,7 @@ export function useWardrobeStats(now: Date = new Date()): WardrobeStats {
             if (item.kind !== 'lumiris-passport') continue;
             const passport = mockPassportById(item.passportId);
             if (!passport) continue;
-            grades.push(scorePassport(passport, now).grade);
+            grades.push(scorePassport(passport, scoredAt).grade);
             co2Avoided += Math.max(0, IMPACT_BASELINE.carbonCeilingKg - carbonForPassport(passport));
             waterSaved += Math.max(0, IMPACT_BASELINE.waterCeilingLiters - waterForPassport(passport));
         }
@@ -92,5 +95,5 @@ export function useWardrobeStats(now: Date = new Date()): WardrobeStats {
                 waterSavedLiters: Math.round(waterSaved),
             },
         };
-    }, [items, dayKey, now]);
+    }, [items, dayKey]);
 }

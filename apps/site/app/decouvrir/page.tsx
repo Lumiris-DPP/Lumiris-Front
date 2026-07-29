@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function DecouvrirPage() {
     return (
-        <main className="min-h-screen pb-20 pt-28">
+        <main className="min-h-screen pt-28 pb-20">
             <DiscoverCatalog />
         </main>
     );

@@ -111,7 +111,7 @@ export function ContactDialog({ artisan, open, onOpenChange, upgradeHint = null 
                     <div className="space-y-1.5">
                         <Label
                             htmlFor="contact-template-select"
-                            className="text-muted-foreground text-[11px] uppercase tracking-wider"
+                            className="text-[11px] tracking-wider text-muted-foreground uppercase"
                         >
                             Modèle
                         </Label>
@@ -132,7 +132,7 @@ export function ContactDialog({ artisan, open, onOpenChange, upgradeHint = null 
                     <div className="space-y-1.5">
                         <Label
                             htmlFor="contact-message-body"
-                            className="text-muted-foreground text-[11px] uppercase tracking-wider"
+                            className="text-[11px] tracking-wider text-muted-foreground uppercase"
                         >
                             Message final
                         </Label>

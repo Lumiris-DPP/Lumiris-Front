@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+'use client';
+
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Shirt, Sparkles } from 'lucide-react';
 import { gradeBackgroundSolid } from '@lumiris/scoring-ui';
@@ -27,18 +29,18 @@ export function ShopCard({ item, index }: ShopCardProps) {
             transition={{ delay: 0.05 + index * 0.03 }}
         >
             <Link
-                to={`/passeport/${passport.id}`}
+                href={`/passeport/${passport.id}`}
                 className={cn(
-                    'bg-card group relative flex flex-col overflow-hidden rounded-2xl border text-left transition-all',
+                    'group relative flex flex-col overflow-hidden rounded-2xl border bg-card text-left transition-all',
                     'border-border/60 hover:border-border',
                 )}
                 style={cardStyle}
             >
-                <div className="bg-secondary/50 relative flex h-28 items-center justify-center">
-                    <Shirt className="text-muted-foreground/25 h-9 w-9" aria-hidden />
+                <div className="relative flex h-28 items-center justify-center bg-secondary/50">
+                    <Shirt className="h-9 w-9 text-muted-foreground/25" aria-hidden />
                     <div
                         className={cn(
-                            'text-primary-foreground absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold',
+                            'absolute top-2 right-2 inline-flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold text-primary-foreground',
                             gradeBackgroundSolid(grade),
                         )}
                         aria-label={`Iris grade ${grade}`}
@@ -47,7 +49,7 @@ export function ShopCard({ item, index }: ShopCardProps) {
                     </div>
                     {isFeatured ? (
                         <span
-                            className="border-lumiris-cyan/30 bg-card/95 text-lumiris-cyan absolute left-2 top-2 inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[9px] font-semibold tracking-wide backdrop-blur-sm"
+                            className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full border border-lumiris-cyan/30 bg-card/95 px-1.5 py-0.5 text-[9px] font-semibold tracking-wide text-lumiris-cyan backdrop-blur-sm"
                             title="Atelier mis en avant"
                         >
                             <Sparkles className="h-2.5 w-2.5" />
@@ -57,11 +59,11 @@ export function ShopCard({ item, index }: ShopCardProps) {
                 </div>
 
                 <div className="p-3">
-                    <h4 className="text-foreground truncate text-xs font-semibold leading-tight">
+                    <h4 className="truncate text-xs leading-tight font-semibold text-foreground">
                         {passport.garment.reference}
                     </h4>
-                    <p className="text-muted-foreground mt-0.5 truncate text-[11px]">{artisanName}</p>
-                    <p className="text-foreground mt-1 text-xs font-bold">
+                    <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{artisanName}</p>
+                    <p className="mt-1 text-xs font-bold text-foreground">
                         {passport.garment.retailPrice}{' '}
                         {passport.garment.currency === 'EUR' ? '€' : passport.garment.currency}
                     </p>

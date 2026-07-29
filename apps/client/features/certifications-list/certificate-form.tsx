@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, type SyntheticEvent } from 'react';
 import { Loader2, Paperclip, Upload } from 'lucide-react';
 import { z } from 'zod';
 import type { CertificationKind } from '@lumiris/types';
@@ -89,7 +89,7 @@ export function CertificateForm({ initial, submitLabel, onSubmit, onCancel, lock
     const setField = <K extends keyof CertificateFields>(key: K, value: CertificateFields[K]) =>
         setFields((f) => ({ ...f, [key]: value }));
 
-    function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
         event.preventDefault();
         const result = formSchema.safeParse({ ...fields, fileDataUri: file.dataUri });
         if (!result.success) {
@@ -132,7 +132,7 @@ export function CertificateForm({ initial, submitLabel, onSubmit, onCancel, lock
                         placeholder="Ex. Maître Brodeur des Compagnons"
                         aria-invalid={!!errors.customName}
                     />
-                    {errors.customName ? <p className="text-destructive text-xs">{errors.customName}</p> : null}
+                    {errors.customName ? <p className="text-xs text-destructive">{errors.customName}</p> : null}
                 </div>
             ) : null}
 
@@ -145,7 +145,7 @@ export function CertificateForm({ initial, submitLabel, onSubmit, onCancel, lock
                     placeholder="Ex. Ecocert, AFNOR, OEKO-TEX Standard 100…"
                     aria-invalid={!!errors.issuer}
                 />
-                {errors.issuer ? <p className="text-destructive text-xs">{errors.issuer}</p> : null}
+                {errors.issuer ? <p className="text-xs text-destructive">{errors.issuer}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -178,7 +178,7 @@ export function CertificateForm({ initial, submitLabel, onSubmit, onCancel, lock
                         onChange={(e) => setField('expiresAt', e.target.value)}
                         aria-invalid={!!errors.expiresAt}
                     />
-                    {errors.expiresAt ? <p className="text-destructive text-xs">{errors.expiresAt}</p> : null}
+                    {errors.expiresAt ? <p className="text-xs text-destructive">{errors.expiresAt}</p> : null}
                 </div>
             </div>
 
@@ -186,11 +186,11 @@ export function CertificateForm({ initial, submitLabel, onSubmit, onCancel, lock
                 <Label>Document</Label>
                 <label
                     className={cn(
-                        'border-input bg-background hover:bg-accent/50 flex cursor-pointer items-center justify-between gap-3 rounded-md border border-dashed px-3 py-2.5 text-sm transition',
+                        'flex cursor-pointer items-center justify-between gap-3 rounded-md border border-dashed border-input bg-background px-3 py-2.5 text-sm transition hover:bg-accent/50',
                         file.reading && 'pointer-events-none opacity-60',
                     )}
                 >
-                    <span className="text-muted-foreground inline-flex items-center gap-2">
+                    <span className="inline-flex items-center gap-2 text-muted-foreground">
                         {file.reading ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                         ) : file.dataUri ? (
@@ -213,7 +213,7 @@ export function CertificateForm({ initial, submitLabel, onSubmit, onCancel, lock
                         onChange={file.onChange}
                     />
                 </label>
-                {file.error ? <p className="text-destructive text-xs">{file.error}</p> : null}
+                {file.error ? <p className="text-xs text-destructive">{file.error}</p> : null}
             </div>
 
             <DialogFooter className="pt-2">

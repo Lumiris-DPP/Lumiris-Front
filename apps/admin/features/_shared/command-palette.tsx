@@ -132,11 +132,11 @@ function CommandPaletteComponent() {
             <button
                 type="button"
                 onClick={() => setOpen(true)}
-                className="border-border bg-background text-muted-foreground hover:border-lumiris-cyan/40 hover:text-foreground flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition-colors"
+                className="flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-lumiris-cyan/40 hover:text-foreground"
             >
                 <Search className="h-3.5 w-3.5" aria-hidden />
                 <span>Rechercher…</span>
-                <kbd className="border-border bg-muted text-muted-foreground ml-6 flex items-center gap-0.5 rounded border px-1.5 py-0.5 font-mono text-[10px]">
+                <kbd className="ml-6 flex items-center gap-0.5 rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
                     <Command className="h-2.5 w-2.5" aria-hidden />K
                 </kbd>
             </button>
@@ -147,16 +147,16 @@ function CommandPaletteComponent() {
                         <button
                             type="button"
                             aria-label="Fermer la palette de commandes"
-                            className="bg-foreground/10 fixed inset-0 z-50 backdrop-blur-sm"
+                            className="fixed inset-0 z-50 bg-foreground/10 backdrop-blur-sm"
                             onClick={close}
                         />
                         <div
                             role="dialog"
                             aria-label="Palette de commandes"
-                            className="border-border bg-card fixed left-1/2 top-[20%] z-50 w-full max-w-lg -translate-x-1/2 overflow-hidden rounded-xl border shadow-lg"
+                            className="fixed top-[20%] left-1/2 z-50 w-full max-w-lg -translate-x-1/2 overflow-hidden rounded-xl border border-border bg-card shadow-lg"
                         >
-                            <div className="border-border flex items-center gap-3 border-b px-4 py-3">
-                                <Search className="text-muted-foreground h-4 w-4" aria-hidden />
+                            <div className="flex items-center gap-3 border-b border-border px-4 py-3">
+                                <Search className="h-4 w-4 text-muted-foreground" aria-hidden />
                                 <input
                                     ref={inputRef}
                                     aria-label="Rechercher un module"
@@ -164,12 +164,12 @@ function CommandPaletteComponent() {
                                     onChange={(e) => setQuery(e.target.value)}
                                     onKeyDown={onKeyDownInList}
                                     placeholder="Rechercher un module…"
-                                    className="text-foreground placeholder-muted-foreground/60 flex-1 bg-transparent text-sm outline-none"
+                                    className="flex-1 bg-transparent text-sm text-foreground placeholder-muted-foreground/60 outline-none"
                                 />
                                 <button
                                     type="button"
                                     onClick={close}
-                                    className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-md p-1"
+                                    className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
                                     aria-label="Fermer la palette"
                                 >
                                     <X className="h-4 w-4" aria-hidden />
@@ -183,7 +183,7 @@ function CommandPaletteComponent() {
                                         onClick={() => navigate(item.route.href)}
                                         onMouseEnter={() => setActiveIndex(index)}
                                         className={cn(
-                                            'text-foreground flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors',
+                                            'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground transition-colors',
                                             index === activeIndex
                                                 ? 'bg-lumiris-cyan/8 text-lumiris-cyan'
                                                 : 'hover:bg-muted',
@@ -191,13 +191,13 @@ function CommandPaletteComponent() {
                                     >
                                         <item.route.icon className="h-4 w-4" aria-hidden />
                                         <span className="font-medium">{item.route.label}</span>
-                                        <span className="text-muted-foreground/60 ml-2 text-xs">{item.group}</span>
+                                        <span className="ml-2 text-xs text-muted-foreground/60">{item.group}</span>
                                         {item.route.shortcut ? (
                                             <span className="ml-auto flex items-center gap-1">
-                                                <kbd className="border-border bg-muted text-muted-foreground rounded border px-1.5 py-0.5 font-mono text-[10px]">
+                                                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
                                                     {item.route.shortcut[0]}
                                                 </kbd>
-                                                <kbd className="border-border bg-muted text-muted-foreground rounded border px-1.5 py-0.5 font-mono text-[10px]">
+                                                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
                                                     {item.route.shortcut[1]}
                                                 </kbd>
                                             </span>
@@ -205,7 +205,7 @@ function CommandPaletteComponent() {
                                     </button>
                                 ))}
                                 {filtered.length === 0 && (
-                                    <p className="text-muted-foreground px-3 py-6 text-center text-sm">
+                                    <p className="px-3 py-6 text-center text-sm text-muted-foreground">
                                         Aucun résultat.
                                     </p>
                                 )}

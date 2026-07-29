@@ -27,12 +27,12 @@ export function InvoiceRow({ invoice, onView, onRescan, onDelete }: Props) {
         <TableRow className="cursor-pointer" onClick={onView}>
             <TableCell>
                 <div className="flex flex-col">
-                    <span className="text-foreground text-sm">{invoice.supplierName}</span>
-                    <span className="text-muted-foreground font-mono text-[11px]">{invoice.id}</span>
+                    <span className="text-sm text-foreground">{invoice.supplierName}</span>
+                    <span className="font-mono text-[11px] text-muted-foreground">{invoice.id}</span>
                 </div>
             </TableCell>
-            <TableCell className="text-muted-foreground text-xs">{formatDateFr(invoice.issuedAt)}</TableCell>
-            <TableCell className="text-foreground text-xs font-medium">{formatEur(invoice.totalAmount)}</TableCell>
+            <TableCell className="text-xs text-muted-foreground">{formatDateFr(invoice.issuedAt)}</TableCell>
+            <TableCell className="text-xs font-medium text-foreground">{formatEur(invoice.totalAmount)}</TableCell>
             <TableCell>
                 <Badge variant="outline" className={INVOICE_BADGE_TONE[invoice.status]}>
                     {INVOICE_STATUS_LABELS[invoice.status]}

@@ -11,6 +11,7 @@ import type { DppFormDto, IrisScoreDto } from '@lumiris/api-client';
 import { fiberLabel } from '@lumiris/scoring-ui';
 import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { draftToPassport, useDraftStore } from '@/lib/draft-store';
+import { publicPassportUrl } from '@/features/passport-detail/access-levels';
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -52,8 +53,6 @@ const DOC_TYPE_LABELS: Record<string, string> = {
     REACH_COMPLIANCE: 'Conformité REACH',
     SALE_INVOICE: 'Facture de vente',
 };
-
-const MOBILE_URL = process.env.NEXT_PUBLIC_MOBILE_URL ?? 'http://localhost:3002';
 
 export default function PrintPassportSheetPage({ params }: PageProps) {
     const { id } = use(params);
@@ -116,7 +115,7 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
         );
     }
 
-    const dppUrl = `${MOBILE_URL}/p/${dpp.publicCode}`;
+    const dppUrl = publicPassportUrl(dpp.publicCode);
     const gradeHex = score ? (GRADE_HEX[score.grade as IrisGrade] ?? '#6b7280') : '#6b7280';
     const publicDocuments = (dpp.documents ?? []).filter((d) => d.visibility === 'PUBLIC_USERS');
 
@@ -139,17 +138,17 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                         <div className="space-y-0.5">
                             <div className="mb-1 flex items-center gap-1.5">
                                 <LumirisLogo title="" className="h-4 w-auto" />
-                                <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-500">
+                                <p className="font-mono text-[11px] tracking-[0.2em] text-neutral-500 uppercase">
                                     LUMIRIS
                                 </p>
                             </div>
-                            <p className="text-base font-semibold leading-tight">
+                            <p className="text-base leading-tight font-semibold">
                                 {dpp.productName ?? 'Produit sans nom'}
                             </p>
                             {dpp.sku && <p className="text-xs text-neutral-600">Réf. {dpp.sku}</p>}
                         </div>
                         <div className="text-right">
-                            <p className="font-mono text-[10px] uppercase tracking-wider text-neutral-500">Créé le</p>
+                            <p className="font-mono text-[10px] tracking-wider text-neutral-500 uppercase">Créé le</p>
                             <p className="font-mono text-xs">{new Date(dpp.createdAt).toLocaleDateString('fr-FR')}</p>
                         </div>
                     </header>
@@ -172,7 +171,7 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                         </div>
                         <div className="flex min-w-0 flex-1 flex-col justify-between">
                             <div className="space-y-1">
-                                <h1 className="text-2xl font-semibold leading-tight">
+                                <h1 className="text-2xl leading-tight font-semibold">
                                     {dpp.productName ?? 'Sans nom'}
                                 </h1>
                                 {dpp.productDescription && (
@@ -185,16 +184,16 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                             {score && (
                                 <div className="flex items-center gap-4 pt-2">
                                     <div
-                                        className="flex h-[28mm] w-[28mm] items-center justify-center rounded-md font-mono text-[64px] font-bold leading-none text-white"
+                                        className="flex h-[28mm] w-[28mm] items-center justify-center rounded-md font-mono text-[64px] leading-none font-bold text-white"
                                         style={{ backgroundColor: gradeHex }}
                                     >
                                         {score.grade}
                                     </div>
                                     <div className="space-y-0.5">
-                                        <p className="font-mono text-[10px] uppercase tracking-wider text-neutral-500">
+                                        <p className="font-mono text-[10px] tracking-wider text-neutral-500 uppercase">
                                             Score Iris
                                         </p>
-                                        <p className="font-mono text-3xl font-semibold leading-none">
+                                        <p className="font-mono text-3xl leading-none font-semibold">
                                             {score.total.toFixed(1)}
                                             <span className="ml-0.5 text-sm font-normal text-neutral-500">/ 100</span>
                                         </p>
@@ -207,12 +206,12 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                     {/* Composition */}
                     {(dpp.materials ?? []).length > 0 && (
                         <section className="space-y-2">
-                            <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-700">
+                            <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold tracking-wider text-neutral-700 uppercase">
                                 Composition
                             </h2>
                             <table className="w-full border-collapse text-xs">
                                 <thead>
-                                    <tr className="border-b border-neutral-300 text-left font-mono text-[10px] uppercase tracking-wider text-neutral-500">
+                                    <tr className="border-b border-neutral-300 text-left font-mono text-[10px] tracking-wider text-neutral-500 uppercase">
                                         <th className="py-1.5 pr-2 font-normal">Matière</th>
                                         <th className="py-1.5 pr-2 font-normal">%</th>
                                         <th className="py-1.5 font-normal">Origine</th>
@@ -234,7 +233,7 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                     {/* Entretien */}
                     {(dpp.careInstructions ?? []).length > 0 && (
                         <section className="space-y-2">
-                            <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-700">
+                            <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold tracking-wider text-neutral-700 uppercase">
                                 Entretien
                             </h2>
                             <div className="flex flex-wrap gap-2">
@@ -261,7 +260,7 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
 
                     {/* Traçabilité */}
                     <section className="space-y-2">
-                        <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-700">
+                        <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold tracking-wider text-neutral-700 uppercase">
                             Traçabilité
                         </h2>
                         <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs">
@@ -295,11 +294,11 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                                     <dd className="flex items-center gap-1">
                                         {dpp.reachCompliant ? (
                                             <>
-                                                <CheckCircle className="text-lumiris-emerald h-3 w-3" /> Oui
+                                                <CheckCircle className="h-3 w-3 text-lumiris-emerald" /> Oui
                                             </>
                                         ) : (
                                             <>
-                                                <XCircle className="text-lumiris-rose h-3 w-3" /> Non
+                                                <XCircle className="h-3 w-3 text-lumiris-rose" /> Non
                                             </>
                                         )}
                                     </dd>
@@ -310,7 +309,7 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
 
                     {/* Durabilité */}
                     <section className="space-y-2">
-                        <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-700">
+                        <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold tracking-wider text-neutral-700 uppercase">
                             Durabilité & Fin de vie
                         </h2>
                         <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs">
@@ -332,11 +331,11 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                                     <dd className="flex items-center gap-1">
                                         {dpp.isRepairable ? (
                                             <>
-                                                <CheckCircle className="text-lumiris-emerald h-3 w-3" /> Oui
+                                                <CheckCircle className="h-3 w-3 text-lumiris-emerald" /> Oui
                                             </>
                                         ) : (
                                             <>
-                                                <XCircle className="text-lumiris-rose h-3 w-3" /> Non
+                                                <XCircle className="h-3 w-3 text-lumiris-rose" /> Non
                                             </>
                                         )}
                                     </dd>
@@ -354,7 +353,7 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                     {/* Documents publics */}
                     {publicDocuments.length > 0 && (
                         <section className="space-y-2">
-                            <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-700">
+                            <h2 className="border-b border-neutral-200 pb-1 text-[11px] font-semibold tracking-wider text-neutral-700 uppercase">
                                 Documents
                             </h2>
                             <ul className="space-y-0.5 text-xs">
@@ -370,7 +369,7 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                     {/* Pied de page — QR code */}
                     <footer className="mt-auto flex items-end justify-between gap-4 border-t border-neutral-300 pt-4">
                         <div className="min-w-0 flex-1 space-y-1">
-                            <p className="text-[10px] italic text-neutral-600">
+                            <p className="text-[10px] text-neutral-600 italic">
                                 Passeport conforme ESPR. Vérifiable sur lumiris.fr.
                             </p>
                             <p className="font-mono text-[9px] text-neutral-700">{dppUrl}</p>
@@ -379,7 +378,7 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                             </p>
                         </div>
                         <div className="shrink-0 rounded-md border border-neutral-300 bg-white p-1.5">
-                            <QRCodeCanvas value={dppUrl} size={96} includeMargin={false} level="M" />
+                            <QRCodeCanvas value={dppUrl} size={96} level="M" />
                         </div>
                     </footer>
                 </article>

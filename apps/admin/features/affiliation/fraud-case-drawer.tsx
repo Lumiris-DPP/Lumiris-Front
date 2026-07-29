@@ -59,8 +59,8 @@ export function FraudCaseDrawer({
                     label="Bénéficiaire"
                     value={
                         <>
-                            <p className="text-foreground text-sm">{event.beneficiaryDisplayName}</p>
-                            <p className="text-muted-foreground text-[10px]">{event.beneficiaryId}</p>
+                            <p className="text-sm text-foreground">{event.beneficiaryDisplayName}</p>
+                            <p className="text-[10px] text-muted-foreground">{event.beneficiaryId}</p>
                         </>
                     }
                 />
@@ -106,8 +106,8 @@ export function FraudCaseDrawer({
 function Field({ label, value, mono = false }: { label: string; value: React.ReactNode; mono?: boolean }) {
     return (
         <div>
-            <dt className="text-muted-foreground text-[10px] uppercase tracking-wider">{label}</dt>
-            <dd className={cn('text-foreground mt-0.5', mono ? 'font-mono' : '')}>{value}</dd>
+            <dt className="text-[10px] tracking-wider text-muted-foreground uppercase">{label}</dt>
+            <dd className={cn('mt-0.5 text-foreground', mono ? 'font-mono' : '')}>{value}</dd>
         </div>
     );
 }
@@ -139,16 +139,16 @@ function SuspicionMap({ flag }: { flag: SuspiciousFlag }) {
         });
     }
     if (items.length === 0) {
-        return <p className="text-muted-foreground text-xs italic">Aucun signal géo/temporel sur ce cas.</p>;
+        return <p className="text-xs text-muted-foreground italic">Aucun signal géo/temporel sur ce cas.</p>;
     }
     return (
         <ul className="space-y-3 text-xs">
             {items.map((item) => (
-                <li key={item.label} className="border-border bg-card flex items-start gap-3 rounded-lg border p-3">
+                <li key={item.label} className="flex items-start gap-3 rounded-lg border border-border bg-card p-3">
                     <item.Icon className={cn('mt-0.5 h-4 w-4 shrink-0', item.tone)} aria-hidden />
                     <div>
-                        <p className="text-foreground text-[11px] font-semibold">{item.label}</p>
-                        <p className="text-muted-foreground mt-0.5 text-[11px]">{item.value}</p>
+                        <p className="text-[11px] font-semibold text-foreground">{item.label}</p>
+                        <p className="mt-0.5 text-[11px] text-muted-foreground">{item.value}</p>
                     </div>
                 </li>
             ))}

@@ -29,10 +29,10 @@ interface PurchaseSectionProps {
 
 export function PurchaseSection({ rates, history, onEdit }: PurchaseSectionProps) {
     return (
-        <section className="border-border bg-card overflow-hidden rounded-xl border">
-            <header className="border-border border-b px-4 py-3">
-                <p className="text-foreground text-sm font-semibold">Affiliation à l&apos;achat</p>
-                <p className="text-muted-foreground mt-0.5 text-[11px]">
+        <section className="overflow-hidden rounded-xl border border-border bg-card">
+            <header className="border-b border-border px-4 py-3">
+                <p className="text-sm font-semibold text-foreground">Affiliation à l&apos;achat</p>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">
                     Commission côté vendeur, jamais facturée à l&apos;utilisateur. Borne {PURCHASE_RATE_BOUNDS.min}-
                     {PURCHASE_RATE_BOUNDS.max} %.
                 </p>
@@ -50,11 +50,11 @@ export function PurchaseSection({ rates, history, onEdit }: PurchaseSectionProps
                     {rates.map((rate) => (
                         <TableRow key={rate.category}>
                             <TableCell>
-                                <p className="text-foreground text-sm">{rate.label}</p>
-                                <p className="text-muted-foreground text-[10px]">{rate.category}</p>
+                                <p className="text-sm text-foreground">{rate.label}</p>
+                                <p className="text-[10px] text-muted-foreground">{rate.category}</p>
                             </TableCell>
                             <TableCell>
-                                <span className="text-foreground font-mono text-sm">{rate.percent} %</span>
+                                <span className="font-mono text-sm text-foreground">{rate.percent} %</span>
                             </TableCell>
                             <TableCell>
                                 <HistoryHover entries={history.get(purchaseKey(rate.category)) ?? []} />
@@ -89,10 +89,10 @@ export function RepairSection({ repair, history, onToggleMode, onEditFlat, onEdi
         [repair, onEditFlat, onEditPct],
     );
     return (
-        <section className="border-border bg-card overflow-hidden rounded-xl border">
-            <header className="border-border border-b px-4 py-3">
-                <p className="text-foreground text-sm font-semibold">Commissions retouche / réparation</p>
-                <p className="text-muted-foreground mt-0.5 text-[11px]">
+        <section className="overflow-hidden rounded-xl border border-border bg-card">
+            <header className="border-b border-border px-4 py-3">
+                <p className="text-sm font-semibold text-foreground">Commissions retouche / réparation</p>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">
                     Payée par le pro. Forfait {REPAIR_FLAT_BOUNDS.min}-{REPAIR_FLAT_BOUNDS.max} € ou{' '}
                     {REPAIR_PCT_BOUNDS.min}-{REPAIR_PCT_BOUNDS.max} % du devis.
                 </p>
@@ -112,12 +112,12 @@ export function RepairSection({ repair, history, onToggleMode, onEditFlat, onEdi
                         return (
                             <TableRow key={row.mode}>
                                 <TableCell>
-                                    <p className="text-foreground inline-flex items-center gap-2 text-sm">
+                                    <p className="inline-flex items-center gap-2 text-sm text-foreground">
                                         {row.label}
                                         {active ? (
                                             <Badge
                                                 variant="outline"
-                                                className="border-lumiris-emerald/40 text-lumiris-emerald font-mono text-[10px]"
+                                                className="border-lumiris-emerald/40 font-mono text-[10px] text-lumiris-emerald"
                                             >
                                                 actif
                                             </Badge>
@@ -159,31 +159,31 @@ export function RepairSection({ repair, history, onToggleMode, onEditFlat, onEdi
 function HistoryHover({ entries }: { entries: readonly RateHistoryEntry[] }) {
     const latest = entries[0];
     if (!latest) {
-        return <span className="text-muted-foreground text-[11px] italic">Aucune modification</span>;
+        return <span className="text-[11px] text-muted-foreground italic">Aucune modification</span>;
     }
     return (
         <HoverCard openDelay={150} closeDelay={80}>
             <HoverCardTrigger asChild>
                 <button
                     type="button"
-                    className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-[11px] underline-offset-2 hover:underline"
+                    className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
                 >
                     <History className="h-3 w-3" aria-hidden />
                     {new Date(latest.at).toLocaleDateString('fr-FR')}
                 </button>
             </HoverCardTrigger>
             <HoverCardContent className="w-72 text-xs" align="start">
-                <p className="text-foreground mb-2 text-[11px] font-semibold">3 derniers changements</p>
+                <p className="mb-2 text-[11px] font-semibold text-foreground">3 derniers changements</p>
                 <ol className="space-y-2">
                     {entries.map((entry) => (
-                        <li key={entry.id} className="border-border border-l-2 pl-2">
-                            <p className="text-foreground font-mono text-[11px]">
+                        <li key={entry.id} className="border-l-2 border-border pl-2">
+                            <p className="font-mono text-[11px] text-foreground">
                                 {entry.oldValue} → <strong>{entry.newValue}</strong>
                             </p>
-                            <p className="text-muted-foreground text-[10px]">
+                            <p className="text-[10px] text-muted-foreground">
                                 {new Date(entry.at).toLocaleString('fr-FR')}
                             </p>
-                            <p className="text-muted-foreground mt-0.5 text-[10px] italic">{entry.reason}</p>
+                            <p className="mt-0.5 text-[10px] text-muted-foreground italic">{entry.reason}</p>
                         </li>
                     ))}
                 </ol>

@@ -3,12 +3,7 @@ import { z } from 'zod';
 import type { Http } from '../core/http';
 import { parseOr } from '../core/validate';
 import { wardrobeItemDtoSchema, type WardrobeItemDto } from '../types/wardrobe';
-import {
-    orderGroupSchema,
-    orderResponseSchema,
-    type OrderGroup,
-    type OrderResponse,
-} from '../types/marketplace';
+import { orderGroupSchema, orderResponseSchema, type OrderGroup, type OrderResponse } from '../types/marketplace';
 
 const wardrobeListSchema = z.array(wardrobeItemDtoSchema);
 const orderListSchema = z.array(orderResponseSchema);
@@ -25,10 +20,7 @@ export function wardrobeApi(http: Http) {
         // Regroupe toutes les lignes d'un même paiement et renvoie le total RÉELLEMENT facturé
         // par Stripe (articles + livraison) — utilisé par l'écran de confirmation de commande.
         async orderGroup(paymentIntentId: string): Promise<OrderGroup> {
-            return parseOr(
-                orderGroupSchema,
-                await http.request(`/api/orders/group/${paymentIntentId}`),
-            );
+            return parseOr(orderGroupSchema, await http.request(`/api/orders/group/${paymentIntentId}`));
         },
     };
 }

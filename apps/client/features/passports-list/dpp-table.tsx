@@ -27,7 +27,7 @@ interface DppTableProps {
 function StatusBadge({ status }: { status: DppFormSummaryDto['status'] }) {
     if (status === 'DRAFT') {
         return (
-            <Badge variant="outline" className="border-lumiris-amber/40 text-lumiris-amber bg-lumiris-amber/5">
+            <Badge variant="outline" className="border-lumiris-amber/40 bg-lumiris-amber/5 text-lumiris-amber">
                 Brouillon
             </Badge>
         );
@@ -78,7 +78,7 @@ export function DppTable({ rows }: DppTableProps) {
                     <TableBody>
                         {rows.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={5} className="text-muted-foreground py-12 text-center text-sm">
+                                <TableCell colSpan={5} className="py-12 text-center text-sm text-muted-foreground">
                                     Aucun DPP trouvé.
                                 </TableCell>
                             </TableRow>
@@ -91,17 +91,17 @@ export function DppTable({ rows }: DppTableProps) {
                                         <div className="flex items-center gap-2">
                                             <p className="font-medium">{dpp.productName ?? 'Sans nom'}</p>
                                             {loadingId === dpp.id && (
-                                                <Loader2 className="text-muted-foreground h-3.5 w-3.5 animate-spin" />
+                                                <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
                                             )}
                                         </div>
                                         {dpp.sku && (
-                                            <p className="text-muted-foreground font-mono text-xs">{dpp.sku}</p>
+                                            <p className="font-mono text-xs text-muted-foreground">{dpp.sku}</p>
                                         )}
                                     </TableCell>
-                                    <TableCell className="text-muted-foreground text-sm">
+                                    <TableCell className="text-sm text-muted-foreground">
                                         {garmentCategoryLabel(dpp.productCategory)}
                                     </TableCell>
-                                    <TableCell className="text-muted-foreground text-xs">
+                                    <TableCell className="text-xs text-muted-foreground">
                                         {formatDateFr(dpp.createdAt)}
                                     </TableCell>
                                     <TableCell>

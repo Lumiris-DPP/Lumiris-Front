@@ -10,7 +10,7 @@
                 "scripts/*.{mjs,js,ts}",
                 "bench/scenarios/*.js"
             ],
-            "ignoreDependencies": ["k6", "postcss-load-config"]
+            "ignoreDependencies": ["k6", "postcss-load-config", "tailwindcss"]
         },
         "apps/admin": {
             "entry": [
@@ -58,7 +58,7 @@
         },
         "packages/api-client": {
             "entry": ["src/index.ts"],
-            "project": ["src/**/*.ts"]
+            "project": ["src/**/*.{ts,tsx}"]
         },
         "packages/config": {
             "entry": ["tsconfig/*.json"],

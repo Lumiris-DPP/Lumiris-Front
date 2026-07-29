@@ -17,7 +17,7 @@ export function ScoreHero({ grade, productName, brand, onOpenBreakdown }: ScoreH
     const cssVar = GRADE_CSS_VAR[grade];
 
     return (
-        <header className="h-70 relative flex shrink-0 items-center justify-center overflow-hidden">
+        <header className="relative flex h-70 shrink-0 items-center justify-center overflow-hidden">
             <motion.div
                 aria-hidden
                 className="pointer-events-none absolute h-72 w-72 rounded-full blur-[80px]"
@@ -33,7 +33,7 @@ export function ScoreHero({ grade, productName, brand, onOpenBreakdown }: ScoreH
                     onClick={onOpenBreakdown}
                     aria-label={`Score Iris ${grade} - ouvrir le détail`}
                     className={cn(
-                        'flex h-28 w-28 items-center justify-center rounded-full border-2 font-mono text-[64px] font-bold leading-none tracking-tight backdrop-blur-md transition active:scale-95',
+                        'flex h-28 w-28 items-center justify-center rounded-full border-2 font-mono text-[64px] leading-none font-bold tracking-tight backdrop-blur-md transition active:scale-95',
                         GRADE_BORDER[grade],
                         GRADE_TEXT[grade],
                         GRADE_BG_SOFT[grade],
@@ -52,11 +52,11 @@ export function ScoreHero({ grade, productName, brand, onOpenBreakdown }: ScoreH
                     transition={{ duration: 0.4, delay: 0.45 }}
                     className="flex flex-col items-center gap-0.5 text-center"
                 >
-                    <p className={cn('text-xs font-semibold uppercase tracking-[0.18em]', GRADE_TEXT[grade])}>
+                    <p className={cn('text-xs font-semibold tracking-[0.18em] uppercase', GRADE_TEXT[grade])}>
                         {GRADE_LABEL[grade]}
                     </p>
-                    <p className="text-foreground text-sm font-semibold">{productName}</p>
-                    <p className="text-muted-foreground text-xs">{brand}</p>
+                    <p className="text-sm font-semibold text-foreground">{productName}</p>
+                    <p className="text-xs text-muted-foreground">{brand}</p>
                 </motion.div>
             </div>
         </header>

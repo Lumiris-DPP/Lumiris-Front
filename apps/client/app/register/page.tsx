@@ -22,23 +22,23 @@ export default function RegisterPage() {
     if (!hydrated || artisanId) return null;
 
     return (
-        <div className="bg-background flex min-h-screen flex-col">
-            <header className="border-border bg-card border-b">
+        <div className="flex min-h-screen flex-col bg-background">
+            <header className="border-b border-border bg-card">
                 <div className="mx-auto flex max-w-6xl items-center gap-3 px-6 py-5">
                     <LumirisLogo className="h-9 w-auto" />
                     <div>
-                        <p className="text-foreground text-sm font-semibold leading-none">LUMIRIS</p>
-                        <p className="text-muted-foreground font-mono text-[10px] tracking-widest">ATELIER</p>
+                        <p className="text-sm leading-none font-semibold text-foreground">LUMIRIS</p>
+                        <p className="font-mono text-[10px] tracking-widest text-muted-foreground">ATELIER</p>
                     </div>
                 </div>
             </header>
 
             <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-6 py-12">
-                <Card className="bg-card rounded-2xl px-7 py-8 shadow-xl">
+                <Card className="rounded-2xl bg-card px-7 py-8 shadow-xl">
                     <RegisterForm />
                 </Card>
 
-                <p className="text-muted-foreground mt-6 text-center text-xs">
+                <p className="mt-6 text-center text-xs text-muted-foreground">
                     Déjà un compte ?{' '}
                     <Link href="/login" className="text-lumiris-cyan hover:underline">
                         Se connecter

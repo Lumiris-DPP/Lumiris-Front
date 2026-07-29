@@ -1,32 +1,37 @@
-import { Link, useNavigate } from 'react-router-dom';
+'use client';
+
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Loader2, Minus, Plus, Shirt, ShoppingBag, Trash2, Truck } from 'lucide-react';
+import Image from 'next/image';
+import { routes } from '@/lib/routes';
 import { formatCents, removeFromCart, setCartQuantity, useCartDetails } from '@/lib/marketplace';
 
 export function Panier() {
-    const navigate = useNavigate();
+    const router = useRouter();
     const { items, subtotalCents, count, sellerCount, missingCount, isLoading } = useCartDetails();
     const empty = items.length === 0;
     const multiSeller = sellerCount > 1;
 
     return (
-        <div className="bg-background flex h-full flex-col overflow-y-auto pb-44">
+        <div className="flex h-full flex-col overflow-y-auto bg-background pb-44">
             <motion.header
-                className="flex items-center gap-3 px-4 pb-3 pt-12"
+                className="flex items-center gap-3 px-4 pt-12 pb-3"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
             >
                 <button
                     type="button"
-                    onClick={() => navigate(-1)}
+                    onClick={() => router.back()}
                     aria-label="Retour"
-                    className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full border"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground"
                 >
                     <ArrowLeft className="h-4 w-4" />
                 </button>
                 <div className="min-w-0 flex-1">
-                    <h1 className="text-foreground text-base font-bold">Panier</h1>
-                    <p className="text-muted-foreground text-xs">
+                    <h1 className="text-base font-bold text-foreground">Panier</h1>
+                    <p className="text-xs text-muted-foreground">
                         {count} article{count > 1 ? 's' : ''}
                     </p>
                 </div>
@@ -35,7 +40,7 @@ export function Panier() {
             {!isLoading && missingCount > 0 ? (
                 <div className="mb-1 px-4">
                     <p
-                        className="border-lumiris-amber/30 bg-lumiris-amber/10 text-lumiris-amber rounded-2xl border p-3 text-xs"
+                        className="rounded-2xl border border-lumiris-amber/30 bg-lumiris-amber/10 p-3 text-xs text-lumiris-amber"
                         role="status"
                     >
                         {missingCount} article{missingCount > 1 ? 's' : ''} ne{' '}
@@ -46,7 +51,7 @@ export function Panier() {
             ) : null}
 
             {isLoading && empty ? (
-                <div className="text-muted-foreground flex flex-1 items-center justify-center gap-2 text-sm">
+                <div className="flex flex-1 items-center justify-center gap-2 text-sm text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" /> Chargement du panier…
                 </div>
             ) : empty ? (
@@ -59,22 +64,25 @@ export function Panier() {
                             return (
                                 <li
                                     key={product.id}
-                                    className="border-border/60 bg-card opal-shadow flex gap-3 rounded-2xl border p-3"
+                                    className="opal-shadow flex gap-3 rounded-2xl border border-border/60 bg-card p-3"
                                 >
                                     <Link
-                                        to={`/boutique/${product.id}`}
+                                        href={routes.product(product.id)}
                                         aria-label={product.name}
-                                        className="bg-muted relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl"
+                                        className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted"
                                     >
                                         {product.photoUrl ? (
-                                            <img
+                                            <Image
                                                 src={product.photoUrl}
                                                 alt={product.name}
-                                                className="absolute inset-0 h-full w-full object-cover"
+                                                fill
+                                                sizes="80px"
+                                                className="object-cover"
+                                                unoptimized
                                             />
                                         ) : (
                                             <Shirt
-                                                className="text-muted-foreground/30 h-8 w-8"
+                                                className="h-8 w-8 text-muted-foreground/30"
                                                 strokeWidth={1.5}
                                                 aria-hidden
                                             />
@@ -82,26 +90,26 @@ export function Panier() {
                                     </Link>
 
                                     <div className="flex min-w-0 flex-1 flex-col">
-                                        <Link to={`/boutique/${product.id}`} className="min-w-0">
-                                            <p className="text-foreground truncate text-sm font-semibold">
+                                        <Link href={routes.product(product.id)} className="min-w-0">
+                                            <p className="truncate text-sm font-semibold text-foreground">
                                                 {product.name}
                                             </p>
-                                            <p className="text-muted-foreground truncate text-xs">
+                                            <p className="truncate text-xs text-muted-foreground">
                                                 {product.artisanName}
                                             </p>
                                         </Link>
 
                                         <div className="mt-auto flex items-center justify-between gap-2 pt-2">
-                                            <div className="border-border inline-flex items-center rounded-full border">
+                                            <div className="inline-flex items-center rounded-full border border-border">
                                                 <button
                                                     type="button"
                                                     aria-label="Diminuer la quantité"
                                                     onClick={() => setCartQuantity(product.id, item.quantity - 1)}
-                                                    className="text-foreground inline-flex h-7 w-7 items-center justify-center"
+                                                    className="inline-flex h-7 w-7 items-center justify-center text-foreground"
                                                 >
                                                     <Minus className="h-3.5 w-3.5" />
                                                 </button>
-                                                <span className="text-foreground min-w-6 text-center text-sm font-semibold tabular-nums">
+                                                <span className="min-w-6 text-center text-sm font-semibold text-foreground tabular-nums">
                                                     {item.quantity}
                                                 </span>
                                                 <button
@@ -109,13 +117,13 @@ export function Panier() {
                                                     aria-label="Augmenter la quantité"
                                                     disabled={item.quantity >= product.stock}
                                                     onClick={() => setCartQuantity(product.id, item.quantity + 1)}
-                                                    className="text-foreground inline-flex h-7 w-7 items-center justify-center disabled:opacity-30"
+                                                    className="inline-flex h-7 w-7 items-center justify-center text-foreground disabled:opacity-30"
                                                 >
                                                     <Plus className="h-3.5 w-3.5" />
                                                 </button>
                                             </div>
 
-                                            <span className="text-foreground text-sm font-semibold tabular-nums">
+                                            <span className="text-sm font-semibold text-foreground tabular-nums">
                                                 {formatCents(item.lineTotalCents)}
                                             </span>
                                         </div>
@@ -125,7 +133,7 @@ export function Panier() {
                                         type="button"
                                         aria-label={`Retirer ${product.name} du panier`}
                                         onClick={() => removeFromCart(product.id)}
-                                        className="text-muted-foreground hover:text-lumiris-rose self-start"
+                                        className="self-start text-muted-foreground hover:text-lumiris-rose"
                                     >
                                         <Trash2 className="h-4 w-4" />
                                     </button>
@@ -135,9 +143,9 @@ export function Panier() {
                     </ul>
 
                     <div className="mt-5 px-4">
-                        <div className="border-border/60 bg-card flex items-center gap-2 rounded-2xl border p-3">
-                            <Truck className="text-muted-foreground h-4 w-4 shrink-0" />
-                            <p className="text-muted-foreground text-xs">
+                        <div className="flex items-center gap-2 rounded-2xl border border-border/60 bg-card p-3">
+                            <Truck className="h-4 w-4 shrink-0 text-muted-foreground" />
+                            <p className="text-xs text-muted-foreground">
                                 Frais de port calculés à l&apos;étape paiement selon l&apos;atelier.
                             </p>
                         </div>
@@ -145,7 +153,7 @@ export function Panier() {
 
                     {multiSeller ? (
                         <div className="mt-3 px-4">
-                            <p className="border-lumiris-amber/30 bg-lumiris-amber/10 text-lumiris-amber rounded-2xl border p-3 text-xs">
+                            <p className="rounded-2xl border border-lumiris-amber/30 bg-lumiris-amber/10 p-3 text-xs text-lumiris-amber">
                                 Ton panier contient des pièces de plusieurs ateliers. Chaque atelier se règle séparément
                                 — retire des pièces pour ne garder qu&apos;un atelier.
                             </p>
@@ -161,7 +169,7 @@ export function Panier() {
 
 function CartSummary({ subtotalCents, disabled }: { subtotalCents: number; disabled: boolean }) {
     return (
-        <div className="border-border/60 bg-background/90 fixed inset-x-0 bottom-0 z-40 mx-auto max-w-md border-t px-4 pb-6 pt-3 backdrop-blur">
+        <div className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-md border-t border-border/60 bg-background/90 px-4 pt-3 pb-6 backdrop-blur">
             <dl className="mb-3 flex flex-col gap-1">
                 <div className="flex items-center justify-between text-xs">
                     <dt className="text-muted-foreground">Sous-total</dt>
@@ -173,13 +181,13 @@ function CartSummary({ subtotalCents, disabled }: { subtotalCents: number; disab
                 </div>
             </dl>
             {disabled ? (
-                <span className="bg-muted text-muted-foreground flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold">
+                <span className="flex w-full items-center justify-center gap-2 rounded-full bg-muted py-3 text-sm font-semibold text-muted-foreground">
                     Un seul atelier par commande
                 </span>
             ) : (
                 <Link
-                    to="/checkout"
-                    className="bg-foreground text-primary-foreground flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold"
+                    href="/checkout"
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3 text-sm font-semibold text-primary-foreground"
                 >
                     Passer la commande
                 </Link>
@@ -195,18 +203,18 @@ function EmptyCart() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
         >
-            <div className="border-border/60 bg-card flex h-16 w-16 items-center justify-center rounded-3xl border">
-                <ShoppingBag className="text-muted-foreground h-7 w-7" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-3xl border border-border/60 bg-card">
+                <ShoppingBag className="h-7 w-7 text-muted-foreground" />
             </div>
             <div>
-                <h2 className="text-foreground text-base font-semibold">Ton panier est vide</h2>
-                <p className="text-muted-foreground mt-1 text-sm">
+                <h2 className="text-base font-semibold text-foreground">Ton panier est vide</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
                     Découvre des pièces tracées et garanties dans la Boutique.
                 </p>
             </div>
             <Link
-                to="/boutique"
-                className="bg-foreground text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
+                href="/boutique"
+                className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-primary-foreground"
             >
                 <ShoppingBag className="h-4 w-4" />
                 Voir la Boutique

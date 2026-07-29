@@ -51,8 +51,8 @@ export function EmptyState({
                     <Icon className="h-5 w-5" />
                 </div>
                 <div className="space-y-1">
-                    <h2 className="text-foreground text-lg font-semibold">{title}</h2>
-                    <p className="text-muted-foreground max-w-md text-sm">{description}</p>
+                    <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+                    <p className="max-w-md text-sm text-muted-foreground">{description}</p>
                 </div>
                 {children ?? (cta && <EmptyStateCta cta={cta} tone={tone} />)}
             </CardContent>

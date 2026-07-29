@@ -1,6 +1,8 @@
+'use client';
+
 import { useCallback, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ChevronRight, ExternalLink, FileText } from 'lucide-react';
 import { mockPassportById } from '@lumiris/mock-data';
@@ -13,6 +15,7 @@ import {
     itemKey,
     useWardrobe,
 } from '@/lib/wardrobe-storage';
+import { routes } from '@/lib/routes';
 import { decryptToBlob } from '@/lib/documents/crypto';
 import { useUser } from '@/lib/auth';
 import { toast } from '@/lib/toast';
@@ -39,13 +42,13 @@ function deriveLabelAndHref(item: WardrobeItem): { label: string; href: string |
         return { label: item.productName, href: '/vault' };
     }
     if (item.kind === 'public-dpp') {
-        return { label: item.productName, href: `/p/${item.publicCode}` };
+        return { label: item.productName, href: routes.publicPassport(item.publicCode) };
     }
     return { label: `DPP externe · ${item.gtin}`, href: '/vault' };
 }
 
 export function MyDocuments() {
-    const navigate = useNavigate();
+    const router = useRouter();
     const wardrobe = useWardrobe();
     const { user } = useUser();
     const userId = user?.id ?? null;
@@ -90,23 +93,23 @@ export function MyDocuments() {
     const total = all.length;
 
     return (
-        <div className="bg-background flex h-full flex-col overflow-y-auto pb-24">
+        <div className="flex h-full flex-col overflow-y-auto bg-background pb-24">
             <motion.header
-                className="flex items-center gap-3 px-4 pb-3 pt-12"
+                className="flex items-center gap-3 px-4 pt-12 pb-3"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
             >
                 <button
                     type="button"
-                    onClick={() => navigate(-1)}
+                    onClick={() => router.back()}
                     aria-label="Retour"
-                    className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full border"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground"
                 >
                     <ArrowLeft className="h-4 w-4" />
                 </button>
                 <div className="min-w-0 flex-1">
-                    <h1 className="text-foreground text-base font-bold">Mes documents</h1>
-                    <p className="text-muted-foreground text-xs">
+                    <h1 className="text-base font-bold text-foreground">Mes documents</h1>
+                    <p className="text-xs text-muted-foreground">
                         {total} document{total > 1 ? 's' : ''} chiffré{total > 1 ? 's' : ''}
                     </p>
                 </div>
@@ -154,11 +157,11 @@ function KindFilter({ filter, counts, total, onChange }: KindFilterProps) {
     if (chips.length <= 1) return null;
 
     return (
-        <div className="bg-background/85 sticky top-0 z-10 mx-0 px-4 py-2 backdrop-blur-md">
+        <div className="sticky top-0 z-10 mx-0 bg-background/85 px-4 py-2 backdrop-blur-md">
             <div
                 role="tablist"
                 aria-label="Filtrer par type de document"
-                className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                className="flex [scrollbar-width:none] gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
             >
                 {chips.map((chip) => {
                     const active = chip.key === filter;
@@ -171,10 +174,10 @@ function KindFilter({ filter, counts, total, onChange }: KindFilterProps) {
                             onClick={() => onChange(chip.key)}
                             className={cn(
                                 'inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all',
-                                'focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
+                                'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:outline-none',
                                 active
-                                    ? 'bg-foreground text-background border-transparent shadow-sm'
-                                    : 'bg-card/40 text-muted-foreground border-border/60 hover:text-foreground hover:bg-card/70',
+                                    ? 'border-transparent bg-foreground text-background shadow-sm'
+                                    : 'border-border/60 bg-card/40 text-muted-foreground hover:bg-card/70 hover:text-foreground',
                             )}
                         >
                             {chip.label}
@@ -196,14 +199,14 @@ function Empty({ hasAny }: { hasAny: boolean }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
         >
-            <div className="border-border/60 bg-card flex h-16 w-16 items-center justify-center rounded-3xl border">
-                <FileText className="text-muted-foreground h-7 w-7" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-3xl border border-border/60 bg-card">
+                <FileText className="h-7 w-7 text-muted-foreground" />
             </div>
             <div>
-                <h2 className="text-foreground text-base font-semibold">
+                <h2 className="text-base font-semibold text-foreground">
                     {hasAny ? 'Aucun document pour ce filtre' : 'Aucun document pour l’instant'}
                 </h2>
-                <p className="text-muted-foreground mt-1 text-sm">
+                <p className="mt-1 text-sm text-muted-foreground">
                     {hasAny
                         ? 'Change de catégorie ou ajoute des documents depuis un passeport.'
                         : 'Ouvre un passeport et utilise « Documents » pour joindre tes factures, garanties ou tickets.'}
@@ -222,17 +225,17 @@ function DocumentCard({ row, onOpen }: { row: FlatDocument; onOpen: () => void }
     });
 
     return (
-        <article className="border-border/60 bg-card flex flex-col gap-2 rounded-2xl border p-3">
+        <article className="flex flex-col gap-2 rounded-2xl border border-border/60 bg-card p-3">
             <div className="flex items-center gap-3">
                 <span
                     aria-hidden
-                    className="bg-muted text-muted-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground"
                 >
                     <Icon className="h-4 w-4" />
                 </span>
                 <div className="min-w-0 flex-1">
-                    <p className="text-foreground truncate text-sm font-medium">{row.doc.fileName}</p>
-                    <p className="text-muted-foreground text-[11px]">
+                    <p className="truncate text-sm font-medium text-foreground">{row.doc.fileName}</p>
+                    <p className="text-[11px] text-muted-foreground">
                         {DOCUMENT_KIND_LABEL[row.doc.kind]} · {humanSize(row.doc.byteLength)} · {date}
                     </p>
                 </div>
@@ -240,7 +243,7 @@ function DocumentCard({ row, onOpen }: { row: FlatDocument; onOpen: () => void }
                     type="button"
                     onClick={onOpen}
                     aria-label={`Ouvrir ${row.doc.fileName}`}
-                    className="border-border bg-background text-foreground hover:bg-card inline-flex h-8 w-8 items-center justify-center rounded-full border"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-card"
                 >
                     <ExternalLink className="h-3.5 w-3.5" />
                 </button>
@@ -248,19 +251,19 @@ function DocumentCard({ row, onOpen }: { row: FlatDocument; onOpen: () => void }
 
             {row.href ? (
                 <Link
-                    to={row.href}
-                    className="border-border/60 bg-background/60 text-muted-foreground hover:text-foreground flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-[11px]"
+                    href={row.href}
+                    className="flex items-center justify-between gap-2 rounded-lg border border-border/60 bg-background/60 px-3 py-2 text-[11px] text-muted-foreground hover:text-foreground"
                 >
                     <span className="truncate">Rattaché à {row.label}</span>
                     <ChevronRight className="h-3.5 w-3.5 shrink-0" aria-hidden />
                 </Link>
             ) : (
-                <p className="text-muted-foreground border-border/60 bg-background/60 truncate rounded-lg border px-3 py-2 text-[11px]">
+                <p className="truncate rounded-lg border border-border/60 bg-background/60 px-3 py-2 text-[11px] text-muted-foreground">
                     Rattaché à {row.label}
                 </p>
             )}
 
-            <p className="text-muted-foreground/70 truncate font-mono text-[10px]">#{itemKey(row.item)}</p>
+            <p className="truncate font-mono text-[10px] text-muted-foreground/70">#{itemKey(row.item)}</p>
         </article>
     );
 }

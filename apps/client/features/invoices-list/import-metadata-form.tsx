@@ -47,7 +47,7 @@ export function ImportMetadataForm(props: Props) {
                         ))}
                     </SelectContent>
                 </Select>
-                {errors.supplierId ? <p className="text-destructive mt-1 text-xs">{errors.supplierId}</p> : null}
+                {errors.supplierId ? <p className="mt-1 text-xs text-destructive">{errors.supplierId}</p> : null}
             </div>
 
             <div>
@@ -58,7 +58,7 @@ export function ImportMetadataForm(props: Props) {
                     value={props.issuedAt}
                     onChange={(e) => props.onIssuedAt(e.target.value)}
                 />
-                {errors.issuedAt ? <p className="text-destructive mt-1 text-xs">{errors.issuedAt}</p> : null}
+                {errors.issuedAt ? <p className="mt-1 text-xs text-destructive">{errors.issuedAt}</p> : null}
             </div>
 
             <div>
@@ -71,7 +71,7 @@ export function ImportMetadataForm(props: Props) {
                     value={Number.isFinite(props.totalAmount) ? props.totalAmount : ''}
                     onChange={(e) => props.onTotalAmount(Number(e.target.value))}
                 />
-                {errors.totalAmount ? <p className="text-destructive mt-1 text-xs">{errors.totalAmount}</p> : null}
+                {errors.totalAmount ? <p className="mt-1 text-xs text-destructive">{errors.totalAmount}</p> : null}
             </div>
 
             <ImportFiberEditor fibers={props.fibers} onChange={props.onFibers} />

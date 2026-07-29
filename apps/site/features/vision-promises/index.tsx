@@ -48,10 +48,10 @@ export function VisionPromises() {
                     transition={{ duration: 0.5 }}
                     className="mb-12 text-center"
                 >
-                    <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                         Trois promesses, une app
                     </h2>
-                    <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg">
+                    <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
                         Tout ce dont vous avez besoin pour consommer le textile en conscience.
                     </p>
                 </motion.div>
@@ -68,14 +68,14 @@ export function VisionPromises() {
                                 viewport={{ once: true, margin: '-50px' }}
                                 transition={{ duration: 0.4, delay: index * 0.1 }}
                             >
-                                <div className="bg-card border-border h-full rounded-2xl border p-6 text-center">
+                                <div className="h-full rounded-2xl border border-border bg-card p-6 text-center">
                                     <div
                                         className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl ${tone.bg}`}
                                     >
                                         <promise.icon className={`h-7 w-7 ${tone.text}`} />
                                     </div>
-                                    <h3 className="text-foreground text-lg font-semibold">{promise.title}</h3>
-                                    <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+                                    <h3 className="text-lg font-semibold text-foreground">{promise.title}</h3>
+                                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                                         {promise.description}
                                     </p>
                                 </div>

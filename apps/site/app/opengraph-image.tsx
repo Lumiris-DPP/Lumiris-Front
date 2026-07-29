@@ -21,7 +21,7 @@ export default function Image() {
             }}
         >
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                {/* eslint-disable-next-line @next/next/no-img-element -- next/og renders via Satori, not the DOM */}
+                {}
                 <img src={OG_LOGO_DATA_URI} width={62} height={44} alt="" />
                 <div style={{ display: 'flex', fontSize: 24, letterSpacing: 6, color: '#475569' }}>LUMIRIS</div>
             </div>

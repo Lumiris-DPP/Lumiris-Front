@@ -1,6 +1,9 @@
+'use client';
+
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
     ChevronRight,
@@ -39,25 +42,25 @@ function LoggedOut() {
                 <GlassCard className="flex flex-col items-center p-7 text-center">
                     <span
                         aria-hidden
-                        className="border-border/60 bg-background/60 mb-5 flex h-16 w-16 items-center justify-center rounded-full border"
+                        className="mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-border/60 bg-background/60"
                     >
-                        <User className="text-muted-foreground h-12 w-12" strokeWidth={1.4} />
+                        <User className="h-12 w-12 text-muted-foreground" strokeWidth={1.4} />
                     </span>
-                    <h1 className="text-foreground text-lg font-semibold">Pas encore de compte</h1>
-                    <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+                    <h1 className="text-lg font-semibold text-foreground">Pas encore de compte</h1>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                         Crée un compte pour synchroniser ta Garde-Robe et débloquer les retoucheurs locaux.
                     </p>
 
                     <Button
                         asChild
-                        className="bg-foreground text-background hover:bg-foreground/90 mt-6 h-11 w-full rounded-full text-sm font-semibold"
+                        className="mt-6 h-11 w-full rounded-full bg-foreground text-sm font-semibold text-background hover:bg-foreground/90"
                     >
-                        <Link to="/auth">Créer un compte</Link>
+                        <Link href="/auth">Créer un compte</Link>
                     </Button>
 
                     <Link
-                        to="/about"
-                        className="text-muted-foreground hover:text-foreground mt-4 text-xs underline-offset-4 hover:underline"
+                        href="/about"
+                        className="mt-4 text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
                     >
                         À propos de LUMIRIS
                     </Link>
@@ -74,7 +77,7 @@ interface LoggedInProps {
 }
 
 function LoggedIn({ displayName, email, city }: LoggedInProps) {
-    const navigate = useNavigate();
+    const router = useRouter();
     const stats = useWardrobeStats();
     const { signOut } = useUser();
     const [signingOut, setSigningOut] = useState(false);
@@ -87,7 +90,7 @@ function LoggedIn({ displayName, email, city }: LoggedInProps) {
         if (signingOut) return;
         setSigningOut(true);
         signOut();
-        navigate('/');
+        router.push('/');
     }
 
     return (
@@ -95,7 +98,7 @@ function LoggedIn({ displayName, email, city }: LoggedInProps) {
             <IridescentBackground intensity="subtle" />
 
             <motion.header
-                className="px-5 pb-5 pt-[max(env(safe-area-inset-top),3rem)]"
+                className="px-5 pt-[max(env(safe-area-inset-top),3rem)] pb-5"
                 variants={slideUpFade}
                 initial="initial"
                 animate="animate"
@@ -103,14 +106,14 @@ function LoggedIn({ displayName, email, city }: LoggedInProps) {
                 <div className="flex items-center gap-4">
                     <span
                         aria-hidden
-                        className="from-lumiris-cyan to-lumiris-iris bg-linear-to-br flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-base font-semibold text-white shadow-md"
+                        className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-lumiris-cyan to-lumiris-iris text-base font-semibold text-white shadow-md"
                     >
                         {initial}
                     </span>
                     <div className="min-w-0 flex-1">
-                        <h1 className="text-foreground truncate text-lg font-semibold">{displayName}</h1>
-                        <p className="text-muted-foreground truncate text-xs">{email}</p>
-                        {city ? <p className="text-muted-foreground/80 truncate text-[11px]">{city}</p> : null}
+                        <h1 className="truncate text-lg font-semibold text-foreground">{displayName}</h1>
+                        <p className="truncate text-xs text-muted-foreground">{email}</p>
+                        {city ? <p className="truncate text-[11px] text-muted-foreground/80">{city}</p> : null}
                     </div>
                 </div>
             </motion.header>
@@ -160,7 +163,7 @@ function LoggedIn({ displayName, email, city }: LoggedInProps) {
                     type="button"
                     onClick={handleSignOut}
                     disabled={signingOut}
-                    className="border-lumiris-rose/30 bg-lumiris-rose/5 text-lumiris-rose hover:bg-lumiris-rose/10 inline-flex w-full items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-xs font-semibold transition disabled:opacity-50"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-lumiris-rose/30 bg-lumiris-rose/5 px-4 py-3 text-xs font-semibold text-lumiris-rose transition hover:bg-lumiris-rose/10 disabled:opacity-50"
                 >
                     <LogOut className="h-4 w-4" />
                     Se déconnecter
@@ -180,7 +183,7 @@ interface StatCardProps {
 function StatCard({ label, value, accent, badge }: StatCardProps) {
     return (
         <GlassCard className="flex flex-col gap-1 p-4" intensity="subtle">
-            <p className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">{label}</p>
+            <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">{label}</p>
             <div className="flex items-baseline justify-between gap-2">
                 <p className={`${accent} font-mono text-xl font-bold`}>{value}</p>
                 {badge}
@@ -201,11 +204,11 @@ function ActionLink({ href, Icon, label, external = false }: ActionLinkProps) {
         'border-border/60 bg-card/60 hover:bg-card/80 flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-sm backdrop-blur-md transition-colors';
     const content = (
         <>
-            <span className="text-foreground inline-flex items-center gap-3">
-                <Icon className="text-muted-foreground h-4 w-4" />
+            <span className="inline-flex items-center gap-3 text-foreground">
+                <Icon className="h-4 w-4 text-muted-foreground" />
                 {label}
             </span>
-            <ChevronRight className="text-muted-foreground/60 h-4 w-4" />
+            <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
         </>
     );
 
@@ -221,7 +224,7 @@ function ActionLink({ href, Icon, label, external = false }: ActionLinkProps) {
 
     return (
         <li>
-            <Link to={href} className={className}>
+            <Link href={href} className={className}>
                 {content}
             </Link>
         </li>

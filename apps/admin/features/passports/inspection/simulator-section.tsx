@@ -109,8 +109,8 @@ export function SimulatorSection({ passport, baseScore }: SimulatorSectionProps)
     return (
         <section className="space-y-6">
             <header className="flex flex-wrap items-center justify-between gap-3">
-                <h2 className="text-foreground inline-flex items-center gap-2 text-base font-semibold">
-                    <Beaker className="text-lumiris-amber h-4 w-4" />
+                <h2 className="inline-flex items-center gap-2 text-base font-semibold text-foreground">
+                    <Beaker className="h-4 w-4 text-lumiris-amber" />
                     Simulateur
                 </h2>
                 <div className="flex items-center gap-2">
@@ -139,8 +139,8 @@ export function SimulatorSection({ passport, baseScore }: SimulatorSectionProps)
             </header>
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <div className="border-border bg-card space-y-3 rounded-xl border p-5">
-                    <p className="text-foreground text-sm font-semibold">Hypothèses</p>
+                <div className="space-y-3 rounded-xl border border-border bg-card p-5">
+                    <p className="text-sm font-semibold text-foreground">Hypothèses</p>
                     {TOGGLES.map((t) => (
                         <div key={t.key} className="flex items-center justify-between gap-3 text-xs">
                             <div className="flex items-center gap-1.5">
@@ -169,8 +169,8 @@ export function SimulatorSection({ passport, baseScore }: SimulatorSectionProps)
                     ))}
                 </div>
 
-                <div className="border-border bg-card rounded-xl border p-5">
-                    <p className="text-foreground mb-3 text-sm font-semibold">Delta</p>
+                <div className="rounded-xl border border-border bg-card p-5">
+                    <p className="mb-3 text-sm font-semibold text-foreground">Delta</p>
                     <div className="grid grid-cols-2 gap-3">
                         <GradeTile label="Actuel" grade={baseScore.grade} total={baseScore.total} />
                         <GradeTile
@@ -183,9 +183,9 @@ export function SimulatorSection({ passport, baseScore }: SimulatorSectionProps)
                     </div>
 
                     <div className="mt-4">
-                        <p className="text-muted-foreground mb-2 text-[11px] uppercase">Axes affectés</p>
+                        <p className="mb-2 text-[11px] text-muted-foreground uppercase">Axes affectés</p>
                         {affectedAxes.length === 0 ? (
-                            <p className="text-muted-foreground text-xs">
+                            <p className="text-xs text-muted-foreground">
                                 Aucune modification — activez une hypothèse.
                             </p>
                         ) : (
@@ -221,7 +221,7 @@ export function SimulatorSection({ passport, baseScore }: SimulatorSectionProps)
             </div>
 
             <Sheet open={previewOpen} onOpenChange={setPreviewOpen}>
-                <SheetContent className="w-160 sm:max-w-160 max-w-[95vw]" side="right">
+                <SheetContent className="w-160 max-w-[95vw] sm:max-w-160" side="right">
                     <SheetHeader>
                         <SheetTitle>Aperçu</SheetTitle>
                         <SheetDescription>Rendu DPP avec hypothèses.</SheetDescription>
@@ -260,13 +260,13 @@ function GradeTile({
     return (
         <div
             className={cn(
-                'border-border bg-background flex flex-col items-center gap-1.5 rounded-lg border p-3',
+                'flex flex-col items-center gap-1.5 rounded-lg border border-border bg-background p-3',
                 highlight && 'border-lumiris-emerald/40',
             )}
         >
-            <p className="text-muted-foreground text-[10px] uppercase">{label}</p>
+            <p className="text-[10px] text-muted-foreground uppercase">{label}</p>
             <IrisGrade grade={grade} size="lg" shape="square" />
-            <p className="text-foreground font-mono text-sm">{total.toFixed(1)}</p>
+            <p className="font-mono text-sm text-foreground">{total.toFixed(1)}</p>
             {delta !== undefined ? (
                 <Badge variant="outline" className={cn('font-mono text-[10px]', deltaTone)}>
                     {delta > 0 ? '+' : ''}
@@ -290,7 +290,7 @@ function PreviewColumn({
 }) {
     return (
         <div className="space-y-2">
-            <p className="text-muted-foreground text-center text-[11px] uppercase">{label}</p>
+            <p className="text-center text-[11px] text-muted-foreground uppercase">{label}</p>
             <div className="origin-top scale-90">
                 <PassportPhonePreview passport={passport} {...(artisan ? { artisan } : {})} score={score} />
             </div>

@@ -6,11 +6,8 @@ import { Resource } from '@opentelemetry/resources';
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { ConsoleSpanExporter, ParentBasedSampler, TraceIdRatioBasedSampler } from '@opentelemetry/sdk-trace-base';
-import {
-    SEMRESATTRS_DEPLOYMENT_ENVIRONMENT,
-    SEMRESATTRS_SERVICE_NAME,
-    SEMRESATTRS_SERVICE_VERSION,
-} from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
+import { ATTR_DEPLOYMENT_ENVIRONMENT_NAME } from '@opentelemetry/semantic-conventions/incubating';
 
 import { LUMIRIS_SAMPLE_RATE_DEV, LUMIRIS_SAMPLE_RATE_PROD } from './constants';
 import type { ServiceName, TelemetryEnv } from './types';
@@ -59,9 +56,9 @@ export function initOtel(options: InitOtelOptions): NodeSDK | null {
         : undefined;
 
     const resource = new Resource({
-        [SEMRESATTRS_SERVICE_NAME]: options.service,
-        [SEMRESATTRS_SERVICE_VERSION]: options.serviceVersion ?? process.env.npm_package_version ?? '0.0.0',
-        [SEMRESATTRS_DEPLOYMENT_ENVIRONMENT]: env,
+        [ATTR_SERVICE_NAME]: options.service,
+        [ATTR_SERVICE_VERSION]: options.serviceVersion ?? process.env.npm_package_version ?? '0.0.0',
+        [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]: env,
     });
 
     sdk = new NodeSDK({

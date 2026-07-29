@@ -59,7 +59,7 @@ export function Stepper({ draftId, currentStep, draft }: StepperProps) {
                                     'relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border font-mono text-xs font-semibold transition-colors',
                                     badgeClass(state),
                                     state === 'current' &&
-                                        'ring-primary/40 ring-offset-background ring-2 ring-offset-2',
+                                        'ring-2 ring-primary/40 ring-offset-2 ring-offset-background',
                                     !canClick && 'cursor-not-allowed opacity-60',
                                 )}
                             >
@@ -75,7 +75,7 @@ export function Stepper({ draftId, currentStep, draft }: StepperProps) {
                         <span
                             className={cn(
                                 'truncate text-center text-[11px] tracking-tight',
-                                state === 'current' ? 'text-foreground font-medium' : 'text-muted-foreground',
+                                state === 'current' ? 'font-medium text-foreground' : 'text-muted-foreground',
                             )}
                         >
                             {STEP_LABELS[s]}

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Github, History, Scale, ShieldCheck } from 'lucide-react';
+import { History, Scale, ShieldCheck } from 'lucide-react';
+import { GithubMark } from '@lumiris/ui/components/github-mark';
 import { Card, CardContent } from '@lumiris/ui/components/card';
 
 export const metadata: Metadata = {
@@ -128,18 +129,18 @@ const ARTICLES: ReadonlyArray<{ n: number; title: string; body: string }> = [
 
 export default function CharteIndependancePage() {
     return (
-        <div className="pb-20 pt-28">
+        <div className="pt-28 pb-20">
             <header className="mx-auto max-w-3xl px-6">
                 <div className="flex items-center gap-3">
                     <ShieldCheck className="text-grade-a h-7 w-7" />
-                    <p className="text-muted-foreground text-xs font-medium uppercase tracking-[0.25em]">
+                    <p className="text-xs font-medium tracking-[0.25em] text-muted-foreground uppercase">
                         Charte d’indépendance
                     </p>
                 </div>
-                <h1 className="text-foreground mt-4 text-balance text-4xl font-bold tracking-tight sm:text-5xl">
+                <h1 className="mt-4 text-4xl font-bold tracking-tight text-balance text-foreground sm:text-5xl">
                     Aucun acteur n’achète son score Iris.
                 </h1>
-                <p className="text-muted-foreground mt-5 max-w-2xl text-pretty text-lg leading-relaxed">
+                <p className="mt-5 max-w-2xl text-lg leading-relaxed text-pretty text-muted-foreground">
                     LUMIRIS s’est créé en réaction. En réaction à des labels privés qui notent leurs propres clients. En
                     réaction à des plateformes qui empilent les badges sponsorisés. Voici, en sept articles, ce que nous
                     ne ferons jamais.
@@ -152,12 +153,12 @@ export default function CharteIndependancePage() {
                         <li key={a.n}>
                             <Card>
                                 <CardContent className="flex gap-5 p-6">
-                                    <div className="text-muted-foreground shrink-0 font-mono text-3xl font-semibold leading-none">
+                                    <div className="shrink-0 font-mono text-3xl leading-none font-semibold text-muted-foreground">
                                         {String(a.n).padStart(2, '0')}
                                     </div>
                                     <div>
-                                        <p className="text-foreground text-lg font-semibold leading-snug">{a.title}</p>
-                                        <p className="text-muted-foreground mt-2 text-sm leading-relaxed">{a.body}</p>
+                                        <p className="text-lg leading-snug font-semibold text-foreground">{a.title}</p>
+                                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{a.body}</p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -169,15 +170,15 @@ export default function CharteIndependancePage() {
             <section aria-labelledby="commission-heading" className="mx-auto mt-16 max-w-3xl px-6">
                 <div className="flex items-center gap-3">
                     <Scale className="text-grade-b h-6 w-6" />
-                    <h2 id="commission-heading" className="text-foreground text-2xl font-semibold tracking-tight">
+                    <h2 id="commission-heading" className="text-2xl font-semibold tracking-tight text-foreground">
                         Commission d’indépendance
                     </h2>
                 </div>
-                <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                     Cinq personnalités externes - sans contrat commercial avec LUMIRIS - sont saisissables par tout
                     consommateur, artisan ou journaliste qui doute de l’indépendance d’un score Iris ou d’un placement
                     éditorial. Mandat de trois ans, signé le{' '}
-                    <span className="text-foreground font-mono">
+                    <span className="font-mono text-foreground">
                         {new Date(COMMISSION_SIGNED_AT).toLocaleDateString('fr-FR', {
                             day: 'numeric',
                             month: 'long',
@@ -193,19 +194,19 @@ export default function CharteIndependancePage() {
                             <Card>
                                 <CardContent className="p-5">
                                     <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-                                        <p className="text-foreground font-semibold">{c.name}</p>
-                                        <p className="text-muted-foreground text-xs uppercase tracking-wide">
+                                        <p className="font-semibold text-foreground">{c.name}</p>
+                                        <p className="text-xs tracking-wide text-muted-foreground uppercase">
                                             {c.role}
                                         </p>
                                     </div>
-                                    <p className="text-muted-foreground mt-1 text-sm">{c.affiliation}</p>
+                                    <p className="mt-1 text-sm text-muted-foreground">{c.affiliation}</p>
                                 </CardContent>
                             </Card>
                         </li>
                     ))}
                 </ul>
 
-                <p className="text-muted-foreground mt-6 text-sm">
+                <p className="mt-6 text-sm text-muted-foreground">
                     Une saisine ?{' '}
                     <a
                         href="mailto:commission@lumiris.fr"
@@ -227,11 +228,11 @@ export default function CharteIndependancePage() {
             <section aria-labelledby="baselines-heading" className="mx-auto mt-16 max-w-3xl px-6">
                 <div className="flex items-center gap-3">
                     <History className="text-grade-c h-6 w-6" />
-                    <h2 id="baselines-heading" className="text-foreground text-2xl font-semibold tracking-tight">
+                    <h2 id="baselines-heading" className="text-2xl font-semibold tracking-tight text-foreground">
                         Changelog des datasets baseline
                     </h2>
                 </div>
-                <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                     Chaque version d’un coefficient (carbone, eau, seuils ESPR) est annoncée 90 jours avant son entrée
                     en vigueur. Les versions historiques restent disponibles pour rejouer un score à n’importe quelle
                     date.
@@ -243,8 +244,8 @@ export default function CharteIndependancePage() {
                             <Card>
                                 <CardContent className="p-5">
                                     <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-                                        <p className="text-foreground font-mono text-sm font-semibold">{rel.version}</p>
-                                        <p className="text-muted-foreground text-xs uppercase tracking-wide">
+                                        <p className="font-mono text-sm font-semibold text-foreground">{rel.version}</p>
+                                        <p className="text-xs tracking-wide text-muted-foreground uppercase">
                                             En vigueur le{' '}
                                             <span className="font-mono">
                                                 {new Date(rel.effectiveAt).toLocaleDateString('fr-FR', {
@@ -255,8 +256,8 @@ export default function CharteIndependancePage() {
                                             </span>
                                         </p>
                                     </div>
-                                    <p className="text-foreground mt-2 text-sm font-medium">{rel.summary}</p>
-                                    <ul className="text-muted-foreground mt-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed">
+                                    <p className="mt-2 text-sm font-medium text-foreground">{rel.summary}</p>
+                                    <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-muted-foreground">
                                         {rel.changes.map((change) => (
                                             <li key={change}>{change}</li>
                                         ))}
@@ -267,7 +268,7 @@ export default function CharteIndependancePage() {
                     ))}
                 </ol>
 
-                <p className="text-muted-foreground mt-4 text-xs">
+                <p className="mt-4 text-xs text-muted-foreground">
                     Releases publiées sur{' '}
                     <a
                         href={`${SOURCE_REPO_URL}/releases`}
@@ -283,12 +284,12 @@ export default function CharteIndependancePage() {
 
             <section aria-labelledby="source-heading" className="mx-auto mt-16 max-w-3xl px-6">
                 <div className="flex items-center gap-3">
-                    <Github className="text-foreground h-5 w-5" />
-                    <h2 id="source-heading" className="text-foreground text-2xl font-semibold tracking-tight">
+                    <GithubMark className="h-5 w-5 text-foreground" />
+                    <h2 id="source-heading" className="text-2xl font-semibold tracking-tight text-foreground">
                         Code source ouvert
                     </h2>
                 </div>
-                <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                     L’algorithme <span className="font-mono">@lumiris/core</span> et ses datasets (coefficients carbone
                     ADEME / Higg, eau WFN, seuils ESPR) sont publics. Toute modification d’un poids ou d’un coefficient
                     passe par une pull-request signée, annoncée 90 jours avant son entrée en vigueur.
@@ -297,15 +298,15 @@ export default function CharteIndependancePage() {
                     href={SOURCE_REPO_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="border-border bg-card hover:border-grade-a/40 mt-5 inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors"
+                    className="hover:border-grade-a/40 mt-5 inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-colors"
                 >
-                    <Github className="h-4 w-4" />
+                    <GithubMark className="h-4 w-4" />
                     github.com/lumiris-fr/lumiris
                 </a>
             </section>
 
             <section className="mx-auto mt-16 max-w-3xl px-6 text-center">
-                <p className="text-muted-foreground text-sm">
+                <p className="text-sm text-muted-foreground">
                     <Link href="/reglementation" className="text-foreground underline-offset-4 hover:underline">
                         Comprendre la réglementation
                     </Link>{' '}

@@ -1,5 +1,7 @@
+'use client';
+
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ExternalLink, ShoppingBag, Shirt } from 'lucide-react';
 import { IrisGrade } from '@lumiris/scoring-ui';
@@ -7,6 +9,7 @@ import type { IrisGrade as IrisGradeValue } from '@lumiris/types';
 import { useTrackAffiliate } from '@lumiris/api-client/react';
 import type { MarketplaceItem } from '@lumiris/api-client';
 import { cn } from '@lumiris/ui/lib/cn';
+import { routes } from '@/lib/routes';
 import { formatCents } from '@/lib/marketplace';
 import { AtelierPlusBadge } from './atelier-plus-badge';
 import { materialLabel } from './labels';
@@ -37,7 +40,7 @@ interface ProductCardProps {
 }
 
 // Carte du catalogue réel. Deux modes :
-//  • vente in-app → renvoie vers la fiche Boutique (/boutique/[id]) qui porte le VRAI flux
+//  • vente in-app → renvoie vers la fiche Boutique qui porte le VRAI flux
 //    panier + paiement embarqué (aucun paiement direct au clic) ;
 //  • affilié → ouvre le lien de commande de l'atelier, tracké via /public/track/affiliate.
 export function ProductCard({ item, index, source = 'shop' }: ProductCardProps) {
@@ -57,8 +60,9 @@ export function ProductCard({ item, index, source = 'shop' }: ProductCardProps) 
 
     const body = (
         <>
-            <div className="bg-secondary/50 relative flex h-28 items-center justify-center overflow-hidden">
+            <div className="relative flex h-28 items-center justify-center overflow-hidden bg-secondary/50">
                 {photo && !photoFailed ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                         src={photo}
                         alt=""
@@ -67,29 +71,29 @@ export function ProductCard({ item, index, source = 'shop' }: ProductCardProps) 
                         className="absolute inset-0 h-full w-full object-cover"
                     />
                 ) : (
-                    <Shirt className="text-muted-foreground/25 h-9 w-9" aria-hidden />
+                    <Shirt className="h-9 w-9 text-muted-foreground/25" aria-hidden />
                 )}
                 {grade ? (
-                    <span className="absolute right-2 top-2">
+                    <span className="absolute top-2 right-2">
                         <IrisGrade grade={grade} size="sm" tone="solid" />
                     </span>
                 ) : null}
-                {item.atelierPlus ? <AtelierPlusBadge className="absolute left-2 top-2" /> : null}
+                {item.atelierPlus ? <AtelierPlusBadge className="absolute top-2 left-2" /> : null}
             </div>
 
             <div className="p-3">
-                <h4 className="text-foreground truncate text-xs font-semibold leading-tight">{item.name}</h4>
-                <p className="text-muted-foreground mt-0.5 truncate text-[11px]">
+                <h4 className="truncate text-xs leading-tight font-semibold text-foreground">{item.name}</h4>
+                <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
                     {item.artisanName ?? 'Atelier indépendant'}
                     {item.material ? ` · ${materialLabel(item.material)}` : ''}
                 </p>
                 <div className="mt-1 flex items-center justify-between gap-2">
-                    <p className="text-foreground text-xs font-bold">{formatCents(item.priceCents)}</p>
+                    <p className="text-xs font-bold text-foreground">{formatCents(item.priceCents)}</p>
                     {inApp ? (
-                        <ShoppingBag className="text-primary h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden />
+                        <ShoppingBag className="h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={1.75} aria-hidden />
                     ) : href ? (
                         <ExternalLink
-                            className="text-muted-foreground h-3.5 w-3.5 shrink-0"
+                            className="h-3.5 w-3.5 shrink-0 text-muted-foreground"
                             strokeWidth={1.5}
                             aria-hidden
                         />
@@ -100,7 +104,7 @@ export function ProductCard({ item, index, source = 'shop' }: ProductCardProps) 
     );
 
     const className = cn(
-        'bg-card group relative flex flex-col overflow-hidden rounded-2xl border text-left transition-all',
+        'group relative flex flex-col overflow-hidden rounded-2xl border bg-card text-left transition-all',
         'border-border/60 hover:border-border',
     );
 
@@ -112,7 +116,7 @@ export function ProductCard({ item, index, source = 'shop' }: ProductCardProps) 
         >
             {inApp ? (
                 <Link
-                    to={`/boutique/${item.id}`}
+                    href={routes.product(item.id)}
                     className={className}
                     aria-label={`Voir « ${item.name} » dans la Boutique`}
                 >

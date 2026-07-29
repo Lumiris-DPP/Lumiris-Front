@@ -31,7 +31,7 @@ const SHAPE: Record<IrisGradeShape, string> = {
 export function IrisGrade({ grade, size = 'md', tone = 'soft', shape = 'pill', className, ...rest }: IrisGradeProps) {
     const toneClasses =
         tone === 'solid'
-            ? cn(gradeBackgroundSolid(grade), 'text-primary-foreground border-transparent')
+            ? cn(gradeBackgroundSolid(grade), 'border-transparent text-primary-foreground')
             : cn(gradeColor(grade), gradeBackground(grade), gradeBorder(grade));
 
     return (

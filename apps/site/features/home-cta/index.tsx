@@ -9,7 +9,7 @@ export function HomeCta() {
         <section className="relative overflow-hidden py-24 sm:py-32">
             {/* Prismatic halo background */}
             <div className="pointer-events-none absolute inset-0 -z-10">
-                <div className="from-lumiris-cyan/6 via-lumiris-iris/4 to-lumiris-rose/6 absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br blur-3xl" />
+                <div className="absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-lumiris-cyan/6 via-lumiris-iris/4 to-lumiris-rose/6 blur-3xl" />
             </div>
 
             <div className="mx-auto max-w-4xl px-6 text-center">
@@ -19,10 +19,10 @@ export function HomeCta() {
                     viewport={{ once: true, margin: '-100px' }}
                     transition={{ duration: 0.5 }}
                 >
-                    <h2 className="text-foreground text-balance text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+                    <h2 className="text-3xl font-bold tracking-tight text-balance text-foreground sm:text-4xl lg:text-5xl">
                         Rejoignez le mouvement de la transparence textile
                     </h2>
-                    <p className="text-muted-foreground mx-auto mt-6 max-w-2xl text-lg">
+                    <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
                         Que vous soyez artisan ou consommateur, LUMIRIS vous donne les clés pour comprendre et valoriser
                         le textile responsable.
                     </p>
@@ -37,20 +37,20 @@ export function HomeCta() {
                 >
                     <Link
                         href="/decouvrir"
-                        className="bg-foreground text-background inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-medium transition-opacity hover:opacity-90"
+                        className="inline-flex items-center gap-2 rounded-xl bg-foreground px-6 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90"
                     >
                         Découvrir les pièces
                         <ArrowRight className="h-4 w-4" />
                     </Link>
                     <Link
                         href="/atelier"
-                        className="border-border text-foreground hover:bg-muted/50 inline-flex items-center gap-2 rounded-xl border px-6 py-3 text-sm font-medium transition-colors"
+                        className="inline-flex items-center gap-2 rounded-xl border border-border px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted/50"
                     >
                         Espace artisans
                     </Link>
                     <Link
                         href="/vision"
-                        className="border-border text-foreground hover:bg-muted/50 inline-flex items-center gap-2 rounded-xl border px-6 py-3 text-sm font-medium transition-colors"
+                        className="inline-flex items-center gap-2 rounded-xl border border-border px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted/50"
                     >
                         Télécharger VISION
                     </Link>

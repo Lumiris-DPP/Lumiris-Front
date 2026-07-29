@@ -1,5 +1,7 @@
+'use client';
+
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Archive,
@@ -28,6 +30,7 @@ import { useWardrobe as useBackendWardrobe } from '@lumiris/api-client/react';
 import type { WardrobeItemDto } from '@lumiris/api-client';
 import { cn } from '@lumiris/ui/lib/cn';
 import { useUser } from '@/lib/auth/use-user';
+import { routes } from '@/lib/routes';
 import { scorePassport } from '@/lib/passport-score';
 import { useWardrobe, type WardrobeItem, type WardrobeSector } from '@/lib/wardrobe-storage';
 import { getGradeDistribution, getOverallScore } from '@/lib/iris/wardrobe-stats';
@@ -191,8 +194,8 @@ function buildPurchasedRow(item: WardrobeItemDto): PurchasedVaultRow {
 }
 
 export function Vault() {
-    const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const { isAuthenticated } = useUser();
     const items = useWardrobe();
     const { data: purchased = [] } = useBackendWardrobe({ enabled: isAuthenticated });
@@ -337,14 +340,14 @@ export function Vault() {
                 toggleCompare(row.passport.id);
                 return;
             }
-            if (row.kind === 'scored') navigate(`/passeport/${row.passport.id}`);
-            if (row.kind === 'public-dpp') navigate(`/p/${row.publicCode}`);
+            if (row.kind === 'scored') router.push(`/passeport/${row.passport.id}`);
+            if (row.kind === 'public-dpp') router.push(routes.publicPassport(row.publicCode));
             if (row.kind === 'purchased') {
-                if (row.publicCode) navigate(`/p/${row.publicCode}`);
-                else navigate('/me/orders');
+                if (row.publicCode) router.push(routes.publicPassport(row.publicCode));
+                else router.push('/me/orders');
             }
         },
-        [compareMode, navigate],
+        [compareMode, router],
     );
 
     const onChipTap = useCallback((grade: IrisGrade) => {
@@ -353,8 +356,8 @@ export function Vault() {
 
     if (rows.length === 0) {
         return (
-            <div className="bg-background flex h-full flex-col overflow-y-auto pt-12">
-                <VaultEmpty onScan={() => navigate('/')} onAdd={() => navigate('/vault/add')} />
+            <div className="flex h-full flex-col overflow-y-auto bg-background pt-12">
+                <VaultEmpty onScan={() => router.push('/')} onAdd={() => router.push('/vault/add')} />
             </div>
         );
     }
@@ -366,24 +369,24 @@ export function Vault() {
     const remaining = COMPARE_MAX - compareIds.length;
 
     return (
-        <div className="bg-background flex h-full flex-col">
+        <div className="flex h-full flex-col bg-background">
             <motion.header
                 className="flex items-center justify-between px-5 pt-12 pb-4"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
             >
                 <div>
-                    <h1 className="text-foreground text-xl font-bold">Mon inventaire</h1>
-                    <p className="text-muted-foreground mt-0.5 text-sm">
+                    <h1 className="text-xl font-bold text-foreground">Mon inventaire</h1>
+                    <p className="mt-0.5 text-sm text-muted-foreground">
                         {rows.length} produit{rows.length > 1 ? 's' : ''} enregistré{rows.length > 1 ? 's' : ''}
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
                     <button
                         type="button"
-                        onClick={() => navigate('/vault/add')}
+                        onClick={() => router.push('/vault/add')}
                         aria-label="Ajouter un produit"
-                        className="border-border bg-card text-foreground inline-flex h-8 w-8 items-center justify-center rounded-full border"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-foreground"
                     >
                         <Plus className="h-3.5 w-3.5" />
                     </button>
@@ -402,7 +405,7 @@ export function Vault() {
                         <SlidersHorizontal className="h-3.5 w-3.5" />
                         {hasActiveFilters ? (
                             <span
-                                className="bg-lumiris-cyan absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full"
+                                className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-lumiris-cyan"
                                 aria-hidden
                             />
                         ) : null}
@@ -436,12 +439,12 @@ export function Vault() {
                 <AnimatePresence>
                     {compareMode && remaining > 0 ? (
                         <motion.div
-                            className="border-lumiris-cyan/30 bg-lumiris-cyan/5 mb-4 rounded-2xl border px-4 py-3 text-center"
+                            className="mb-4 rounded-2xl border border-lumiris-cyan/30 bg-lumiris-cyan/5 px-4 py-3 text-center"
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
                         >
-                            <p className="text-lumiris-cyan text-xs font-medium">
+                            <p className="text-xs font-medium text-lumiris-cyan">
                                 Sélectionne {remaining} autre{remaining > 1 ? 's' : ''} produit
                                 {remaining > 1 ? 's' : ''} à passeport pour comparer
                             </p>
@@ -468,7 +471,7 @@ export function Vault() {
                 </div>
 
                 {filteredRows.length === 0 ? (
-                    <p className="text-muted-foreground mt-8 text-center text-xs">
+                    <p className="mt-8 text-center text-xs text-muted-foreground">
                         Aucun produit ne correspond aux filtres.
                     </p>
                 ) : null}
@@ -504,20 +507,20 @@ export function Vault() {
 function VaultEmpty({ onScan, onAdd }: { onScan: () => void; onAdd: () => void }) {
     return (
         <motion.div
-            className="bg-background flex h-full flex-col items-center justify-center gap-4 px-8 text-center"
+            className="flex h-full flex-col items-center justify-center gap-4 bg-background px-8 text-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
         >
-            <div className="border-border/60 bg-card relative flex h-20 w-20 items-center justify-center rounded-3xl border">
-                <Archive className="text-muted-foreground h-8 w-8" />
+            <div className="relative flex h-20 w-20 items-center justify-center rounded-3xl border border-border/60 bg-card">
+                <Archive className="h-8 w-8 text-muted-foreground" />
                 <span
-                    className="bg-lumiris-cyan/15 absolute -inset-3 -z-10 rounded-3xl blur-xl motion-reduce:hidden"
+                    className="absolute -inset-3 -z-10 rounded-3xl bg-lumiris-cyan/15 blur-xl motion-reduce:hidden"
                     aria-hidden
                 />
             </div>
             <div>
-                <h1 className="text-foreground text-lg font-semibold">Inventaire vide</h1>
-                <p className="text-muted-foreground mt-1 max-w-xs text-sm">
+                <h1 className="text-lg font-semibold text-foreground">Inventaire vide</h1>
+                <p className="mt-1 max-w-xs text-sm text-muted-foreground">
                     Scanne un produit ou ajoute-le manuellement à ton inventaire.
                 </p>
             </div>
@@ -525,7 +528,7 @@ function VaultEmpty({ onScan, onAdd }: { onScan: () => void; onAdd: () => void }
                 <button
                     type="button"
                     onClick={onScan}
-                    className="bg-foreground text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
+                    className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-primary-foreground"
                 >
                     <ScanQrCode className="h-4 w-4" />
                     Scanner
@@ -533,7 +536,7 @@ function VaultEmpty({ onScan, onAdd }: { onScan: () => void; onAdd: () => void }
                 <button
                     type="button"
                     onClick={onAdd}
-                    className="border-border bg-card text-foreground inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold"
+                    className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold text-foreground"
                 >
                     <Plus className="h-4 w-4" />
                     Ajouter
@@ -557,7 +560,7 @@ function WardrobeHealth({ grade, percentage, scoredCount }: WardrobeHealthProps)
 
     return (
         <motion.div
-            className="border-border/60 bg-card mb-5 flex items-center gap-5 rounded-2xl border p-5"
+            className="mb-5 flex items-center gap-5 rounded-2xl border border-border/60 bg-card p-5"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -587,16 +590,16 @@ function WardrobeHealth({ grade, percentage, scoredCount }: WardrobeHealthProps)
             </div>
 
             <div className="flex-1">
-                <h3 className="text-foreground text-sm font-bold">Inventory Health</h3>
+                <h3 className="text-sm font-bold text-foreground">Inventory Health</h3>
                 <p className="mt-0.5 text-xs font-semibold" style={{ color: stroke }}>
                     {GRADE_LABEL[grade]}
                 </p>
-                <p className="text-muted-foreground mt-1 text-[11px]">
+                <p className="mt-1 text-[11px] text-muted-foreground">
                     Score moyen calculé sur {scoredCount} item{scoredCount > 1 ? 's' : ''} avec DPP.
                 </p>
-                <div className="bg-lumiris-cyan/10 mt-2.5 inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1.5">
-                    <TrendingUp className="text-lumiris-cyan h-3 w-3" />
-                    <span className="text-lumiris-cyan text-[11px] font-medium">{tone}</span>
+                <div className="mt-2.5 inline-flex items-center gap-1.5 rounded-xl bg-lumiris-cyan/10 px-2.5 py-1.5">
+                    <TrendingUp className="h-3 w-3 text-lumiris-cyan" />
+                    <span className="text-[11px] font-medium text-lumiris-cyan">{tone}</span>
                 </div>
             </div>
         </motion.div>
@@ -630,7 +633,7 @@ function DistributionChips({ distribution, activeGrade, onSelect }: Distribution
                         onClick={() => onSelect(grade)}
                         aria-pressed={active}
                         className={cn(
-                            'bg-card flex flex-1 flex-col items-center gap-0.5 rounded-xl border py-2.5 transition-colors',
+                            'flex flex-1 flex-col items-center gap-0.5 rounded-xl border bg-card py-2.5 transition-colors',
                             active ? 'border-current shadow-sm' : 'border-border/40',
                         )}
                         style={active ? { color: cssVar } : undefined}
@@ -681,8 +684,8 @@ function VaultCard({ row, index, compareMode, isSelected, onTap, onOpenActions }
             exit={{ opacity: 0, scale: 0.92, transition: { duration: 0.2 } }}
             transition={{ delay: 0.25 + index * 0.04 }}
             className={cn(
-                'bg-card group relative flex flex-col overflow-hidden rounded-2xl border text-left transition-colors',
-                isSelected ? 'border-lumiris-cyan ring-lumiris-cyan/20 ring-2' : 'border-border/60',
+                'group relative flex flex-col overflow-hidden rounded-2xl border bg-card text-left transition-colors',
+                isSelected ? 'border-lumiris-cyan ring-2 ring-lumiris-cyan/20' : 'border-border/60',
             )}
             style={cardStyle}
         >
@@ -695,7 +698,7 @@ function VaultCard({ row, index, compareMode, isSelected, onTap, onOpenActions }
                         )}
                         aria-hidden
                     >
-                        {isSelected ? <Check className="text-primary-foreground h-3 w-3" /> : null}
+                        {isSelected ? <Check className="h-3 w-3 text-primary-foreground" /> : null}
                     </div>
                 ) : (
                     <span
@@ -709,12 +712,12 @@ function VaultCard({ row, index, compareMode, isSelected, onTap, onOpenActions }
                     </span>
                 )}
 
-                <div className="bg-secondary/50 relative flex h-28 items-center justify-center">
-                    <Icon className="text-muted-foreground/25 h-9 w-9" aria-hidden />
+                <div className="relative flex h-28 items-center justify-center bg-secondary/50">
+                    <Icon className="h-9 w-9 text-muted-foreground/25" aria-hidden />
                     {grade ? (
                         <div
                             className={cn(
-                                'text-primary-foreground absolute top-2 right-2 inline-flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold',
+                                'absolute top-2 right-2 inline-flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold text-primary-foreground',
                                 gradeBackgroundSolid(grade),
                             )}
                             aria-label={`Iris grade ${grade}`}
@@ -725,31 +728,31 @@ function VaultCard({ row, index, compareMode, isSelected, onTap, onOpenActions }
                 </div>
 
                 <div className="p-3">
-                    <h4 className="text-foreground truncate text-xs leading-tight font-semibold">{row.label}</h4>
-                    <p className="text-muted-foreground mt-0.5 truncate text-[11px]">{row.sublabel}</p>
+                    <h4 className="truncate text-xs leading-tight font-semibold text-foreground">{row.label}</h4>
+                    <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{row.sublabel}</p>
                     {row.kind === 'scored' ? (
-                        <p className="text-foreground mt-1 text-xs font-bold">
+                        <p className="mt-1 text-xs font-bold text-foreground">
                             {row.passport.garment.retailPrice}{' '}
                             {row.passport.garment.currency === 'EUR' ? '€' : row.passport.garment.currency}
                         </p>
                     ) : row.kind === 'public-dpp' ? (
-                        <p className="text-muted-foreground/70 mt-1 font-mono text-[11px]">{row.publicCode}</p>
+                        <p className="mt-1 font-mono text-[11px] text-muted-foreground/70">{row.publicCode}</p>
                     ) : row.kind === 'purchased' ? (
                         <div className="mt-1 flex flex-col gap-0.5">
                             {row.invoiceNumber ? (
-                                <p className="text-muted-foreground/70 truncate font-mono text-[10px]">
+                                <p className="truncate font-mono text-[10px] text-muted-foreground/70">
                                     {row.invoiceNumber}
                                 </p>
                             ) : null}
                             {row.warrantyDescription ? (
-                                <p className="text-muted-foreground inline-flex items-center gap-1 text-[10px]">
-                                    <ShieldCheck className="text-lumiris-emerald h-3 w-3 shrink-0" aria-hidden />
+                                <p className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                                    <ShieldCheck className="h-3 w-3 shrink-0 text-lumiris-emerald" aria-hidden />
                                     <span className="truncate">{row.warrantyDescription}</span>
                                 </p>
                             ) : null}
                         </div>
                     ) : (
-                        <p className="text-muted-foreground/70 mt-1 text-[11px]">Sans DPP</p>
+                        <p className="mt-1 text-[11px] text-muted-foreground/70">Sans DPP</p>
                     )}
                 </div>
             </button>
@@ -762,7 +765,7 @@ function VaultCard({ row, index, compareMode, isSelected, onTap, onOpenActions }
                         onOpenActions();
                     }}
                     aria-label={`Actions pour ${row.label}`}
-                    className="border-border bg-background/80 text-foreground hover:bg-background absolute right-2 bottom-2 inline-flex h-7 w-7 items-center justify-center rounded-full border backdrop-blur-md active:scale-95"
+                    className="absolute right-2 bottom-2 inline-flex h-7 w-7 items-center justify-center rounded-full border border-border bg-background/80 text-foreground backdrop-blur-md hover:bg-background active:scale-95"
                 >
                     <MoreHorizontal className="h-3.5 w-3.5" />
                 </button>

@@ -32,10 +32,10 @@ export function VisionPrivacy() {
                     transition={{ duration: 0.5 }}
                     className="mb-10 text-center"
                 >
-                    <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                         Votre vie privée, notre priorité
                     </h2>
-                    <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg">
+                    <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
                         VISION est conçu avec la confidentialité au coeur de son architecture.
                     </p>
                 </motion.div>
@@ -49,12 +49,12 @@ export function VisionPrivacy() {
                             viewport={{ once: true, margin: '-50px' }}
                             transition={{ duration: 0.4, delay: index * 0.1 }}
                         >
-                            <div className="bg-card border-border rounded-xl border p-5 text-center">
+                            <div className="rounded-xl border border-border bg-card p-5 text-center">
                                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-lumiris-cyan/10">
                                     <point.icon className="h-6 w-6 text-lumiris-cyan" />
                                 </div>
-                                <h3 className="text-foreground font-semibold">{point.title}</h3>
-                                <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+                                <h3 className="font-semibold text-foreground">{point.title}</h3>
+                                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                                     {point.description}
                                 </p>
                             </div>

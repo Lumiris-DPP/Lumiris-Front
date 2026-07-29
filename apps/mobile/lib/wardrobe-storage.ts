@@ -71,7 +71,7 @@ export interface ExternalDppItem {
     documents: readonly WardrobeDocument[];
 }
 
-/** DPP Lumiris servi par le backend (page publique /p/[code]). Snapshot d'affichage pour la liste. */
+/** DPP Lumiris servi par le backend (page publique /p). Snapshot d'affichage pour la liste. */
 export interface PublicDppItem {
     kind: 'public-dpp';
     publicCode: string;

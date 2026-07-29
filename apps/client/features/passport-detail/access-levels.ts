@@ -1,7 +1,15 @@
 import { Globe, Landmark, Wrench, type LucideIcon } from 'lucide-react';
 import type { DppAccessLevel, DppFormDocument } from '@lumiris/api-client';
 
-export const MOBILE_URL = process.env.NEXT_PUBLIC_MOBILE_URL ?? 'http://localhost:3002';
+const MOBILE_URL = process.env.NEXT_PUBLIC_MOBILE_URL ?? 'http://localhost:3002';
+
+// L'app mobile est exportée en statique : le code public et le jeton d'accès voyagent en query
+// string (`/p/?c=…&k=…`), seule forme qu'un fichier HTML pré-rendu peut servir pour tout code.
+export function publicPassportUrl(publicCode: string, accessToken?: string | null): string {
+    const search = new URLSearchParams({ c: publicCode });
+    if (accessToken) search.set('k', accessToken);
+    return `${MOBILE_URL}/p/?${search.toString()}`;
+}
 
 interface AccessLevelMeta {
     label: string;

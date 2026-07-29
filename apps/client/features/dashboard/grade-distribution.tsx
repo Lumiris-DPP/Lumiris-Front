@@ -16,7 +16,7 @@ export function GradeDistribution({ scored }: { scored: readonly ScoredPassport[
         <Card>
             <CardHeader>
                 <CardTitle>Distribution des grades</CardTitle>
-                <p className="text-muted-foreground text-xs">A → E sur l’ensemble des passeports actifs</p>
+                <p className="text-xs text-muted-foreground">A → E sur l’ensemble des passeports actifs</p>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={CHART_CONFIG} className="h-64 w-full">

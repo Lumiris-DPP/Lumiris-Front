@@ -25,15 +25,15 @@ export function PassportStatusBanner({ passport, score, className, ...rest }: Pa
         <div
             role="status"
             className={cn(
-                'border-lumiris-amber/30 bg-lumiris-amber/10 text-lumiris-amber flex items-start gap-3 rounded-2xl border p-3',
+                'flex items-start gap-3 rounded-2xl border border-lumiris-amber/30 bg-lumiris-amber/10 p-3 text-lumiris-amber',
                 className,
             )}
             {...rest}
         >
             <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
             <div className="min-w-0">
-                <p className="text-foreground/90 text-sm font-medium">{message}</p>
-                {detail ? <p className="text-foreground/70 mt-1 font-mono text-[11px]">{detail}</p> : null}
+                <p className="text-sm font-medium text-foreground/90">{message}</p>
+                {detail ? <p className="mt-1 font-mono text-[11px] text-foreground/70">{detail}</p> : null}
             </div>
         </div>
     );

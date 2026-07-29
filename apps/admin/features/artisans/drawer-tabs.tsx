@@ -20,8 +20,8 @@ export function fmtDate(iso: string): string {
 
 function InfoCard({ label, children }: { label: string; children: React.ReactNode }) {
     return (
-        <div className="border-border bg-card rounded-xl border p-3">
-            <p className="text-muted-foreground mb-1 text-[10px] uppercase tracking-wider">{label}</p>
+        <div className="rounded-xl border border-border bg-card p-3">
+            <p className="mb-1 text-[10px] tracking-wider text-muted-foreground uppercase">{label}</p>
             <div className="text-foreground">{children}</div>
         </div>
     );
@@ -42,7 +42,7 @@ export function SynthesisTab({ artisan, row, auditLog }: SynthesisTabProps) {
                 <p>
                     {artisan.atelierName} · {artisan.city}, {artisan.region}
                 </p>
-                <p className="text-muted-foreground mt-0.5 font-mono text-[11px]">
+                <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">
                     FR-{artisan.id.toUpperCase()}-PROXY
                 </p>
             </InfoCard>
@@ -60,7 +60,7 @@ export function SynthesisTab({ artisan, row, auditLog }: SynthesisTabProps) {
                     {artisan.epvLabeled ? (
                         <Badge
                             variant="outline"
-                            className="border-lumiris-emerald/40 text-lumiris-emerald gap-1 text-[10px]"
+                            className="gap-1 border-lumiris-emerald/40 text-[10px] text-lumiris-emerald"
                         >
                             <Award className="h-3 w-3" /> EPV depuis 2018
                         </Badge>
@@ -68,7 +68,7 @@ export function SynthesisTab({ artisan, row, auditLog }: SynthesisTabProps) {
                     {artisan.ofgLabeled ? (
                         <Badge
                             variant="outline"
-                            className="border-lumiris-amber/40 text-lumiris-amber gap-1 text-[10px]"
+                            className="gap-1 border-lumiris-amber/40 text-[10px] text-lumiris-amber"
                         >
                             <Award className="h-3 w-3" /> OFG
                         </Badge>
@@ -80,7 +80,7 @@ export function SynthesisTab({ artisan, row, auditLog }: SynthesisTabProps) {
             </InfoCard>
             <InfoCard label="Santé compte">
                 <p className="font-mono text-sm">{row.health.total}/100</p>
-                <p className="text-muted-foreground mt-0.5 text-[11px]">
+                <p className="mt-0.5 text-[11px] text-muted-foreground">
                     Capacité {row.health.capacityScore} · Iris {row.health.irisScore} · Overrides{' '}
                     {row.health.overrideScore} ({row.health.overrideCount90d} sur 90j)
                 </p>
@@ -90,19 +90,19 @@ export function SynthesisTab({ artisan, row, auditLog }: SynthesisTabProps) {
             </InfoCard>
 
             <section className="space-y-2">
-                <p className="text-muted-foreground text-[10px] uppercase tracking-wider">Activité récente</p>
+                <p className="text-[10px] tracking-wider text-muted-foreground uppercase">Activité récente</p>
                 {timeline.length === 0 ? (
-                    <p className="text-muted-foreground text-xs">Aucun événement enregistré.</p>
+                    <p className="text-xs text-muted-foreground">Aucun événement enregistré.</p>
                 ) : (
                     <ol className="relative space-y-2 border-l border-dashed pl-4 text-xs">
                         {timeline.map((event) => (
                             <li key={event.id} className="relative">
-                                <span className="bg-foreground -left-1.25 absolute mt-1 block h-2 w-2 rounded-full" />
-                                <p className="text-foreground flex flex-wrap items-center gap-1.5">
+                                <span className="absolute -left-1.25 mt-1 block h-2 w-2 rounded-full bg-foreground" />
+                                <p className="flex flex-wrap items-center gap-1.5 text-foreground">
                                     {event.kind === 'passport-published' ? (
-                                        <FileCheck2 className="text-lumiris-emerald h-3 w-3" />
+                                        <FileCheck2 className="h-3 w-3 text-lumiris-emerald" />
                                     ) : (
-                                        <Sparkles className="text-muted-foreground h-3 w-3" />
+                                        <Sparkles className="h-3 w-3 text-muted-foreground" />
                                     )}
                                     <span className="font-mono">{event.label}</span>
                                     {event.actor ? (
@@ -111,10 +111,10 @@ export function SynthesisTab({ artisan, row, auditLog }: SynthesisTabProps) {
                                         </span>
                                     ) : null}
                                     {event.refId ? (
-                                        <span className="text-muted-foreground font-mono">· {event.refId}</span>
+                                        <span className="font-mono text-muted-foreground">· {event.refId}</span>
                                     ) : null}
                                 </p>
-                                <p className="text-muted-foreground text-[10px]">{fmtDate(event.ts)}</p>
+                                <p className="text-[10px] text-muted-foreground">{fmtDate(event.ts)}</p>
                             </li>
                         ))}
                     </ol>
@@ -168,7 +168,7 @@ export function ActionsTab({ artisan, canContact, canDunning, onContact, onDunni
         <div className="space-y-4 text-xs">
             <InfoCard label="Plan actif">
                 <div className="flex items-baseline justify-between">
-                    <p className="text-foreground font-medium">
+                    <p className="font-medium text-foreground">
                         ATELIER {artisan.tier}{' '}
                         {artisan.plus ? <span className="text-lumiris-cyan">+ ATELIER+</span> : null}
                     </p>

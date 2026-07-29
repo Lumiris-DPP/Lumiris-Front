@@ -40,7 +40,7 @@ export function NotificationsBell({ notifications }: NotificationsBellProps) {
                     {total > 0 && (
                         <Badge
                             variant={warnCount > 0 ? 'destructive' : 'secondary'}
-                            className="absolute -right-1 -top-1 h-4 min-w-4 rounded-full px-1 text-[10px] leading-none"
+                            className="absolute -top-1 -right-1 h-4 min-w-4 rounded-full px-1 text-[10px] leading-none"
                         >
                             {total}
                         </Badge>
@@ -48,29 +48,29 @@ export function NotificationsBell({ notifications }: NotificationsBellProps) {
                 </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="w-[380px] p-0">
-                <div className="border-border flex items-center justify-between border-b px-4 py-3">
-                    <p className="text-foreground text-sm font-semibold">Notifications</p>
-                    <p className="text-muted-foreground text-xs">
+                <div className="flex items-center justify-between border-b border-border px-4 py-3">
+                    <p className="text-sm font-semibold text-foreground">Notifications</p>
+                    <p className="text-xs text-muted-foreground">
                         {total} active{total > 1 ? 's' : ''}
                     </p>
                 </div>
                 <ul className="max-h-[420px] overflow-y-auto">
                     {visible.length === 0 ? (
-                        <li className="text-muted-foreground px-4 py-6 text-center text-sm">Tout est à jour.</li>
+                        <li className="px-4 py-6 text-center text-sm text-muted-foreground">Tout est à jour.</li>
                     ) : (
                         visible.map((n) => (
-                            <li key={n.id} className="border-border border-b last:border-b-0">
+                            <li key={n.id} className="border-b border-border last:border-b-0">
                                 <NotificationRow notification={n} />
                             </li>
                         ))
                     )}
                 </ul>
                 {visible.length > 0 && (
-                    <div className="border-border border-t p-2">
+                    <div className="border-t border-border p-2">
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="text-muted-foreground hover:text-foreground w-full text-xs font-normal"
+                            className="w-full text-xs font-normal text-muted-foreground hover:text-foreground"
                             onClick={() =>
                                 dismissAll(
                                     artisanId,
@@ -102,13 +102,13 @@ function NotificationRow({ notification }: { notification: AtelierNotification }
                 <Icon className="h-3.5 w-3.5" />
             </span>
             <div className="min-w-0 flex-1">
-                <p className="text-foreground text-sm font-medium leading-tight">{notification.title}</p>
-                <p className="text-muted-foreground mt-0.5 text-xs">{notification.description}</p>
+                <p className="text-sm leading-tight font-medium text-foreground">{notification.title}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{notification.description}</p>
             </div>
         </div>
     );
     return notification.href ? (
-        <Link href={notification.href} className="hover:bg-muted/50 block transition-colors">
+        <Link href={notification.href} className="block transition-colors hover:bg-muted/50">
             {inner}
         </Link>
     ) : (

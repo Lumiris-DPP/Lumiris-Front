@@ -22,19 +22,19 @@ export function ComparisonOverlay({ items, onClose }: ComparisonOverlayProps) {
 
     return (
         <motion.div
-            className="bg-background absolute inset-0 z-50 flex flex-col"
+            className="absolute inset-0 z-50 flex flex-col bg-background"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 40 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         >
-            <div className="flex items-center justify-between px-6 pb-4 pt-12">
-                <h2 className="text-foreground text-lg font-bold">Comparer</h2>
+            <div className="flex items-center justify-between px-6 pt-12 pb-4">
+                <h2 className="text-lg font-bold text-foreground">Comparer</h2>
                 <button
                     type="button"
                     onClick={onClose}
                     aria-label="Fermer la comparaison"
-                    className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-xl border"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-foreground"
                 >
                     <X className="h-4 w-4" />
                 </button>
@@ -82,24 +82,24 @@ export function ComparisonOverlay({ items, onClose }: ComparisonOverlayProps) {
 
 function ComparisonHeaderCard({ item }: { item: VaultItem }) {
     return (
-        <div className="border-border/60 bg-card flex flex-1 flex-col items-center gap-2 rounded-2xl border py-5">
+        <div className="flex flex-1 flex-col items-center gap-2 rounded-2xl border border-border/60 bg-card py-5">
             <IrisGradeBadge grade={item.score.grade} size="lg" tone="soft" />
-            <p className="text-foreground line-clamp-2 px-2 text-center text-xs font-semibold">
+            <p className="line-clamp-2 px-2 text-center text-xs font-semibold text-foreground">
                 {item.passport.garment.reference}
             </p>
-            <p className="text-muted-foreground text-[11px]">{item.artisanName}</p>
+            <p className="text-[11px] text-muted-foreground">{item.artisanName}</p>
         </div>
     );
 }
 
 function ComparisonRow({ label, valueA, valueB }: { label: string; valueA: string; valueB: string }) {
     return (
-        <div className="border-border/40 flex items-center gap-3 border-b py-3">
-            <span className="text-foreground flex-1 text-right text-sm font-semibold">{valueA}</span>
-            <span className="text-muted-foreground w-24 text-center text-[10px] font-bold uppercase tracking-wider">
+        <div className="flex items-center gap-3 border-b border-border/40 py-3">
+            <span className="flex-1 text-right text-sm font-semibold text-foreground">{valueA}</span>
+            <span className="w-24 text-center text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
                 {label}
             </span>
-            <span className="text-foreground flex-1 text-sm font-semibold">{valueB}</span>
+            <span className="flex-1 text-sm font-semibold text-foreground">{valueB}</span>
         </div>
     );
 }

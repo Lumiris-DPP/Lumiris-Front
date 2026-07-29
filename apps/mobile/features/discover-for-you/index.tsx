@@ -1,6 +1,8 @@
+'use client';
+
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, ArrowUpRight, Info, Sparkles } from 'lucide-react';
 import type { JournalCategory } from '@lumiris/types';
@@ -20,19 +22,19 @@ const TOAST_DURATION_MS = 4000;
 const MAX_PIECES = 6;
 
 export function DiscoverForYou() {
-    const navigate = useNavigate();
+    const router = useRouter();
     const { user, isAuthenticated } = useUser();
     const [showStyleToast, setShowStyleToast] = useState(false);
     const [filter, setFilter] = useState<CategoryFilter>('all');
 
     // Pièces recommandées : catalogue public RÉEL (mêmes données que la Boutique), tri neutre,
     // curées sur les meilleurs scores Iris (A/B). Chaque carte mène à la fiche produit réelle
-    // (/boutique/[id]) → surface de recommandation branchée sur le vrai parcours d'achat.
+    // Boutique → surface de recommandation branchée sur le vrai parcours d'achat.
     const { data: marketplace, isLoading: piecesLoading } = useMarketplaceSearch();
 
     useEffect(() => {
-        if (!isAuthenticated) navigate('/auth', { replace: true });
-    }, [isAuthenticated, navigate]);
+        if (!isAuthenticated) router.replace('/auth');
+    }, [isAuthenticated, router]);
 
     const stylePrefs = useMemo(() => user?.stylePrefs ?? [], [user]);
     const stylePrefsEmpty = isAuthenticated && stylePrefs.length === 0;
@@ -76,20 +78,20 @@ export function DiscoverForYou() {
     if (!isAuthenticated) return null;
 
     return (
-        <div className="bg-background flex h-full flex-col">
-            <motion.header className="px-5 pb-3 pt-12" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="flex h-full flex-col bg-background">
+            <motion.header className="px-5 pt-12 pb-3" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
                 <Link
-                    to="/discover"
-                    className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs"
+                    href="/discover"
+                    className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
                 >
                     <ArrowLeft className="h-3.5 w-3.5" />
                     Découvrir
                 </Link>
                 <div className="mt-2 flex items-center gap-2">
-                    <h1 className="text-foreground text-2xl font-bold tracking-tight">Pour toi</h1>
-                    <Sparkles className="text-lumiris-cyan h-4 w-4" />
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground">Pour toi</h1>
+                    <Sparkles className="h-4 w-4 text-lumiris-cyan" />
                 </div>
-                <p className="text-muted-foreground mt-0.5 text-sm">{subtitle}</p>
+                <p className="mt-0.5 text-sm text-muted-foreground">{subtitle}</p>
             </motion.header>
 
             <AnimatePresence>
@@ -97,17 +99,17 @@ export function DiscoverForYou() {
                     <motion.div
                         role="status"
                         aria-live="polite"
-                        className="border-border/60 bg-card/95 text-foreground pointer-events-auto fixed left-1/2 top-24 z-50 flex w-fit max-w-[20rem] -translate-x-1/2 items-center gap-2 rounded-2xl border px-4 py-2 text-xs shadow-xl backdrop-blur-md"
+                        className="pointer-events-auto fixed top-24 left-1/2 z-50 flex w-fit max-w-[20rem] -translate-x-1/2 items-center gap-2 rounded-2xl border border-border/60 bg-card/95 px-4 py-2 text-xs text-foreground shadow-xl backdrop-blur-md"
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                     >
-                        <Info className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
+                        <Info className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                         <span>
                             Choisis ton style pour personnaliser{' '}
                             <Link
-                                to="/onboarding/profile"
-                                className="text-foreground font-semibold underline-offset-2 hover:underline"
+                                href="/onboarding/profile"
+                                className="font-semibold text-foreground underline-offset-2 hover:underline"
                             >
                                 renseigner
                             </Link>
@@ -150,7 +152,7 @@ function ArticlesSection({
 }: ArticlesSectionProps) {
     return (
         <section className="mt-2">
-            <h2 className="text-foreground px-1 text-base font-semibold tracking-tight">
+            <h2 className="px-1 text-base font-semibold tracking-tight text-foreground">
                 Articles qui matchent ton style
             </h2>
 
@@ -161,7 +163,7 @@ function ArticlesSection({
                     cta="Choisir mon style"
                 />
             ) : allFeed.length === 0 ? (
-                <p className="text-muted-foreground mt-3 px-1 text-xs">
+                <p className="mt-3 px-1 text-xs text-muted-foreground">
                     Pas d&apos;article pour ces préférences pour le moment.
                 </p>
             ) : (
@@ -183,7 +185,7 @@ function ArticlesView({ feed, filter }: { feed: readonly DiscoverFeedItem[]; fil
 
     if (feed.length === 0) {
         return (
-            <p className="text-muted-foreground mt-6 px-1 text-xs">Pas encore d&apos;article dans cette catégorie.</p>
+            <p className="mt-6 px-1 text-xs text-muted-foreground">Pas encore d&apos;article dans cette catégorie.</p>
         );
     }
 
@@ -241,12 +243,12 @@ interface PiecesSectionProps {
 function PiecesSection({ pieces, isLoading }: PiecesSectionProps) {
     return (
         <section className="mt-10">
-            <h2 className="text-foreground px-1 text-base font-semibold tracking-tight">
+            <h2 className="px-1 text-base font-semibold tracking-tight text-foreground">
                 Pièces qui pourraient te plaire
             </h2>
-            <p className="text-muted-foreground mt-0.5 px-1 text-xs">Sélectionnées dans la Boutique Lumiris.</p>
+            <p className="mt-0.5 px-1 text-xs text-muted-foreground">Sélectionnées dans la Boutique Lumiris.</p>
             {isLoading ? (
-                <p className="text-muted-foreground mt-3 px-1 text-xs">Chargement des pièces…</p>
+                <p className="mt-3 px-1 text-xs text-muted-foreground">Chargement des pièces…</p>
             ) : pieces.length === 0 ? (
                 <EmptyHint
                     text="Aucune pièce en vente pour le moment. Découvre la Boutique."
@@ -273,10 +275,10 @@ interface EmptyHintProps {
 function EmptyHint({ text, href, cta }: EmptyHintProps) {
     return (
         <GlassCard intensity="subtle" className="mt-3 flex flex-col items-start gap-2 rounded-2xl p-4">
-            <p className="text-muted-foreground text-xs leading-relaxed">{text}</p>
+            <p className="text-xs leading-relaxed text-muted-foreground">{text}</p>
             <Link
-                to={href}
-                className="text-foreground inline-flex items-center gap-1 text-xs font-semibold underline-offset-4 hover:underline"
+                href={href}
+                className="inline-flex items-center gap-1 text-xs font-semibold text-foreground underline-offset-4 hover:underline"
             >
                 {cta}
                 <ArrowUpRight className="h-3.5 w-3.5" />

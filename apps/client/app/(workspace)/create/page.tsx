@@ -7,7 +7,7 @@ export default function CreateEntryPage() {
     useStartDraft();
 
     return (
-        <div className="text-muted-foreground flex items-center gap-2 p-12 text-sm">
+        <div className="flex items-center gap-2 p-12 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" /> Création d&apos;un nouveau brouillon…
         </div>
     );

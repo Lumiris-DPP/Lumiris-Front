@@ -249,11 +249,11 @@ export function AuditList() {
 
     return (
         <div className="space-y-6">
-            <div className="bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky top-0 z-20 -mx-4 space-y-3 px-4 py-3 backdrop-blur">
+            <div className="sticky top-0 z-20 -mx-4 space-y-3 bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/80">
                 <div className="flex flex-wrap items-center gap-2">
                     <div className="relative min-w-[240px] flex-1">
                         <Search
-                            className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+                            className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
                             aria-hidden
                         />
                         <Input
@@ -463,7 +463,7 @@ export function AuditList() {
                     </div>
                 </div>
 
-                <p className="text-muted-foreground text-xs" aria-live="polite">
+                <p className="text-xs text-muted-foreground" aria-live="polite">
                     {filtered.length === 0
                         ? `0 entrée${auditLog.length > 0 ? ` sur ${auditLog.length}` : ''}`
                         : `${filtered.length.toLocaleString('fr-FR')} entrée${filtered.length > 1 ? 's' : ''}`}
@@ -486,11 +486,11 @@ export function AuditList() {
                     }
                 />
             ) : (
-                <div className="border-border bg-card divide-border divide-y rounded-xl border">
+                <div className="divide-y divide-border rounded-xl border border-border bg-card">
                     {grouped.map(({ day, items }) => (
                         <Fragment key={day}>
-                            <div className="bg-muted/30 border-border border-b px-4 py-2">
-                                <span className="text-muted-foreground text-xs uppercase tracking-wider">
+                            <div className="border-b border-border bg-muted/30 px-4 py-2">
+                                <span className="text-xs tracking-wider text-muted-foreground uppercase">
                                     {dayLabel(day)}
                                 </span>
                             </div>
@@ -505,13 +505,13 @@ export function AuditList() {
                                     onClick={() => setSelected(entry)}
                                     aria-label={`Action ${entry.action} par ${entry.actorId} sur ${entry.targetType}/${entry.targetId}`}
                                     className={cn(
-                                        'hover:bg-muted/30 flex w-full items-center gap-3 px-4 py-2 text-left text-sm',
+                                        'flex w-full items-center gap-3 px-4 py-2 text-left text-sm hover:bg-muted/30',
                                         focusId === entry.id
-                                            ? 'bg-lumiris-cyan/10 ring-lumiris-cyan/40 ring-1 ring-inset'
+                                            ? 'bg-lumiris-cyan/10 ring-1 ring-lumiris-cyan/40 ring-inset'
                                             : '',
                                     )}
                                 >
-                                    <span className="text-muted-foreground w-12 shrink-0 font-mono text-xs">
+                                    <span className="w-12 shrink-0 font-mono text-xs text-muted-foreground">
                                         {new Date(entry.ts).toLocaleTimeString('fr-FR', {
                                             hour: '2-digit',
                                             minute: '2-digit',
@@ -523,14 +523,14 @@ export function AuditList() {
                                     >
                                         {ROLE_LABEL[entry.actorRole]}
                                     </Badge>
-                                    <span className="text-foreground w-24 shrink-0 truncate font-mono text-xs">
+                                    <span className="w-24 shrink-0 truncate font-mono text-xs text-foreground">
                                         {entry.actorId}
                                     </span>
                                     <span className={cn('shrink-0 font-mono text-xs', ACTION_TONE[entry.action])}>
                                         {entry.action}
                                     </span>
-                                    <span className="text-muted-foreground/70 shrink-0">→</span>
-                                    <span className="text-muted-foreground truncate font-mono text-xs">
+                                    <span className="shrink-0 text-muted-foreground/70">→</span>
+                                    <span className="truncate font-mono text-xs text-muted-foreground">
                                         {entry.targetType}/{entry.targetId}
                                     </span>
                                 </button>
@@ -582,7 +582,7 @@ export function AuditList() {
 function FilterField({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <label className="block space-y-1.5">
-            <span className="text-muted-foreground text-xs font-medium">{label}</span>
+            <span className="text-xs font-medium text-muted-foreground">{label}</span>
             {children}
         </label>
     );

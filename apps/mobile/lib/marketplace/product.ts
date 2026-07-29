@@ -6,7 +6,7 @@ import type { MarketplaceItem as MarketplaceItemDto } from '@lumiris/api-client'
 import type { IrisGrade } from '@lumiris/types';
 
 export interface MarketplaceItem {
-    /** Identifiant produit — clé du panier et de l'URL /boutique/[id]. */
+    /** Identifiant produit — clé du panier et de la fiche Boutique. */
     id: string;
     /** DPP source (passeport numérique) rattaché à l'annonce, s'il existe. */
     dppFormId: string | null;

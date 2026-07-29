@@ -25,10 +25,10 @@ export function VisionComparison() {
                     transition={{ duration: 0.5 }}
                     className="mb-10 text-center"
                 >
-                    <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                         Gratuit, pour toujours
                     </h2>
-                    <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg">
+                    <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
                         Créez un compte pour débloquer toutes les fonctionnalités — sans payer un centime.
                     </p>
                 </motion.div>
@@ -38,18 +38,18 @@ export function VisionComparison() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: '-50px' }}
                     transition={{ duration: 0.4, delay: 0.1 }}
-                    className="border-border overflow-hidden rounded-2xl border"
+                    className="overflow-hidden rounded-2xl border border-border"
                 >
                     <table className="w-full">
                         <thead>
                             <tr className="bg-muted/50">
-                                <th className="text-foreground px-4 py-4 text-left text-sm font-semibold sm:px-6">
+                                <th className="px-4 py-4 text-left text-sm font-semibold text-foreground sm:px-6">
                                     Fonctionnalité
                                 </th>
-                                <th className="text-muted-foreground w-28 px-4 py-4 text-center text-sm font-medium sm:w-32 sm:px-6">
+                                <th className="w-28 px-4 py-4 text-center text-sm font-medium text-muted-foreground sm:w-32 sm:px-6">
                                     Sans compte
                                 </th>
-                                <th className="text-foreground w-28 px-4 py-4 text-center text-sm font-semibold sm:w-32 sm:px-6">
+                                <th className="w-28 px-4 py-4 text-center text-sm font-semibold text-foreground sm:w-32 sm:px-6">
                                     Avec compte
                                 </th>
                             </tr>
@@ -57,23 +57,23 @@ export function VisionComparison() {
                         <tbody>
                             {FEATURES.map((row, index) => (
                                 <tr key={row.feature} className={index % 2 === 0 ? 'bg-card' : 'bg-background'}>
-                                    <td className="text-foreground px-4 py-3 text-sm sm:px-6">{row.feature}</td>
+                                    <td className="px-4 py-3 text-sm text-foreground sm:px-6">{row.feature}</td>
                                     <td className="px-4 py-3 text-center sm:px-6">
                                         {row.noAccount ? (
-                                            <Check className="text-lumiris-cyan mx-auto h-5 w-5" aria-label="Inclus" />
+                                            <Check className="mx-auto h-5 w-5 text-lumiris-cyan" aria-label="Inclus" />
                                         ) : (
                                             <X
-                                                className="text-muted-foreground/40 mx-auto h-5 w-5"
+                                                className="mx-auto h-5 w-5 text-muted-foreground/40"
                                                 aria-label="Non inclus"
                                             />
                                         )}
                                     </td>
                                     <td className="px-4 py-3 text-center sm:px-6">
                                         {row.withAccount ? (
-                                            <Check className="text-lumiris-cyan mx-auto h-5 w-5" aria-label="Inclus" />
+                                            <Check className="mx-auto h-5 w-5 text-lumiris-cyan" aria-label="Inclus" />
                                         ) : (
                                             <X
-                                                className="text-muted-foreground/40 mx-auto h-5 w-5"
+                                                className="mx-auto h-5 w-5 text-muted-foreground/40"
                                                 aria-label="Non inclus"
                                             />
                                         )}

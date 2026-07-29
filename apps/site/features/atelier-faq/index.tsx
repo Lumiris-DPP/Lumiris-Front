@@ -86,10 +86,10 @@ export function AtelierFaq() {
         <Accordion type="single" collapsible className="w-full">
             {FAQ.map((entry, index) => (
                 <AccordionItem key={entry.q} value={`item-${index}`}>
-                    <AccordionTrigger className="text-foreground text-left text-base font-medium">
+                    <AccordionTrigger className="text-left text-base font-medium text-foreground">
                         {entry.q}
                     </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground text-sm leading-relaxed">
+                    <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
                         {entry.a}
                     </AccordionContent>
                 </AccordionItem>

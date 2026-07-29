@@ -73,10 +73,10 @@ export function VitrineTab() {
     }, [profile]);
 
     if (isLoading) {
-        return <p className="text-muted-foreground text-sm">Chargement…</p>;
+        return <p className="text-sm text-muted-foreground">Chargement…</p>;
     }
     if (!profile) {
-        return <p className="text-muted-foreground text-sm">Profil artisan introuvable.</p>;
+        return <p className="text-sm text-muted-foreground">Profil artisan introuvable.</p>;
     }
 
     const isVerified = profile.status === 'VERIFIED';
@@ -127,17 +127,17 @@ export function VitrineTab() {
     return (
         <div className="space-y-6">
             {!isVerified ? (
-                <p className="border-border bg-muted/40 text-muted-foreground rounded-lg border p-3 text-xs">
+                <p className="rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
                     Votre profil doit être vérifié (KYB) avant de pouvoir publier votre vitrine publique. Vous pouvez
                     déjà préparer son contenu.
                 </p>
             ) : null}
 
             {profile.published && profile.slug ? (
-                <p className="text-muted-foreground inline-flex items-center gap-1.5 text-sm">
+                <p className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
                     <ExternalLink className="h-3 w-3" />
                     Vitrine publique :{' '}
-                    <span className="text-foreground font-mono text-xs">/artisans/{profile.slug}</span>
+                    <span className="font-mono text-xs text-foreground">/artisans/{profile.slug}</span>
                 </p>
             ) : null}
 
@@ -152,17 +152,17 @@ export function VitrineTab() {
                                 onClick={() => removePhotoMutation.mutate(photo.id)}
                                 disabled={removePhotoMutation.isPending}
                                 aria-label="Supprimer la photo"
-                                className="absolute right-1 top-1 rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                                className="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
                             >
                                 <Trash2 className="h-3 w-3" />
                             </button>
                         </div>
                     ))}
-                    <label className="border-border bg-muted/40 hover:bg-muted relative flex h-24 w-24 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed">
+                    <label className="relative flex h-24 w-24 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted/40 hover:bg-muted">
                         {addPhotoMutation.isPending ? (
-                            <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
+                            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                         ) : (
-                            <ImagePlus className="text-muted-foreground h-5 w-5" />
+                            <ImagePlus className="h-5 w-5 text-muted-foreground" />
                         )}
                         <input
                             type="file"
@@ -218,7 +218,7 @@ export function VitrineTab() {
             <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                     <Label htmlFor="story">Histoire de l&apos;atelier</Label>
-                    <span className="text-muted-foreground text-xs tabular-nums">
+                    <span className="text-xs text-muted-foreground tabular-nums">
                         {draft.story.length} / {STORY_MAX}
                     </span>
                 </div>
@@ -257,7 +257,7 @@ export function VitrineTab() {
                 <Label>Spécialités</Label>
                 <div className="flex flex-wrap gap-1.5">
                     {draft.specialties.length === 0 && (
-                        <p className="text-muted-foreground text-xs">Aucune spécialité renseignée.</p>
+                        <p className="text-xs text-muted-foreground">Aucune spécialité renseignée.</p>
                     )}
                     {draft.specialties.map((t) => (
                         <Badge key={t} variant="secondary" className="gap-1">

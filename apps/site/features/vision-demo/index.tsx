@@ -32,13 +32,13 @@ export function VisionDemo() {
         <section className="bg-muted/30 py-20 sm:py-28">
             <div className="mx-auto max-w-6xl px-6">
                 <div className="mb-12 text-center">
-                    <span className="inline-block rounded-full bg-lumiris-iris/10 px-3 py-1 text-xs font-medium uppercase tracking-wider text-lumiris-iris">
+                    <span className="inline-block rounded-full bg-lumiris-iris/10 px-3 py-1 text-xs font-medium tracking-wider text-lumiris-iris uppercase">
                         Demo
                     </span>
-                    <h2 className="text-foreground mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+                    <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                         L&apos;expérience VISION
                     </h2>
-                    <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg">
+                    <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
                         Découvrez les fonctionnalités clés de l&apos;application.
                     </p>
                 </div>
@@ -56,8 +56,8 @@ export function VisionDemo() {
                                     aria-pressed={activeTab === tab.id}
                                     className={`flex w-full items-center gap-4 rounded-xl p-4 text-left transition-all ${
                                         activeTab === tab.id
-                                            ? 'bg-card border-2 border-lumiris-iris/30 shadow-md'
-                                            : 'hover:bg-card/50 border-2 border-transparent'
+                                            ? 'border-2 border-lumiris-iris/30 bg-card shadow-md'
+                                            : 'border-2 border-transparent hover:bg-card/50'
                                     }`}
                                 >
                                     <div
@@ -79,7 +79,7 @@ export function VisionDemo() {
                                         >
                                             {tab.label}
                                         </p>
-                                        <p className="text-muted-foreground text-sm">{tab.description}</p>
+                                        <p className="text-sm text-muted-foreground">{tab.description}</p>
                                     </div>
                                 </button>
                             ))}
@@ -89,24 +89,24 @@ export function VisionDemo() {
                     {/* Phone mockup */}
                     <div className="order-1 flex justify-center lg:order-2">
                         <div className="relative">
-                            <div className="bg-foreground w-64 rounded-[2.5rem] p-2 shadow-2xl sm:w-72">
-                                <div className="bg-background overflow-hidden rounded-[2rem]">
+                            <div className="w-64 rounded-[2.5rem] bg-foreground p-2 shadow-2xl sm:w-72">
+                                <div className="overflow-hidden rounded-[2rem] bg-background">
                                     {/* Status bar */}
-                                    <div className="bg-card flex items-center justify-center py-2">
-                                        <div className="bg-foreground h-6 w-24 rounded-full" />
+                                    <div className="flex items-center justify-center bg-card py-2">
+                                        <div className="h-6 w-24 rounded-full bg-foreground" />
                                     </div>
 
                                     {/* Screen content */}
                                     <div className="aspect-[9/16] p-4">
                                         {activeTab === 'scan' && (
                                             <div className="flex h-full flex-col items-center justify-center">
-                                                <div className="bg-muted relative h-48 w-48 rounded-2xl">
+                                                <div className="relative h-48 w-48 rounded-2xl bg-muted">
                                                     <div className="absolute inset-4 rounded-lg border-2 border-dashed border-lumiris-iris" />
                                                     <div className="absolute inset-0 flex items-center justify-center">
                                                         <ScanLine className="h-12 w-12 text-lumiris-iris" />
                                                     </div>
                                                 </div>
-                                                <p className="text-muted-foreground mt-4 text-center text-sm">
+                                                <p className="mt-4 text-center text-sm text-muted-foreground">
                                                     Placez le QR code dans le cadre
                                                 </p>
                                             </div>
@@ -124,10 +124,10 @@ export function VisionDemo() {
                                                         />
                                                     </div>
                                                     <div className="flex-1">
-                                                        <p className="text-foreground text-sm font-medium">
+                                                        <p className="text-sm font-medium text-foreground">
                                                             Chemise Lin
                                                         </p>
-                                                        <p className="text-muted-foreground text-xs">Atelier Margaux</p>
+                                                        <p className="text-xs text-muted-foreground">Atelier Margaux</p>
                                                     </div>
                                                     <span className="rounded bg-lumiris-emerald px-2 py-0.5 text-xs font-bold text-white">
                                                         A
@@ -145,11 +145,11 @@ export function VisionDemo() {
                                                                 <span className="text-muted-foreground">
                                                                     {item.label}
                                                                 </span>
-                                                                <span className="text-foreground font-medium">
+                                                                <span className="font-medium text-foreground">
                                                                     {item.value}
                                                                 </span>
                                                             </div>
-                                                            <div className="bg-muted h-2 overflow-hidden rounded-full">
+                                                            <div className="h-2 overflow-hidden rounded-full bg-muted">
                                                                 <div
                                                                     className={`h-full rounded-full ${item.color}`}
                                                                     style={{ width: `${item.value}%` }}
@@ -163,7 +163,7 @@ export function VisionDemo() {
 
                                         {activeTab === 'wardrobe' && (
                                             <div className="h-full">
-                                                <p className="text-foreground mb-3 font-medium">Ma Garde-Robe</p>
+                                                <p className="mb-3 font-medium text-foreground">Ma Garde-Robe</p>
                                                 <div className="grid grid-cols-2 gap-2">
                                                     {[
                                                         '/images/product-chemise.jpg',
@@ -184,7 +184,7 @@ export function VisionDemo() {
                                                         </div>
                                                     ))}
                                                 </div>
-                                                <p className="text-muted-foreground mt-3 text-center text-xs">
+                                                <p className="mt-3 text-center text-xs text-muted-foreground">
                                                     4 pièces enregistrées
                                                 </p>
                                             </div>

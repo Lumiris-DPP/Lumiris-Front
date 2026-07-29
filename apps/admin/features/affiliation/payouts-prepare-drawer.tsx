@@ -74,7 +74,7 @@ export function PayoutsPrepareDrawer({
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent side="right" className="flex h-full w-full flex-col gap-0 p-0 sm:max-w-lg">
-                <SheetHeader className="border-border border-b px-5 py-4">
+                <SheetHeader className="border-b border-border px-5 py-4">
                     <SheetTitle>Préparer payout</SheetTitle>
                     <SheetDescription>
                         {currentStepIndex + 1} / {STEPS.length} · {STEPS[currentStepIndex]?.label}
@@ -106,7 +106,7 @@ export function PayoutsPrepareDrawer({
                     ) : null}
                 </div>
 
-                <div className="border-border bg-background flex items-center justify-between border-t px-5 py-3">
+                <div className="flex items-center justify-between border-t border-border bg-background px-5 py-3">
                     {step === 'period' ? (
                         <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
                             Annuler
@@ -133,7 +133,7 @@ export function PayoutsPrepareDrawer({
 
 function StepIndicator({ currentIndex }: { currentIndex: number }) {
     return (
-        <ol className="border-border flex items-center gap-2 border-b px-5 py-3 text-[11px]">
+        <ol className="flex items-center gap-2 border-b border-border px-5 py-3 text-[11px]">
             {STEPS.map((step, index) => {
                 const isActive = index === currentIndex;
                 const isDone = index < currentIndex;
@@ -144,7 +144,7 @@ function StepIndicator({ currentIndex }: { currentIndex: number }) {
                                 'flex h-5 w-5 items-center justify-center rounded-full font-mono text-[10px]',
                                 isActive && 'bg-foreground text-background',
                                 isDone && 'bg-lumiris-emerald/20 text-lumiris-emerald',
-                                !isActive && !isDone && 'border-border text-muted-foreground border',
+                                !isActive && !isDone && 'border border-border text-muted-foreground',
                             )}
                             aria-hidden
                         >
@@ -153,7 +153,7 @@ function StepIndicator({ currentIndex }: { currentIndex: number }) {
                         <span
                             className={cn(
                                 'truncate',
-                                isActive ? 'text-foreground font-medium' : 'text-muted-foreground',
+                                isActive ? 'font-medium text-foreground' : 'text-muted-foreground',
                             )}
                         >
                             {step.label}
@@ -180,10 +180,10 @@ function PeriodStep({
 }) {
     return (
         <div className="space-y-4 text-sm">
-            <div className="border-border bg-card flex items-start gap-3 rounded-xl border p-4">
-                <CalendarRange className="text-muted-foreground mt-0.5 h-5 w-5" aria-hidden />
+            <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-4">
+                <CalendarRange className="mt-0.5 h-5 w-5 text-muted-foreground" aria-hidden />
                 <div>
-                    <p className="text-foreground font-semibold">Période : {period}</p>
+                    <p className="font-semibold text-foreground">Période : {period}</p>
                 </div>
             </div>
             <dl className="grid grid-cols-2 gap-3 text-xs">
@@ -204,15 +204,15 @@ function PreviewStep({
     totalEur: number;
 }) {
     if (beneficiaries.length === 0) {
-        return <p className="text-muted-foreground text-xs italic">Aucun bénéficiaire éligible sur la période.</p>;
+        return <p className="text-xs text-muted-foreground italic">Aucun bénéficiaire éligible sur la période.</p>;
     }
     return (
         <div className="space-y-3">
-            <p className="text-muted-foreground text-xs">
+            <p className="text-xs text-muted-foreground">
                 {beneficiaries.length} bénéficiaire(s) — total{' '}
-                <strong className="text-foreground font-mono">{totalEur.toFixed(2)} €</strong>.
+                <strong className="font-mono text-foreground">{totalEur.toFixed(2)} €</strong>.
             </p>
-            <div className="border-border overflow-hidden rounded-lg border">
+            <div className="overflow-hidden rounded-lg border border-border">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -225,8 +225,8 @@ function PreviewStep({
                         {beneficiaries.map((b) => (
                             <TableRow key={b.id}>
                                 <TableCell>
-                                    <p className="text-foreground text-sm">{b.name}</p>
-                                    <p className="text-muted-foreground text-[10px]">{b.id}</p>
+                                    <p className="text-sm text-foreground">{b.name}</p>
+                                    <p className="text-[10px] text-muted-foreground">{b.id}</p>
                                 </TableCell>
                                 <TableCell className="text-right font-mono text-xs">{b.eventCount}</TableCell>
                                 <TableCell className="text-right font-mono text-sm">
@@ -258,17 +258,17 @@ function ConfirmStep({
 }) {
     return (
         <div className="space-y-4 text-sm">
-            <div className="border-border bg-card rounded-xl border p-4">
-                <p className="text-foreground font-semibold">Récapitulatif — {period}</p>
-                <ul className="text-muted-foreground mt-2 space-y-1 text-xs">
+            <div className="rounded-xl border border-border bg-card p-4">
+                <p className="font-semibold text-foreground">Récapitulatif — {period}</p>
+                <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
                     <li>
-                        <strong className="text-foreground font-mono">{beneficiaryCount}</strong> bénéficiaire(s)
+                        <strong className="font-mono text-foreground">{beneficiaryCount}</strong> bénéficiaire(s)
                     </li>
                     <li>
-                        <strong className="text-foreground font-mono">{totalEur.toFixed(2)} €</strong> versés
+                        <strong className="font-mono text-foreground">{totalEur.toFixed(2)} €</strong> versés
                     </li>
                     <li>
-                        <strong className="text-foreground font-mono">{excludedCount}</strong> événement(s) exclu(s)
+                        <strong className="font-mono text-foreground">{excludedCount}</strong> événement(s) exclu(s)
                         (patterns suspects ou flag manuel)
                     </li>
                 </ul>
@@ -279,7 +279,7 @@ function ConfirmStep({
                     checked={confirmed}
                     onCheckedChange={(v) => onConfirmedChange(Boolean(v))}
                 />
-                <Label htmlFor="payout-prepare-confirm" className="text-foreground cursor-pointer text-xs">
+                <Label htmlFor="payout-prepare-confirm" className="cursor-pointer text-xs text-foreground">
                     Je confirme — l&apos;action est tracée. ({period} · total{' '}
                     <strong className="font-mono">{totalEur.toFixed(2)} €</strong>).
                 </Label>
@@ -291,8 +291,8 @@ function ConfirmStep({
 function Stat({ label, value, accent }: { label: string; value: string; accent?: string }) {
     return (
         <div>
-            <dt className="text-muted-foreground text-[10px] uppercase tracking-wider">{label}</dt>
-            <dd className={cn('text-foreground mt-0.5 font-mono text-base font-semibold', accent)}>{value}</dd>
+            <dt className="text-[10px] tracking-wider text-muted-foreground uppercase">{label}</dt>
+            <dd className={cn('mt-0.5 font-mono text-base font-semibold text-foreground', accent)}>{value}</dd>
         </div>
     );
 }

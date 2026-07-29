@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+'use client';
+
+import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Clock } from 'lucide-react';
 import { JOURNAL_CATEGORY_LABEL } from '@lumiris/types';
@@ -24,13 +26,13 @@ export function HeroCard({ item, delay = 0 }: HeroCardProps) {
             style={isE ? { filter: 'saturate(0.4)' } : undefined}
         >
             <Link
-                to={`/journal/${item.slug}`}
+                href={`/journal/${item.slug}`}
                 aria-label={`${item.title} - ${JOURNAL_CATEGORY_LABEL[item.category]} - grade ${item.grade}`}
                 className="group block"
             >
                 <motion.article
                     whileTap={prefersReduced ? undefined : { scale: 0.98 }}
-                    className="border-border/40 bg-card/60 relative aspect-[16/10] overflow-hidden rounded-3xl border shadow-lg backdrop-blur-md"
+                    className="relative aspect-[16/10] overflow-hidden rounded-3xl border border-border/40 bg-card/60 shadow-lg backdrop-blur-md"
                 >
                     <CoverImage
                         src={item.coverImage}
@@ -46,14 +48,14 @@ export function HeroCard({ item, delay = 0 }: HeroCardProps) {
                         className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent"
                     />
 
-                    <span className="border-border/40 bg-background/80 text-foreground absolute left-3 top-3 inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-medium backdrop-blur-md">
+                    <span className="absolute top-3 left-3 inline-flex items-center rounded-full border border-border/40 bg-background/80 px-2.5 py-1 text-[11px] font-medium text-foreground backdrop-blur-md">
                         {JOURNAL_CATEGORY_LABEL[item.category]}
                     </span>
 
                     <span
                         aria-label={`Grade ${item.grade}`}
                         className={cn(
-                            'text-primary-foreground absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-lg font-mono text-xs font-bold shadow-md',
+                            'absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-lg font-mono text-xs font-bold text-primary-foreground shadow-md',
                             GRADE_CONFIG[item.grade].bgClass,
                         )}
                     >
@@ -61,7 +63,7 @@ export function HeroCard({ item, delay = 0 }: HeroCardProps) {
                     </span>
 
                     <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-4 text-white">
-                        <h2 className="line-clamp-3 text-lg font-bold leading-tight tracking-tight">{item.title}</h2>
+                        <h2 className="line-clamp-3 text-lg leading-tight font-bold tracking-tight">{item.title}</h2>
                         <div className="flex items-center gap-3 text-[11px] text-white/80">
                             <span className="line-clamp-1">{item.author}</span>
                             <span aria-hidden>·</span>

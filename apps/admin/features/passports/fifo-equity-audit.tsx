@@ -57,7 +57,7 @@ export function useFifoAudit(rows: readonly PassportRow[]): FifoAudit {
 export function FifoViolationsAlert({ audit }: { audit: FifoAudit }) {
     if (audit.violations.length === 0) return null;
     return (
-        <div className="border-lumiris-rose/40 text-lumiris-rose flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs">
+        <div className="flex items-center gap-2 rounded-lg border border-lumiris-rose/40 px-3 py-1.5 text-xs text-lumiris-rose">
             <TriangleAlert className="h-3.5 w-3.5" aria-hidden />
             <span className="font-medium">Violations FIFO · {audit.violations.length}</span>
         </div>

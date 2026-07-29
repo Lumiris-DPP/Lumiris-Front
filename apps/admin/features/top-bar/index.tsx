@@ -34,7 +34,7 @@ function Breadcrumb() {
     const match = findRoute(pathname);
 
     if (!match) {
-        return <span className="text-muted-foreground text-sm">Admin</span>;
+        return <span className="text-sm text-muted-foreground">Admin</span>;
     }
 
     const id = searchParams?.get('id');
@@ -42,12 +42,12 @@ function Breadcrumb() {
     return (
         <nav aria-label="Fil d'Ariane" className="flex items-center gap-1.5 text-sm">
             <span className="text-muted-foreground">{match.group.label}</span>
-            <ChevronRight className="text-muted-foreground/40 h-3.5 w-3.5" aria-hidden />
-            <span className="text-foreground font-medium">{match.route.label}</span>
+            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/40" aria-hidden />
+            <span className="font-medium text-foreground">{match.route.label}</span>
             {id ? (
                 <Fragment>
-                    <ChevronRight className="text-muted-foreground/40 h-3.5 w-3.5" aria-hidden />
-                    <span className="text-foreground font-mono text-xs">{id}</span>
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/40" aria-hidden />
+                    <span className="font-mono text-xs text-foreground">{id}</span>
                 </Fragment>
             ) : null}
         </nav>
@@ -65,9 +65,9 @@ function EsprCountdownChip() {
 
     if (!now) {
         return (
-            <div className="border-border bg-muted/40 flex items-center gap-2 rounded-lg border px-3 py-1.5">
-                <CalendarClock className="text-muted-foreground h-3.5 w-3.5" aria-hidden />
-                <span className="text-muted-foreground text-xs font-medium">Calendrier ESPR…</span>
+            <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-1.5">
+                <CalendarClock className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
+                <span className="text-xs font-medium text-muted-foreground">Calendrier ESPR…</span>
             </div>
         );
     }
@@ -75,9 +75,9 @@ function EsprCountdownChip() {
     const next = majorMilestones(now)[0];
     if (!next) {
         return (
-            <div className="border-lumiris-amber/20 bg-lumiris-amber/5 flex items-center gap-2 rounded-lg border px-3 py-1.5">
-                <CalendarClock className="text-lumiris-amber h-3.5 w-3.5" aria-hidden />
-                <span className="text-lumiris-amber text-xs font-medium">Phase d&apos;application ESPR en cours</span>
+            <div className="flex items-center gap-2 rounded-lg border border-lumiris-amber/20 bg-lumiris-amber/5 px-3 py-1.5">
+                <CalendarClock className="h-3.5 w-3.5 text-lumiris-amber" aria-hidden />
+                <span className="text-xs font-medium text-lumiris-amber">Phase d&apos;application ESPR en cours</span>
             </div>
         );
     }
@@ -109,7 +109,7 @@ function EsprCountdownChip() {
             <span className="text-xs font-medium tabular-nums">
                 {overdue ? 'Échéance ESPR dépassée' : `J-${days.toLocaleString('fr-FR')}`}
             </span>
-            <span className="text-muted-foreground hidden text-[11px] sm:inline">
+            <span className="hidden text-[11px] text-muted-foreground sm:inline">
                 {overdue ? next.title : `avant ${next.title}`}
             </span>
         </a>
@@ -151,7 +151,7 @@ function UserAvatar() {
                 <button
                     type="button"
                     aria-label={`Compte ${user.fullName}`}
-                    className="focus-visible:ring-ring rounded-full outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                    className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
                     <Avatar className="size-8">
                         <AvatarFallback className="text-[10px] font-semibold">
@@ -162,11 +162,11 @@ function UserAvatar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">
                 <DropdownMenuLabel className="flex flex-col gap-0.5">
-                    <span className="text-foreground text-sm font-medium">{user.fullName}</span>
-                    <span className="text-muted-foreground text-xs font-normal">{user.email}</span>
+                    <span className="text-sm font-medium text-foreground">{user.fullName}</span>
+                    <span className="text-xs font-normal text-muted-foreground">{user.email}</span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuLabel className="text-muted-foreground font-mono text-[10px] uppercase tracking-wider">
+                <DropdownMenuLabel className="font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
                     {ROLE_LABEL[user.role]}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -188,9 +188,9 @@ const IS_DEV = process.env.NODE_ENV !== 'production';
 
 function TopBarComponent() {
     return (
-        <header className="border-border bg-card/80 fixed left-60 right-0 top-0 z-30 flex h-14 items-center gap-3 border-b px-6 backdrop-blur-sm">
+        <header className="fixed top-0 right-0 left-60 z-30 flex h-14 items-center gap-3 border-b border-border bg-card/80 px-6 backdrop-blur-sm">
             {/* `useSearchParams` bail-out exige une Suspense boundary à la frontière du prerender (`/_not-found`). */}
-            <Suspense fallback={<span className="text-muted-foreground text-sm">Admin</span>}>
+            <Suspense fallback={<span className="text-sm text-muted-foreground">Admin</span>}>
                 <Breadcrumb />
             </Suspense>
 

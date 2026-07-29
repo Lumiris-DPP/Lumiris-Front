@@ -24,14 +24,14 @@ const eurCompact = (value: number): string => {
 export function TrajectoryChart({ data }: TrajectoryChartProps) {
     const [breakevenStart, breakevenEnd] = data.breakevenRange;
     return (
-        <div className="border-border bg-card rounded-xl border">
-            <div className="border-border border-b px-6 py-4">
-                <h3 className="text-foreground text-sm font-semibold">Trajectoire</h3>
-                <p className="text-muted-foreground mt-0.5 text-xs">
+        <div className="rounded-xl border border-border bg-card">
+            <div className="border-b border-border px-6 py-4">
+                <h3 className="text-sm font-semibold text-foreground">Trajectoire</h3>
+                <p className="mt-0.5 text-xs text-muted-foreground">
                     Point mort M{breakevenStart}–M{breakevenEnd}
                 </p>
             </div>
-            <div className="px-3 pb-3 pt-4">
+            <div className="px-3 pt-4 pb-3">
                 <ChartContainer config={TRAJECTORY_CONFIG} className="h-72 w-full">
                     <ComposedChart data={[...data.points]} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" className="stroke-border" />

@@ -72,7 +72,7 @@ export function Dashboard() {
 
     return (
         <div className="space-y-6 p-8">
-            <p className="text-foreground text-lg font-medium">{greeting(artisan)}</p>
+            <p className="text-lg font-medium text-foreground">{greeting(artisan)}</p>
 
             {showAttention && (
                 <AttentionBlock

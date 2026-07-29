@@ -22,7 +22,7 @@ export function EventFormCard({ passportId }: { passportId: string }) {
 
     const canSubmit = occurredAt !== '' && description.trim() !== '' && actorType !== '';
 
-    const onSubmit = (e: React.FormEvent) => {
+    const onSubmit = (e: React.SyntheticEvent) => {
         e.preventDefault();
         if (!canSubmit || createEvent.isPending) return;
         const country = COUNTRIES.find((c) => c.code === locationCountryCode);
@@ -57,7 +57,7 @@ export function EventFormCard({ passportId }: { passportId: string }) {
                         <div className="flex flex-col gap-1">
                             <label
                                 htmlFor="event-occurred-at"
-                                className="text-muted-foreground text-[11px] uppercase tracking-wider"
+                                className="text-[11px] tracking-wider text-muted-foreground uppercase"
                             >
                                 Date de l&apos;événement
                             </label>
@@ -70,7 +70,7 @@ export function EventFormCard({ passportId }: { passportId: string }) {
                             />
                         </div>
                         <div className="flex flex-col gap-1">
-                            <span className="text-muted-foreground text-[11px] uppercase tracking-wider">Acteur</span>
+                            <span className="text-[11px] tracking-wider text-muted-foreground uppercase">Acteur</span>
                             <Select value={actorType} onValueChange={(v) => setActorType(v as DppEventActorType)}>
                                 <SelectTrigger aria-label="Acteur" className="w-full">
                                     <SelectValue placeholder="Sélectionner un acteur" />
@@ -89,7 +89,7 @@ export function EventFormCard({ passportId }: { passportId: string }) {
                         <div className="flex flex-col gap-1">
                             <label
                                 htmlFor="event-location-city"
-                                className="text-muted-foreground text-[11px] uppercase tracking-wider"
+                                className="text-[11px] tracking-wider text-muted-foreground uppercase"
                             >
                                 Ville (optionnel)
                             </label>
@@ -102,7 +102,7 @@ export function EventFormCard({ passportId }: { passportId: string }) {
                             />
                         </div>
                         <div className="flex flex-col gap-1">
-                            <span className="text-muted-foreground text-[11px] uppercase tracking-wider">
+                            <span className="text-[11px] tracking-wider text-muted-foreground uppercase">
                                 Pays (optionnel)
                             </span>
                             <Select value={locationCountryCode} onValueChange={setLocationCountryCode}>
@@ -122,7 +122,7 @@ export function EventFormCard({ passportId }: { passportId: string }) {
                     <div className="flex flex-col gap-1">
                         <label
                             htmlFor="event-description"
-                            className="text-muted-foreground text-[11px] uppercase tracking-wider"
+                            className="text-[11px] tracking-wider text-muted-foreground uppercase"
                         >
                             Description
                         </label>
