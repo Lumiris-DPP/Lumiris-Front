@@ -1,5 +1,7 @@
+'use client';
+
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Tag, TrendingUp, TrendingDown, Minus, ShieldCheck, ChevronRight } from 'lucide-react';
 import { CertificatesList, useUniqueCertificates } from '@lumiris/scoring-ui';
@@ -7,6 +9,7 @@ import { mockArtisanById, mockPassports } from '@lumiris/mock-data';
 import type { Passport } from '@lumiris/types';
 import { KIND_LABEL_FR } from '@lumiris/utils';
 import { cn } from '@lumiris/ui/lib/cn';
+import { routes } from '@/lib/routes';
 import { findAlternatives } from '@/lib/iris/alternatives';
 import { usePassportScore } from '@/lib/iris/use-passport-score';
 import { useWardrobe } from '@/lib/wardrobe-storage';
@@ -93,7 +96,7 @@ export function PassportDetail({ passport }: PassportDetailProps) {
     }).format(now);
 
     return (
-        <div className={cn('bg-background relative flex h-full w-full flex-col overflow-y-auto', 'pb-28')}>
+        <div className={cn('relative flex h-full w-full flex-col overflow-y-auto bg-background', 'pb-28')}>
             <ScoreHero
                 grade={score.grade}
                 productName={productName}
@@ -111,35 +114,36 @@ export function PassportDetail({ passport }: PassportDetailProps) {
                         <SectionHeading>Identité</SectionHeading>
                         {artisan ? (
                             <Link
-                                to={`/artisans/${artisan.slug}`}
-                                className="border-border bg-card hover:bg-muted/40 active:bg-muted/60 flex items-start gap-3 rounded-xl border p-4 transition-colors"
+                                href={routes.artisan(artisan.slug)}
+                                prefetch
+                                className="flex items-start gap-3 rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/40 active:bg-muted/60"
                             >
-                                <span className="bg-muted text-muted-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                                     <Tag className="h-4 w-4" aria-hidden />
                                 </span>
                                 <div className="min-w-0 flex-1">
-                                    <p className="text-foreground text-sm font-semibold">{brand}</p>
-                                    <p className="text-muted-foreground text-xs">
+                                    <p className="text-sm font-semibold text-foreground">{brand}</p>
+                                    <p className="text-xs text-muted-foreground">
                                         {KIND_LABEL_FR[passport.garment.kind]} · réf. {passport.garment.reference}
                                     </p>
                                 </div>
-                                <p className="text-foreground shrink-0 font-mono text-base font-semibold">
+                                <p className="shrink-0 font-mono text-base font-semibold text-foreground">
                                     {formatPrice(passport.garment.retailPrice)}
                                 </p>
-                                <ChevronRight className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                                <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
                             </Link>
                         ) : (
-                            <div className="border-border bg-card flex items-start gap-3 rounded-xl border p-4">
-                                <span className="bg-muted text-muted-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
+                            <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-4">
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                                     <Tag className="h-4 w-4" aria-hidden />
                                 </span>
                                 <div className="min-w-0 flex-1">
-                                    <p className="text-foreground text-sm font-semibold">{brand}</p>
-                                    <p className="text-muted-foreground text-xs">
+                                    <p className="text-sm font-semibold text-foreground">{brand}</p>
+                                    <p className="text-xs text-muted-foreground">
                                         {KIND_LABEL_FR[passport.garment.kind]} · réf. {passport.garment.reference}
                                     </p>
                                 </div>
-                                <p className="text-foreground shrink-0 font-mono text-base font-semibold">
+                                <p className="shrink-0 font-mono text-base font-semibold text-foreground">
                                     {formatPrice(passport.garment.retailPrice)}
                                 </p>
                             </div>
@@ -175,7 +179,7 @@ export function PassportDetail({ passport }: PassportDetailProps) {
                         <Layer delay={LAYER_DELAYS.proofs}>
                             <SectionHeading>Preuves vérifiées</SectionHeading>
                             <CertificatesList certificates={certificates} now={now} />
-                            <p className="text-lumiris-emerald border-lumiris-emerald/30 bg-lumiris-emerald/10 inline-flex items-center gap-1.5 self-start rounded-full border px-3 py-1 text-[11px] font-medium">
+                            <p className="inline-flex items-center gap-1.5 self-start rounded-full border border-lumiris-emerald/30 bg-lumiris-emerald/10 px-3 py-1 text-[11px] font-medium text-lumiris-emerald">
                                 <ShieldCheck className="h-3.5 w-3.5" aria-hidden />
                                 Certifié par Lumiris
                             </p>
@@ -186,7 +190,7 @@ export function PassportDetail({ passport }: PassportDetailProps) {
                 {alternativeItems.length > 0 ? (
                     <Layer delay={LAYER_DELAYS.alternatives}>
                         <SectionHeading>Pièces équivalentes d&apos;artisans français</SectionHeading>
-                        <p className="text-muted-foreground text-[11px] italic">
+                        <p className="text-[11px] text-muted-foreground italic">
                             Tri par score puis prix. Indépendant des commissions.
                         </p>
                         <div className="grid grid-cols-2 gap-3">
@@ -197,7 +201,7 @@ export function PassportDetail({ passport }: PassportDetailProps) {
                     </Layer>
                 ) : null}
 
-                <p className="text-muted-foreground border-border/50 mt-2 border-t pt-4 font-mono text-[10px] leading-relaxed">
+                <p className="mt-2 border-t border-border/50 pt-4 font-mono text-[10px] leading-relaxed text-muted-foreground">
                     ID : {passport.id.toUpperCase()} / Scanné : {scannedDateLabel} / Grade {score.grade} / {brand}
                 </p>
             </div>
@@ -237,12 +241,12 @@ function PriceRatioCard({ ratio }: RatioCardProps) {
 
     return (
         <div className={cn('flex items-center gap-3 rounded-xl border p-4', tone)}>
-            <span className="bg-current/10 flex h-8 w-8 items-center justify-center rounded-lg">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-current/10">
                 <Icon className="h-4 w-4" aria-hidden />
             </span>
             <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold uppercase tracking-wider">Prix vs grade</p>
-                <p className="text-foreground/90 text-sm font-medium">{ratio.label}</p>
+                <p className="text-xs font-semibold tracking-wider uppercase">Prix vs grade</p>
+                <p className="text-sm font-medium text-foreground/90">{ratio.label}</p>
             </div>
         </div>
     );

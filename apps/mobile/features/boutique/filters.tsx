@@ -107,7 +107,7 @@ export function BoutiqueFilters({
 
     return (
         <motion.div
-            className="bg-background/85 sticky top-0 z-30 flex items-center gap-2 px-5 pb-3 pt-2 backdrop-blur-xl"
+            className="sticky top-0 z-30 flex items-center gap-2 bg-background/85 px-5 pt-2 pb-3 backdrop-blur-xl"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.08 }}
@@ -126,14 +126,14 @@ export function BoutiqueFilters({
                 <SlidersHorizontal className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
                 Filtres
                 {activeCount > 0 ? (
-                    <span className="bg-primary-foreground/20 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] tabular-nums">
+                    <span className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary-foreground/20 px-1 text-[10px] tabular-nums">
                         {activeCount}
                     </span>
                 ) : null}
             </button>
 
-            <label className="border-border bg-card text-foreground relative ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-full border py-1.5 pl-3 pr-2 text-xs font-semibold">
-                <ArrowUpDown className="text-muted-foreground h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+            <label className="relative ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card py-1.5 pr-2 pl-3 text-xs font-semibold text-foreground">
+                <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.5} aria-hidden />
                 <span className="sr-only">Trier par</span>
                 <select
                     value={state.sort}
@@ -189,11 +189,11 @@ function BoutiqueFilterSheet({
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent
                 side="bottom"
-                className="mx-auto max-h-[88vh] max-w-md overflow-y-auto rounded-t-3xl px-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] pt-6"
+                className="mx-auto max-h-[88vh] max-w-md overflow-y-auto rounded-t-3xl px-6 pt-6 pb-[max(env(safe-area-inset-bottom),1.5rem)]"
             >
                 <SheetHeader className="px-0 text-left">
                     <SheetTitle className="flex items-center gap-2 text-base">
-                        <SlidersHorizontal className="text-primary h-4 w-4" strokeWidth={1.5} aria-hidden />
+                        <SlidersHorizontal className="h-4 w-4 text-primary" strokeWidth={1.5} aria-hidden />
                         Filtres
                     </SheetTitle>
                     <SheetDescription className="text-xs">
@@ -243,9 +243,9 @@ function BoutiqueFilterSheet({
                     ) : null}
 
                     <fieldset className="flex flex-col gap-3">
-                        <legend className="text-muted-foreground flex w-full items-center justify-between text-[11px] font-semibold uppercase tracking-wider">
+                        <legend className="flex w-full items-center justify-between text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                             <span>Budget</span>
-                            <span className="text-foreground font-mono tabular-nums">
+                            <span className="font-mono text-foreground tabular-nums">
                                 {range[0]} € – {range[1]} €
                             </span>
                         </legend>
@@ -270,7 +270,7 @@ function BoutiqueFilterSheet({
                     <button
                         type="button"
                         onClick={() => onChange({ ...EMPTY_BOUTIQUE_FILTERS, sort: state.sort })}
-                        className="text-muted-foreground hover:text-foreground inline-flex h-12 items-center justify-center gap-1.5 px-4 text-sm font-medium"
+                        className="inline-flex h-12 items-center justify-center gap-1.5 px-4 text-sm font-medium text-muted-foreground hover:text-foreground"
                     >
                         <X className="h-4 w-4" strokeWidth={1.5} aria-hidden />
                         Réinitialiser
@@ -278,7 +278,7 @@ function BoutiqueFilterSheet({
                     <button
                         type="button"
                         onClick={() => onOpenChange(false)}
-                        className="bg-foreground text-background inline-flex h-12 flex-1 items-center justify-center rounded-full px-6 text-sm font-semibold active:scale-[0.98]"
+                        className="inline-flex h-12 flex-1 items-center justify-center rounded-full bg-foreground px-6 text-sm font-semibold text-background active:scale-[0.98]"
                     >
                         Voir {resultCount} résultat{resultCount > 1 ? 's' : ''}
                     </button>
@@ -291,7 +291,7 @@ function BoutiqueFilterSheet({
 function FilterGroup({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <fieldset className="flex flex-col gap-3">
-            <legend className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+            <legend className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                 {label}
             </legend>
             <div className="flex flex-wrap gap-2">{children}</div>
@@ -315,7 +315,7 @@ function FilterChip({
             aria-pressed={active}
             className={cn(
                 'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
-                'focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
+                'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:outline-none',
                 active
                     ? 'border-primary bg-primary/10 text-primary'
                     : 'border-border/60 bg-card text-muted-foreground hover:text-foreground',

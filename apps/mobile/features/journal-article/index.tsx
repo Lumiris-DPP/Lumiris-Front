@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
+import Image from 'next/image';
 import { ChevronLeft, Clock } from 'lucide-react';
 import { JOURNAL_CATEGORY_LABEL } from '@lumiris/types';
 import type { JournalArticlePublic } from '@lumiris/mock-data';
@@ -22,10 +23,10 @@ export function JournalArticle({ article }: JournalArticleProps) {
         .filter(Boolean);
 
     return (
-        <div className="bg-background relative flex h-full flex-col overflow-y-auto pb-28">
+        <div className="relative flex h-full flex-col overflow-y-auto bg-background pb-28">
             <div className="sticky top-0 z-30 flex px-3 pt-3">
-                <Button asChild variant="outline" size="icon" className="bg-card/90 rounded-full backdrop-blur-md">
-                    <Link to="/discover" aria-label="Retour à Découvrir">
+                <Button asChild variant="outline" size="icon" className="rounded-full bg-card/90 backdrop-blur-md">
+                    <Link href="/discover" aria-label="Retour à Découvrir">
                         <ChevronLeft className="h-4 w-4" />
                     </Link>
                 </Button>
@@ -34,11 +35,13 @@ export function JournalArticle({ article }: JournalArticleProps) {
             <article className="mt-4 flex flex-col gap-5 px-5">
                 {article.coverImage ? (
                     <div className="relative aspect-video overflow-hidden rounded-2xl">
-                        <img
+                        <Image
                             src={article.coverImage}
                             alt={article.title}
+                            fill
+                            sizes="(max-width: 480px) 100vw, 480px"
                             loading="lazy"
-                            className="absolute inset-0 h-full w-full object-cover"
+                            className="object-cover"
                         />
                     </div>
                 ) : (
@@ -56,29 +59,29 @@ export function JournalArticle({ article }: JournalArticleProps) {
                     <Badge
                         aria-label={`Grade ${grade}`}
                         className={cn(
-                            'text-primary-foreground h-6 min-w-6 rounded-md px-1.5 font-mono font-bold',
+                            'h-6 min-w-6 rounded-md px-1.5 font-mono font-bold text-primary-foreground',
                             GRADE_CONFIG[grade].bgClass,
                         )}
                     >
                         {grade}
                     </Badge>
-                    <Badge variant="outline" className="text-muted-foreground rounded-full">
+                    <Badge variant="outline" className="rounded-full text-muted-foreground">
                         {JOURNAL_CATEGORY_LABEL[article.category]}
                     </Badge>
                     <span className="text-muted-foreground">{formatDate(article.updatedAt, { locale: 'fr-FR' })}</span>
-                    <span className="text-muted-foreground inline-flex items-center gap-1">
+                    <span className="inline-flex items-center gap-1 text-muted-foreground">
                         <Clock className="h-3 w-3" />
                         {article.readTime}
                     </span>
                 </div>
 
-                <h1 className="text-foreground text-2xl font-bold leading-tight tracking-tight">{article.title}</h1>
+                <h1 className="text-2xl leading-tight font-bold tracking-tight text-foreground">{article.title}</h1>
 
-                <p className="text-muted-foreground text-lg leading-relaxed">{article.excerpt}</p>
+                <p className="text-lg leading-relaxed text-muted-foreground">{article.excerpt}</p>
 
                 <div className="prose prose-sm dark:prose-invert flex max-w-none flex-col gap-4">
                     {paragraphs.map((p, i) => (
-                        <p key={i} className="text-foreground/90 text-sm leading-relaxed">
+                        <p key={i} className="text-sm leading-relaxed text-foreground/90">
                             {p}
                         </p>
                     ))}
@@ -86,10 +89,10 @@ export function JournalArticle({ article }: JournalArticleProps) {
 
                 {article.author ? (
                     <GlassCard intensity="subtle" className="mt-4 rounded-2xl p-4">
-                        <p className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+                        <p className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                             Auteur
                         </p>
-                        <p className="text-foreground mt-1 text-sm font-semibold">{article.author}</p>
+                        <p className="mt-1 text-sm font-semibold text-foreground">{article.author}</p>
                     </GlassCard>
                 ) : null}
             </article>
@@ -99,11 +102,11 @@ export function JournalArticle({ article }: JournalArticleProps) {
 
 export function JournalArticleNotFound() {
     return (
-        <div className="bg-background flex h-full flex-col items-center justify-center gap-4 px-8 text-center">
-            <p className="text-foreground text-lg font-semibold">Article introuvable</p>
-            <p className="text-muted-foreground text-sm">Cet article n&apos;existe pas ou a été retiré du Journal.</p>
+        <div className="flex h-full flex-col items-center justify-center gap-4 bg-background px-8 text-center">
+            <p className="text-lg font-semibold text-foreground">Article introuvable</p>
+            <p className="text-sm text-muted-foreground">Cet article n&apos;existe pas ou a été retiré du Journal.</p>
             <Button asChild variant="outline" size="sm" className="rounded-full">
-                <Link to="/discover">
+                <Link href="/discover">
                     <ChevronLeft className="h-4 w-4" />
                     Retour à Découvrir
                 </Link>

@@ -1,5 +1,8 @@
+'use client';
+
 import { useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Database, Download, ShieldCheck, Trash2, UserX } from 'lucide-react';
 import {
@@ -46,14 +49,14 @@ export function Privacy() {
 function Header() {
     return (
         <motion.header
-            className="px-5 pb-5 pt-[max(env(safe-area-inset-top),3rem)]"
+            className="px-5 pt-[max(env(safe-area-inset-top),3rem)] pb-5"
             variants={slideUpFade}
             initial="initial"
             animate="animate"
         >
             <Link
-                to="/me/settings"
-                className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs"
+                href="/me/settings"
+                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
             >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 Réglages
@@ -61,13 +64,13 @@ function Header() {
             <div className="mt-3 flex items-center gap-3">
                 <span
                     aria-hidden
-                    className="border-border/60 bg-background/60 flex h-10 w-10 items-center justify-center rounded-full border"
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background/60"
                 >
-                    <ShieldCheck className="text-lumiris-cyan h-5 w-5" />
+                    <ShieldCheck className="h-5 w-5 text-lumiris-cyan" />
                 </span>
                 <div>
-                    <h1 className="text-foreground text-xl font-bold">Confidentialité & données</h1>
-                    <p className="text-muted-foreground text-xs">
+                    <h1 className="text-xl font-bold text-foreground">Confidentialité & données</h1>
+                    <p className="text-xs text-muted-foreground">
                         RGPD - ce qu&apos;on stocke, et ce que tu contrôles.
                     </p>
                 </div>
@@ -117,15 +120,15 @@ function DataCollectedSection() {
             <ul className="flex flex-col gap-3">
                 {DATA_COLLECTED.map((item) => (
                     <li key={item.label} className="flex items-start gap-3">
-                        <span className="bg-lumiris-cyan/60 mt-1.5 inline-flex h-1.5 w-1.5 shrink-0 rounded-full" />
+                        <span className="mt-1.5 inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-lumiris-cyan/60" />
                         <div>
-                            <p className="text-foreground text-sm font-semibold">{item.label}</p>
-                            <p className="text-muted-foreground mt-0.5 text-xs leading-relaxed">{item.detail}</p>
+                            <p className="text-sm font-semibold text-foreground">{item.label}</p>
+                            <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{item.detail}</p>
                         </div>
                     </li>
                 ))}
             </ul>
-            <p className="text-muted-foreground/80 mt-4 text-[11px] leading-relaxed">
+            <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground/80">
                 Nous limitons la collecte au strict nécessaire au fonctionnement du service (compte, commandes,
                 Garde-Robe). Les données de paiement sont isolées chez Stripe et ne transitent jamais par nos serveurs.
             </p>
@@ -136,7 +139,7 @@ function DataCollectedSection() {
 function DpoSection() {
     return (
         <Section title="Délégué à la protection (DPO)">
-            <p className="text-foreground/90 text-sm leading-relaxed">
+            <p className="text-sm leading-relaxed text-foreground/90">
                 DPO mutualisé via{' '}
                 <a href={`mailto:${DPO_EMAIL}`} className="text-foreground underline-offset-4 hover:underline">
                     {DPO_EMAIL}
@@ -151,7 +154,7 @@ function RightsSection() {
     const { user, signOut } = useUser();
     const wardrobe = useWardrobe();
     const settings = useSettings();
-    const navigate = useNavigate();
+    const router = useRouter();
     const deleteAccount = useDeleteAccount();
 
     const exportPayload = useMemo(
@@ -205,7 +208,7 @@ function RightsSection() {
         wipeAllUserData();
         signOut();
         toast.success('Ton compte a été supprimé.');
-        navigate('/');
+        router.push('/');
     }
 
     const wardrobeCount = wardrobe.length;
@@ -221,7 +224,7 @@ function RightsSection() {
                     <button
                         type="button"
                         onClick={handleExport}
-                        className="border-border/60 bg-background/60 text-foreground hover:bg-background/80 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background/60 px-3 py-1.5 text-xs font-semibold text-foreground transition hover:bg-background/80"
                     >
                         <Download className="h-3.5 w-3.5" />
                         Exporter
@@ -242,7 +245,7 @@ function RightsSection() {
                             <button
                                 type="button"
                                 disabled={wardrobeCount === 0}
-                                className="border-lumiris-rose/30 bg-lumiris-rose/5 text-lumiris-rose hover:bg-lumiris-rose/10 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition disabled:opacity-40"
+                                className="inline-flex items-center gap-1.5 rounded-full border border-lumiris-rose/30 bg-lumiris-rose/5 px-3 py-1.5 text-xs font-semibold text-lumiris-rose transition hover:bg-lumiris-rose/10 disabled:opacity-40"
                             >
                                 <Trash2 className="h-3.5 w-3.5" />
                                 Effacer
@@ -260,7 +263,7 @@ function RightsSection() {
                                 <AlertDialogCancel>Annuler</AlertDialogCancel>
                                 <AlertDialogAction
                                     onClick={handleClearWardrobe}
-                                    className="bg-lumiris-rose hover:bg-lumiris-rose/90 text-white"
+                                    className="bg-lumiris-rose text-white hover:bg-lumiris-rose/90"
                                 >
                                     Effacer
                                 </AlertDialogAction>
@@ -279,7 +282,7 @@ function RightsSection() {
                             <button
                                 type="button"
                                 disabled={user === null || deleteAccount.isPending}
-                                className="border-lumiris-rose/30 bg-lumiris-rose/5 text-lumiris-rose hover:bg-lumiris-rose/10 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition disabled:opacity-40"
+                                className="inline-flex items-center gap-1.5 rounded-full border border-lumiris-rose/30 bg-lumiris-rose/5 px-3 py-1.5 text-xs font-semibold text-lumiris-rose transition hover:bg-lumiris-rose/10 disabled:opacity-40"
                             >
                                 <UserX className="h-3.5 w-3.5" />
                                 Supprimer
@@ -299,7 +302,7 @@ function RightsSection() {
                                 <AlertDialogCancel>Annuler</AlertDialogCancel>
                                 <AlertDialogAction
                                     onClick={handleDeleteAccount}
-                                    className="bg-lumiris-rose hover:bg-lumiris-rose/90 text-white"
+                                    className="bg-lumiris-rose text-white hover:bg-lumiris-rose/90"
                                 >
                                     Supprimer
                                 </AlertDialogAction>
@@ -321,12 +324,12 @@ interface RightRowProps {
 
 function RightRow({ Icon, title, description, children }: RightRowProps) {
     return (
-        <div className="[&:not(:last-child)]:border-border/40 flex items-start justify-between gap-3 [&:not(:last-child)]:border-b [&:not(:last-child)]:pb-3">
+        <div className="flex items-start justify-between gap-3 [&:not(:last-child)]:border-b [&:not(:last-child)]:border-border/40 [&:not(:last-child)]:pb-3">
             <div className="flex min-w-0 flex-1 items-start gap-3">
-                <Icon className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
+                <Icon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                 <div className="min-w-0 flex-1">
-                    <p className="text-foreground text-sm">{title}</p>
-                    <p className="text-muted-foreground mt-0.5 text-[11px]">{description}</p>
+                    <p className="text-sm text-foreground">{title}</p>
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">{description}</p>
                 </div>
             </div>
             {children}

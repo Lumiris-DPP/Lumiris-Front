@@ -1,5 +1,7 @@
+'use client';
+
 import { useId, useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ExternalLink, LifeBuoy, Mail, Send } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@lumiris/ui/components/accordion';
@@ -19,7 +21,7 @@ const FAQ: readonly FaqEntry[] = [
             <>
                 Quatre piliers - Transparence (40%), Savoir-faire (25%), Impact (25%), Réparabilité (10%). Le calcul est
                 déterministe et reproductible à partir du DPP.{' '}
-                <Link to="/about#scoring-doc" className="text-foreground underline-offset-4 hover:underline">
+                <Link href="/about#scoring-doc" className="text-foreground underline-offset-4 hover:underline">
                     Voir la documentation
                 </Link>
                 .
@@ -32,7 +34,7 @@ const FAQ: readonly FaqEntry[] = [
             <>
                 Vérifie l&apos;éclairage et la mise au point. Si l&apos;étiquette est abîmée, tu peux saisir
                 manuellement le code à l&apos;ouverture du scanner -{' '}
-                <Link to="/scan" className="text-foreground underline-offset-4 hover:underline">
+                <Link href="/scan" className="text-foreground underline-offset-4 hover:underline">
                     réessayer maintenant
                 </Link>
                 .
@@ -45,7 +47,7 @@ const FAQ: readonly FaqEntry[] = [
             <>
                 Non. Aucune donnée n&apos;est partagée ni vendue. Tout est stocké localement dans ton navigateur. Détail
                 complet sur la page{' '}
-                <Link to="/me/privacy" className="text-foreground underline-offset-4 hover:underline">
+                <Link href="/me/privacy" className="text-foreground underline-offset-4 hover:underline">
                     Confidentialité
                 </Link>
                 .
@@ -57,7 +59,7 @@ const FAQ: readonly FaqEntry[] = [
         a: (
             <>
                 Depuis la page{' '}
-                <Link to="/me/privacy" className="text-foreground underline-offset-4 hover:underline">
+                <Link href="/me/privacy" className="text-foreground underline-offset-4 hover:underline">
                     Confidentialité
                 </Link>
                 , bouton « Supprimer mon compte ». L&apos;effacement est immédiat et définitif (compte, garde-robe,
@@ -128,14 +130,14 @@ export function Help() {
 function Header() {
     return (
         <motion.header
-            className="px-5 pb-5 pt-[max(env(safe-area-inset-top),3rem)]"
+            className="px-5 pt-[max(env(safe-area-inset-top),3rem)] pb-5"
             variants={slideUpFade}
             initial="initial"
             animate="animate"
         >
             <Link
-                to="/me"
-                className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs"
+                href="/me"
+                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
             >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 Profil
@@ -143,13 +145,13 @@ function Header() {
             <div className="mt-3 flex items-center gap-3">
                 <span
                     aria-hidden
-                    className="border-border/60 bg-background/60 flex h-10 w-10 items-center justify-center rounded-full border"
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background/60"
                 >
-                    <LifeBuoy className="text-lumiris-cyan h-5 w-5" />
+                    <LifeBuoy className="h-5 w-5 text-lumiris-cyan" />
                 </span>
                 <div>
-                    <h1 className="text-foreground text-xl font-bold">Aide & Support</h1>
-                    <p className="text-muted-foreground text-xs">FAQ et contact direct.</p>
+                    <h1 className="text-xl font-bold text-foreground">Aide & Support</h1>
+                    <p className="text-xs text-muted-foreground">FAQ et contact direct.</p>
                 </div>
             </div>
         </motion.header>
@@ -173,8 +175,8 @@ function FaqSection() {
             <Accordion type="single" collapsible className="w-full">
                 {FAQ.map((entry, i) => (
                     <AccordionItem key={entry.q} value={`faq-${i}`}>
-                        <AccordionTrigger className="text-foreground text-sm">{entry.q}</AccordionTrigger>
-                        <AccordionContent className="text-muted-foreground text-sm leading-relaxed">
+                        <AccordionTrigger className="text-sm text-foreground">{entry.q}</AccordionTrigger>
+                        <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
                             {entry.a}
                         </AccordionContent>
                     </AccordionItem>
@@ -200,17 +202,17 @@ function ContactSection() {
             <div className="flex flex-col gap-4">
                 <a
                     href="mailto:hello@lumiris.example"
-                    className="border-border/60 bg-background/60 hover:bg-background/80 inline-flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-sm transition-colors"
+                    className="inline-flex items-center justify-between gap-3 rounded-2xl border border-border/60 bg-background/60 px-4 py-3 text-sm transition-colors hover:bg-background/80"
                 >
-                    <span className="text-foreground inline-flex items-center gap-3">
-                        <Mail className="text-muted-foreground h-4 w-4" />
+                    <span className="inline-flex items-center gap-3 text-foreground">
+                        <Mail className="h-4 w-4 text-muted-foreground" />
                         hello@lumiris.example
                     </span>
-                    <ExternalLink className="text-muted-foreground/60 h-4 w-4" />
+                    <ExternalLink className="h-4 w-4 text-muted-foreground/60" />
                 </a>
 
                 <div className="flex flex-col gap-2">
-                    <label htmlFor={textareaId} className="text-foreground text-sm font-medium">
+                    <label htmlFor={textareaId} className="text-sm font-medium text-foreground">
                         Signaler un bug
                     </label>
                     <Textarea
@@ -218,16 +220,16 @@ function ContactSection() {
                         value={body}
                         onChange={(e) => setBody(e.target.value)}
                         placeholder="Décris ce qui s’est passé, sur quel écran, et le résultat attendu."
-                        className="bg-background/60 min-h-32"
+                        className="min-h-32 bg-background/60"
                     />
                     <a
                         href={buildMailto()}
-                        className="bg-foreground text-background hover:bg-foreground/90 inline-flex h-10 items-center justify-center gap-2 self-end rounded-full px-4 text-sm font-semibold transition"
+                        className="inline-flex h-10 items-center justify-center gap-2 self-end rounded-full bg-foreground px-4 text-sm font-semibold text-background transition hover:bg-foreground/90"
                     >
                         <Send className="h-3.5 w-3.5" />
                         Envoyer
                     </a>
-                    <p className="text-muted-foreground/80 text-[10px]">
+                    <p className="text-[10px] text-muted-foreground/80">
                         Ouvre ton client mail avec le contenu pré-rempli.
                     </p>
                 </div>

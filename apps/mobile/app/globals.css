@@ -1,0 +1,94 @@
+@import '@lumiris/ui/styles/prismatic.css';
+
+/* Polices auto-hébergées (@fontsource, importées dans app/layout.tsx) exposées sous les mêmes
+   noms de variables que next/font, pour que --font-sans / --font-mono de prismatic.css
+   continuent de résoudre. */
+:root {
+    --font-inter: 'Inter';
+    --font-geist-mono: 'Geist Mono';
+    --grade-a: var(--iris-grade-a);
+    --grade-b: var(--iris-grade-b);
+    --grade-c: var(--iris-grade-c);
+    --grade-d: var(--iris-grade-d);
+    --grade-e: var(--iris-grade-e);
+    --glass: oklch(100% 0 0deg / 70%);
+}
+
+@theme inline {
+    --color-grade-a: var(--iris-grade-a);
+    --color-grade-b: var(--iris-grade-b);
+    --color-grade-c: var(--iris-grade-c);
+    --color-grade-d: var(--iris-grade-d);
+    --color-grade-e: var(--iris-grade-e);
+}
+
+/* Ombre douce "opal-glow" — deux couches très subtiles, jamais de bordure dure. */
+.opal-shadow {
+    box-shadow:
+        0 1px 3px oklch(50% 0.01 260deg / 4%),
+        0 4px 12px oklch(50% 0.01 260deg / 3%);
+}
+
+@keyframes grade-a-glow {
+    0%,
+    100% {
+        box-shadow:
+            0 0 8px oklch(55% 0.18 160deg / 15%),
+            0 0 24px oklch(55% 0.18 160deg / 5%);
+    }
+
+    50% {
+        box-shadow:
+            0 0 16px oklch(55% 0.18 160deg / 25%),
+            0 0 40px oklch(55% 0.18 160deg / 8%);
+    }
+}
+
+/* Impression de la facture : on masque toute l'app (cadre, navigation, bannières) et on
+   n'imprime que la feuille de facture, à pleine largeur et fond blanc. La feuille porte la
+   classe `.facture-print` ; les éléments interactifs (boutons, retour) portent `.facture-no-print`. */
+@media print {
+    html,
+    body {
+        height: auto !important;
+        overflow: visible !important;
+        background: #fff !important;
+    }
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    .facture-print,
+    .facture-print * {
+        visibility: visible !important;
+    }
+
+    .facture-print {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
+        border: none !important;
+        background: #fff !important;
+        color: #000 !important;
+    }
+
+    .facture-no-print {
+        display: none !important;
+    }
+}
+
+/* Toggle "Réduire les animations" piloté par /me/settings - coupe transitions
+   et animations à la racine, indépendamment de `prefers-reduced-motion`
+   (l'app expose son propre opt-in en mode démo). */
+html[data-reduce-motion='true'],
+html[data-reduce-motion='true'] *,
+html[data-reduce-motion='true'] *::before,
+html[data-reduce-motion='true'] *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+}

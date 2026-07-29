@@ -1,4 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+'use client';
+
+import { useRouter } from 'next/navigation';
 import {
     Armchair,
     BatteryCharging,
@@ -38,7 +40,7 @@ const SECTOR_ICON: Record<WardrobeSector, typeof Shirt> = {
 };
 
 export function ItemActionsSheet({ open, onOpenChange, target }: ItemActionsSheetProps) {
-    const navigate = useNavigate();
+    const router = useRouter();
 
     if (!target) return null;
 
@@ -46,7 +48,7 @@ export function ItemActionsSheet({ open, onOpenChange, target }: ItemActionsShee
 
     const onRescan = () => {
         close();
-        navigate('/');
+        router.push('/');
     };
 
     const onRemove = () => {
@@ -57,7 +59,7 @@ export function ItemActionsSheet({ open, onOpenChange, target }: ItemActionsShee
     const onFindRetoucheur = () => {
         if (!target.passport) return;
         close();
-        navigate(`/local?for=${encodeURIComponent(target.passport.id)}`);
+        router.push(`/local?for=${encodeURIComponent(target.passport.id)}`);
     };
 
     const Icon = SECTOR_ICON[target.sector];
@@ -66,18 +68,18 @@ export function ItemActionsSheet({ open, onOpenChange, target }: ItemActionsShee
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent side="bottom" className="mx-auto max-h-[85vh] max-w-md overflow-y-auto rounded-t-2xl pb-8">
-                <SheetHeader className="pb-3 pt-5">
-                    <SheetTitle className="text-foreground text-base">Que veux-tu faire ?</SheetTitle>
+                <SheetHeader className="pt-5 pb-3">
+                    <SheetTitle className="text-base text-foreground">Que veux-tu faire ?</SheetTitle>
                 </SheetHeader>
 
                 <div className="flex flex-col gap-4 px-4">
-                    <header className="border-border bg-card flex items-center gap-3 rounded-2xl border p-3">
-                        <span className="bg-secondary/60 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
-                            <Icon className="text-muted-foreground/60 h-5 w-5" aria-hidden />
+                    <header className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3">
+                        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary/60">
+                            <Icon className="h-5 w-5 text-muted-foreground/60" aria-hidden />
                         </span>
                         <div className="min-w-0 flex-1">
-                            <p className="text-foreground truncate text-sm font-semibold">{target.label}</p>
-                            <p className="text-muted-foreground truncate text-xs">{target.sublabel}</p>
+                            <p className="truncate text-sm font-semibold text-foreground">{target.label}</p>
+                            <p className="truncate text-xs text-muted-foreground">{target.sublabel}</p>
                         </div>
                     </header>
 
@@ -110,8 +112,8 @@ function ActionRow({ Icon, label, onClick, tone = 'default' }: ActionRowProps) {
                 onClick={onClick}
                 className={
                     danger
-                        ? 'border-lumiris-rose/30 bg-lumiris-rose/5 hover:bg-lumiris-rose/10 text-lumiris-rose flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-medium transition-colors'
-                        : 'border-border bg-card hover:bg-muted/40 text-foreground flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-medium transition-colors'
+                        ? 'flex w-full items-center gap-3 rounded-2xl border border-lumiris-rose/30 bg-lumiris-rose/5 px-4 py-3 text-sm font-medium text-lumiris-rose transition-colors hover:bg-lumiris-rose/10'
+                        : 'flex w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted/40'
                 }
             >
                 <Icon className="h-4 w-4" aria-hidden />

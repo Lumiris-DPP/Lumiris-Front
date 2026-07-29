@@ -29,7 +29,7 @@ export function ViewToggle({ value, onChange }: ViewToggleProps) {
         <div
             role="tablist"
             aria-label="Mode d'affichage"
-            className="border-border/60 bg-card inline-flex items-center rounded-full border p-0.5"
+            className="inline-flex items-center rounded-full border border-border/60 bg-card p-0.5"
         >
             {OPTIONS.map(({ id, label, Icon }) => {
                 const active = value === id;
@@ -43,7 +43,7 @@ export function ViewToggle({ value, onChange }: ViewToggleProps) {
                         onClick={() => onChange(id)}
                         className={cn(
                             'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
-                            'focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
+                            'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:outline-none',
                             active ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground',
                         )}
                     >

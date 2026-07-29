@@ -1,5 +1,8 @@
-import { useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+'use client';
+
+import { useMemo, useState, type ChangeEvent, type SyntheticEvent } from 'react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ImagePlus, Send, X } from 'lucide-react';
 import { mockPassportById } from '@lumiris/mock-data';
@@ -32,7 +35,7 @@ interface RepairRequestFormProps {
 }
 
 export function RepairRequestForm({ repairer, prefillPassportId }: RepairRequestFormProps) {
-    const navigate = useNavigate();
+    const router = useRouter();
     const wardrobe = useWardrobe();
 
     const wardrobePassports = useMemo(
@@ -85,7 +88,7 @@ export function RepairRequestForm({ repairer, prefillPassportId }: RepairRequest
         setPhotos((prev) => prev.filter((_, i) => i !== index));
     }
 
-    function onSubmit(event: FormEvent<HTMLFormElement>): void {
+    function onSubmit(event: SyntheticEvent<HTMLFormElement>): void {
         event.preventDefault();
         if (submitting) return;
         if (description.trim().length === 0) return;
@@ -111,29 +114,29 @@ export function RepairRequestForm({ repairer, prefillPassportId }: RepairRequest
         });
 
         setToast(true);
-        window.setTimeout(() => navigate('/me/repairs'), 700);
+        window.setTimeout(() => router.push('/me/repairs'), 700);
     }
 
     const canSubmit = !submitting && description.trim().length > 0;
 
     return (
-        <div className="bg-background flex h-full flex-col overflow-y-auto pb-28">
+        <div className="flex h-full flex-col overflow-y-auto bg-background pb-28">
             <motion.header
-                className="flex items-center gap-3 px-4 pb-3 pt-12"
+                className="flex items-center gap-3 px-4 pt-12 pb-3"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
             >
                 <button
                     type="button"
-                    onClick={() => navigate(-1)}
+                    onClick={() => router.back()}
                     aria-label="Retour"
-                    className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full border"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground"
                 >
                     <ArrowLeft className="h-4 w-4" />
                 </button>
                 <div className="min-w-0 flex-1">
-                    <h1 className="text-foreground truncate text-base font-bold">Demander une retouche</h1>
-                    <p className="text-muted-foreground truncate text-xs">
+                    <h1 className="truncate text-base font-bold text-foreground">Demander une retouche</h1>
+                    <p className="truncate text-xs text-muted-foreground">
                         {repairer.atelierName ?? repairer.displayName} · {repairer.city}
                     </p>
                 </div>
@@ -141,13 +144,13 @@ export function RepairRequestForm({ repairer, prefillPassportId }: RepairRequest
 
             <form onSubmit={onSubmit} className="flex flex-col gap-5 px-4">
                 <fieldset className="flex flex-col gap-2">
-                    <legend className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+                    <legend className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                         Pièce
                     </legend>
                     {selectedPassport ? (
                         <PassportRow passport={selectedPassport} onClear={() => setPassportId(null)} />
                     ) : wardrobePassports.length === 0 ? (
-                        <p className="border-border/60 bg-card text-muted-foreground rounded-2xl border px-4 py-3 text-xs italic">
+                        <p className="rounded-2xl border border-border/60 bg-card px-4 py-3 text-xs text-muted-foreground italic">
                             Tu n&apos;as pas encore de pièce dans ta Garde-Robe - tu peux quand même envoyer une demande
                             générique.
                         </p>
@@ -157,7 +160,7 @@ export function RepairRequestForm({ repairer, prefillPassportId }: RepairRequest
                 </fieldset>
 
                 <fieldset className="flex flex-col gap-2">
-                    <legend className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+                    <legend className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                         Type de prestation
                     </legend>
                     <ul className="flex flex-wrap gap-1.5">
@@ -190,7 +193,7 @@ export function RepairRequestForm({ repairer, prefillPassportId }: RepairRequest
                 </fieldset>
 
                 <fieldset className="flex flex-col gap-2">
-                    <legend className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+                    <legend className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                         Description
                     </legend>
                     <textarea
@@ -199,32 +202,33 @@ export function RepairRequestForm({ repairer, prefillPassportId }: RepairRequest
                         maxLength={MAX_DESC}
                         rows={5}
                         placeholder="Décris ce que tu veux faire retoucher - emplacement, dimensions approximatives, niveau d'urgence."
-                        className="border-border bg-card text-foreground placeholder:text-muted-foreground/60 focus:ring-lumiris-cyan/30 rounded-2xl border px-3 py-2 text-sm outline-none focus:ring-2"
+                        className="rounded-2xl border border-border bg-card px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-lumiris-cyan/30"
                         aria-label="Description de la demande"
                         required
                     />
-                    <p className="text-muted-foreground/70 text-right font-mono text-[10px]">
+                    <p className="text-right font-mono text-[10px] text-muted-foreground/70">
                         {description.length}/{MAX_DESC}
                     </p>
                 </fieldset>
 
                 <fieldset className="flex flex-col gap-2">
-                    <legend className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+                    <legend className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                         Photos ({photos.length}/{MAX_PHOTOS})
                     </legend>
                     <ul className="flex flex-wrap gap-2">
                         {photos.map((src, idx) => (
                             <li key={`${idx}-${src.length}`} className="relative h-20 w-20">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src={src}
                                     alt={`Pièce jointe ${idx + 1}`}
-                                    className="border-border h-full w-full rounded-xl border object-cover"
+                                    className="h-full w-full rounded-xl border border-border object-cover"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => removePhoto(idx)}
                                     aria-label={`Retirer la pièce jointe ${idx + 1}`}
-                                    className="border-border bg-card text-foreground absolute -right-1.5 -top-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full border shadow"
+                                    className="absolute -top-1.5 -right-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full border border-border bg-card text-foreground shadow"
                                 >
                                     <X className="h-2.5 w-2.5" />
                                 </button>
@@ -232,7 +236,7 @@ export function RepairRequestForm({ repairer, prefillPassportId }: RepairRequest
                         ))}
                         {photos.length < MAX_PHOTOS ? (
                             <li>
-                                <label className="border-border/60 bg-card text-muted-foreground flex h-20 w-20 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed text-[10px]">
+                                <label className="flex h-20 w-20 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-border/60 bg-card text-[10px] text-muted-foreground">
                                     <ImagePlus className="h-5 w-5" />
                                     Ajouter
                                     <input
@@ -248,22 +252,22 @@ export function RepairRequestForm({ repairer, prefillPassportId }: RepairRequest
                         ) : null}
                     </ul>
                     {photoError ? (
-                        <p className="text-lumiris-rose text-[11px]">{photoError}</p>
+                        <p className="text-[11px] text-lumiris-rose">{photoError}</p>
                     ) : (
-                        <p className="text-muted-foreground/70 text-[10px]">JPG / PNG, max 1 Mo par photo.</p>
+                        <p className="text-[10px] text-muted-foreground/70">JPG / PNG, max 1 Mo par photo.</p>
                     )}
                 </fieldset>
 
                 <button
                     type="submit"
                     disabled={!canSubmit}
-                    className="bg-foreground text-primary-foreground inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold disabled:opacity-50"
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50"
                 >
                     <Send className="h-4 w-4" />
                     Envoyer la demande
                 </button>
 
-                <p className="text-muted-foreground/80 text-center text-[10px]">
+                <p className="text-center text-[10px] text-muted-foreground/80">
                     Le retoucheur recevra ta demande par email. La commission LUMIRIS est prélevée sur le devis accepté.
                 </p>
             </form>
@@ -271,7 +275,7 @@ export function RepairRequestForm({ repairer, prefillPassportId }: RepairRequest
             {toast ? (
                 <motion.div
                     role="status"
-                    className="border-lumiris-cyan/40 bg-card/95 text-foreground pointer-events-none fixed left-1/2 top-24 z-50 -translate-x-1/2 rounded-2xl border px-4 py-2 text-xs font-medium shadow-xl backdrop-blur-md"
+                    className="pointer-events-none fixed top-24 left-1/2 z-50 -translate-x-1/2 rounded-2xl border border-lumiris-cyan/40 bg-card/95 px-4 py-2 text-xs font-medium text-foreground shadow-xl backdrop-blur-md"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                 >
@@ -284,19 +288,22 @@ export function RepairRequestForm({ repairer, prefillPassportId }: RepairRequest
 
 function PassportRow({ passport, onClear }: { passport: Passport; onClear: () => void }) {
     return (
-        <div className="border-border/60 bg-card flex items-center gap-3 rounded-2xl border p-3">
-            <div className="bg-secondary/40 relative h-14 w-14 shrink-0 overflow-hidden rounded-xl">
+        <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-3">
+            <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-secondary/40">
                 {passport.garment.mainPhotoUrl ? (
-                    <img
+                    <Image
                         src={passport.garment.mainPhotoUrl}
                         alt={passport.garment.reference}
-                        className="absolute inset-0 h-full w-full object-cover"
+                        fill
+                        unoptimized
+                        sizes="56px"
+                        className="object-cover"
                     />
                 ) : null}
             </div>
             <div className="min-w-0 flex-1">
-                <p className="text-foreground truncate text-sm font-semibold">{passport.garment.reference}</p>
-                <p className="text-muted-foreground truncate text-[11px]">
+                <p className="truncate text-sm font-semibold text-foreground">{passport.garment.reference}</p>
+                <p className="truncate text-[11px] text-muted-foreground">
                     {passport.garment.retailPrice}{' '}
                     {passport.garment.currency === 'EUR' ? '€' : passport.garment.currency}
                 </p>
@@ -305,7 +312,7 @@ function PassportRow({ passport, onClear }: { passport: Passport; onClear: () =>
                 type="button"
                 onClick={onClear}
                 aria-label="Retirer la pièce"
-                className="border-border text-muted-foreground inline-flex h-7 w-7 items-center justify-center rounded-full border"
+                className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-border text-muted-foreground"
             >
                 <X className="h-3 w-3" />
             </button>
@@ -318,7 +325,7 @@ function PassportPicker({ passports, onSelect }: { passports: readonly Passport[
         <select
             onChange={(e) => onSelect(e.target.value)}
             defaultValue=""
-            className="border-border bg-card text-foreground focus:ring-lumiris-cyan/30 rounded-2xl border px-3 py-2 text-sm outline-none focus:ring-2"
+            className="rounded-2xl border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-lumiris-cyan/30"
             aria-label="Choisir une pièce"
         >
             <option value="" disabled>

@@ -9,7 +9,7 @@ export function SectionLabel({ title, Icon, className }: { title: string; Icon?:
     return (
         <h2
             className={cn(
-                'text-muted-foreground inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider',
+                'inline-flex items-center gap-2 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase',
                 className,
             )}
         >
@@ -22,7 +22,7 @@ export function SectionLabel({ title, Icon, className }: { title: string; Icon?:
 /** Stronger, foreground section heading used on the DPP detail screens. */
 export function SectionHeading({ children, className }: { children: React.ReactNode; className?: string }) {
     return (
-        <h2 className={cn('text-foreground text-xs font-semibold uppercase tracking-[0.18em]', className)}>
+        <h2 className={cn('text-xs font-semibold tracking-[0.18em] text-foreground uppercase', className)}>
             {children}
         </h2>
     );

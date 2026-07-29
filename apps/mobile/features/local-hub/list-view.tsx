@@ -18,7 +18,7 @@ export function ListView({ points, loading, showMarketplaceBanner }: ListViewPro
     const prefersReduced = useReducedMotion();
 
     return (
-        <div className="flex flex-col gap-4 px-4 pb-24 pt-3">
+        <div className="flex flex-col gap-4 px-4 pt-3 pb-24">
             <AnimatePresence initial={false}>
                 {showMarketplaceBanner && !loading ? (
                     <motion.div

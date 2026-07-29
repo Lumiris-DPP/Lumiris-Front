@@ -1,10 +1,12 @@
+'use client';
+
 import { useCallback, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Tag, Leaf, Recycle, BookmarkPlus, BookmarkCheck, Share2, X } from 'lucide-react';
 import { CertificatesList } from '@lumiris/scoring-ui';
 import type { Certificate, ExternalDpp } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { computeExternalScore } from '@/lib/iris/external-score';
 import { addExternalDpp, removeFromWardrobe, useWardrobe } from '@/lib/wardrobe-storage';
 import { toast } from '@/lib/toast';
@@ -33,7 +35,7 @@ export interface ExternalDppDetailProps {
 }
 
 export function ExternalDppDetail({ dpp }: ExternalDppDetailProps) {
-    const navigate = useNavigate();
+    const router = useRouter();
     const [now] = useState(() => new Date());
     const score = useMemo(() => computeExternalScore(dpp, now), [dpp, now]);
     const [breakdownOpen, setBreakdownOpen] = useState(false);
@@ -93,7 +95,7 @@ export function ExternalDppDetail({ dpp }: ExternalDppDetailProps) {
     }, [dpp.materials]);
 
     return (
-        <div className="bg-background relative flex h-full w-full flex-col overflow-y-auto pb-28">
+        <div className="relative flex h-full w-full flex-col overflow-y-auto bg-background pb-28">
             <ScoreHero
                 grade={score.grade}
                 productName={dpp.productName}
@@ -107,23 +109,23 @@ export function ExternalDppDetail({ dpp }: ExternalDppDetailProps) {
             >
                 <Layer delay={LAYER_DELAYS.identity}>
                     <SectionHeading>Identité</SectionHeading>
-                    <div className="border-border bg-card flex items-start gap-3 rounded-xl border p-4">
-                        <span className="bg-muted text-muted-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
+                    <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-4">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                             <Tag className="h-4 w-4" aria-hidden />
                         </span>
                         <div className="min-w-0 flex-1">
-                            <p className="text-foreground text-sm font-semibold">{dpp.brand}</p>
-                            <p className="text-muted-foreground text-xs">
+                            <p className="text-sm font-semibold text-foreground">{dpp.brand}</p>
+                            <p className="text-xs text-muted-foreground">
                                 {SECTOR_LABEL_FR[dpp.sector]} · {dpp.productName}
                             </p>
-                            <p className="text-muted-foreground/80 mt-1 text-[11px]">
+                            <p className="mt-1 text-[11px] text-muted-foreground/80">
                                 Émis par {dpp.emitter}
                                 {dpp.origin?.region ? ` · ${dpp.origin.region}, ${dpp.origin.country}` : ''}
                                 {!dpp.origin?.region && dpp.origin?.country ? ` · ${dpp.origin.country}` : ''}
                             </p>
                         </div>
                     </div>
-                    <p className="border-lumiris-cyan/30 bg-lumiris-cyan/10 text-lumiris-cyan inline-flex items-center gap-1.5 self-start rounded-full border px-3 py-1 text-[11px] font-medium">
+                    <p className="inline-flex items-center gap-1.5 self-start rounded-full border border-lumiris-cyan/30 bg-lumiris-cyan/10 px-3 py-1 text-[11px] font-medium text-lumiris-cyan">
                         DPP ESPR · hors LUMIRIS
                     </p>
                 </Layer>
@@ -148,14 +150,14 @@ export function ExternalDppDetail({ dpp }: ExternalDppDetailProps) {
                     <Layer delay={LAYER_DELAYS.proofs}>
                         <SectionHeading>Certifications déclarées</SectionHeading>
                         <CertificatesList certificates={certificates} now={now} />
-                        <p className="text-muted-foreground border-border/50 mt-1 border-t pt-3 text-[11px] italic leading-relaxed">
+                        <p className="mt-1 border-t border-border/50 pt-3 text-[11px] leading-relaxed text-muted-foreground italic">
                             Certifications déclarées par {dpp.emitter} dans son DPP ESPR. LUMIRIS les expose telles
                             quelles - aucune vérification humaine de notre côté.
                         </p>
                     </Layer>
                 ) : null}
 
-                <p className="text-muted-foreground border-border/50 mt-2 border-t pt-4 font-mono text-[10px] leading-relaxed">
+                <p className="mt-2 border-t border-border/50 pt-4 font-mono text-[10px] leading-relaxed text-muted-foreground">
                     GTIN : {dpp.gtin}
                     {dpp.serial ? ` / Série : ${dpp.serial}` : ''} / Scanné : {scannedDateLabel} / Grade {score.grade}
                 </p>
@@ -163,12 +165,12 @@ export function ExternalDppDetail({ dpp }: ExternalDppDetailProps) {
 
             <motion.nav
                 aria-label="Actions du DPP externe"
-                className="border-border/50 bg-background/85 fixed inset-x-0 bottom-0 z-50 mx-auto flex max-w-md items-center justify-around gap-1 border-t px-4 pb-6 pt-3 backdrop-blur-xl"
+                className="fixed inset-x-0 bottom-0 z-50 mx-auto flex max-w-md items-center justify-around gap-1 border-t border-border/50 bg-background/85 px-4 pt-3 pb-6 backdrop-blur-xl"
                 initial={{ y: 80, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ type: 'spring', stiffness: 380, damping: 32, delay: 0.4 }}
             >
-                <ActionButton onClick={() => navigate(-1)} label="Fermer" Icon={X} />
+                <ActionButton onClick={() => router.back()} label="Fermer" Icon={X} />
                 <ActionButton onClick={onShare} label="Partager" Icon={Share2} />
                 <ActionButton
                     onClick={onToggleSave}
@@ -207,7 +209,7 @@ function ExternalMaterialRow({ material }: ExternalMaterialRowProps) {
     const pct = Math.max(0, Math.min(100, material.percentage));
 
     return (
-        <div className="border-border bg-card rounded-xl border p-3.5">
+        <div className="rounded-xl border border-border bg-card p-3.5">
             <div className="flex items-center gap-3">
                 <span
                     className={cn(
@@ -221,11 +223,11 @@ function ExternalMaterialRow({ material }: ExternalMaterialRowProps) {
                 </span>
                 <div className="min-w-0 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
-                        <p className="text-foreground truncate text-sm font-semibold">{material.name}</p>
-                        <p className="text-foreground font-mono text-sm font-semibold">{pct}%</p>
+                        <p className="truncate text-sm font-semibold text-foreground">{material.name}</p>
+                        <p className="font-mono text-sm font-semibold text-foreground">{pct}%</p>
                     </div>
                     {isRecycled ? (
-                        <p className="text-lumiris-cyan mt-0.5 truncate text-xs">Dont {recycledShare}% recyclé</p>
+                        <p className="mt-0.5 truncate text-xs text-lumiris-cyan">Dont {recycledShare}% recyclé</p>
                     ) : null}
                 </div>
             </div>
@@ -235,7 +237,7 @@ function ExternalMaterialRow({ material }: ExternalMaterialRowProps) {
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-label={`${material.name} - ${pct}%`}
-                className="bg-muted mt-2.5 h-1.5 overflow-hidden rounded-full"
+                className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-muted"
             >
                 <div
                     className={cn(
@@ -282,7 +284,7 @@ function ExternalImpactStats({ dpp, recycledOverall }: { dpp: ExternalDpp; recyc
     return (
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             {stats.map((stat) => (
-                <li key={stat.label} className="border-border bg-card flex items-center gap-3 rounded-xl border p-3">
+                <li key={stat.label} className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
                     <span
                         className={cn(
                             'flex h-9 w-9 items-center justify-center rounded-lg',
@@ -294,10 +296,10 @@ function ExternalImpactStats({ dpp, recycledOverall }: { dpp: ExternalDpp; recyc
                         <stat.Icon className="h-4 w-4" aria-hidden />
                     </span>
                     <div className="min-w-0 flex-1">
-                        <p className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">
+                        <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                             {stat.label}
                         </p>
-                        <p className="text-foreground text-base font-semibold leading-tight">{stat.value}</p>
+                        <p className="text-base leading-tight font-semibold text-foreground">{stat.value}</p>
                     </div>
                 </li>
             ))}

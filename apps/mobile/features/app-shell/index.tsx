@@ -1,5 +1,8 @@
+'use client';
+
 import { useEffect, type ReactNode } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Scan, Archive, MapPin, ShoppingBag, User } from 'lucide-react';
 import { fadeInOut, SPRING_INDICATOR, SPRING_TAB } from '@/lib/motion';
@@ -31,7 +34,7 @@ function activeTabFor(pathname: string): Tab | null {
         pathname.startsWith('/boutique/') ||
         pathname === '/panier' ||
         pathname === '/checkout' ||
-        pathname.startsWith('/commande/')
+        pathname.startsWith('/commande')
     ) {
         return 'boutique';
     }
@@ -46,7 +49,7 @@ function activeTabFor(pathname: string): Tab | null {
     if (
         pathname === '/local' ||
         pathname.startsWith('/local/') ||
-        pathname.startsWith('/artisans/') ||
+        pathname.startsWith('/artisans') ||
         pathname.startsWith('/retoucheurs')
     ) {
         return 'local';
@@ -62,7 +65,7 @@ function shouldHideTabBar(pathname: string): boolean {
     if (pathname === '/onboarding' || pathname.startsWith('/onboarding/')) return true;
     if (pathname.startsWith('/passeport/')) return true;
     if (pathname.startsWith('/boutique/')) return true;
-    if (pathname === '/panier' || pathname === '/checkout' || pathname.startsWith('/commande/')) return true;
+    if (pathname === '/panier' || pathname === '/checkout' || pathname.startsWith('/commande')) return true;
     return false;
 }
 
@@ -72,7 +75,7 @@ function shouldHideTabBar(pathname: string): boolean {
 // format téléphone. Aucun autre écran n'est affecté.
 function shellMaxWidth(pathname: string): string {
     if (pathname === '/checkout') return 'max-w-md md:max-w-4xl';
-    if (pathname.startsWith('/commande/') && pathname.endsWith('/facture')) return 'max-w-md md:max-w-3xl';
+    if (pathname === '/commande/facture') return 'max-w-md md:max-w-3xl';
     return 'max-w-md';
 }
 
@@ -82,7 +85,7 @@ interface AppShellProps {
 }
 
 export function AppShell({ children, hideTabBar = false }: AppShellProps) {
-    const pathname = useLocation().pathname ?? '/';
+    const pathname = usePathname() ?? '/';
     const activeTab = activeTabFor(pathname);
     const tabBarHidden = hideTabBar || shouldHideTabBar(pathname);
     const cartCount = useCartCount();
@@ -93,7 +96,7 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
 
     return (
         <div
-            className={`bg-background relative mx-auto flex h-dvh flex-col overflow-hidden print:h-auto print:overflow-visible ${shellMaxWidth(pathname)}`}
+            className={`relative mx-auto flex h-dvh flex-col overflow-hidden bg-background print:h-auto print:overflow-visible ${shellMaxWidth(pathname)}`}
         >
             <OfflineBanner />
             <div className="relative flex-1 overflow-hidden print:overflow-visible">
@@ -116,7 +119,7 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
                     <motion.nav
                         key="tab-bar"
                         aria-label="Navigation principale"
-                        className="border-border/40 bg-background/85 absolute inset-x-0 bottom-0 z-50 border-t px-4 pb-[max(env(safe-area-inset-bottom),1.75rem)] pt-2 backdrop-blur-xl"
+                        className="absolute inset-x-0 bottom-0 z-50 border-t border-border/40 bg-background/85 px-4 pt-2 pb-[max(env(safe-area-inset-bottom),1.75rem)] backdrop-blur-xl"
                         initial={{ y: 80 }}
                         animate={{ y: 0 }}
                         exit={{ y: 80 }}
@@ -128,7 +131,8 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
                                 return (
                                     <Link
                                         key={id}
-                                        to={href}
+                                        href={href}
+                                        prefetch
                                         aria-current={active ? 'page' : undefined}
                                         className={`relative flex flex-col items-center gap-0.5 px-2 py-1.5 transition-colors ${
                                             active ? 'text-lumiris-cyan' : 'text-muted-foreground'
@@ -139,7 +143,7 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
                                             {id === 'boutique' && cartCount > 0 ? (
                                                 <span
                                                     aria-label={`${cartCount} article${cartCount > 1 ? 's' : ''} dans le panier`}
-                                                    className="bg-lumiris-cyan text-background absolute -right-2 -top-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold tabular-nums"
+                                                    className="absolute -top-1.5 -right-2 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-lumiris-cyan px-1 text-[9px] font-bold text-background tabular-nums"
                                                 >
                                                     {cartCount > 9 ? '9+' : cartCount}
                                                 </span>
@@ -148,7 +152,7 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
                                         <span className="text-[10px] font-semibold tracking-tight">{label}</span>
                                         {active ? (
                                             <motion.span
-                                                className="bg-lumiris-cyan absolute -top-2 h-0.5 w-8 rounded-full"
+                                                className="absolute -top-2 h-0.5 w-8 rounded-full bg-lumiris-cyan"
                                                 layoutId="tab-indicator"
                                                 transition={SPRING_INDICATOR}
                                             />

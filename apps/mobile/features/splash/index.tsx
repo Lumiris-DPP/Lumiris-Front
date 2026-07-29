@@ -1,5 +1,7 @@
+'use client';
+
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { IridescentBackground } from '@/lib/motion';
@@ -14,7 +16,7 @@ interface SplashProps {
 }
 
 export function Splash({ children }: SplashProps) {
-    const navigate = useNavigate();
+    const router = useRouter();
     const [state, setState] = useState<SplashState>('pending');
 
     useEffect(() => {
@@ -22,7 +24,7 @@ export function Splash({ children }: SplashProps) {
 
         if (!completed) {
             setState('redirect');
-            navigate('/onboarding', { replace: true });
+            router.replace('/onboarding');
             return;
         }
 
@@ -36,7 +38,7 @@ export function Splash({ children }: SplashProps) {
 
         const timer = setTimeout(() => setState('done'), SPLASH_DURATION_MS);
         return () => clearTimeout(timer);
-    }, [navigate]);
+    }, [router]);
 
     if (state === 'done') {
         return <>{children}</>;
@@ -50,7 +52,7 @@ function SplashScreen() {
         <div
             role="status"
             aria-label="Chargement de LUMIRIS Vision"
-            className="bg-background relative flex h-full flex-col items-center justify-center overflow-hidden"
+            className="relative flex h-full flex-col items-center justify-center overflow-hidden bg-background"
         >
             <IridescentBackground intensity="subtle" />
 
@@ -68,19 +70,19 @@ function SplashScreen() {
 
                 <div
                     aria-hidden
-                    className="border-border/50 bg-glass relative flex h-40 w-40 items-center justify-center rounded-full border backdrop-blur-2xl"
+                    className="relative flex h-40 w-40 items-center justify-center rounded-full border border-border/50 bg-glass backdrop-blur-2xl"
                     style={{ animation: 'iris-breathe 2.4s ease-in-out infinite' }}
                 >
-                    <div className="border-border/25 pointer-events-none absolute h-[80%] w-[80%] rounded-full border" />
-                    <div className="border-border/15 pointer-events-none absolute h-[62%] w-[62%] rounded-full border" />
-                    <div className="border-border/10 pointer-events-none absolute h-[44%] w-[44%] rounded-full border" />
+                    <div className="pointer-events-none absolute h-[80%] w-[80%] rounded-full border border-border/25" />
+                    <div className="pointer-events-none absolute h-[62%] w-[62%] rounded-full border border-border/15" />
+                    <div className="pointer-events-none absolute h-[44%] w-[44%] rounded-full border border-border/10" />
                     <LumirisLogo title="" className="relative h-14 w-auto" />
                 </div>
             </div>
 
             <div className="relative z-10 mt-8 flex flex-col items-center">
-                <p className="text-foreground text-lg font-bold tracking-tight">LUMIRIS</p>
-                <p className="text-muted-foreground mt-1 text-[10px] font-semibold uppercase tracking-[0.32em]">
+                <p className="text-lg font-bold tracking-tight text-foreground">LUMIRIS</p>
+                <p className="mt-1 text-[10px] font-semibold tracking-[0.32em] text-muted-foreground uppercase">
                     Vision
                 </p>
             </div>

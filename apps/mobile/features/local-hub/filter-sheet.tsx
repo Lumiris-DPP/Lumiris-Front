@@ -51,11 +51,11 @@ export function FilterSheet({
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent
                 side="bottom"
-                className="mx-auto max-h-[85vh] max-w-md overflow-y-auto rounded-t-3xl px-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] pt-6"
+                className="mx-auto max-h-[85vh] max-w-md overflow-y-auto rounded-t-3xl px-6 pt-6 pb-[max(env(safe-area-inset-bottom),1.5rem)]"
             >
                 <SheetHeader className="px-0 text-left">
                     <SheetTitle className="flex items-center gap-2 text-base">
-                        <SlidersHorizontal className="text-primary h-4 w-4" strokeWidth={1.5} aria-hidden />
+                        <SlidersHorizontal className="h-4 w-4 text-primary" strokeWidth={1.5} aria-hidden />
                         Filtres
                     </SheetTitle>
                     <SheetDescription className="text-xs">Affine par spécialité et distance.</SheetDescription>
@@ -64,7 +64,7 @@ export function FilterSheet({
                 <div className="mt-5 flex flex-col gap-6">
                     {specialtyOptions.length > 0 ? (
                         <fieldset className="flex flex-col gap-3">
-                            <legend className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+                            <legend className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                                 Spécialité
                             </legend>
                             <ul className="flex flex-wrap gap-2">
@@ -78,7 +78,7 @@ export function FilterSheet({
                                                 onClick={() => toggleSpecialty(specialty)}
                                                 className={cn(
                                                     'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
-                                                    'focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
+                                                    'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:outline-none',
                                                     active
                                                         ? 'border-primary bg-primary/10 text-primary'
                                                         : 'border-border/60 bg-card text-muted-foreground hover:text-foreground',
@@ -97,9 +97,9 @@ export function FilterSheet({
                     ) : null}
 
                     <fieldset className="flex flex-col gap-3">
-                        <legend className="text-muted-foreground flex w-full items-center justify-between text-[11px] font-semibold uppercase tracking-wider">
+                        <legend className="flex w-full items-center justify-between text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                             <span>Distance maximale</span>
-                            <span className="text-foreground font-mono tabular-nums">
+                            <span className="font-mono text-foreground tabular-nums">
                                 {filters.maxDistanceKm >= DISTANCE_MAX_KM ? 'Toutes' : `${filters.maxDistanceKm} km`}
                             </span>
                         </legend>
@@ -115,7 +115,7 @@ export function FilterSheet({
                             aria-label="Distance maximale en kilomètres"
                         />
                         {!distanceEnabled ? (
-                            <p className="text-muted-foreground/80 text-[11px]">
+                            <p className="text-[11px] text-muted-foreground/80">
                                 Partage ta position (vue Carte) pour filtrer par distance.
                             </p>
                         ) : null}
@@ -126,14 +126,14 @@ export function FilterSheet({
                     <button
                         type="button"
                         onClick={() => onChange(EMPTY_FILTERS)}
-                        className="text-muted-foreground hover:text-foreground inline-flex h-12 items-center justify-center px-4 text-sm font-medium"
+                        className="inline-flex h-12 items-center justify-center px-4 text-sm font-medium text-muted-foreground hover:text-foreground"
                     >
                         Réinitialiser
                     </button>
                     <button
                         type="button"
                         onClick={() => onOpenChange(false)}
-                        className="bg-foreground text-background inline-flex h-12 flex-1 items-center justify-center rounded-full px-6 text-sm font-semibold active:scale-[0.98]"
+                        className="inline-flex h-12 flex-1 items-center justify-center rounded-full bg-foreground px-6 text-sm font-semibold text-background active:scale-[0.98]"
                     >
                         Voir {resultCount} résultat{resultCount > 1 ? 's' : ''}
                     </button>

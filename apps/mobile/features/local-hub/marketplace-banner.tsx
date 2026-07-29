@@ -1,4 +1,7 @@
-import { Link } from 'react-router-dom';
+'use client';
+
+import Image from 'next/image';
+import Link from 'next/link';
 import { useMemo } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { mockPassports } from '@lumiris/mock-data';
@@ -26,30 +29,30 @@ export function MarketplaceBanner() {
     return (
         <section
             aria-label="Marketplace LUMIRIS"
-            className="border-lumiris-cyan/30 bg-lumiris-cyan/5 rounded-2xl border p-5"
+            className="rounded-2xl border border-lumiris-cyan/30 bg-lumiris-cyan/5 p-5"
         >
-            <p className="text-lumiris-cyan text-[10px] font-semibold uppercase tracking-wider">
-                Marketplace LUMIRIS
-            </p>
-            <p className="text-foreground mt-1 text-sm font-semibold">Trie exclusivement par score Iris</p>
+            <p className="text-[10px] font-semibold tracking-wider text-lumiris-cyan uppercase">Marketplace LUMIRIS</p>
+            <p className="mt-1 text-sm font-semibold text-foreground">Trie exclusivement par score Iris</p>
 
             {previews.length > 0 ? (
                 <ul className="mt-4 flex gap-2">
                     {previews.map(({ passport, score }) => (
                         <li key={passport.id} className="flex-1">
                             <Link
-                                to={`/passeport/${passport.id}`}
+                                href={`/passeport/${passport.id}`}
                                 aria-label={`${passport.garment.reference} - grade ${score.grade}`}
                                 className={cn(
-                                    'border-border/40 bg-card relative block aspect-square overflow-hidden rounded-xl border',
-                                    'focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
+                                    'relative block aspect-square overflow-hidden rounded-xl border border-border/40 bg-card',
+                                    'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:outline-none',
                                 )}
                             >
                                 {passport.garment.mainPhotoUrl ? (
-                                    <img
+                                    <Image
                                         src={passport.garment.mainPhotoUrl}
                                         alt=""
-                                        className="absolute inset-0 h-full w-full object-cover"
+                                        fill
+                                        sizes="33vw"
+                                        className="object-cover"
                                     />
                                 ) : (
                                     <div
@@ -63,7 +66,7 @@ export function MarketplaceBanner() {
                                 <span
                                     aria-hidden
                                     className={cn(
-                                        'text-primary-foreground absolute right-1.5 top-1.5 inline-flex h-6 w-6 items-center justify-center rounded-md font-mono text-[11px] font-bold shadow-sm',
+                                        'absolute top-1.5 right-1.5 inline-flex h-6 w-6 items-center justify-center rounded-md font-mono text-[11px] font-bold text-primary-foreground shadow-sm',
                                         gradeBackgroundSolid(score.grade),
                                     )}
                                 >
@@ -76,7 +79,7 @@ export function MarketplaceBanner() {
             ) : null}
 
             <Button asChild className="mt-4 w-full rounded-full">
-                <Link to="/boutique" aria-label="Parcourir tout le catalogue marketplace">
+                <Link href="/boutique" aria-label="Parcourir tout le catalogue marketplace">
                     <span>Parcourir tout le catalogue</span>
                     <ArrowRight className="h-4 w-4" aria-hidden />
                 </Link>

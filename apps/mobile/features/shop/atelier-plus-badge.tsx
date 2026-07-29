@@ -7,7 +7,7 @@ export function AtelierPlusBadge({ className }: { className?: string }) {
     return (
         <span
             className={cn(
-                'border-lumiris-cyan/30 bg-card/95 text-lumiris-cyan inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide backdrop-blur-sm',
+                'inline-flex items-center gap-1 rounded-full border border-lumiris-cyan/30 bg-card/95 px-1.5 py-0.5 text-[9px] font-semibold tracking-wide text-lumiris-cyan uppercase backdrop-blur-sm',
                 className,
             )}
             title="Artisan abonné ATELIER+"

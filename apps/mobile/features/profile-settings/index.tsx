@@ -1,5 +1,7 @@
+'use client';
+
 import { useEffect, useId, useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ChevronRight, ShieldCheck } from 'lucide-react';
 import { Button } from '@lumiris/ui/components/button';
@@ -43,19 +45,19 @@ export function ProfileSettings() {
 function Header() {
     return (
         <motion.header
-            className="px-5 pb-5 pt-[max(env(safe-area-inset-top),3rem)]"
+            className="px-5 pt-[max(env(safe-area-inset-top),3rem)] pb-5"
             variants={slideUpFade}
             initial="initial"
             animate="animate"
         >
             <Link
-                to="/me"
-                className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs"
+                href="/me"
+                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
             >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 Profil
             </Link>
-            <h1 className="text-foreground mt-2 text-xl font-bold">Réglages</h1>
+            <h1 className="mt-2 text-xl font-bold text-foreground">Réglages</h1>
         </motion.header>
     );
 }
@@ -64,13 +66,13 @@ function NotConnectedNotice() {
     return (
         <div className="relative flex h-full flex-col items-center justify-center px-6 pb-28 text-center">
             <IridescentBackground intensity="subtle" />
-            <p className="text-foreground text-sm font-medium">Pas connecté.</p>
-            <p className="text-muted-foreground mt-2 text-xs">Les réglages de compte demandent un compte LUMIRIS.</p>
+            <p className="text-sm font-medium text-foreground">Pas connecté.</p>
+            <p className="mt-2 text-xs text-muted-foreground">Les réglages de compte demandent un compte LUMIRIS.</p>
             <Button
                 asChild
-                className="bg-foreground text-background hover:bg-foreground/90 mt-4 h-10 rounded-full px-5 text-sm font-semibold"
+                className="mt-4 h-10 rounded-full bg-foreground px-5 text-sm font-semibold text-background hover:bg-foreground/90"
             >
-                <Link to="/auth">Créer un compte</Link>
+                <Link href="/auth">Créer un compte</Link>
             </Button>
         </div>
     );
@@ -89,7 +91,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function Row({ children, last = false }: { children: React.ReactNode; last?: boolean }) {
     return (
-        <div className={`flex items-center justify-between gap-3 px-4 py-3 ${last ? '' : 'border-border/40 border-b'}`}>
+        <div className={`flex items-center justify-between gap-3 px-4 py-3 ${last ? '' : 'border-b border-border/40'}`}>
             {children}
         </div>
     );
@@ -131,7 +133,7 @@ function AccountSection({ displayName, email, city }: AccountSectionProps) {
         <Section title="Compte">
             <div className="flex flex-col gap-3 p-4">
                 <div className="flex flex-col gap-1.5">
-                    <Label htmlFor={nameId} className="text-muted-foreground text-xs">
+                    <Label htmlFor={nameId} className="text-xs text-muted-foreground">
                         Nom
                     </Label>
                     <Input
@@ -144,7 +146,7 @@ function AccountSection({ displayName, email, city }: AccountSectionProps) {
                     />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                    <Label htmlFor={emailId} className="text-muted-foreground text-xs">
+                    <Label htmlFor={emailId} className="text-xs text-muted-foreground">
                         Email
                     </Label>
                     <Input
@@ -152,12 +154,12 @@ function AccountSection({ displayName, email, city }: AccountSectionProps) {
                         value={email}
                         readOnly
                         aria-readonly
-                        className="bg-muted/40 cursor-not-allowed"
+                        className="cursor-not-allowed bg-muted/40"
                     />
-                    <p className="text-muted-foreground/80 text-[10px]">Non modifiable en mode démo.</p>
+                    <p className="text-[10px] text-muted-foreground/80">Non modifiable en mode démo.</p>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                    <Label htmlFor={cityId} className="text-muted-foreground text-xs">
+                    <Label htmlFor={cityId} className="text-xs text-muted-foreground">
                         Ville
                     </Label>
                     <Input
@@ -171,7 +173,7 @@ function AccountSection({ displayName, email, city }: AccountSectionProps) {
                     />
                 </div>
                 {dirty ? (
-                    <p className="text-muted-foreground text-[10px]">
+                    <p className="text-[10px] text-muted-foreground">
                         Les modifications sont enregistrées en quittant le champ.
                     </p>
                 ) : null}
@@ -198,7 +200,7 @@ function AppearanceSection({ settings }: { settings: Settings }) {
     return (
         <Section title="Apparence">
             <Row>
-                <span className="text-foreground text-sm">Thème</span>
+                <span className="text-sm text-foreground">Thème</span>
                 <Tabs value={settings.theme} onValueChange={(value) => updateSettings({ theme: value as ThemePref })}>
                     <TabsList className="h-8">
                         {THEME_OPTIONS.map((opt) => (
@@ -210,7 +212,7 @@ function AppearanceSection({ settings }: { settings: Settings }) {
                 </Tabs>
             </Row>
             <Row last>
-                <Label htmlFor={reduceMotionId} className="text-foreground text-sm font-normal">
+                <Label htmlFor={reduceMotionId} className="text-sm font-normal text-foreground">
                     Réduire les animations
                 </Label>
                 <Switch
@@ -237,7 +239,7 @@ function NotificationsSection({ settings }: { settings: Settings }) {
                 const id = `notif-${key}`;
                 return (
                     <Row key={key} last={i === NOTIFS.length - 1}>
-                        <Label htmlFor={id} className="text-foreground text-sm font-normal">
+                        <Label htmlFor={id} className="text-sm font-normal text-foreground">
                             {label}
                         </Label>
                         <Switch
@@ -256,19 +258,19 @@ function PrivacyLink() {
     return (
         <Section title="Données">
             <Link
-                to="/me/privacy"
-                className="hover:bg-background/40 group flex items-center justify-between gap-3 px-4 py-3 transition-colors"
+                href="/me/privacy"
+                className="group flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-background/40"
             >
                 <span className="inline-flex items-center gap-3">
-                    <ShieldCheck className="text-lumiris-cyan h-4 w-4" />
+                    <ShieldCheck className="h-4 w-4 text-lumiris-cyan" />
                     <span className="flex flex-col">
-                        <span className="text-foreground text-sm">Confidentialité &amp; données</span>
-                        <span className="text-muted-foreground text-[11px]">
+                        <span className="text-sm text-foreground">Confidentialité &amp; données</span>
+                        <span className="text-[11px] text-muted-foreground">
                             Export, effacement, suppression de compte.
                         </span>
                     </span>
                 </span>
-                <ChevronRight className="text-muted-foreground/60 h-4 w-4" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
             </Link>
         </Section>
     );
@@ -276,11 +278,11 @@ function PrivacyLink() {
 
 function Footer() {
     return (
-        <footer className="text-muted-foreground/70 mt-8 px-4 text-center text-[11px]">
+        <footer className="mt-8 px-4 text-center text-[11px] text-muted-foreground/70">
             <p>LUMIRIS Vision · v{APP_VERSION} · Mode démo</p>
             <Link
-                to="/about"
-                className="hover:text-foreground mt-1 inline-flex items-center gap-1 underline-offset-4 hover:underline"
+                href="/about"
+                className="mt-1 inline-flex items-center gap-1 underline-offset-4 hover:text-foreground hover:underline"
             >
                 À propos
                 <ChevronRight className="h-3 w-3" />

@@ -26,7 +26,7 @@ export function MiniPointCard({ point, onClose }: MiniPointCardProps) {
                 type="button"
                 onClick={onClose}
                 aria-label="Fermer"
-                className="border-border/40 bg-background text-muted-foreground hover:text-foreground absolute right-3 top-3 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border shadow-md backdrop-blur-md"
+                className="absolute top-3 right-3 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/40 bg-background text-muted-foreground shadow-md backdrop-blur-md hover:text-foreground"
             >
                 <X className="h-4 w-4" aria-hidden />
             </button>

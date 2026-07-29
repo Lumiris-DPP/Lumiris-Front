@@ -1,5 +1,7 @@
+'use client';
+
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import type { JournalCategory } from '@lumiris/types';
@@ -22,7 +24,7 @@ export interface DiscoverProps {
 
 export function Discover({ items }: DiscoverProps = {}) {
     const feed = useMemo(() => items ?? getDiscoverFeed(), [items]);
-    const navigate = useNavigate();
+    const router = useRouter();
     const { isAuthenticated } = useUser();
 
     const [filter, setFilter] = useState<CategoryFilter>('all');
@@ -44,19 +46,19 @@ export function Discover({ items }: DiscoverProps = {}) {
     }, [feed]);
 
     return (
-        <div className="bg-background flex h-full flex-col">
-            <motion.header className="px-5 pb-3 pt-12" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="flex h-full flex-col bg-background">
+            <motion.header className="px-5 pt-12 pb-3" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
                 <div className="flex items-center gap-2">
-                    <h1 className="text-foreground text-2xl font-bold tracking-tight">Découvrir</h1>
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground">Découvrir</h1>
                     <Sparkles className={cn('h-4 w-4', GRADE_CONFIG.C.cssClass)} />
                 </div>
-                <p className="text-muted-foreground mt-0.5 text-sm">Le Journal LUMIRIS</p>
+                <p className="mt-0.5 text-sm text-muted-foreground">Le Journal LUMIRIS</p>
 
                 {isAuthenticated ? (
                     <Tabs
                         value="all"
                         onValueChange={(value) => {
-                            if (value === 'for-you') navigate('/discover/for-you');
+                            if (value === 'for-you') router.push('/discover/for-you');
                         }}
                         className="mt-4"
                     >
@@ -116,7 +118,7 @@ function AllView({ feed }: { feed: readonly DiscoverFeedItem[] }) {
 function FilteredView({ items }: { items: readonly DiscoverFeedItem[] }) {
     if (items.length === 0) {
         return (
-            <p className="text-muted-foreground mt-12 px-2 text-center text-xs">
+            <p className="mt-12 px-2 text-center text-xs text-muted-foreground">
                 Pas encore d&apos;article dans cette catégorie.
             </p>
         );
@@ -152,8 +154,8 @@ function groupByCategory(items: readonly DiscoverFeedItem[]): Partial<Record<Jou
 function EmptyState() {
     return (
         <div className="mt-12 flex flex-col items-center gap-3 px-8 text-center">
-            <Sparkles className="text-muted-foreground h-8 w-8" />
-            <p className="text-muted-foreground text-sm">Pas encore d&apos;articles. Reviens bientôt.</p>
+            <Sparkles className="h-8 w-8 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">Pas encore d&apos;articles. Reviens bientôt.</p>
         </div>
     );
 }
@@ -165,7 +167,7 @@ function FooterCta() {
                 href={`${WEB_BASE_URL}/journal`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground text-xs underline-offset-4 hover:underline"
+                className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
             >
                 Plus d&apos;histoires sur lumiris.fr/journal
             </a>

@@ -72,7 +72,7 @@ function IrisRingImpl({ status }: IrisRingProps) {
                             exit={{ opacity: 0 }}
                         >
                             <motion.div
-                                className="bg-lumiris-cyan absolute left-0 right-0 h-px"
+                                className="absolute right-0 left-0 h-px bg-lumiris-cyan"
                                 style={{ boxShadow: '0 0 12px var(--lumiris-cyan)' }}
                                 initial={{ top: '0%' }}
                                 animate={{ top: ['0%', '100%', '0%'] }}
@@ -89,7 +89,7 @@ function IrisRingImpl({ status }: IrisRingProps) {
                         style={{ filter: 'drop-shadow(0 1px 2px rgb(0 0 0 / 0.5))' }}
                     >
                         <Scan className="h-7 w-7 text-white/70" aria-hidden />
-                        <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-white/80">
+                        <span className="text-[10px] font-medium tracking-[0.12em] text-white/80 uppercase">
                             Pointez vers un QR code
                         </span>
                     </div>

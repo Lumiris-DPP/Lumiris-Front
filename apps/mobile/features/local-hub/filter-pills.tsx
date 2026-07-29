@@ -39,10 +39,10 @@ export function FilterPills({ value, onChange, counts }: FilterPillsProps) {
                         whileTap={prefersReduced ? undefined : { scale: 0.95 }}
                         className={cn(
                             'inline-flex items-center gap-1 rounded-full border px-4 py-2 text-sm font-medium transition-colors',
-                            'focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
+                            'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:outline-none',
                             active
-                                ? 'bg-foreground text-background border-transparent shadow-sm'
-                                : 'bg-card text-muted-foreground border-border/60 hover:text-foreground',
+                                ? 'border-transparent bg-foreground text-background shadow-sm'
+                                : 'border-border/60 bg-card text-muted-foreground hover:text-foreground',
                         )}
                     >
                         <span>{pill.label}</span>

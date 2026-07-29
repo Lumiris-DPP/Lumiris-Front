@@ -24,7 +24,7 @@ export function CompositionRow({ material }: { material: Material }) {
     const pct = Math.max(0, Math.min(100, material.percentage));
 
     return (
-        <div className="border-border bg-card rounded-xl border p-3.5">
+        <div className="rounded-xl border border-border bg-card p-3.5">
             <div className="flex items-center gap-3">
                 <span
                     className={cn(
@@ -38,10 +38,10 @@ export function CompositionRow({ material }: { material: Material }) {
                 </span>
                 <div className="min-w-0 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
-                        <p className="text-foreground truncate text-sm font-semibold">{FIBER_LABEL[material.fiber]}</p>
-                        <p className="text-foreground font-mono text-sm font-semibold">{pct}%</p>
+                        <p className="truncate text-sm font-semibold text-foreground">{FIBER_LABEL[material.fiber]}</p>
+                        <p className="font-mono text-sm font-semibold text-foreground">{pct}%</p>
                     </div>
-                    <p className="text-muted-foreground mt-0.5 truncate text-xs">
+                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
                         <span className="mr-1">{COUNTRY_FLAG[material.originCountry] ?? '🏳️'}</span>
                         {material.originCountry}
                     </p>
@@ -53,7 +53,7 @@ export function CompositionRow({ material }: { material: Material }) {
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-label={`${FIBER_LABEL[material.fiber]} - ${pct}%`}
-                className="bg-muted mt-2.5 h-1.5 overflow-hidden rounded-full"
+                className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-muted"
             >
                 <div
                     className={cn(

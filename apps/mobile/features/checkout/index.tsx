@@ -1,11 +1,15 @@
+'use client';
+
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, CreditCard, Loader2, Lock, LogIn, MapPin, ShieldCheck, Shirt, UserPlus } from 'lucide-react';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { useApiClient } from '@lumiris/api-client/react';
 import type { PaymentIntentResponse } from '@lumiris/api-client';
+import { routes } from '@/lib/routes';
 import { useUser } from '@/lib/auth/use-user';
 import { clearCart, formatCents, useCartDetails, type CartItemDetail } from '@/lib/marketplace';
 import { getStripe } from '@/lib/stripe';
@@ -35,7 +39,7 @@ function cartSignature(items: ReadonlyArray<{ product: { id: string }; quantity:
 }
 
 export function Checkout() {
-    const navigate = useNavigate();
+    const router = useRouter();
     const { user, isAuthenticated } = useUser();
     const client = useApiClient();
     const { items, subtotalCents, sellerCount, isLoading } = useCartDetails();
@@ -78,12 +82,12 @@ export function Checkout() {
 
     if (!isLoading && items.length === 0 && !intent) {
         return (
-            <div className="bg-background flex h-full flex-col items-center justify-center gap-4 px-8 text-center">
-                <p className="text-foreground text-base font-semibold">Aucun article à régler</p>
+            <div className="flex h-full flex-col items-center justify-center gap-4 bg-background px-8 text-center">
+                <p className="text-base font-semibold text-foreground">Aucun article à régler</p>
                 <button
                     type="button"
-                    onClick={() => navigate('/boutique', { replace: true })}
-                    className="bg-foreground text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
+                    onClick={() => router.replace('/boutique')}
+                    className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-primary-foreground"
                 >
                     Retour à la Boutique
                 </button>
@@ -95,27 +99,27 @@ export function Checkout() {
     // PAS vidé — il sera fusionné et restauré au retour (returnTo=/checkout).
     if (!isAuthenticated) {
         return (
-            <div className="bg-background flex h-full flex-col items-center justify-center gap-5 px-8 text-center">
-                <div className="border-border/60 bg-card flex h-16 w-16 items-center justify-center rounded-3xl border">
-                    <Lock className="text-muted-foreground h-6 w-6" />
+            <div className="flex h-full flex-col items-center justify-center gap-5 bg-background px-8 text-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-3xl border border-border/60 bg-card">
+                    <Lock className="h-6 w-6 text-muted-foreground" />
                 </div>
                 <div>
-                    <h1 className="text-foreground text-lg font-bold">Connecte-toi pour finaliser</h1>
-                    <p className="text-muted-foreground mt-1 text-sm">
+                    <h1 className="text-lg font-bold text-foreground">Connecte-toi pour finaliser</h1>
+                    <p className="mt-1 text-sm text-muted-foreground">
                         Crée un compte ou connecte-toi pour régler en toute sécurité. Ton panier est conservé.
                     </p>
                 </div>
                 <div className="flex w-full max-w-xs flex-col gap-2">
                     <Link
-                        to={`/auth/sign-in?returnTo=${CHECKOUT_RETURN}`}
-                        className="bg-foreground text-primary-foreground inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold"
+                        href={`/auth/sign-in?returnTo=${CHECKOUT_RETURN}`}
+                        className="inline-flex items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-semibold text-primary-foreground"
                     >
                         <LogIn className="h-4 w-4" />
                         Se connecter
                     </Link>
                     <Link
-                        to={`/auth/sign-in?mode=signup&returnTo=${CHECKOUT_RETURN}`}
-                        className="border-border text-foreground inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-semibold"
+                        href={`/auth/sign-in?mode=signup&returnTo=${CHECKOUT_RETURN}`}
+                        className="inline-flex items-center justify-center gap-2 rounded-full border border-border px-5 py-3 text-sm font-semibold text-foreground"
                     >
                         <UserPlus className="h-4 w-4" />
                         Créer un compte
@@ -123,8 +127,8 @@ export function Checkout() {
                 </div>
                 <button
                     type="button"
-                    onClick={() => navigate('/panier', { replace: true })}
-                    className="text-muted-foreground hover:text-foreground text-xs underline-offset-4 hover:underline"
+                    onClick={() => router.replace('/panier')}
+                    className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
                 >
                     Revenir au panier
                 </button>
@@ -134,13 +138,13 @@ export function Checkout() {
 
     if (intentError) {
         return (
-            <div className="bg-background flex h-full flex-col items-center justify-center gap-4 px-8 text-center">
-                <p className="text-foreground text-base font-semibold">Paiement indisponible</p>
-                <p className="text-muted-foreground text-sm">{intentError}</p>
+            <div className="flex h-full flex-col items-center justify-center gap-4 bg-background px-8 text-center">
+                <p className="text-base font-semibold text-foreground">Paiement indisponible</p>
+                <p className="text-sm text-muted-foreground">{intentError}</p>
                 <button
                     type="button"
-                    onClick={() => navigate('/panier', { replace: true })}
-                    className="bg-foreground text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
+                    onClick={() => router.replace('/panier')}
+                    className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-primary-foreground"
                 >
                     Retour au panier
                 </button>
@@ -150,7 +154,7 @@ export function Checkout() {
 
     if (!intent) {
         return (
-            <div className="bg-background text-muted-foreground flex h-full items-center justify-center gap-2 text-sm">
+            <div className="flex h-full items-center justify-center gap-2 bg-background text-sm text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" /> Préparation du paiement sécurisé…
             </div>
         );
@@ -187,13 +191,13 @@ export function Checkout() {
                 amountTotalCents={intent.amountTotalCents}
                 subtotalCents={subtotalCents}
                 defaultName={user?.displayName ?? ''}
-                onBack={() => navigate(-1)}
+                onBack={() => router.back()}
                 onPaid={(paymentIntentId) => {
                     intentCache.clear();
                     clearCart();
                     // Confirmation rattachée au PaymentIntent → total réel (articles + livraison)
                     // et toutes les lignes de la commande, via GET /api/orders/group/{pi}.
-                    navigate(`/commande/${paymentIntentId}`, { replace: true });
+                    router.replace(routes.order(paymentIntentId));
                 }}
             />
         </Elements>
@@ -232,7 +236,7 @@ function CheckoutForm({
 
     const payDisabled = !stripe || !addressValid || submitting;
 
-    async function handleSubmit(event: React.FormEvent) {
+    async function handleSubmit(event: React.SyntheticEvent) {
         event.preventDefault();
         if (!stripe || !elements || !addressValid || submitting) return;
         setSubmitting(true);
@@ -243,7 +247,7 @@ function CheckoutForm({
             confirmParams: {
                 // Retour après redirection (3-D Secure) : Stripe ajoute ?payment_intent=…
                 // que l'écran de confirmation lit pour charger le groupe de commande.
-                return_url: `${window.location.origin}/commande/latest`,
+                return_url: `${window.location.origin}${routes.order('latest')}`,
                 shipping: {
                     name: address.fullName,
                     address: {
@@ -270,9 +274,9 @@ function CheckoutForm({
     }
 
     return (
-        <form onSubmit={handleSubmit} className="bg-background flex h-full flex-col overflow-y-auto pb-44 md:pb-20">
+        <form onSubmit={handleSubmit} className="flex h-full flex-col overflow-y-auto bg-background pb-44 md:pb-20">
             <motion.header
-                className="mx-auto flex w-full max-w-md items-center gap-3 px-4 pb-3 pt-12 md:max-w-4xl md:px-6"
+                className="mx-auto flex w-full max-w-md items-center gap-3 px-4 pt-12 pb-3 md:max-w-4xl md:px-6"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
             >
@@ -280,11 +284,11 @@ function CheckoutForm({
                     type="button"
                     onClick={onBack}
                     aria-label="Retour"
-                    className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full border"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground"
                 >
                     <ArrowLeft className="h-4 w-4" />
                 </button>
-                <h1 className="text-foreground text-base font-bold">Paiement</h1>
+                <h1 className="text-base font-bold text-foreground">Paiement</h1>
             </motion.header>
 
             {/* Sur md+ : deux colonnes (formulaire à gauche, récapitulatif collant à droite).
@@ -296,8 +300,8 @@ function CheckoutForm({
                     <div className="flex flex-col gap-6">
                         <section className="flex flex-col gap-3">
                             <div className="flex items-center gap-2">
-                                <MapPin className="text-muted-foreground h-4 w-4" />
-                                <h2 className="text-foreground text-sm font-semibold">Adresse de livraison</h2>
+                                <MapPin className="h-4 w-4 text-muted-foreground" />
+                                <h2 className="text-sm font-semibold text-foreground">Adresse de livraison</h2>
                             </div>
                             <Field
                                 label="Nom complet"
@@ -334,14 +338,14 @@ function CheckoutForm({
 
                         <section className="flex flex-col gap-3">
                             <div className="flex items-center gap-2">
-                                <CreditCard className="text-muted-foreground h-4 w-4" />
-                                <h2 className="text-foreground text-sm font-semibold">Paiement</h2>
+                                <CreditCard className="h-4 w-4 text-muted-foreground" />
+                                <h2 className="text-sm font-semibold text-foreground">Paiement</h2>
                             </div>
-                            <div className="border-border/60 bg-card rounded-2xl border p-4">
+                            <div className="rounded-2xl border border-border/60 bg-card p-4">
                                 <PaymentElement options={{ layout: 'tabs' }} />
                             </div>
-                            {payError ? <p className="text-lumiris-rose text-xs">{payError}</p> : null}
-                            <p className="text-muted-foreground flex items-center gap-1.5 text-[11px]">
+                            {payError ? <p className="text-xs text-lumiris-rose">{payError}</p> : null}
+                            <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
                                 <ShieldCheck className="h-3 w-3" />
                                 Paiement sécurisé par Stripe. Le vendeur est réglé directement ; Lumiris ne stocke
                                 aucune donnée de carte. Carte de test : 4242 4242 4242 4242.
@@ -350,7 +354,7 @@ function CheckoutForm({
                     </div>
 
                     {/* Colonne droite : récapitulatif (collant sur md+) + paiement sur desktop */}
-                    <aside className="mt-6 md:mt-0 md:sticky md:top-6">
+                    <aside className="mt-6 md:sticky md:top-6 md:mt-0">
                         <RecapCard
                             items={items}
                             subtotalCents={subtotalCents}
@@ -369,7 +373,7 @@ function CheckoutForm({
             </div>
 
             {/* Barre de paiement fixe — mobile uniquement (sur md+ le bouton vit dans le récap). */}
-            <div className="border-border/60 bg-background/90 fixed inset-x-0 bottom-0 z-40 mx-auto max-w-md border-t px-4 pb-6 pt-3 backdrop-blur md:hidden">
+            <div className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-md border-t border-border/60 bg-background/90 px-4 pt-3 pb-6 backdrop-blur md:hidden">
                 <PayAction disabled={payDisabled} submitting={submitting} amountTotalCents={amountTotalCents} />
             </div>
         </form>
@@ -388,38 +392,41 @@ function RecapCard({
     amountTotalCents: number;
 }) {
     return (
-        <div className="border-border/60 bg-card opal-shadow rounded-2xl border p-4">
-            <h2 className="text-foreground text-sm font-semibold">Récapitulatif</h2>
+        <div className="opal-shadow rounded-2xl border border-border/60 bg-card p-4">
+            <h2 className="text-sm font-semibold text-foreground">Récapitulatif</h2>
             {items.length > 0 ? (
                 <ul className="mt-3 flex flex-col gap-3">
                     {items.map((it) => (
                         <li key={it.product.id} className="flex items-center gap-3">
-                            <div className="bg-muted relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl">
+                            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted">
                                 {it.product.photoUrl ? (
-                                    <img
+                                    <Image
                                         src={it.product.photoUrl}
                                         alt={it.product.name}
-                                        className="absolute inset-0 h-full w-full object-cover"
+                                        fill
+                                        sizes="48px"
+                                        className="object-cover"
+                                        unoptimized
                                     />
                                 ) : (
-                                    <Shirt className="text-muted-foreground/30 h-5 w-5" strokeWidth={1.5} aria-hidden />
+                                    <Shirt className="h-5 w-5 text-muted-foreground/30" strokeWidth={1.5} aria-hidden />
                                 )}
                             </div>
                             <div className="min-w-0 flex-1">
-                                <p className="text-foreground truncate text-xs font-medium">{it.product.name}</p>
-                                <p className="text-muted-foreground truncate text-[11px]">
+                                <p className="truncate text-xs font-medium text-foreground">{it.product.name}</p>
+                                <p className="truncate text-[11px] text-muted-foreground">
                                     {it.product.artisanName}
                                     {it.quantity > 1 ? ` · ×${it.quantity}` : ''}
                                 </p>
                             </div>
-                            <span className="text-foreground shrink-0 text-xs font-semibold tabular-nums">
+                            <span className="shrink-0 text-xs font-semibold text-foreground tabular-nums">
                                 {formatCents(it.lineTotalCents)}
                             </span>
                         </li>
                     ))}
                 </ul>
             ) : null}
-            <dl className="border-border/60 mt-4 flex flex-col gap-2 border-t pt-3 text-sm">
+            <dl className="mt-4 flex flex-col gap-2 border-t border-border/60 pt-3 text-sm">
                 <div className="flex items-center justify-between">
                     <dt className="text-muted-foreground">Sous-total</dt>
                     <dd className="text-foreground tabular-nums">{formatCents(subtotalCents)}</dd>
@@ -430,7 +437,7 @@ function RecapCard({
                         {shippingCents === 0 ? 'Offerte' : formatCents(shippingCents)}
                     </dd>
                 </div>
-                <div className="border-border/60 mt-1 flex items-center justify-between border-t pt-2 font-semibold">
+                <div className="mt-1 flex items-center justify-between border-t border-border/60 pt-2 font-semibold">
                     <dt className="text-foreground">Total</dt>
                     <dd className="text-foreground tabular-nums">{formatCents(amountTotalCents)}</dd>
                 </div>
@@ -453,7 +460,7 @@ function PayAction({
             <button
                 type="submit"
                 disabled={disabled}
-                className="bg-foreground text-primary-foreground flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold disabled:opacity-40"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3 text-sm font-semibold text-primary-foreground disabled:opacity-40"
             >
                 {submitting ? (
                     <>
@@ -467,9 +474,7 @@ function PayAction({
                     </>
                 )}
             </button>
-            <p className="text-muted-foreground mt-2 text-center text-[11px]">
-                Payez en plusieurs fois avec Klarna.
-            </p>
+            <p className="mt-2 text-center text-[11px] text-muted-foreground">Payez en plusieurs fois avec Klarna.</p>
         </>
     );
 }
@@ -488,12 +493,12 @@ function Field({
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'className'>) {
     return (
         <label className={`flex flex-col gap-1 ${className ?? ''}`}>
-            <span className="text-muted-foreground text-[11px] font-medium">{label}</span>
+            <span className="text-[11px] font-medium text-muted-foreground">{label}</span>
             <input
                 {...rest}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="border-border bg-card text-foreground focus:border-foreground rounded-xl border px-3 py-2.5 text-sm outline-none"
+                className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none focus:border-foreground"
             />
         </label>
     );

@@ -1,5 +1,7 @@
+'use client';
+
 import { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { X, Share2, GitCompareArrows, BookmarkPlus, BookmarkCheck, ShoppingBag, FileText } from 'lucide-react';
 import { cn } from '@lumiris/ui/lib/cn';
@@ -18,7 +20,7 @@ interface ActionBarProps {
 }
 
 export function ActionBar({ passport, artisan, isSaved, documents }: ActionBarProps) {
-    const navigate = useNavigate();
+    const router = useRouter();
     const [buyOpen, setBuyOpen] = useState(false);
     const [docsOpen, setDocsOpen] = useState(false);
 
@@ -41,8 +43,8 @@ export function ActionBar({ passport, artisan, isSaved, documents }: ActionBarPr
     }, [passport.id, passport.garment.reference]);
 
     const onCompare = useCallback(() => {
-        navigate(`/vault?compareWith=${encodeURIComponent(passport.id)}`);
-    }, [navigate, passport.id]);
+        router.push(`/vault?compareWith=${encodeURIComponent(passport.id)}`);
+    }, [router, passport.id]);
 
     const onToggleSave = useCallback(() => {
         if (isSaved) removeLumirisPassport(passport.id);
@@ -56,12 +58,12 @@ export function ActionBar({ passport, artisan, isSaved, documents }: ActionBarPr
         <>
             <motion.nav
                 aria-label="Actions du passeport"
-                className="border-border/50 bg-background/85 fixed inset-x-0 bottom-0 z-50 mx-auto flex max-w-md items-center justify-around gap-1 border-t px-4 pb-6 pt-3 backdrop-blur-xl"
+                className="fixed inset-x-0 bottom-0 z-50 mx-auto flex max-w-md items-center justify-around gap-1 border-t border-border/50 bg-background/85 px-4 pt-3 pb-6 backdrop-blur-xl"
                 initial={{ y: 80, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ type: 'spring', stiffness: 380, damping: 32, delay: 0.4 }}
             >
-                <ActionButton onClick={() => navigate(-1)} label="Fermer" Icon={X} />
+                <ActionButton onClick={() => router.back()} label="Fermer" Icon={X} />
                 <ActionButton onClick={onShare} label="Partager" Icon={Share2} />
                 <ActionButton onClick={onCompare} label="Comparer" Icon={GitCompareArrows} />
                 <ActionButton
@@ -124,7 +126,7 @@ function ActionButton({ onClick, label, Icon, active = false, disabled = false, 
                 {badge !== undefined && badge > 0 ? (
                     <span
                         aria-hidden
-                        className="bg-lumiris-cyan text-background absolute -right-2 -top-1 inline-flex min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-semibold leading-none"
+                        className="absolute -top-1 -right-2 inline-flex min-w-4 items-center justify-center rounded-full bg-lumiris-cyan px-1 text-[9px] leading-none font-semibold text-background"
                     >
                         {badge > 9 ? '9+' : badge}
                     </span>

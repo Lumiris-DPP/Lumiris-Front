@@ -15,6 +15,11 @@ type ScanResult =
     | { kind: 'external-dpp'; dpp: ExternalDpp }
     | { kind: 'unknown'; raw: string };
 
+/** URL canonique du passeport public : `/p/?c=CODE`. */
+const PUBLIC_CODE_QUERY_RE = /\/p\/?\?(?:[^#]*&)?c=([\w-]{8})\b/i;
+/** Ancien chemin `/p/CODE` — les QR déjà imprimés doivent rester lisibles. */
+const PUBLIC_CODE_PATH_RE = /\/p\/([\w-]{8})\b/i;
+
 /** `?k=` d'une URL de QR d'accès élargi. Absent des QR publics, qui n'en ont pas besoin. */
 function accessTokenFrom(payload: string): string | undefined {
     const match = payload.match(/[?&]k=([\w-]+)/);
@@ -25,7 +30,7 @@ export function decodeQrPayload(payload: string): DecodedScan {
     const trimmed = payload.trim();
     if (!trimmed) return { kind: 'unknown', raw: payload };
 
-    const publicCodeUrlMatch = trimmed.match(/\/p\/([\w-]{8})\b/i);
+    const publicCodeUrlMatch = trimmed.match(PUBLIC_CODE_QUERY_RE) ?? trimmed.match(PUBLIC_CODE_PATH_RE);
     if (publicCodeUrlMatch?.[1]) {
         return {
             kind: 'public-code',

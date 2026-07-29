@@ -8,7 +8,7 @@ import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@lumiris/ui/components/tabs';
 import { cn } from '@lumiris/ui/lib/cn';
-import { ACCESS_LEVELS, ACCESS_LEVEL_ORDER, MOBILE_URL, documentsForLevel } from './access-levels';
+import { ACCESS_LEVELS, ACCESS_LEVEL_ORDER, documentsForLevel, publicPassportUrl } from './access-levels';
 import { AccessQr } from './access-qr';
 
 interface AccessQrCardProps {
@@ -79,12 +79,10 @@ function LevelPanel({
 
     // Un niveau élargi sans jeton serait un QR public déguisé : mieux vaut ne rien afficher.
     if (loading || (level !== 'PUBLIC' && !token)) {
-        return <p className="text-muted-foreground py-8 text-center text-xs">Chargement…</p>;
+        return <p className="py-8 text-center text-xs text-muted-foreground">Chargement…</p>;
     }
 
-    const url = token
-        ? `${MOBILE_URL}/p/${publicCode}?k=${encodeURIComponent(token)}`
-        : `${MOBILE_URL}/p/${publicCode}`;
+    const url = publicPassportUrl(publicCode, token);
 
     return (
         <div className="flex flex-col items-center gap-4">
@@ -94,7 +92,7 @@ function LevelPanel({
                 <Badge variant="outline" className={cn('text-[10px]', meta.badgeClass)}>
                     {meta.label}
                 </Badge>
-                <p className="text-muted-foreground text-[11px] leading-relaxed">
+                <p className="text-[11px] leading-relaxed text-muted-foreground">
                     {meta.audience}
                     <br />
                     {count === 0
@@ -106,7 +104,7 @@ function LevelPanel({
             {level === 'PUBLIC' && (
                 <>
                     <div className="flex flex-col items-center gap-1 text-center">
-                        <p className="text-muted-foreground text-[11px] uppercase tracking-wider">Code DPP</p>
+                        <p className="text-[11px] tracking-wider text-muted-foreground uppercase">Code DPP</p>
                         <p className="font-mono text-lg font-semibold tracking-widest">{publicCode}</p>
                     </div>
 

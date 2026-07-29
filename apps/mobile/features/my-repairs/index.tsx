@@ -1,5 +1,8 @@
+'use client';
+
 import { useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, Clock3, ScrollText, Wrench, X, XCircle } from 'lucide-react';
 import { mockPassportById, mockRepairerById } from '@lumiris/mock-data';
@@ -40,7 +43,7 @@ interface ResolvedRequest {
 }
 
 export function MyRepairs() {
-    const navigate = useNavigate();
+    const router = useRouter();
     const requests = useRepairRequests();
     const [detail, setDetail] = useState<RepairRequest | null>(null);
 
@@ -63,23 +66,23 @@ export function MyRepairs() {
     const total = requests.length;
 
     return (
-        <div className="bg-background flex h-full flex-col overflow-y-auto pb-24">
+        <div className="flex h-full flex-col overflow-y-auto bg-background pb-24">
             <motion.header
-                className="flex items-center gap-3 px-4 pb-3 pt-12"
+                className="flex items-center gap-3 px-4 pt-12 pb-3"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
             >
                 <button
                     type="button"
-                    onClick={() => navigate(-1)}
+                    onClick={() => router.back()}
                     aria-label="Retour"
-                    className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full border"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground"
                 >
                     <ArrowLeft className="h-4 w-4" />
                 </button>
                 <div className="min-w-0 flex-1">
-                    <h1 className="text-foreground text-base font-bold">Mes demandes</h1>
-                    <p className="text-muted-foreground text-xs">
+                    <h1 className="text-base font-bold text-foreground">Mes demandes</h1>
+                    <p className="text-xs text-muted-foreground">
                         {total} demande{total > 1 ? 's' : ''}
                     </p>
                 </div>
@@ -93,7 +96,7 @@ export function MyRepairs() {
                     if (items.length === 0) return null;
                     return (
                         <section key={status} className="flex flex-col gap-2">
-                            <h2 className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+                            <h2 className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                                 {STATUS_LABEL[status]} ({items.length})
                             </h2>
                             <ul className="flex flex-col gap-2">
@@ -135,18 +138,18 @@ function Empty() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
         >
-            <div className="border-border/60 bg-card flex h-16 w-16 items-center justify-center rounded-3xl border">
-                <Wrench className="text-muted-foreground h-7 w-7" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-3xl border border-border/60 bg-card">
+                <Wrench className="h-7 w-7 text-muted-foreground" />
             </div>
             <div>
-                <h2 className="text-foreground text-base font-semibold">Aucune demande pour l&apos;instant</h2>
-                <p className="text-muted-foreground mt-1 text-sm">
+                <h2 className="text-base font-semibold text-foreground">Aucune demande pour l&apos;instant</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
                     Trouve un retoucheur près de chez toi et lance ta première retouche.
                 </p>
             </div>
             <Link
-                to="/local"
-                className="bg-foreground text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
+                href="/local"
+                className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-primary-foreground"
             >
                 <Wrench className="h-4 w-4" />
                 Voir les retoucheurs
@@ -156,9 +159,9 @@ function Empty() {
 }
 
 function StatusIcon({ status }: { status: RepairRequestStatus }) {
-    if (status === 'completed') return <CheckCircle2 className="text-lumiris-emerald h-3.5 w-3.5" />;
-    if (status === 'cancelled') return <XCircle className="text-muted-foreground h-3.5 w-3.5" />;
-    return <Clock3 className="text-lumiris-cyan h-3.5 w-3.5" />;
+    if (status === 'completed') return <CheckCircle2 className="h-3.5 w-3.5 text-lumiris-emerald" />;
+    if (status === 'cancelled') return <XCircle className="h-3.5 w-3.5 text-muted-foreground" />;
+    return <Clock3 className="h-3.5 w-3.5 text-lumiris-cyan" />;
 }
 
 function RequestCard({
@@ -181,11 +184,11 @@ function RequestCard({
     const canCancel = request.status === 'pending';
 
     return (
-        <article className="border-border/60 bg-card flex flex-col gap-2 rounded-2xl border p-4">
+        <article className="flex flex-col gap-2 rounded-2xl border border-border/60 bg-card p-4">
             <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                    <p className="text-foreground truncate text-sm font-semibold">{repairerName}</p>
-                    <p className="text-muted-foreground truncate text-xs">{reference}</p>
+                    <p className="truncate text-sm font-semibold text-foreground">{repairerName}</p>
+                    <p className="truncate text-xs text-muted-foreground">{reference}</p>
                 </div>
                 <span className="inline-flex shrink-0 items-center gap-1 text-[11px] font-semibold">
                     <StatusIcon status={request.status} />
@@ -193,7 +196,7 @@ function RequestCard({
                 </span>
             </div>
 
-            <div className="text-muted-foreground flex items-center justify-between text-[11px]">
+            <div className="flex items-center justify-between text-[11px] text-muted-foreground">
                 <span>
                     {SPECIALITY_LABEL[request.specialty]} · {date}
                 </span>
@@ -205,7 +208,7 @@ function RequestCard({
                     <button
                         type="button"
                         onClick={onCancel}
-                        className="border-lumiris-rose/30 text-lumiris-rose inline-flex items-center gap-1 rounded-full border px-3 py-1 text-[11px] font-medium"
+                        className="inline-flex items-center gap-1 rounded-full border border-lumiris-rose/30 px-3 py-1 text-[11px] font-medium text-lumiris-rose"
                     >
                         Annuler
                     </button>
@@ -213,7 +216,7 @@ function RequestCard({
                 <button
                     type="button"
                     onClick={onView}
-                    className="border-border bg-card text-foreground inline-flex items-center gap-1 rounded-full border px-3 py-1 text-[11px] font-medium"
+                    className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-3 py-1 text-[11px] font-medium text-foreground"
                 >
                     <ScrollText className="h-3 w-3" />
                     Voir le détail
@@ -241,11 +244,11 @@ function RequestDetailOverlay({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
         >
-            <div className="bg-background/70 absolute inset-0 backdrop-blur-sm" onClick={onClose} role="presentation" />
+            <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" onClick={onClose} role="presentation" />
             <motion.div
                 role="dialog"
                 aria-label={`Détail demande ${request.id}`}
-                className="border-border bg-card relative mx-4 mb-8 w-full max-w-sm rounded-3xl border p-5 shadow-2xl"
+                className="relative mx-4 mb-8 w-full max-w-sm rounded-3xl border border-border bg-card p-5 shadow-2xl"
                 initial={{ y: 60 }}
                 animate={{ y: 0 }}
                 exit={{ y: 60 }}
@@ -255,20 +258,20 @@ function RequestDetailOverlay({
                     type="button"
                     onClick={onClose}
                     aria-label="Fermer"
-                    className="border-border/60 bg-card text-foreground absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full border"
+                    className="absolute top-3 right-3 inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/60 bg-card text-foreground"
                 >
                     <X className="h-3.5 w-3.5" />
                 </button>
 
-                <h2 className="text-foreground text-base font-semibold">
+                <h2 className="text-base font-semibold text-foreground">
                     {repairer?.atelierName ?? repairer?.displayName ?? 'Retoucheur'}
                 </h2>
-                <p className="text-muted-foreground text-xs">
+                <p className="text-xs text-muted-foreground">
                     {SPECIALITY_LABEL[request.specialty]}
                     {passport ? ` · ${passport.garment.reference}` : ''}
                 </p>
 
-                <p className="text-foreground mt-3 whitespace-pre-line text-sm leading-relaxed">
+                <p className="mt-3 text-sm leading-relaxed whitespace-pre-line text-foreground">
                     {request.description}
                 </p>
 
@@ -276,17 +279,18 @@ function RequestDetailOverlay({
                     <ul className="mt-3 flex flex-wrap gap-2">
                         {request.photos.map((src, idx) => (
                             <li key={`${idx}-${src.length}`} className="h-16 w-16">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src={src}
                                     alt={`Pièce jointe ${idx + 1}`}
-                                    className="border-border h-full w-full rounded-lg border object-cover"
+                                    className="h-full w-full rounded-lg border border-border object-cover"
                                 />
                             </li>
                         ))}
                     </ul>
                 ) : null}
 
-                <p className="text-muted-foreground/80 mt-4 text-[11px]">
+                <p className="mt-4 text-[11px] text-muted-foreground/80">
                     Créée le{' '}
                     {new Date(request.createdAt).toLocaleString('fr-FR', {
                         day: 'numeric',

@@ -1,31 +1,34 @@
-import { useNavigate } from 'react-router-dom';
+'use client';
+
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, ExternalLink, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { ArtisanPublicProfileDto } from '@/lib/public-artisan-api';
 
 export function ArtisanPublicProfile({ artisan }: { artisan: ArtisanPublicProfileDto }) {
-    const navigate = useNavigate();
+    const router = useRouter();
     const title = artisan.atelierName ?? artisan.displayName ?? 'Atelier';
 
     return (
-        <div className="bg-background flex h-full flex-col overflow-y-auto pb-24">
+        <div className="flex h-full flex-col overflow-y-auto bg-background pb-24">
             <motion.header
-                className="flex items-center gap-3 px-4 pb-3 pt-12"
+                className="flex items-center gap-3 px-4 pt-12 pb-3"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
             >
                 <button
                     type="button"
-                    onClick={() => navigate(-1)}
+                    onClick={() => router.back()}
                     aria-label="Retour"
-                    className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full border"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground"
                 >
                     <ArrowLeft className="h-4 w-4" />
                 </button>
                 <div className="min-w-0 flex-1">
-                    <h1 className="text-foreground truncate text-base font-bold">{title}</h1>
+                    <h1 className="truncate text-base font-bold text-foreground">{title}</h1>
                     {artisan.city ? (
-                        <p className="text-muted-foreground flex items-center gap-1 truncate text-xs">
+                        <p className="flex items-center gap-1 truncate text-xs text-muted-foreground">
                             <MapPin className="h-3 w-3" />
                             {artisan.city}
                             {artisan.region ? ` · ${artisan.region}` : ''}
@@ -39,7 +42,7 @@ export function ArtisanPublicProfile({ artisan }: { artisan: ArtisanPublicProfil
                     <div className="flex gap-2 overflow-x-auto">
                         {artisan.photoUrls.map((url) => (
                             <div key={url} className="relative h-40 w-40 shrink-0 overflow-hidden rounded-xl">
-                                <img src={url} alt={title} className="absolute inset-0 h-full w-full object-cover" />
+                                <Image src={url} alt={title} fill sizes="160px" className="object-cover" />
                             </div>
                         ))}
                     </div>
@@ -50,7 +53,7 @@ export function ArtisanPublicProfile({ artisan }: { artisan: ArtisanPublicProfil
                         {artisan.specialties.map((s) => (
                             <span
                                 key={s}
-                                className="bg-lumiris-emerald/10 text-lumiris-emerald rounded-md px-2 py-1 text-xs"
+                                className="rounded-md bg-lumiris-emerald/10 px-2 py-1 text-xs text-lumiris-emerald"
                             >
                                 {s}
                             </span>
@@ -60,22 +63,22 @@ export function ArtisanPublicProfile({ artisan }: { artisan: ArtisanPublicProfil
 
                 {artisan.story ? (
                     <section>
-                        <h2 className="text-foreground mb-1 text-sm font-semibold">Histoire</h2>
-                        <p className="text-foreground/90 text-sm leading-relaxed">{artisan.story}</p>
+                        <h2 className="mb-1 text-sm font-semibold text-foreground">Histoire</h2>
+                        <p className="text-sm leading-relaxed text-foreground/90">{artisan.story}</p>
                     </section>
                 ) : null}
 
                 {artisan.method ? (
                     <section>
-                        <h2 className="text-foreground mb-1 text-sm font-semibold">Méthode</h2>
-                        <p className="text-foreground/90 text-sm leading-relaxed">{artisan.method}</p>
+                        <h2 className="mb-1 text-sm font-semibold text-foreground">Méthode</h2>
+                        <p className="text-sm leading-relaxed text-foreground/90">{artisan.method}</p>
                     </section>
                 ) : null}
 
                 {artisan.journey ? (
                     <section>
-                        <h2 className="text-foreground mb-1 text-sm font-semibold">Parcours</h2>
-                        <p className="text-foreground/90 text-sm leading-relaxed">{artisan.journey}</p>
+                        <h2 className="mb-1 text-sm font-semibold text-foreground">Parcours</h2>
+                        <p className="text-sm leading-relaxed text-foreground/90">{artisan.journey}</p>
                     </section>
                 ) : null}
 
@@ -87,7 +90,7 @@ export function ArtisanPublicProfile({ artisan }: { artisan: ArtisanPublicProfil
                                 href={url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-lumiris-emerald inline-flex items-center gap-1.5 text-sm hover:underline"
+                                className="inline-flex items-center gap-1.5 text-sm text-lumiris-emerald hover:underline"
                             >
                                 {label} <ExternalLink className="h-3 w-3" />
                             </a>
@@ -100,7 +103,7 @@ export function ArtisanPublicProfile({ artisan }: { artisan: ArtisanPublicProfil
                         href={artisan.websiteUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-lumiris-emerald inline-flex items-center gap-1.5 text-sm hover:underline"
+                        className="inline-flex items-center gap-1.5 text-sm text-lumiris-emerald hover:underline"
                     >
                         Site externe <ExternalLink className="h-3 w-3" />
                     </a>

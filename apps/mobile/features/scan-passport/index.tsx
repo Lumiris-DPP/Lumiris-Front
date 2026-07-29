@@ -1,8 +1,12 @@
+'use client';
+
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, HelpCircle, Keyboard } from 'lucide-react';
 import { mockArtisanById } from '@lumiris/mock-data';
 import type { Passport } from '@lumiris/types';
+import { routes } from '@/lib/routes';
 import { usePassportScore } from '@/lib/iris/use-passport-score';
 import { incrementScanCounter } from '@/lib/scan-counter';
 import { getCameraPermissionState, hasSeenCameraPrompt, markCameraPromptSeen } from '@/lib/camera/permission-storage';
@@ -19,7 +23,7 @@ const FRAME_INTERVAL_MS = 1000 / 30;
 type ProcessVideoFrame = typeof processVideoFrame;
 
 export function ScanPassport() {
-    const navigate = useNavigate();
+    const router = useRouter();
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const streamRef = useRef<MediaStream | null>(null);
@@ -98,8 +102,7 @@ export function ScanPassport() {
             incrementScanCounter();
             stopCamera();
             // Le jeton d'un QR d'accès élargi suit jusqu'à la vue, qui le rejoue vers l'API.
-            const query = result.accessToken ? `?k=${encodeURIComponent(result.accessToken)}` : '';
-            navigate(`/p/${result.code}${query}`);
+            router.push(routes.publicPassport(result.code, result.accessToken));
             return;
         }
         if (result.kind === 'external' || result.kind === 'unknown') {
@@ -113,7 +116,7 @@ export function ScanPassport() {
             return;
         }
         rafRef.current = requestAnimationFrame(tick);
-    }, [stopCamera, navigate]);
+    }, [stopCamera, router]);
 
     useEffect(() => {
         if (status === 'scanning') {
@@ -165,15 +168,15 @@ export function ScanPassport() {
     const onOpenMatch = useCallback(() => {
         if (!match) return;
         stopCamera();
-        navigate(`/passeport/${match.id}`);
-    }, [match, navigate, stopCamera]);
+        router.push(`/passeport/${match.id}`);
+    }, [match, router, stopCamera]);
 
     const [now] = useState(() => new Date());
     const matchScore = usePassportScore(match, now);
     const matchArtisan = match ? mockArtisanById(match.artisanId) : undefined;
 
     return (
-        <div className="bg-background relative h-full w-full overflow-hidden">
+        <div className="relative h-full w-full overflow-hidden bg-background">
             <video
                 ref={videoRef}
                 playsInline
@@ -182,21 +185,21 @@ export function ScanPassport() {
                 aria-label="Vue caméra"
             />
 
-            <div className="bg-background/20 pointer-events-none absolute inset-0" />
+            <div className="pointer-events-none absolute inset-0 bg-background/20" />
 
-            <header className="absolute left-0 right-0 top-0 z-20 flex items-center justify-between px-5 pt-12">
+            <header className="absolute top-0 right-0 left-0 z-20 flex items-center justify-between px-5 pt-12">
                 <button
                     type="button"
-                    onClick={() => navigate(-1)}
+                    onClick={() => router.back()}
                     aria-label="Retour"
-                    className="text-foreground bg-card/70 inline-flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-md"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-card/70 text-foreground backdrop-blur-md"
                 >
                     <ArrowLeft className="h-5 w-5" aria-hidden />
                 </button>
                 <Link
-                    to="/help"
+                    href="/help"
                     aria-label="Aide"
-                    className="text-foreground bg-card/70 inline-flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-md"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-card/70 text-foreground backdrop-blur-md"
                 >
                     <HelpCircle className="h-5 w-5" aria-hidden />
                 </Link>
@@ -210,7 +213,7 @@ export function ScanPassport() {
                 <button
                     type="button"
                     onClick={openManualEntry}
-                    className="bg-card/70 text-foreground hover:bg-card/90 inline-flex h-12 items-center gap-2 rounded-full border border-white/30 px-5 text-sm font-semibold backdrop-blur-md active:scale-[0.98]"
+                    className="inline-flex h-12 items-center gap-2 rounded-full border border-white/30 bg-card/70 px-5 text-sm font-semibold text-foreground backdrop-blur-md hover:bg-card/90 active:scale-[0.98]"
                 >
                     <Keyboard className="h-4 w-4" strokeWidth={1.5} aria-hidden />
                     Saisir un code à la main
