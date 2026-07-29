@@ -23,7 +23,7 @@ export function PlanCard({ plan, isCurrent, isAnnual, hasActiveSubscription, dis
         <Card className={cn('flex flex-col', isCurrent && 'border-lumiris-emerald/40 bg-lumiris-emerald/5')}>
             <CardContent className="flex flex-1 flex-col gap-4 p-6">
                 <div className="flex items-start justify-between gap-2">
-                    <p className="text-foreground text-lg font-semibold">{plan.label}</p>
+                    <p className="text-lg font-semibold text-foreground">{plan.label}</p>
                     {isCurrent && (
                         <Badge variant="outline" className="text-[10px] uppercase">
                             Actuel
@@ -32,19 +32,19 @@ export function PlanCard({ plan, isCurrent, isAnnual, hasActiveSubscription, dis
                 </div>
                 <p className="font-mono text-2xl font-semibold">
                     {euros(amount)} €
-                    <span className="text-muted-foreground ml-1 text-sm font-normal">/{isAnnual ? 'an' : 'mois'}</span>
+                    <span className="ml-1 text-sm font-normal text-muted-foreground">/{isAnnual ? 'an' : 'mois'}</span>
                 </p>
-                <ul className="text-muted-foreground flex-1 space-y-1.5 text-xs">
+                <ul className="flex-1 space-y-1.5 text-xs text-muted-foreground">
                     <li className="flex items-start gap-1.5">
-                        <Check className="text-lumiris-cyan mt-0.5 h-3 w-3 shrink-0" />
+                        <Check className="mt-0.5 h-3 w-3 shrink-0 text-lumiris-cyan" />
                         {quotaLabel(plan)}
                     </li>
                     <li className="flex items-start gap-1.5">
-                        <Check className="text-lumiris-cyan mt-0.5 h-3 w-3 shrink-0" />
+                        <Check className="mt-0.5 h-3 w-3 shrink-0 text-lumiris-cyan" />
                         Score Iris pré-calculé sur chaque pièce
                     </li>
                     <li className="flex items-start gap-1.5">
-                        <Check className="text-lumiris-cyan mt-0.5 h-3 w-3 shrink-0" />
+                        <Check className="mt-0.5 h-3 w-3 shrink-0 text-lumiris-cyan" />
                         Page d’atelier publique + annuaire
                     </li>
                 </ul>

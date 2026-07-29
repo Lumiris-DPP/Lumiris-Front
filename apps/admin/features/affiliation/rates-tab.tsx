@@ -33,8 +33,8 @@ export function RatesTab() {
     const canWriteRates = usePermission('affiliation.rate_change');
     if (!canWriteRates) {
         return (
-            <div className="border-border bg-muted/30 text-muted-foreground rounded-xl border border-dashed p-6 text-sm">
-                <p className="text-foreground font-medium">Accès restreint</p>
+            <div className="rounded-xl border border-dashed border-border bg-muted/30 p-6 text-sm text-muted-foreground">
+                <p className="font-medium text-foreground">Accès restreint</p>
                 <p className="mt-0.5 text-xs">
                     L&apos;édition des taux requiert la permission{' '}
                     <code className="font-mono">affiliation.rate_change</code>.
@@ -137,11 +137,11 @@ function RatesEditor() {
 
     return (
         <div className="flex flex-col gap-5">
-            <div className="border-lumiris-emerald/20 bg-lumiris-emerald/5 rounded-xl border p-4 text-xs">
-                <p className="text-foreground inline-flex items-center gap-2 font-semibold">
+            <div className="rounded-xl border border-lumiris-emerald/20 bg-lumiris-emerald/5 p-4 text-xs">
+                <p className="inline-flex items-center gap-2 font-semibold text-foreground">
                     <SlidersHorizontal className="h-3.5 w-3.5" /> Bornes verrouillées
                 </p>
-                <p className="text-muted-foreground mt-1">
+                <p className="mt-1 text-muted-foreground">
                     Achat {PURCHASE_RATE_BOUNDS.min}-{PURCHASE_RATE_BOUNDS.max} % · forfait retouche{' '}
                     {REPAIR_FLAT_BOUNDS.min}-{REPAIR_FLAT_BOUNDS.max} € · % devis {REPAIR_PCT_BOUNDS.min}-
                     {REPAIR_PCT_BOUNDS.max} %. Toute modification est audit-loguée (

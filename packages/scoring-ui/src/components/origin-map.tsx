@@ -95,7 +95,7 @@ export function OriginMap({ origins, steps }: OriginMapProps) {
     return (
         <OriginMapErrorBoundary origins={origins} steps={steps}>
             <div className="flex flex-col gap-3">
-                <div className="border-border relative h-72 w-full overflow-hidden rounded-2xl border">
+                <div className="relative h-72 w-full overflow-hidden rounded-2xl border border-border">
                     <MapContainer
                         center={center}
                         zoom={5}
@@ -174,10 +174,10 @@ function LocationList({
     visuallyHidden?: boolean;
 }) {
     return (
-        <div className={visuallyHidden ? 'sr-only' : 'border-border bg-card rounded-2xl border p-4'}>
+        <div className={visuallyHidden ? 'sr-only' : 'rounded-2xl border border-border bg-card p-4'}>
             {origins.length > 0 ? (
                 <div>
-                    <h3 className={visuallyHidden ? undefined : 'text-foreground mb-2 text-sm font-semibold'}>
+                    <h3 className={visuallyHidden ? undefined : 'mb-2 text-sm font-semibold text-foreground'}>
                         Origine des matières
                     </h3>
                     <ul className={visuallyHidden ? undefined : 'flex flex-wrap gap-2'}>
@@ -187,7 +187,7 @@ function LocationList({
                                 className={
                                     visuallyHidden
                                         ? undefined
-                                        : 'border-border bg-muted rounded-full border px-3 py-1 text-xs'
+                                        : 'rounded-full border border-border bg-muted px-3 py-1 text-xs'
                                 }
                             >
                                 {o.label}
@@ -199,7 +199,7 @@ function LocationList({
             ) : null}
             {steps.length > 0 ? (
                 <div className={visuallyHidden ? undefined : 'mt-4'}>
-                    <h3 className={visuallyHidden ? undefined : 'text-foreground mb-2 text-sm font-semibold'}>
+                    <h3 className={visuallyHidden ? undefined : 'mb-2 text-sm font-semibold text-foreground'}>
                         Étapes de fabrication
                     </h3>
                     <ol className={visuallyHidden ? undefined : 'flex flex-col gap-1'}>
@@ -231,14 +231,14 @@ function OriginMapFallback({
 }) {
     if (origins.length === 0 && steps.length === 0) {
         return (
-            <div className="border-border bg-card text-muted-foreground flex h-48 items-center justify-center rounded-2xl border text-xs italic">
+            <div className="flex h-48 items-center justify-center rounded-2xl border border-border bg-card text-xs text-muted-foreground italic">
                 Aucune localisation renseignée pour cette pièce.
             </div>
         );
     }
     return (
-        <div className="border-border bg-card rounded-2xl border p-4">
-            <p className="text-muted-foreground mb-3 text-xs italic">
+        <div className="rounded-2xl border border-border bg-card p-4">
+            <p className="mb-3 text-xs text-muted-foreground italic">
                 {reason === 'error'
                     ? "La carte n'a pas pu être chargée. Voici les lieux renseignés :"
                     : 'Coordonnées manquantes pour afficher la carte. Voici les lieux renseignés :'}

@@ -83,13 +83,13 @@ export function ArtisansDirectory({ artisans }: Props) {
     const hasFilters = region !== 'all' || specs.length > 0 || cert !== 'all';
 
     return (
-        <div className="pb-20 pt-28">
+        <div className="pt-28 pb-20">
             <header className="mx-auto mb-12 max-w-5xl px-6">
-                <p className="text-muted-foreground mb-4 text-xs font-medium uppercase tracking-[0.25em]">Artisans</p>
-                <h1 className="text-foreground text-balance text-4xl font-bold tracking-tight sm:text-5xl">
+                <p className="mb-4 text-xs font-medium tracking-[0.25em] text-muted-foreground uppercase">Artisans</p>
+                <h1 className="text-4xl font-bold tracking-tight text-balance text-foreground sm:text-5xl">
                     Les artisans textiles français
                 </h1>
-                <p className="text-muted-foreground mt-4 max-w-2xl text-pretty text-base leading-relaxed">
+                <p className="mt-4 max-w-2xl text-base leading-relaxed text-pretty text-muted-foreground">
                     Tous les ateliers qui publient leurs passeports DPP sur LUMIRIS - couture, tissage, bonneterie,
                     cordonnerie, broderie. Cliquez sur un atelier pour voir ses pièces.
                 </p>
@@ -97,10 +97,10 @@ export function ArtisansDirectory({ artisans }: Props) {
 
             <section
                 aria-label="Filtres de l’annuaire"
-                className="border-border bg-card mx-auto mb-10 max-w-5xl rounded-2xl border p-5"
+                className="mx-auto mb-10 max-w-5xl rounded-2xl border border-border bg-card p-5"
             >
                 <div className="flex flex-wrap items-center gap-3">
-                    <span className="text-foreground inline-flex items-center gap-1.5 text-xs font-medium">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
                         <Filter className="h-3.5 w-3.5" />
                         Filtres
                     </span>
@@ -108,7 +108,7 @@ export function ArtisansDirectory({ artisans }: Props) {
                     <select
                         value={region}
                         onChange={(e) => setRegion(e.target.value as FrenchRegion | 'all')}
-                        className="border-border bg-background text-foreground rounded-lg border px-3 py-1.5 text-xs"
+                        className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground"
                         aria-label="Région"
                     >
                         <option value="all">Toutes régions</option>
@@ -122,7 +122,7 @@ export function ArtisansDirectory({ artisans }: Props) {
                     <select
                         value={cert}
                         onChange={(e) => setCert(e.target.value as CertificationFilter)}
-                        className="border-border bg-background text-foreground rounded-lg border px-3 py-1.5 text-xs"
+                        className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground"
                         aria-label="Certification"
                     >
                         <option value="all">Toutes certifications</option>
@@ -134,7 +134,7 @@ export function ArtisansDirectory({ artisans }: Props) {
                         <button
                             type="button"
                             onClick={reset}
-                            className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs underline-offset-2 hover:underline"
+                            className="inline-flex items-center gap-1 text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
                         >
                             <X className="h-3 w-3" />
                             Réinitialiser
@@ -153,7 +153,7 @@ export function ArtisansDirectory({ artisans }: Props) {
                                 aria-pressed={active}
                                 className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                                     active
-                                        ? 'bg-foreground text-background border-foreground'
+                                        ? 'border-foreground bg-foreground text-background'
                                         : 'border-border text-muted-foreground hover:text-foreground'
                                 }`}
                             >
@@ -166,7 +166,7 @@ export function ArtisansDirectory({ artisans }: Props) {
 
             <section className="mx-auto max-w-5xl px-6">
                 {filtered.length === 0 ? (
-                    <p className="text-muted-foreground py-12 text-center text-sm">
+                    <p className="py-12 text-center text-sm text-muted-foreground">
                         Aucun atelier ne correspond à ces filtres.{' '}
                         <button
                             type="button"
@@ -180,7 +180,7 @@ export function ArtisansDirectory({ artisans }: Props) {
                 ) : (
                     grouped.map(([regionName, entries]) => (
                         <div key={regionName} className="mb-12 last:mb-0">
-                            <h2 className="text-muted-foreground mb-4 text-xs font-medium uppercase tracking-[0.25em]">
+                            <h2 className="mb-4 text-xs font-medium tracking-[0.25em] text-muted-foreground uppercase">
                                 {regionName} · {entries.length}
                             </h2>
                             <ul className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -194,7 +194,7 @@ export function ArtisansDirectory({ artisans }: Props) {
                                     >
                                         <Link
                                             href={`/artisans/${artisan.slug}`}
-                                            className="border-border bg-card hover:border-grade-a/40 group flex h-full flex-col rounded-2xl border p-6 shadow-sm transition-shadow hover:shadow-md"
+                                            className="hover:border-grade-a/40 group flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md"
                                         >
                                             <div className="flex gap-4">
                                                 <Image
@@ -202,16 +202,16 @@ export function ArtisansDirectory({ artisans }: Props) {
                                                     alt={`Portrait de ${artisan.displayName}`}
                                                     width={64}
                                                     height={64}
-                                                    className="border-border h-16 w-16 shrink-0 rounded-xl border object-cover"
+                                                    className="h-16 w-16 shrink-0 rounded-xl border border-border object-cover"
                                                 />
                                                 <div className="min-w-0 flex-1">
-                                                    <h3 className="text-foreground group-hover:text-grade-a truncate text-base font-semibold leading-snug transition-colors">
+                                                    <h3 className="group-hover:text-grade-a truncate text-base leading-snug font-semibold text-foreground transition-colors">
                                                         {artisan.atelierName}
                                                     </h3>
-                                                    <p className="text-muted-foreground truncate text-xs">
+                                                    <p className="truncate text-xs text-muted-foreground">
                                                         {artisan.displayName}
                                                     </p>
-                                                    <p className="text-muted-foreground mt-1 inline-flex items-center gap-1 text-xs">
+                                                    <p className="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground">
                                                         <MapPin className="h-3 w-3" />
                                                         {artisan.city}
                                                     </p>
@@ -235,14 +235,14 @@ export function ArtisansDirectory({ artisans }: Props) {
                                                 {families.map((f) => (
                                                     <span
                                                         key={f}
-                                                        className="text-muted-foreground border-border rounded-md border px-2 py-0.5 text-[11px]"
+                                                        className="rounded-md border border-border px-2 py-0.5 text-[11px] text-muted-foreground"
                                                     >
                                                         {f}
                                                     </span>
                                                 ))}
                                             </div>
 
-                                            <p className="text-muted-foreground mt-4 line-clamp-3 flex-1 text-sm leading-relaxed">
+                                            <p className="mt-4 line-clamp-3 flex-1 text-sm leading-relaxed text-muted-foreground">
                                                 {artisan.story}
                                             </p>
                                         </Link>

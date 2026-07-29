@@ -69,8 +69,7 @@ export function ProductsTab({ onCreate }: { onCreate: () => void }) {
         updateMutation.mutate(
             { id: product.id, payload: toPayload(product, status) },
             {
-                onSuccess: () =>
-                    toast.success(status === 'ARCHIVED' ? 'Produit archivé.' : 'Produit publié.'),
+                onSuccess: () => toast.success(status === 'ARCHIVED' ? 'Produit archivé.' : 'Produit publié.'),
                 onError: (e) => toast.error(e.message || 'Échec de la mise à jour.'),
             },
         );
@@ -115,10 +114,10 @@ export function ProductsTab({ onCreate }: { onCreate: () => void }) {
     };
 
     if (isLoading) {
-        return <div className="text-muted-foreground p-8 text-sm">Chargement…</div>;
+        return <div className="p-8 text-sm text-muted-foreground">Chargement…</div>;
     }
     if (error) {
-        return <div className="text-destructive p-8 text-sm">Erreur : {error.message}</div>;
+        return <div className="p-8 text-sm text-destructive">Erreur : {error.message}</div>;
     }
 
     return (
@@ -152,7 +151,7 @@ export function ProductsTab({ onCreate }: { onCreate: () => void }) {
                                 <TableRow key={product.id}>
                                     <TableCell>
                                         <div className="font-medium">{product.name}</div>
-                                        <div className="text-muted-foreground text-xs">
+                                        <div className="text-xs text-muted-foreground">
                                             {[product.category, product.material, product.originCountry]
                                                 .filter(Boolean)
                                                 .join(' · ') || '—'}
@@ -165,7 +164,7 @@ export function ProductsTab({ onCreate }: { onCreate: () => void }) {
                                     </TableCell>
                                     <TableCell>{formatPriceCents(product.priceCents, product.currency)}</TableCell>
                                     <TableCell>{product.stock}</TableCell>
-                                    <TableCell className="text-muted-foreground text-right tabular-nums">
+                                    <TableCell className="text-right text-muted-foreground tabular-nums">
                                         {product.views ?? 0}
                                     </TableCell>
                                     <TableCell className="text-right font-medium tabular-nums">
@@ -178,7 +177,7 @@ export function ProductsTab({ onCreate }: { onCreate: () => void }) {
                                                 {product.irisTotal != null ? ` · ${product.irisTotal}` : ''}
                                             </Badge>
                                         ) : (
-                                            <span className="text-muted-foreground text-xs">—</span>
+                                            <span className="text-xs text-muted-foreground">—</span>
                                         )}
                                     </TableCell>
                                     <TableCell>
@@ -215,7 +214,7 @@ export function ProductsTab({ onCreate }: { onCreate: () => void }) {
                                             onClick={() => setToDelete(product)}
                                             aria-label="Supprimer"
                                         >
-                                            <Trash2 className="text-destructive h-4 w-4" />
+                                            <Trash2 className="h-4 w-4 text-destructive" />
                                         </Button>
                                     </TableCell>
                                 </TableRow>

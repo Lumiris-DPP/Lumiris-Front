@@ -31,17 +31,17 @@ export function RejectedScreen() {
     }
 
     return (
-        <div className="bg-background flex min-h-screen flex-col">
-            <header className="border-border bg-card border-b">
+        <div className="flex min-h-screen flex-col bg-background">
+            <header className="border-b border-border bg-card">
                 <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-6 py-5">
                     <div className="flex items-center gap-3">
                         <LumirisLogo className="h-9 w-auto" />
                         <div>
-                            <p className="text-foreground text-sm font-semibold leading-none">LUMIRIS</p>
-                            <p className="text-muted-foreground font-mono text-[10px] tracking-widest">ATELIER</p>
+                            <p className="text-sm leading-none font-semibold text-foreground">LUMIRIS</p>
+                            <p className="font-mono text-[10px] tracking-widest text-muted-foreground">ATELIER</p>
                         </div>
                     </div>
-                    <Button variant="ghost" size="sm" onClick={signOut} className="text-muted-foreground text-xs">
+                    <Button variant="ghost" size="sm" onClick={signOut} className="text-xs text-muted-foreground">
                         Se déconnecter
                     </Button>
                 </div>
@@ -50,20 +50,20 @@ export function RejectedScreen() {
             <main className="mx-auto flex w-full max-w-lg flex-1 flex-col items-center justify-center px-6 py-12">
                 <Card className="w-full">
                     <CardContent className="flex flex-col items-center gap-5 p-10 text-center">
-                        <div className="bg-lumiris-rose/10 flex h-14 w-14 items-center justify-center rounded-full">
-                            <XCircle className="text-lumiris-rose h-6 w-6" />
+                        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-lumiris-rose/10">
+                            <XCircle className="h-6 w-6 text-lumiris-rose" />
                         </div>
 
                         <div className="space-y-2">
-                            <h1 className="text-foreground text-xl font-semibold">Validation refusée</h1>
-                            <p className="text-muted-foreground text-sm leading-relaxed">
+                            <h1 className="text-xl font-semibold text-foreground">Validation refusée</h1>
+                            <p className="text-sm leading-relaxed text-muted-foreground">
                                 Votre demande de validation n&apos;a pas pu être approuvée. Contactez notre support pour
                                 obtenir plus d&apos;informations ou soumettez un nouveau dossier.
                             </p>
                         </div>
 
-                        <div className="border-lumiris-rose/20 bg-lumiris-rose/5 w-full rounded-lg border px-4 py-3 text-left">
-                            <p className="text-lumiris-rose text-[12px] leading-relaxed">
+                        <div className="w-full rounded-lg border border-lumiris-rose/20 bg-lumiris-rose/5 px-4 py-3 text-left">
+                            <p className="text-[12px] leading-relaxed text-lumiris-rose">
                                 {rejectionReason ??
                                     "Si vous pensez qu'il s'agit d'une erreur, contactez-nous avec votre numéro SIRET."}
                             </p>
@@ -76,7 +76,7 @@ export function RejectedScreen() {
                             </Button>
                             <Button
                                 onClick={handleResubmit}
-                                className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 gap-2 text-white"
+                                className="gap-2 bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90"
                             >
                                 Nouveau dossier
                             </Button>

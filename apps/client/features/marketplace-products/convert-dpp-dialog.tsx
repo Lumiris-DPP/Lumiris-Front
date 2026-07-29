@@ -105,11 +105,11 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
 
                 <div className="space-y-4 py-2">
                     {sellBlocked && (
-                        <div className="border-lumiris-amber/40 bg-lumiris-amber/10 flex items-start gap-2.5 rounded-lg border p-3 text-sm">
-                            <AlertTriangle className="text-lumiris-amber mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                        <div className="flex items-start gap-2.5 rounded-lg border border-lumiris-amber/40 bg-lumiris-amber/10 p-3 text-sm">
+                            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-lumiris-amber" aria-hidden />
                             <div className="space-y-1.5">
-                                <p className="text-foreground font-medium">Abonnement ATELIER requis pour vendre</p>
-                                <p className="text-muted-foreground text-xs">
+                                <p className="font-medium text-foreground">Abonnement ATELIER requis pour vendre</p>
+                                <p className="text-xs text-muted-foreground">
                                     Un abonnement ATELIER actif est nécessaire pour mettre une pièce en vente.
                                 </p>
                                 <Button
@@ -139,7 +139,7 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                             </SelectContent>
                         </Select>
                         {!isLoading && dpps.length === 0 ? (
-                            <p className="text-muted-foreground text-xs">
+                            <p className="text-xs text-muted-foreground">
                                 Aucun DPP à convertir — créez d’abord un passeport.
                             </p>
                         ) : null}
@@ -227,7 +227,7 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                     <Button
                         onClick={submit}
                         disabled={!canSubmit}
-                        className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 gap-1.5 text-white"
+                        className="gap-1.5 bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90"
                     >
                         <Wand2 className="h-4 w-4" />
                         {convert.isPending ? 'Conversion…' : 'Mettre en vente'}

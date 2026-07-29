@@ -172,7 +172,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
 
     return (
         <WizardStepFrame draftId={draftId} step="eco" onPrev={handlePrev} hideNav contentClassName="space-y-6">
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm text-muted-foreground">
                 Ces champs sont optionnels mais valorisants pour votre score Iris et pour les consommateurs soucieux de
                 l&apos;environnement.
             </p>
@@ -192,10 +192,10 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                         }
                         className={`pr-8 ${(form.recycledPct ?? 0) > 100 ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                     />
-                    <span className="text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 text-sm">%</span>
+                    <span className="absolute top-1/2 right-3 -translate-y-1/2 text-sm text-muted-foreground">%</span>
                 </div>
                 {(form.recycledPct ?? 0) > 100 && (
-                    <p className="text-destructive text-xs">La valeur ne peut pas dépasser 100 %.</p>
+                    <p className="text-xs text-destructive">La valeur ne peut pas dépasser 100 %.</p>
                 )}
             </div>
 
@@ -216,7 +216,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                     <Label htmlFor="repairable" className="cursor-pointer">
                         Facilement réparable
                     </Label>
-                    <p className="text-muted-foreground text-[11px]">
+                    <p className="text-[11px] text-muted-foreground">
                         Bouton d&apos;origine fourni, coutures accessibles, pièces détachées disponibles.
                     </p>
                 </div>
@@ -261,7 +261,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
             </div>
 
             {/* Documents éco */}
-            <div className="border-border space-y-4 rounded-lg border p-4">
+            <div className="space-y-4 rounded-lg border border-border p-4">
                 <p className="text-sm font-medium">Documents de durabilité</p>
 
                 <DocUploadField
@@ -288,9 +288,9 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
             </div>
 
             {/* Boutons brouillon + publier */}
-            <div className="border-border border-t pt-4">
+            <div className="border-t border-border pt-4">
                 {publishBlocked && (
-                    <p className="text-muted-foreground mb-3 text-xs">
+                    <p className="mb-3 text-xs text-muted-foreground">
                         {quota?.reason === 'QUOTA_EXCEEDED'
                             ? `Quota atteint (${quota?.used} / ${quota?.limit}). `
                             : 'Aucun abonnement ATELIER actif. '}
@@ -325,7 +325,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                                         : 'Abonnement ATELIER requis pour publier'
                                     : undefined
                             }
-                            className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 gap-2 text-white"
+                            className="gap-2 bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90"
                         >
                             <QrCode className="h-4 w-4" />
                             {publishing ? 'Publication…' : 'Publier et générer le QR Code'}

@@ -25,18 +25,18 @@ function SidebarComponent() {
     })).filter((entry) => entry.routes.length > 0);
 
     return (
-        <aside className="border-border bg-sidebar fixed left-0 top-0 z-40 flex h-screen w-60 flex-col border-r">
-            <div className="border-border flex items-center gap-3 border-b px-5 py-6">
+        <aside className="fixed top-0 left-0 z-40 flex h-screen w-60 flex-col border-r border-border bg-sidebar">
+            <div className="flex items-center gap-3 border-b border-border px-5 py-6">
                 <LumirisLogo className="h-8 w-auto" />
                 <div>
-                    <h1 className="text-foreground text-sm font-semibold tracking-wide">LUMIRIS</h1>
+                    <h1 className="text-sm font-semibold tracking-wide text-foreground">LUMIRIS</h1>
                 </div>
             </div>
 
             <nav aria-label="Navigation principale" className="flex-1 space-y-6 overflow-y-auto px-3 py-4">
                 {visibleGroups.map(({ group, routes }) => (
                     <div key={group.id}>
-                        <p className="text-muted-foreground px-3 pb-2 text-xs uppercase tracking-wider">
+                        <p className="px-3 pb-2 text-xs tracking-wider text-muted-foreground uppercase">
                             {group.label}
                         </p>
                         <div className="space-y-0.5">
@@ -50,7 +50,7 @@ function SidebarComponent() {
                                         className={cn(
                                             'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
                                             active
-                                                ? 'bg-lumiris-cyan/10 text-lumiris-cyan font-medium'
+                                                ? 'bg-lumiris-cyan/10 font-medium text-lumiris-cyan'
                                                 : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                                         )}
                                     >

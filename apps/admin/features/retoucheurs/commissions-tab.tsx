@@ -54,26 +54,26 @@ export function CommissionsTab({ retoucheurId }: CommissionsTabProps) {
 
     return (
         <div className="space-y-3">
-            <div className="border-border bg-card flex items-baseline justify-between rounded-xl border p-3">
+            <div className="flex items-baseline justify-between rounded-xl border border-border bg-card p-3">
                 <div>
-                    <p className="text-foreground font-medium">Mises en relation — 90 derniers jours</p>
-                    <p className="text-muted-foreground mt-0.5 text-[11px]">
+                    <p className="font-medium text-foreground">Mises en relation — 90 derniers jours</p>
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">
                         Forfait {COMMISSION_FLAT_MIN_EUR}–{COMMISSION_FLAT_MAX_EUR} € ou {COMMISSION_PCT} % du devis
                         accepté. Identité VISION anonymisée après {COMMISSION_ANONYMIZE_AFTER_DAYS} jours (RGPD).
                     </p>
                 </div>
                 <div className="text-right">
-                    <p className="text-muted-foreground text-[10px] uppercase tracking-wider">Total période</p>
-                    <p className="text-foreground font-mono text-base">{total.toFixed(2)} €</p>
+                    <p className="text-[10px] tracking-wider text-muted-foreground uppercase">Total période</p>
+                    <p className="font-mono text-base text-foreground">{total.toFixed(2)} €</p>
                 </div>
             </div>
 
             {rows.length === 0 ? (
-                <div className="border-border bg-card text-muted-foreground rounded-xl border p-6 text-center">
+                <div className="rounded-xl border border-border bg-card p-6 text-center text-muted-foreground">
                     Aucune mise en relation enregistrée sur les {COMMISSION_WINDOW_DAYS} derniers jours.
                 </div>
             ) : (
-                <div className="border-border bg-card overflow-hidden rounded-xl border">
+                <div className="overflow-hidden rounded-xl border border-border bg-card">
                     <Table>
                         <TableHeader>
                             <TableRow>

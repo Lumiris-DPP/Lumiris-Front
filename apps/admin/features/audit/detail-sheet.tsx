@@ -51,22 +51,22 @@ function DetailSection({ entry }: { entry: AdminAuditLogEntry }) {
                 </p>
             </Field>
             <Field label="Cible">
-                <p className="text-foreground font-mono">
+                <p className="font-mono text-foreground">
                     {entry.targetType} / {entry.targetId}
                 </p>
             </Field>
             <Field label="IP (mock)">
-                <p className="text-foreground font-mono">{entry.ipMock ?? '-'}</p>
+                <p className="font-mono text-foreground">{entry.ipMock ?? '-'}</p>
             </Field>
             {target ? (
                 <Link
                     href={`${target.path}?focus=${entry.targetId}`}
-                    className="text-lumiris-cyan hover:text-lumiris-cyan/80 inline-flex items-center gap-1 text-xs"
+                    className="inline-flex items-center gap-1 text-xs text-lumiris-cyan hover:text-lumiris-cyan/80"
                 >
                     <ExternalLink className="h-3 w-3" aria-hidden /> {target.label}
                 </Link>
             ) : null}
-            <p className="text-muted-foreground/70 inline-flex items-center gap-1 font-mono text-[10px]">
+            <p className="inline-flex items-center gap-1 font-mono text-[10px] text-muted-foreground/70">
                 <History className="h-3 w-3" /> id {entry.id}
             </p>
         </div>
@@ -75,7 +75,7 @@ function DetailSection({ entry }: { entry: AdminAuditLogEntry }) {
 
 function PayloadSection({ entry }: { entry: AdminAuditLogEntry }) {
     return (
-        <pre className="text-foreground bg-muted/40 overflow-auto whitespace-pre rounded-lg p-3 font-mono text-[11px]">
+        <pre className="overflow-auto rounded-lg bg-muted/40 p-3 font-mono text-[11px] whitespace-pre text-foreground">
             {JSON.stringify(entry.payload, null, 2)}
         </pre>
     );
@@ -84,8 +84,8 @@ function PayloadSection({ entry }: { entry: AdminAuditLogEntry }) {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <div>
-            <p className="text-muted-foreground text-[10px] uppercase tracking-wider">{label}</p>
-            <div className="text-foreground mt-1">{children}</div>
+            <p className="text-[10px] tracking-wider text-muted-foreground uppercase">{label}</p>
+            <div className="mt-1 text-foreground">{children}</div>
         </div>
     );
 }

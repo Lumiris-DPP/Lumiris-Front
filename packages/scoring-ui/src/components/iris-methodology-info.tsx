@@ -33,7 +33,7 @@ export function IrisMethodologyInfo({ className, side = 'left' }: IrisMethodolog
         <Popover>
             <PopoverTrigger
                 className={cn(
-                    'text-muted-foreground hover:text-foreground hover:border-foreground/30 focus-visible:ring-ring inline-flex size-5 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2',
+                    'inline-flex size-5 shrink-0 items-center justify-center rounded-full border text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
                     className,
                 )}
                 aria-label="Comment est calculé le score Iris ?"
@@ -44,7 +44,7 @@ export function IrisMethodologyInfo({ className, side = 'left' }: IrisMethodolog
                 {isLoading && <MethodologySkeleton />}
 
                 {isError && (
-                    <p className="text-muted-foreground p-4 text-xs">
+                    <p className="p-4 text-xs text-muted-foreground">
                         La méthodologie n&apos;a pas pu être chargée. Réessayez dans un instant.
                     </p>
                 )}
@@ -52,8 +52,8 @@ export function IrisMethodologyInfo({ className, side = 'left' }: IrisMethodolog
                 {data && (
                     <div className="space-y-4 p-4">
                         <header className="space-y-1.5">
-                            <h2 className="text-foreground text-sm font-semibold">{data.title}</h2>
-                            <p className="text-muted-foreground text-xs leading-relaxed">{data.intro}</p>
+                            <h2 className="text-sm font-semibold text-foreground">{data.title}</h2>
+                            <p className="text-xs leading-relaxed text-muted-foreground">{data.intro}</p>
                         </header>
 
                         <div className="space-y-4 border-t pt-3">
@@ -63,14 +63,14 @@ export function IrisMethodologyInfo({ className, side = 'left' }: IrisMethodolog
                         </div>
 
                         <section className="space-y-1.5 border-t pt-3">
-                            <h3 className="text-foreground text-xs font-semibold">Barème des lettres</h3>
+                            <h3 className="text-xs font-semibold text-foreground">Barème des lettres</h3>
                             <ul className="space-y-1">
                                 {data.grades.map((grade) => (
                                     <li
                                         key={grade.grade}
-                                        className="text-muted-foreground flex gap-2 text-[11px] leading-relaxed"
+                                        className="flex gap-2 text-[11px] leading-relaxed text-muted-foreground"
                                     >
-                                        <span className="text-foreground w-14 shrink-0 font-mono font-semibold">
+                                        <span className="w-14 shrink-0 font-mono font-semibold text-foreground">
                                             {grade.grade} ≥ {grade.minScore}
                                         </span>
                                         <span>{grade.label}</span>
@@ -80,7 +80,7 @@ export function IrisMethodologyInfo({ className, side = 'left' }: IrisMethodolog
                         </section>
 
                         {data.disclaimer && (
-                            <p className="text-muted-foreground/80 border-t pt-3 text-[11px] leading-relaxed">
+                            <p className="border-t pt-3 text-[11px] leading-relaxed text-muted-foreground/80">
                                 {data.disclaimer}
                             </p>
                         )}
@@ -96,21 +96,21 @@ function SectionBlock({ section }: { section: IrisMethodologySection }) {
         <section className="space-y-1.5">
             <div className="flex items-baseline gap-2">
                 <span className={cn('mt-1 size-1.5 shrink-0 rounded-full', sectionDotClass(section.key))} aria-hidden />
-                <h3 className="text-foreground text-xs font-semibold">{section.label}</h3>
+                <h3 className="text-xs font-semibold text-foreground">{section.label}</h3>
                 {section.weightPercent != null && (
-                    <span className="text-muted-foreground ml-auto shrink-0 font-mono text-[11px]">
+                    <span className="ml-auto shrink-0 font-mono text-[11px] text-muted-foreground">
                         {section.weightPercent} %
                     </span>
                 )}
             </div>
-            <p className="text-muted-foreground pl-3.5 text-[11px] leading-relaxed">{section.summary}</p>
+            <p className="pl-3.5 text-[11px] leading-relaxed text-muted-foreground">{section.summary}</p>
             <ul className="space-y-1.5 pl-3.5">
                 {section.criteria.map((criterion) => (
                     <li key={criterion.label} className="text-[11px] leading-relaxed">
-                        <span className="text-foreground font-medium">
+                        <span className="font-medium text-foreground">
                             {criterion.label}
                             {criterion.points != null && (
-                                <span className="text-muted-foreground font-mono font-normal">
+                                <span className="font-mono font-normal text-muted-foreground">
                                     {' '}
                                     · {criterion.points} pts
                                 </span>

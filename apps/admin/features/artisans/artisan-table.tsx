@@ -38,7 +38,7 @@ export function ArtisanTable({ rows, onSelect, onResetFilters }: ArtisanTablePro
         );
     }
     return (
-        <div className="border-border bg-card overflow-hidden rounded-xl border">
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
             <div className="overflow-x-auto">
                 <Table>
                     <TableHeader stickyHeader>
@@ -96,8 +96,8 @@ function Row({ row, onSelect }: { row: ArtisanRow; onSelect: (a: Artisan) => voi
                         </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0">
-                        <p className="text-foreground truncate text-sm">{row.artisan.atelierName}</p>
-                        <p className="text-muted-foreground truncate text-[11px]">
+                        <p className="truncate text-sm text-foreground">{row.artisan.atelierName}</p>
+                        <p className="truncate text-[11px] text-muted-foreground">
                             {row.artisan.displayName} · {row.artisan.city}
                         </p>
                     </div>
@@ -111,7 +111,7 @@ function Row({ row, onSelect }: { row: ArtisanRow; onSelect: (a: Artisan) => voi
                     {row.artisan.plus ? (
                         <Badge
                             variant="outline"
-                            className="border-lumiris-cyan/40 text-lumiris-cyan font-mono text-[10px]"
+                            className="border-lumiris-cyan/40 font-mono text-[10px] text-lumiris-cyan"
                         >
                             ATELIER+
                         </Badge>
@@ -141,7 +141,7 @@ function Row({ row, onSelect }: { row: ArtisanRow; onSelect: (a: Artisan) => voi
                     {row.upgradeHint ? (
                         <Badge
                             variant="outline"
-                            className="border-lumiris-cyan/40 text-lumiris-cyan mt-0.5 gap-1 font-mono text-[10px]"
+                            className="mt-0.5 gap-1 border-lumiris-cyan/40 font-mono text-[10px] text-lumiris-cyan"
                         >
                             <ArrowUpCircle className="h-3 w-3" /> Upgrade {row.upgradeHint}
                         </Badge>

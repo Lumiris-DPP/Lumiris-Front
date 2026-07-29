@@ -161,7 +161,7 @@ export function PaymentsTab() {
                     description="Élargissez la période ou réinitialisez les filtres pour explorer l'historique."
                 />
             ) : (
-                <div className="border-border bg-card overflow-hidden rounded-xl border">
+                <div className="overflow-hidden rounded-xl border border-border bg-card">
                     <Table>
                         <TableHeader stickyHeader>
                             <TableRow>
@@ -179,8 +179,8 @@ export function PaymentsTab() {
                                     <TableRow key={p.id}>
                                         <TableCell className="font-mono text-[11px]">{p.id}</TableCell>
                                         <TableCell>
-                                            <p className="text-foreground text-sm">{p.displayName}</p>
-                                            <p className="text-muted-foreground text-[10px]">
+                                            <p className="text-sm text-foreground">{p.displayName}</p>
+                                            <p className="text-[10px] text-muted-foreground">
                                                 {p.subscriberKind === 'artisan' ? 'Artisan' : 'Retoucheur'} ·{' '}
                                                 {p.subscriberId}
                                             </p>
@@ -196,7 +196,7 @@ export function PaymentsTab() {
                                                 {s.label}
                                             </Badge>
                                             {p.failureReason ? (
-                                                <span className="text-muted-foreground ml-2 font-mono text-[10px]">
+                                                <span className="ml-2 font-mono text-[10px] text-muted-foreground">
                                                     {p.failureReason}
                                                 </span>
                                             ) : null}

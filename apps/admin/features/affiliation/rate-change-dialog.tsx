@@ -62,7 +62,7 @@ export function RateChangeDialog({ target, onCancel, onConfirm }: RateChangeDial
                 </AlertDialogHeader>
                 <div className="space-y-3">
                     <div>
-                        <Label htmlFor="rate-change-value" className="text-foreground mb-1.5 text-xs">
+                        <Label htmlFor="rate-change-value" className="mb-1.5 text-xs text-foreground">
                             Nouveau taux
                         </Label>
                         <div className="relative">
@@ -77,14 +77,14 @@ export function RateChangeDialog({ target, onCancel, onConfirm }: RateChangeDial
                                     valueError ? 'border-lumiris-rose/60 focus-visible:ring-lumiris-rose/30' : '',
                                 )}
                             />
-                            <span className="text-muted-foreground pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px]">
+                            <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-[11px] text-muted-foreground">
                                 {target?.suffix}
                             </span>
                         </div>
-                        {valueError ? <p className="text-lumiris-rose mt-1 text-[10px]">{valueError}</p> : null}
+                        {valueError ? <p className="mt-1 text-[10px] text-lumiris-rose">{valueError}</p> : null}
                     </div>
                     <div>
-                        <Label htmlFor="rate-change-reason" className="text-foreground mb-1.5 text-xs">
+                        <Label htmlFor="rate-change-reason" className="mb-1.5 text-xs text-foreground">
                             Justification métier
                         </Label>
                         <Textarea

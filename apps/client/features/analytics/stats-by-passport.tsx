@@ -39,12 +39,12 @@ export function StatsByPassport({ rows, locked }: Props) {
     return (
         <section className="space-y-4">
             <header>
-                <h2 className="text-foreground text-lg font-semibold tracking-tight">Détail par passeport</h2>
-                <p className="text-muted-foreground text-xs">Réservé aux abonnés ATELIER+.</p>
+                <h2 className="text-lg font-semibold tracking-tight text-foreground">Détail par passeport</h2>
+                <p className="text-xs text-muted-foreground">Réservé aux abonnés ATELIER+.</p>
             </header>
 
             <div className="relative">
-                <Card className={locked ? 'pointer-events-none select-none blur-sm' : undefined}>
+                <Card className={locked ? 'pointer-events-none blur-sm select-none' : undefined}>
                     <CardHeader>
                         <CardTitle className="text-base">Par passeport</CardTitle>
                     </CardHeader>
@@ -64,7 +64,7 @@ export function StatsByPassport({ rows, locked }: Props) {
                                     <TableRow>
                                         <TableCell
                                             colSpan={5}
-                                            className="text-muted-foreground py-10 text-center text-sm"
+                                            className="py-10 text-center text-sm text-muted-foreground"
                                         >
                                             Aucune donnée sur cette période.
                                         </TableCell>
@@ -73,7 +73,7 @@ export function StatsByPassport({ rows, locked }: Props) {
                                 {displayRows.map((row) => (
                                     <TableRow key={row.dppFormId}>
                                         <TableCell>
-                                            <span className="text-foreground font-medium">
+                                            <span className="font-medium text-foreground">
                                                 {row.productName ?? row.publicCode}
                                             </span>
                                         </TableCell>
@@ -92,19 +92,19 @@ export function StatsByPassport({ rows, locked }: Props) {
                     <div className="absolute inset-0 flex items-center justify-center">
                         <Card className="max-w-sm shadow-lg">
                             <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
-                                <div className="bg-lumiris-amber/10 text-lumiris-amber flex h-10 w-10 items-center justify-center rounded-full">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-lumiris-amber/10 text-lumiris-amber">
                                     <Lock className="h-4 w-4" />
                                 </div>
-                                <p className="text-foreground text-sm font-semibold">
+                                <p className="text-sm font-semibold text-foreground">
                                     Détail par passeport réservé à ATELIER+
                                 </p>
-                                <p className="text-muted-foreground text-xs">
+                                <p className="text-xs text-muted-foreground">
                                     Passez à ATELIER+ pour voir la performance passeport par passeport.
                                 </p>
                                 <Button
                                     asChild
                                     size="sm"
-                                    className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 text-white"
+                                    className="bg-lumiris-emerald text-white hover:bg-lumiris-emerald/90"
                                 >
                                     <Link href="/subscription?upsell=analytics">Activer ATELIER+</Link>
                                 </Button>

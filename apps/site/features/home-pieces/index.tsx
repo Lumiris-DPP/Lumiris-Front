@@ -53,16 +53,16 @@ export function HomePieces() {
                     className="flex items-end justify-between gap-4"
                 >
                     <div>
-                        <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
+                        <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                             Pièces publiées
                         </h2>
-                        <p className="text-muted-foreground mt-2 text-lg">
+                        <p className="mt-2 text-lg text-muted-foreground">
                             Découvrez les créations traçées par nos artisans partenaires.
                         </p>
                     </div>
                     <Link
                         href="/decouvrir"
-                        className="text-lumiris-cyan hover:text-lumiris-cyan/80 hidden items-center gap-1 text-sm font-medium transition-colors sm:inline-flex"
+                        className="hidden items-center gap-1 text-sm font-medium text-lumiris-cyan transition-colors hover:text-lumiris-cyan/80 sm:inline-flex"
                     >
                         Tout voir
                         <ArrowRight className="h-4 w-4" />
@@ -80,7 +80,7 @@ export function HomePieces() {
                             transition={{ duration: 0.4, delay: index * 0.08 }}
                         >
                             <Link href={`/passeport/${item.id}`} className="group block">
-                                <div className="bg-card border-border overflow-hidden rounded-2xl border transition-all hover:shadow-lg">
+                                <div className="overflow-hidden rounded-2xl border border-border bg-card transition-all hover:shadow-lg">
                                     <div className="relative aspect-[4/5]">
                                         <Image
                                             src={item.image}
@@ -89,16 +89,16 @@ export function HomePieces() {
                                             className="object-cover transition-transform duration-300 group-hover:scale-105"
                                         />
                                         {/* IrisGrade overlay */}
-                                        <div className="absolute left-3 top-3">
+                                        <div className="absolute top-3 left-3">
                                             <IrisGrade grade={item.grade} size="sm" />
                                         </div>
                                     </div>
                                     <div className="p-4">
-                                        <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                                        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                                             {item.artisan}
                                         </p>
-                                        <p className="text-foreground mt-1 font-medium">{item.name}</p>
-                                        <p className="text-muted-foreground mt-0.5 font-mono text-xs">{item.ref}</p>
+                                        <p className="mt-1 font-medium text-foreground">{item.name}</p>
+                                        <p className="mt-0.5 font-mono text-xs text-muted-foreground">{item.ref}</p>
                                     </div>
                                 </div>
                             </Link>
@@ -110,7 +110,7 @@ export function HomePieces() {
                 <div className="mt-8 text-center sm:hidden">
                     <Link
                         href="/decouvrir"
-                        className="text-lumiris-cyan hover:text-lumiris-cyan/80 inline-flex items-center gap-1 text-sm font-medium transition-colors"
+                        className="inline-flex items-center gap-1 text-sm font-medium text-lumiris-cyan transition-colors hover:text-lumiris-cyan/80"
                     >
                         Tout voir
                         <ArrowRight className="h-4 w-4" />

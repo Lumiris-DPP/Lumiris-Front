@@ -99,10 +99,10 @@ export function UserList() {
             <div aria-live="polite" aria-atomic="true" className="sr-only">
                 {announcement}
             </div>
-            <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1.5">
                     <span>Avec compte</span>
-                    <span className="text-foreground font-mono font-semibold">
+                    <span className="font-mono font-semibold text-foreground">
                         {accountUsers.length.toLocaleString('fr-FR')}
                     </span>
                 </span>
@@ -111,7 +111,7 @@ export function UserList() {
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                     <span>Sans compte</span>
-                    <span className="text-foreground font-mono font-semibold">{anonCount.toLocaleString('fr-FR')}</span>
+                    <span className="font-mono font-semibold text-foreground">{anonCount.toLocaleString('fr-FR')}</span>
                 </span>
             </div>
             <DataTableFilters
@@ -168,7 +168,7 @@ export function UserList() {
                             />
                             <Label
                                 htmlFor="vision-user-read-confirm"
-                                className="text-foreground cursor-pointer text-xs"
+                                className="cursor-pointer text-xs text-foreground"
                             >
                                 Je confirme — l&apos;accès est tracé
                             </Label>

@@ -38,10 +38,10 @@ export function HomeTrust() {
                     transition={{ duration: 0.5 }}
                     className="text-center"
                 >
-                    <h2 className="text-foreground text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+                    <h2 className="text-3xl font-bold tracking-tight text-balance text-foreground sm:text-4xl">
                         Le seul score qui ne s&apos;achète pas
                     </h2>
-                    <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg">
+                    <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
                         La méthodologie Iris garantit l&apos;intégrité de chaque évaluation. Transparence radicale,
                         résultats impartiaux.
                     </p>
@@ -55,13 +55,13 @@ export function HomeTrust() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, margin: '-50px' }}
                             transition={{ duration: 0.4, delay: index * 0.05 }}
-                            className="bg-card border-border rounded-xl border p-5"
+                            className="rounded-xl border border-border bg-card p-5"
                         >
-                            <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
-                                <point.icon className="text-foreground h-5 w-5" />
+                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                                <point.icon className="h-5 w-5 text-foreground" />
                             </div>
-                            <h3 className="text-foreground mt-4 font-semibold">{point.title}</h3>
-                            <p className="text-muted-foreground mt-2 text-sm leading-relaxed">{point.description}</p>
+                            <h3 className="mt-4 font-semibold text-foreground">{point.title}</h3>
+                            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{point.description}</p>
                         </motion.div>
                     ))}
                 </div>
@@ -75,7 +75,7 @@ export function HomeTrust() {
                 >
                     <Link
                         href="/methode"
-                        className="text-lumiris-cyan hover:text-lumiris-cyan/80 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-lumiris-cyan transition-colors hover:text-lumiris-cyan/80"
                     >
                         Découvrir la méthodologie Iris
                         <ArrowRight className="h-4 w-4" />

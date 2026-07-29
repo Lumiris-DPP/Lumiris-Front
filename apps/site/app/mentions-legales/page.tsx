@@ -12,17 +12,17 @@ const LAST_REVIEWED = '2026-05-15';
 
 export default function MentionsLegalesPage() {
     return (
-        <main className="bg-background min-h-screen pb-24 pt-28">
+        <main className="min-h-screen bg-background pt-28 pb-24">
             <header className="mx-auto max-w-3xl px-6">
                 <div className="flex items-center gap-3">
                     <FileText className="text-grade-b h-6 w-6" aria-hidden="true" />
-                    <h1 className="text-foreground text-3xl font-semibold tracking-tight sm:text-4xl">
+                    <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
                         Mentions légales
                     </h1>
                 </div>
-                <p className="text-muted-foreground mt-3 text-sm">
+                <p className="mt-3 text-sm text-muted-foreground">
                     Version provisoire — à finaliser avant la mise en production publique. Dernière revue&nbsp;:{' '}
-                    <span className="text-foreground font-mono">
+                    <span className="font-mono text-foreground">
                         {new Date(LAST_REVIEWED).toLocaleDateString('fr-FR', {
                             day: 'numeric',
                             month: 'long',
@@ -35,8 +35,8 @@ export default function MentionsLegalesPage() {
 
             <section className="mx-auto mt-10 max-w-3xl space-y-8 px-6 text-sm leading-relaxed">
                 <div>
-                    <h2 className="text-foreground text-base font-semibold">Éditeur</h2>
-                    <p className="text-muted-foreground mt-2">
+                    <h2 className="text-base font-semibold text-foreground">Éditeur</h2>
+                    <p className="mt-2 text-muted-foreground">
                         LUMIRIS — entité éditrice du site et du passeport numérique du textile artisanal français.
                         Coordonnées complètes (raison sociale, SIRET, capital social, siège) en cours de finalisation
                         avant le lancement commercial.
@@ -44,15 +44,15 @@ export default function MentionsLegalesPage() {
                 </div>
 
                 <div>
-                    <h2 className="text-foreground text-base font-semibold">Directeur de la publication</h2>
-                    <p className="text-muted-foreground mt-2">
+                    <h2 className="text-base font-semibold text-foreground">Directeur de la publication</h2>
+                    <p className="mt-2 text-muted-foreground">
                         Le responsable légal de la publication sera désigné nommément ici lors de la mise en production.
                     </p>
                 </div>
 
                 <div>
-                    <h2 className="text-foreground text-base font-semibold">Hébergement</h2>
-                    <p className="text-muted-foreground mt-2">
+                    <h2 className="text-base font-semibold text-foreground">Hébergement</h2>
+                    <p className="mt-2 text-muted-foreground">
                         Le site est servi via une infrastructure d&apos;hébergement en cours d&apos;arbitrage (Vercel,
                         Scaleway ou OVHcloud). L&apos;hébergeur retenu sera publié ici, avec son adresse et ses
                         coordonnées de contact, dès la mise en production.
@@ -60,8 +60,8 @@ export default function MentionsLegalesPage() {
                 </div>
 
                 <div>
-                    <h2 className="text-foreground text-base font-semibold">Contact</h2>
-                    <p className="text-muted-foreground mt-2">
+                    <h2 className="text-base font-semibold text-foreground">Contact</h2>
+                    <p className="mt-2 text-muted-foreground">
                         Pour toute question relative aux mentions légales&nbsp;:{' '}
                         <a
                             href="mailto:legal@lumiris.fr"

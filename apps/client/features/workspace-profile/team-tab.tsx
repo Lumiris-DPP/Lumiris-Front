@@ -52,7 +52,7 @@ export function TeamTab() {
                         <h3 className="text-base font-medium">
                             Membres ({used} / {Number.isFinite(seats) ? seats : '∞'})
                         </h3>
-                        <p className="text-muted-foreground text-xs">Palier {billing.tier}</p>
+                        <p className="text-xs text-muted-foreground">Palier {billing.tier}</p>
                     </div>
                     <Button
                         size="sm"
@@ -65,7 +65,7 @@ export function TeamTab() {
                     </Button>
                 </div>
 
-                <div className="border-border overflow-hidden rounded-lg border">
+                <div className="overflow-hidden rounded-lg border border-border">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -87,7 +87,7 @@ export function TeamTab() {
                                             </Avatar>
                                             <div className="min-w-0">
                                                 <p className="truncate text-sm font-medium">{member.name}</p>
-                                                <p className="text-muted-foreground truncate font-mono text-xs">
+                                                <p className="truncate font-mono text-xs text-muted-foreground">
                                                     {member.email}
                                                 </p>
                                             </div>
@@ -102,7 +102,7 @@ export function TeamTab() {
                                             }}
                                         />
                                     </TableCell>
-                                    <TableCell className="text-muted-foreground hidden text-xs md:table-cell">
+                                    <TableCell className="hidden text-xs text-muted-foreground md:table-cell">
                                         <span
                                             className={cn(
                                                 'inline-flex items-center rounded-md px-2 py-0.5 font-mono text-[10px] uppercase',
@@ -174,12 +174,12 @@ function RoleCell({ member, onChange }: { member: TeamMember; onChange: (role: T
 
 function SoloUpsell() {
     return (
-        <div className="border-border max-w-2xl space-y-4 rounded-lg border p-6">
+        <div className="max-w-2xl space-y-4 rounded-lg border border-border p-6">
             <div className="flex items-center gap-2">
-                <Users className="text-muted-foreground h-4 w-4" />
+                <Users className="h-4 w-4 text-muted-foreground" />
                 <h3 className="text-base font-medium">Travaillez en équipe avec ATELIER Studio</h3>
             </div>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm text-muted-foreground">
                 Votre plan Solo est conçu pour un artisan seul. Passez à Studio (79 €/mois) pour inviter jusqu&apos;à 5
                 collaborateurs, ou à Maison (149 €/mois) pour les ateliers de 6 à 20 personnes.
             </p>

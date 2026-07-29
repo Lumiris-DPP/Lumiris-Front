@@ -39,15 +39,15 @@ const footerColumns = [
 
 export function Footer() {
     return (
-        <footer className="border-border bg-card relative border-t">
+        <footer className="relative border-t border-border bg-card">
             <div className="mx-auto max-w-6xl px-6 py-16">
                 {/* Logo + tagline */}
                 <div className="mb-12">
                     <Link href="/" className="mb-4 flex items-center gap-2.5" aria-label="Accueil LUMIRIS">
                         <LumirisLogo className="h-8 w-auto" />
-                        <span className="text-foreground text-lg font-semibold tracking-tight">LUMIRIS</span>
+                        <span className="text-lg font-semibold tracking-tight text-foreground">LUMIRIS</span>
                     </Link>
-                    <p className="text-muted-foreground max-w-sm text-sm leading-relaxed">
+                    <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
                         Le passeport numérique du textile artisanal français, et le scanner universel des DPP européens.
                     </p>
                 </div>
@@ -56,7 +56,7 @@ export function Footer() {
                 <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
                     {footerColumns.map((column) => (
                         <div key={column.title}>
-                            <h3 className="text-foreground mb-4 text-sm font-semibold">{column.title}</h3>
+                            <h3 className="mb-4 text-sm font-semibold text-foreground">{column.title}</h3>
                             <ul className="flex flex-col gap-2.5">
                                 {column.links.map((link) => (
                                     <li key={link.label}>
@@ -65,7 +65,7 @@ export function Footer() {
                                             {...('external' in link && link.external
                                                 ? { target: '_blank', rel: 'noopener noreferrer' }
                                                 : {})}
-                                            className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                                            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                                         >
                                             {link.label}
                                         </Link>
@@ -77,9 +77,9 @@ export function Footer() {
                 </div>
 
                 {/* Copyright bar */}
-                <div className="border-border mt-12 flex flex-col items-start justify-between gap-3 border-t pt-8 sm:flex-row sm:items-center">
-                    <p className="text-muted-foreground text-xs">© 2026 LUMIRIS. Tous droits réservés.</p>
-                    <p className="text-muted-foreground text-xs">
+                <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-border pt-8 sm:flex-row sm:items-center">
+                    <p className="text-xs text-muted-foreground">© 2026 LUMIRIS. Tous droits réservés.</p>
+                    <p className="text-xs text-muted-foreground">
                         Conforme ESPR / AGEC · Construit en transparence radicale.
                     </p>
                 </div>

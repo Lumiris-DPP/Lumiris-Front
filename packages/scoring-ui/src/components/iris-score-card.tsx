@@ -40,16 +40,16 @@ function IrisScoreCardDisplay({ score, muted = false, variant = 'card', classNam
             <div
                 aria-label={`Score Iris ${score.grade} (${score.total} sur 100)`}
                 className={cn(
-                    'border-border bg-card flex items-center gap-3 rounded-lg border px-3 py-2',
+                    'flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2',
                     muted && 'opacity-60',
                     className,
                 )}
                 {...rest}
             >
                 <IrisGrade grade={score.grade} size="md" />
-                <p className="text-foreground font-mono text-sm font-semibold">
+                <p className="font-mono text-sm font-semibold text-foreground">
                     {score.total.toFixed(1)}
-                    <span className="text-muted-foreground/70 ml-0.5 text-xs font-normal">/ 100</span>
+                    <span className="ml-0.5 text-xs font-normal text-muted-foreground/70">/ 100</span>
                 </p>
             </div>
         );
@@ -59,28 +59,28 @@ function IrisScoreCardDisplay({ score, muted = false, variant = 'card', classNam
         <div
             aria-label={`Score Iris ${score.grade} (${score.total} sur 100)`}
             className={cn(
-                'border-border bg-card flex flex-col gap-4 rounded-2xl border p-6',
+                'flex flex-col gap-4 rounded-2xl border border-border bg-card p-6',
                 muted && 'opacity-60',
                 className,
             )}
             {...rest}
         >
             <div className="flex items-center gap-1.5">
-                <p className="text-muted-foreground text-[11px] uppercase tracking-wider">
+                <p className="text-[11px] tracking-wider text-muted-foreground uppercase">
                     Score Iris · {GRADE_LABEL[score.grade]}
                 </p>
                 <IrisMethodologyInfo className="ml-auto" />
             </div>
             <div className="flex items-center gap-3">
                 <IrisGrade grade={score.grade} size="lg" aria-hidden />
-                <p className="text-foreground font-mono text-2xl font-semibold">
+                <p className="font-mono text-2xl font-semibold text-foreground">
                     {score.total.toFixed(1)}
-                    <span className="text-muted-foreground/70 ml-0.5 text-sm font-normal">/ 100</span>
+                    <span className="ml-0.5 text-sm font-normal text-muted-foreground/70">/ 100</span>
                 </p>
             </div>
             <ScoreBreakdown breakdown={score.breakdown} weights={score.weights} />
             {score.cap?.applied && <ScoreCapWarning cap={score.cap} />}
-            {children && <div className="border-border border-t pt-3">{children}</div>}
+            {children && <div className="border-t border-border pt-3">{children}</div>}
         </div>
     );
 }
@@ -103,7 +103,7 @@ function IrisScoreCardStatus({ tone, variant = 'card', className, onRetry, ...re
             aria-live="polite"
             aria-label={tone === 'loading' ? 'Calcul du score Iris en cours' : 'Score Iris indisponible'}
             className={cn(
-                'border-border bg-card flex items-center gap-3 border',
+                'flex items-center gap-3 border border-border bg-card',
                 isStrip ? 'rounded-lg px-3 py-2' : 'rounded-2xl p-6',
                 className,
             )}
@@ -111,19 +111,19 @@ function IrisScoreCardStatus({ tone, variant = 'card', className, onRetry, ...re
         >
             {tone === 'loading' ? (
                 <>
-                    <Loader2 className="text-muted-foreground h-5 w-5 shrink-0 animate-spin" aria-hidden />
-                    <p className="text-muted-foreground text-sm">Calcul du score Iris…</p>
+                    <Loader2 className="h-5 w-5 shrink-0 animate-spin text-muted-foreground" aria-hidden />
+                    <p className="text-sm text-muted-foreground">Calcul du score Iris…</p>
                 </>
             ) : (
                 <>
-                    <AlertCircle className="text-lumiris-amber h-5 w-5 shrink-0" aria-hidden />
+                    <AlertCircle className="h-5 w-5 shrink-0 text-lumiris-amber" aria-hidden />
                     <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
-                        <p className="text-muted-foreground text-sm">Score indisponible</p>
+                        <p className="text-sm text-muted-foreground">Score indisponible</p>
                         {onRetry && (
                             <button
                                 type="button"
                                 onClick={onRetry}
-                                className="text-foreground hover:text-lumiris-cyan inline-flex shrink-0 items-center gap-1 text-xs font-medium underline underline-offset-2"
+                                className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-foreground underline underline-offset-2 hover:text-lumiris-cyan"
                             >
                                 <RefreshCw className="h-3 w-3" aria-hidden />
                                 Réessayer
@@ -196,13 +196,7 @@ export function IrisScoreCard({
     // legitimately low one, and a stale-but-real value while a refetch is in flight.
     if (displayScore) {
         return (
-            <IrisScoreCardDisplay
-                score={displayScore}
-                muted={muted}
-                variant={variant}
-                className={className}
-                {...rest}
-            >
+            <IrisScoreCardDisplay score={displayScore} muted={muted} variant={variant} className={className} {...rest}>
                 {children}
             </IrisScoreCardDisplay>
         );

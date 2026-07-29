@@ -19,7 +19,7 @@ import type { PassportPublicView } from '@lumiris/mock-data';
 const OriginMap = dynamic(() => import('./origin-map').then((m) => m.OriginMap), {
     ssr: false,
     loading: () => (
-        <div className="border-border bg-card text-muted-foreground flex h-72 items-center justify-center rounded-2xl border text-xs italic">
+        <div className="flex h-72 items-center justify-center rounded-2xl border border-border bg-card text-xs text-muted-foreground italic">
             Chargement de la carte…
         </div>
     ),
@@ -39,7 +39,7 @@ export function PassportPublicViewSection({ view, artisanSlug }: PassportPublicV
     const certificates = useUniqueCertificates(passport);
 
     return (
-        <article className="mx-auto max-w-5xl space-y-8 px-6 pb-20 pt-28" aria-labelledby="passport-title">
+        <article className="mx-auto max-w-5xl space-y-8 px-6 pt-28 pb-20" aria-labelledby="passport-title">
             <h1 id="passport-title" className="sr-only">
                 Passeport {passport.garment.reference}
             </h1>
@@ -58,7 +58,7 @@ export function PassportPublicViewSection({ view, artisanSlug }: PassportPublicV
                 <ArtisanCard artisan={artisan} truncateStory />
                 <Link
                     href={`/artisans/${artisanSlug}`}
-                    className="bg-foreground text-background mt-4 inline-flex items-center gap-2 self-start rounded-full px-4 py-2 text-xs font-medium transition-opacity hover:opacity-90"
+                    className="mt-4 inline-flex items-center gap-2 self-start rounded-full bg-foreground px-4 py-2 text-xs font-medium text-background transition-opacity hover:opacity-90"
                 >
                     Voir l’atelier
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -95,11 +95,11 @@ export function PassportPublicViewSection({ view, artisanSlug }: PassportPublicV
 
             <RepairCallout />
 
-            <p className="text-muted-foreground text-center text-xs">
+            <p className="text-center text-xs text-muted-foreground">
                 Passeport identifié par le GS1 Digital Link{' '}
                 <code className="font-mono">{passport.gs1.verificationUrl}</code>.
             </p>
-            <p className="text-muted-foreground text-center text-xs">
+            <p className="text-center text-xs text-muted-foreground">
                 LUMIRIS ne vend pas ses scores -{' '}
                 <Link href="/charte-independance" className="text-foreground underline-offset-4 hover:underline">
                     charte d’indépendance
@@ -114,8 +114,8 @@ function Section({ title, subtitle, children }: { title: string; subtitle?: stri
     return (
         <section className="flex flex-col gap-4">
             <div>
-                <h2 className="text-foreground text-lg font-semibold tracking-tight">{title}</h2>
-                {subtitle ? <p className="text-muted-foreground text-xs">{subtitle}</p> : null}
+                <h2 className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
+                {subtitle ? <p className="text-xs text-muted-foreground">{subtitle}</p> : null}
             </div>
             {children}
         </section>
@@ -125,11 +125,11 @@ function Section({ title, subtitle, children }: { title: string; subtitle?: stri
 function RepairCallout() {
     return (
         <aside className="border-grade-b/30 bg-grade-b/5 flex flex-col gap-3 rounded-2xl border p-6">
-            <p className="text-foreground inline-flex items-center gap-2 text-base font-semibold">
+            <p className="inline-flex items-center gap-2 text-base font-semibold text-foreground">
                 <Smartphone className="text-grade-b h-4 w-4" aria-hidden="true" />
                 Besoin d’une retouche ?
             </p>
-            <p className="text-muted-foreground max-w-xl text-sm leading-relaxed">
+            <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
                 LUMIRIS Vision — l’app mobile compagnon — permettra bientôt de localiser un retoucheur référencé près de
                 chez vous, avec géolocalisation et plages de disponibilité en temps réel. Ouverture publique annoncée
                 pour le second semestre 2026.

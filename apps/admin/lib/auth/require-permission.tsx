@@ -17,10 +17,10 @@ export function RequirePermission({ action, children, fallback }: RequirePermiss
     if (fallback !== undefined) return <>{fallback}</>;
 
     return (
-        <div className="border-border bg-muted/30 text-muted-foreground flex items-center gap-3 rounded-xl border border-dashed p-6 text-sm">
+        <div className="flex items-center gap-3 rounded-xl border border-dashed border-border bg-muted/30 p-6 text-sm text-muted-foreground">
             <LockKeyhole className="h-4 w-4 shrink-0" aria-hidden />
             <div>
-                <p className="text-foreground font-medium">Accès restreint</p>
+                <p className="font-medium text-foreground">Accès restreint</p>
                 <p className="mt-0.5 text-xs">
                     Permission requise : <code className="font-mono text-[11px]">{action}</code>
                 </p>

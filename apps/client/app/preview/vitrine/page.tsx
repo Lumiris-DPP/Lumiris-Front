@@ -8,16 +8,16 @@ export default function VitrinePreviewPage() {
 
     if (isLoading) {
         return (
-            <div className="bg-background flex min-h-screen items-center justify-center">
-                <p className="text-muted-foreground text-sm">Chargement…</p>
+            <div className="flex min-h-screen items-center justify-center bg-background">
+                <p className="text-sm text-muted-foreground">Chargement…</p>
             </div>
         );
     }
 
     if (isError || !data) {
         return (
-            <div className="bg-background flex min-h-screen items-center justify-center">
-                <p className="text-muted-foreground text-sm">Profil artisan introuvable.</p>
+            <div className="flex min-h-screen items-center justify-center bg-background">
+                <p className="text-sm text-muted-foreground">Profil artisan introuvable.</p>
             </div>
         );
     }

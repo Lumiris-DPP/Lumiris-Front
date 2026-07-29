@@ -25,13 +25,13 @@ export function ScoreBreakdown({ breakdown, weights = LUMIRIS_WEIGHTS, className
                 return (
                     <div key={axis} className="space-y-1">
                         <div className="flex items-baseline justify-between text-xs">
-                            <span className="text-foreground font-medium">{AXIS_LABEL[axis]}</span>
-                            <span className="text-muted-foreground font-mono">
+                            <span className="font-medium text-foreground">{AXIS_LABEL[axis]}</span>
+                            <span className="font-mono text-muted-foreground">
                                 {weighted} / {cap.toFixed(0)}
                             </span>
                         </div>
                         <div
-                            className="bg-muted h-2 overflow-hidden rounded-full"
+                            className="h-2 overflow-hidden rounded-full bg-muted"
                             role="progressbar"
                             aria-valuenow={score}
                             aria-valuemin={0}

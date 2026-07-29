@@ -31,22 +31,22 @@ export function ImportFilePicker({ file, dragActive, onDragActiveChange, onFiles
     if (file) {
         const isImage = isImageMime(file.type);
         return (
-            <div className="border-border bg-card flex items-center gap-3 rounded-lg border p-3">
+            <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3">
                 {isImage ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                         src={file.dataUri}
                         alt={file.name}
-                        className="border-border h-16 w-16 rounded-md border object-cover"
+                        className="h-16 w-16 rounded-md border border-border object-cover"
                     />
                 ) : (
-                    <div className="border-border bg-muted flex h-16 w-16 items-center justify-center rounded-md border">
-                        <FileText className="text-muted-foreground h-7 w-7" />
+                    <div className="flex h-16 w-16 items-center justify-center rounded-md border border-border bg-muted">
+                        <FileText className="h-7 w-7 text-muted-foreground" />
                     </div>
                 )}
                 <div className="min-w-0 flex-1">
-                    <p className="text-foreground truncate text-sm font-medium">{file.name}</p>
-                    <p className="text-muted-foreground text-xs">{formatBytes(file.size)}</p>
+                    <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
+                    <p className="text-xs text-muted-foreground">{formatBytes(file.size)}</p>
                 </div>
                 <Button variant="ghost" size="icon" onClick={onClear} aria-label="Retirer">
                     <X className="h-4 w-4" />
@@ -69,13 +69,13 @@ export function ImportFilePicker({ file, dragActive, onDragActiveChange, onFiles
                 onFiles(e.dataTransfer.files);
             }}
             className={cn(
-                'border-border bg-muted/40 hover:bg-muted relative flex h-40 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed transition-colors',
+                'relative flex h-40 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-border bg-muted/40 transition-colors hover:bg-muted',
                 dragActive && 'border-lumiris-cyan bg-lumiris-cyan/5',
             )}
         >
-            <Upload className="text-muted-foreground h-6 w-6" />
-            <p className="text-foreground text-sm font-medium">Glissez une facture ou cliquez ici</p>
-            <p className="text-muted-foreground text-xs">PDF · JPG · PNG · {MAX_UPLOAD_LABEL} max</p>
+            <Upload className="h-6 w-6 text-muted-foreground" />
+            <p className="text-sm font-medium text-foreground">Glissez une facture ou cliquez ici</p>
+            <p className="text-xs text-muted-foreground">PDF · JPG · PNG · {MAX_UPLOAD_LABEL} max</p>
             <Input
                 id={inputId}
                 ref={inputRef}

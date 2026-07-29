@@ -7,7 +7,7 @@ export function VisionCta() {
         <section className="relative overflow-hidden py-20 sm:py-28">
             {/* Prismatic halo */}
             <div className="pointer-events-none absolute inset-0 -z-10">
-                <div className="from-lumiris-iris/6 via-lumiris-cyan/4 to-lumiris-rose/6 absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br blur-3xl" />
+                <div className="absolute top-1/2 left-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-lumiris-iris/6 via-lumiris-cyan/4 to-lumiris-rose/6 blur-3xl" />
             </div>
 
             <div className="mx-auto max-w-4xl px-6 text-center">
@@ -17,10 +17,10 @@ export function VisionCta() {
                     viewport={{ once: true, margin: '-100px' }}
                     transition={{ duration: 0.5 }}
                 >
-                    <h2 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">
+                    <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl lg:text-4xl">
                         Téléchargez VISION gratuitement
                     </h2>
-                    <p className="text-muted-foreground mx-auto mt-4 max-w-xl text-lg">
+                    <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
                         Disponible sur iOS et Android. Scannez votre premier DPP en 10 secondes.
                     </p>
                 </motion.div>
@@ -36,7 +36,7 @@ export function VisionCta() {
                     <button
                         type="button"
                         disabled
-                        className="bg-foreground text-background inline-flex items-center gap-3 rounded-xl px-5 py-3 transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex items-center gap-3 rounded-xl bg-foreground px-5 py-3 text-background transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                         aria-label="Télécharger sur l'App Store — bientôt disponible"
                     >
                         <svg className="h-7 w-7" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -52,7 +52,7 @@ export function VisionCta() {
                     <button
                         type="button"
                         disabled
-                        className="bg-foreground text-background inline-flex items-center gap-3 rounded-xl px-5 py-3 transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex items-center gap-3 rounded-xl bg-foreground px-5 py-3 text-background transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                         aria-label="Télécharger sur Google Play — bientôt disponible"
                     >
                         <svg className="h-7 w-7" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -70,7 +70,7 @@ export function VisionCta() {
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.4, delay: 0.2 }}
-                    className="text-muted-foreground mt-6 text-sm"
+                    className="mt-6 text-sm text-muted-foreground"
                 >
                     Gratuit · Sans publicité · Sans engagement
                 </motion.p>

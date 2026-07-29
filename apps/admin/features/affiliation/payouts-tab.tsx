@@ -146,15 +146,15 @@ export function PayoutsTab({
 
     return (
         <div className="flex flex-col gap-4">
-            <div className="border-border bg-card flex flex-wrap items-center justify-between gap-4 rounded-xl border p-4">
+            <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-4">
                 <div className="inline-flex items-center gap-4 text-sm">
-                    <Landmark className="text-muted-foreground h-4 w-4" aria-hidden />
-                    <span className="text-foreground font-semibold">Avril 2026</span>
-                    <span className="text-muted-foreground font-mono text-xs">
+                    <Landmark className="h-4 w-4 text-muted-foreground" aria-hidden />
+                    <span className="font-semibold text-foreground">Avril 2026</span>
+                    <span className="font-mono text-xs text-muted-foreground">
                         {currentPeriodStats.beneficiaryCount} bénéf · {currentPeriodStats.eligible.length} elig ·{' '}
                         {currentPeriodStats.excluded.length} excl
                     </span>
-                    <span className="text-lumiris-emerald font-mono text-base font-bold">
+                    <span className="font-mono text-base font-bold text-lumiris-emerald">
                         {currentPeriodStats.total.toFixed(2)} €
                     </span>
                 </div>
@@ -184,8 +184,8 @@ export function PayoutsTab({
                         setStatusFilter('awaiting');
                     }}
                 />
-                <p className="text-muted-foreground text-[11px]">
-                    Total : <strong className="text-foreground font-mono">{filteredTotal.toFixed(2)} €</strong> ·{' '}
+                <p className="text-[11px] text-muted-foreground">
+                    Total : <strong className="font-mono text-foreground">{filteredTotal.toFixed(2)} €</strong> ·{' '}
                     {filtered.length} payout(s).
                 </p>
             </div>

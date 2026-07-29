@@ -78,17 +78,17 @@ export function OriginsMap({ materials, steps }: OriginsMapProps) {
     const agg = aggregate(materials, steps);
 
     if (agg.length === 0) {
-        return <p className="text-muted-foreground text-sm">Origines non renseignées.</p>;
+        return <p className="text-sm text-muted-foreground">Origines non renseignées.</p>;
     }
 
     return (
-        <div className="border-border bg-card overflow-hidden rounded-2xl border">
+        <div className="overflow-hidden rounded-2xl border border-border bg-card">
             <svg
                 viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
                 xmlns="http://www.w3.org/2000/svg"
                 role="img"
                 aria-label="Carte des origines matières et lieux de fabrication"
-                className="bg-muted block h-auto w-full"
+                className="block h-auto w-full bg-muted"
             >
                 <g fill="var(--background)" opacity="0.85">
                     <path d="M 50 60 L 90 50 L 175 50 L 240 65 L 290 100 L 280 145 L 250 175 L 220 185 L 180 175 L 145 165 L 110 140 L 75 110 L 55 85 Z" />
@@ -141,15 +141,15 @@ export function OriginsMap({ materials, steps }: OriginsMapProps) {
                 })}
             </svg>
 
-            <div className="border-border/60 space-y-3 border-t p-4">
-                <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+            <div className="space-y-3 border-t border-border/60 p-4">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                     <span className="inline-flex items-center gap-1.5">
-                        <span className="bg-lumiris-cyan inline-block h-2.5 w-2.5 rounded-full" aria-hidden />
+                        <span className="inline-block h-2.5 w-2.5 rounded-full bg-lumiris-cyan" aria-hidden />
                         Matières premières
                     </span>
                     <span className="inline-flex items-center gap-1.5">
                         <span
-                            className="bg-lumiris-amber inline-block h-2.5 w-2.5"
+                            className="inline-block h-2.5 w-2.5 bg-lumiris-amber"
                             style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }}
                             aria-hidden
                         />
@@ -160,16 +160,16 @@ export function OriginsMap({ materials, steps }: OriginsMapProps) {
                     {agg.map((c) => (
                         <span
                             key={c.code}
-                            className="border-border bg-background text-foreground rounded-full border px-2 py-0.5 font-mono text-[11px] uppercase tracking-wider"
+                            className="rounded-full border border-border bg-background px-2 py-0.5 font-mono text-[11px] tracking-wider text-foreground uppercase"
                         >
                             {c.code}
                         </span>
                     ))}
                 </div>
-                <ul className="text-muted-foreground space-y-1 text-xs sm:hidden">
+                <ul className="space-y-1 text-xs text-muted-foreground sm:hidden">
                     {agg.map((c) => (
                         <li key={c.code}>
-                            <span className="text-foreground font-medium">{c.label}</span>
+                            <span className="font-medium text-foreground">{c.label}</span>
                             {c.materials.length > 0 && (
                                 <span> — {c.materials.map((m) => `${m.fiberLabel} ${m.pct}%`).join(', ')}</span>
                             )}

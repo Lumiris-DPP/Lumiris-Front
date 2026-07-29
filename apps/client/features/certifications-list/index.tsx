@@ -109,9 +109,9 @@ export function CertificationsList() {
             >
                 <div className="space-y-4">
                     {expiringCount > 0 ? (
-                        <div className="border-lumiris-amber/40 bg-lumiris-amber/10 text-foreground flex items-center justify-between gap-3 rounded-xl border p-3">
+                        <div className="flex items-center justify-between gap-3 rounded-xl border border-lumiris-amber/40 bg-lumiris-amber/10 p-3 text-foreground">
                             <span className="inline-flex items-center gap-2 text-sm">
-                                <Clock className="text-lumiris-amber h-4 w-4" />
+                                <Clock className="h-4 w-4 text-lumiris-amber" />
                                 {expiringCount} certificat{expiringCount > 1 ? 's' : ''} expire
                                 {expiringCount > 1 ? 'nt' : ''} dans les 90 prochains jours.
                             </span>
@@ -157,7 +157,7 @@ export function CertificationsList() {
                                         <TableRow>
                                             <TableCell
                                                 colSpan={5}
-                                                className="text-muted-foreground py-10 text-center text-sm"
+                                                className="py-10 text-center text-sm text-muted-foreground"
                                             >
                                                 Aucun certificat ne correspond aux filtres.
                                             </TableCell>

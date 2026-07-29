@@ -45,15 +45,15 @@ export function PassportsDirectory({ passports }: Props) {
     const hasFilters = grades.length > 0 || kinds.length > 0;
 
     return (
-        <div className="pb-20 pt-28">
+        <div className="pt-28 pb-20">
             <header className="mx-auto mb-12 max-w-5xl px-6">
-                <p className="text-muted-foreground mb-4 text-xs font-medium uppercase tracking-[0.25em]">
+                <p className="mb-4 text-xs font-medium tracking-[0.25em] text-muted-foreground uppercase">
                     Passeports DPP
                 </p>
-                <h1 className="text-foreground text-balance text-4xl font-bold tracking-tight sm:text-5xl">
+                <h1 className="text-4xl font-bold tracking-tight text-balance text-foreground sm:text-5xl">
                     Les pièces vivantes publiées
                 </h1>
-                <p className="text-muted-foreground mt-4 max-w-2xl text-pretty text-base leading-relaxed">
+                <p className="mt-4 max-w-2xl text-base leading-relaxed text-pretty text-muted-foreground">
                     Chaque passeport raconte une pièce : composition, étapes de fabrication, atelier, score Iris V2.
                     Filtrez par grade ou par catégorie.
                 </p>
@@ -61,16 +61,16 @@ export function PassportsDirectory({ passports }: Props) {
 
             <section
                 aria-label="Filtres des passeports"
-                className="border-border bg-card mx-auto mb-10 max-w-5xl rounded-2xl border p-5"
+                className="mx-auto mb-10 max-w-5xl rounded-2xl border border-border bg-card p-5"
             >
                 <div className="flex flex-wrap items-center gap-3">
-                    <span className="text-foreground inline-flex items-center gap-1.5 text-xs font-medium">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
                         <Filter className="h-3.5 w-3.5" />
                         Filtres
                     </span>
 
                     <div className="flex flex-wrap items-center gap-1.5">
-                        <span className="text-muted-foreground text-[10px] font-medium uppercase tracking-wider">
+                        <span className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
                             Grade
                         </span>
                         {GRADES.map((g) => {
@@ -84,7 +84,7 @@ export function PassportsDirectory({ passports }: Props) {
                                     className={`inline-flex h-7 w-7 items-center justify-center rounded-full font-mono text-xs font-bold transition-colors ${
                                         active
                                             ? 'bg-foreground text-background'
-                                            : 'border-border text-muted-foreground hover:text-foreground border'
+                                            : 'border border-border text-muted-foreground hover:text-foreground'
                                     }`}
                                 >
                                     {g}
@@ -97,7 +97,7 @@ export function PassportsDirectory({ passports }: Props) {
                         <button
                             type="button"
                             onClick={reset}
-                            className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs underline-offset-2 hover:underline"
+                            className="inline-flex items-center gap-1 text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
                         >
                             <X className="h-3 w-3" />
                             Réinitialiser
@@ -116,7 +116,7 @@ export function PassportsDirectory({ passports }: Props) {
                                 aria-pressed={active}
                                 className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                                     active
-                                        ? 'bg-foreground text-background border-foreground'
+                                        ? 'border-foreground bg-foreground text-background'
                                         : 'border-border text-muted-foreground hover:text-foreground'
                                 }`}
                             >
@@ -129,7 +129,7 @@ export function PassportsDirectory({ passports }: Props) {
 
             <section className="mx-auto max-w-5xl px-6">
                 {filtered.length === 0 ? (
-                    <p className="text-muted-foreground py-12 text-center text-sm">
+                    <p className="py-12 text-center text-sm text-muted-foreground">
                         Aucun passeport ne correspond à ces filtres.{' '}
                         <button
                             type="button"
@@ -142,7 +142,7 @@ export function PassportsDirectory({ passports }: Props) {
                     </p>
                 ) : (
                     <>
-                        <p className="text-muted-foreground mb-6 text-xs font-medium uppercase tracking-[0.25em]">
+                        <p className="mb-6 text-xs font-medium tracking-[0.25em] text-muted-foreground uppercase">
                             {filtered.length} passeport{filtered.length > 1 ? 's' : ''}
                         </p>
                         <ul className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4">
@@ -161,9 +161,9 @@ export function PassportsDirectory({ passports }: Props) {
                                     >
                                         <Link
                                             href={`/passeport/${view.passport.id}`}
-                                            className="bg-card border-border hover:border-lumiris-cyan/40 group flex h-full flex-col overflow-hidden rounded-2xl border shadow-sm transition-shadow hover:shadow-md"
+                                            className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow hover:border-lumiris-cyan/40 hover:shadow-md"
                                         >
-                                            <div className="bg-muted aspect-4/5 relative w-full overflow-hidden">
+                                            <div className="relative aspect-4/5 w-full overflow-hidden bg-muted">
                                                 {photo ? (
                                                     <Image
                                                         src={photo}
@@ -173,7 +173,7 @@ export function PassportsDirectory({ passports }: Props) {
                                                         className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                                                     />
                                                 ) : null}
-                                                <div className="absolute right-2 top-2">
+                                                <div className="absolute top-2 right-2">
                                                     <IrisGradeBadge
                                                         grade={score.grade}
                                                         size="sm"
@@ -183,13 +183,13 @@ export function PassportsDirectory({ passports }: Props) {
                                                 </div>
                                             </div>
                                             <div className="space-y-1.5 p-4">
-                                                <p className="text-muted-foreground font-mono text-[10px] uppercase tracking-wider">
+                                                <p className="font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
                                                     {kind}
                                                 </p>
-                                                <h3 className="text-foreground line-clamp-1 text-sm font-semibold leading-snug">
+                                                <h3 className="line-clamp-1 text-sm leading-snug font-semibold text-foreground">
                                                     {view.passport.garment.reference}
                                                 </h3>
-                                                <p className="text-muted-foreground inline-flex items-center gap-1 text-[11px]">
+                                                <p className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
                                                     <MapPin className="h-3 w-3" />
                                                     <span className="truncate">{view.artisan.atelierName}</span>
                                                 </p>

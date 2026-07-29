@@ -89,7 +89,7 @@ export function WizardShell({
                             <Button
                                 onClick={handleNext}
                                 disabled={nextDisabled}
-                                className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 text-white"
+                                className="bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90"
                             >
                                 {nextLabel}
                             </Button>
@@ -122,7 +122,7 @@ function DraftNotFound() {
                     <CardTitle>Brouillon introuvable</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                         Ce brouillon n&apos;existe pas ou a été supprimé. Vous pouvez en démarrer un nouveau.
                     </p>
                     <Button asChild>

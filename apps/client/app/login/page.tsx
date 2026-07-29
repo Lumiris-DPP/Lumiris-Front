@@ -18,13 +18,13 @@ export default function LoginPage() {
     if (!hydrated || artisanId) return null;
 
     return (
-        <div className="bg-background flex min-h-screen flex-col">
-            <header className="border-border bg-card border-b">
+        <div className="flex min-h-screen flex-col bg-background">
+            <header className="border-b border-border bg-card">
                 <div className="mx-auto flex max-w-6xl items-center gap-3 px-6 py-5">
                     <LumirisLogo className="h-9 w-auto" />
                     <div>
-                        <p className="text-foreground text-sm font-semibold leading-none">LUMIRIS</p>
-                        <p className="text-muted-foreground font-mono text-[10px] tracking-widest">ATELIER</p>
+                        <p className="text-sm leading-none font-semibold text-foreground">LUMIRIS</p>
+                        <p className="font-mono text-[10px] tracking-widest text-muted-foreground">ATELIER</p>
                     </div>
                 </div>
             </header>

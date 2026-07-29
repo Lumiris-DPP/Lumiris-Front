@@ -14,11 +14,7 @@ import { cn } from '../../lib/cn';
  * page is safe: the definitions are identical, so a duplicate id resolves to the
  * same gradient.
  */
-function LumirisLogo({
-    className,
-    title = 'LUMIRIS',
-    ...props
-}: React.ComponentProps<'svg'> & { title?: string }) {
+function LumirisLogo({ className, title = 'LUMIRIS', ...props }: React.ComponentProps<'svg'> & { title?: string }) {
     return (
         <svg
             viewBox="0 0 755 532"

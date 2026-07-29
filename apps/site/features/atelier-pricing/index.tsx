@@ -53,13 +53,13 @@ export function AtelierPricing() {
                     transition={{ duration: 0.5 }}
                     className="mb-12 text-center"
                 >
-                    <span className="bg-lumiris-iris/10 text-lumiris-iris inline-block rounded-full px-3 py-1 text-xs font-medium uppercase tracking-wider">
+                    <span className="inline-block rounded-full bg-lumiris-iris/10 px-3 py-1 text-xs font-medium tracking-wider text-lumiris-iris uppercase">
                         Tarifs
                     </span>
-                    <h2 className="text-foreground mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+                    <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                         Choisissez votre formule
                     </h2>
-                    <p className="text-muted-foreground mx-auto mt-3 max-w-lg">
+                    <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
                         Trois paliers adaptes a la taille de votre atelier. Pas de frais caches.
                     </p>
                 </motion.div>
@@ -72,7 +72,7 @@ export function AtelierPricing() {
                     transition={{ duration: 0.4, delay: 0.1 }}
                     className="mb-12 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-4"
                 >
-                    <div className="bg-muted inline-flex items-center gap-1 rounded-full p-1">
+                    <div className="inline-flex items-center gap-1 rounded-full bg-muted p-1">
                         <button
                             onClick={() => setIsYearly(false)}
                             className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
@@ -98,7 +98,7 @@ export function AtelierPricing() {
                         <motion.span
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="bg-lumiris-cyan/10 text-lumiris-cyan inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
+                            className="inline-flex items-center gap-1.5 rounded-full bg-lumiris-cyan/10 px-3 py-1 text-xs font-semibold text-lumiris-cyan"
                         >
                             <Sparkles className="h-3 w-3" />
                             -17% (2 mois offerts)
@@ -118,35 +118,35 @@ export function AtelierPricing() {
                             className="relative"
                         >
                             {plan.highlighted && (
-                                <div className="absolute -top-3 left-0 right-0 z-10 flex justify-center">
-                                    <span className="bg-lumiris-iris inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold text-white shadow-lg">
+                                <div className="absolute -top-3 right-0 left-0 z-10 flex justify-center">
+                                    <span className="inline-flex items-center gap-1.5 rounded-full bg-lumiris-iris px-4 py-1.5 text-xs font-semibold text-white shadow-lg">
                                         <Sparkles className="h-3 w-3" aria-hidden />
                                         Le plus choisi
                                     </span>
                                 </div>
                             )}
                             <div
-                                className={`bg-card h-full rounded-2xl p-6 transition-all ${
+                                className={`h-full rounded-2xl bg-card p-6 transition-all ${
                                     plan.highlighted
-                                        ? 'border-lumiris-iris/50 shadow-lumiris-iris/10 border-2 shadow-xl'
-                                        : 'border-border border shadow-sm hover:shadow-md'
+                                        ? 'border-2 border-lumiris-iris/50 shadow-xl shadow-lumiris-iris/10'
+                                        : 'border border-border shadow-sm hover:shadow-md'
                                 }`}
                             >
                                 <div className="mb-5">
-                                    <h3 className="text-foreground text-xl font-bold">ATELIER {plan.name}</h3>
-                                    <p className="text-muted-foreground mt-1 text-sm">{plan.audience}</p>
+                                    <h3 className="text-xl font-bold text-foreground">ATELIER {plan.name}</h3>
+                                    <p className="mt-1 text-sm text-muted-foreground">{plan.audience}</p>
                                 </div>
 
                                 <div className="mb-6">
                                     <div className="flex items-baseline gap-1">
-                                        <span className="text-foreground text-4xl font-bold tracking-tight">
+                                        <span className="text-4xl font-bold tracking-tight text-foreground">
                                             {isYearly ? plan.yearly : plan.monthly}
                                         </span>
-                                        <span className="text-muted-foreground text-lg">
+                                        <span className="text-lg text-muted-foreground">
                                             EUR/{isYearly ? 'an' : 'mois'}
                                         </span>
                                     </div>
-                                    <p className="text-muted-foreground mt-2 text-sm">{plan.passports}</p>
+                                    <p className="mt-2 text-sm text-muted-foreground">{plan.passports}</p>
                                 </div>
 
                                 <ul className="mb-6 space-y-3">
@@ -181,7 +181,7 @@ export function AtelierPricing() {
                                     href={SIGNUP_URL}
                                     className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-all hover:scale-[1.02] ${
                                         plan.highlighted
-                                            ? 'bg-lumiris-iris hover:bg-lumiris-iris/90 text-white'
+                                            ? 'bg-lumiris-iris text-white hover:bg-lumiris-iris/90'
                                             : 'bg-foreground text-background hover:opacity-90'
                                     }`}
                                 >

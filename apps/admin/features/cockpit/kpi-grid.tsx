@@ -107,7 +107,7 @@ export function KpiGrid({ artisanKpi, curationKpi, irisKpi, mrrKpi }: KpiGridPro
                         href={tile.href}
                         aria-label={tile.ariaLabel}
                         className={cn(
-                            'bg-card hover:bg-muted/40 focus-visible:ring-ring flex flex-col rounded-xl border p-5 transition-colors focus-visible:outline-none focus-visible:ring-2',
+                            'flex flex-col rounded-xl border bg-card p-5 transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
                             tile.borderClass,
                         )}
                     >
@@ -130,7 +130,7 @@ export function KpiGrid({ artisanKpi, curationKpi, irisKpi, mrrKpi }: KpiGridPro
                                 </span>
                             ) : null}
                         </div>
-                        <p className="text-foreground mt-auto pt-3 text-[13px] font-medium">{tile.label}</p>
+                        <p className="mt-auto pt-3 text-[13px] font-medium text-foreground">{tile.label}</p>
                     </Link>
                 );
             })}

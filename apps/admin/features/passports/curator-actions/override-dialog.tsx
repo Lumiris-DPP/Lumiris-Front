@@ -80,7 +80,7 @@ export function OverrideDialog({ passport, score, open, onOpenChange, onAfterAct
                 </AlertDialogHeader>
                 <div className="space-y-3">
                     <div className="space-y-1.5">
-                        <p className="text-muted-foreground text-[10px] uppercase tracking-wider">Nouveau grade</p>
+                        <p className="text-[10px] tracking-wider text-muted-foreground uppercase">Nouveau grade</p>
                         <Select value={overrideGrade} onValueChange={(v) => setOverrideGrade(v as IrisGradeLetter)}>
                             <SelectTrigger className="w-full" aria-label="Nouveau grade">
                                 <SelectValue />
@@ -97,7 +97,7 @@ export function OverrideDialog({ passport, score, open, onOpenChange, onAfterAct
                     <div className="space-y-1.5">
                         <label
                             htmlFor="override-reason"
-                            className="text-muted-foreground text-[10px] uppercase tracking-wider"
+                            className="text-[10px] tracking-wider text-muted-foreground uppercase"
                         >
                             Motif
                         </label>
@@ -112,7 +112,7 @@ export function OverrideDialog({ passport, score, open, onOpenChange, onAfterAct
                     <div className="space-y-1.5">
                         <label
                             htmlFor="override-source"
-                            className="text-muted-foreground text-[10px] uppercase tracking-wider"
+                            className="text-[10px] tracking-wider text-muted-foreground uppercase"
                         >
                             Source
                         </label>
@@ -129,7 +129,7 @@ export function OverrideDialog({ passport, score, open, onOpenChange, onAfterAct
                             checked={confirmed}
                             onCheckedChange={(v) => setConfirmed(v === true)}
                         />
-                        <label htmlFor="override-confirm" className="text-foreground cursor-pointer">
+                        <label htmlFor="override-confirm" className="cursor-pointer text-foreground">
                             Je confirme l&apos;override de grade
                         </label>
                     </div>
@@ -139,7 +139,7 @@ export function OverrideDialog({ passport, score, open, onOpenChange, onAfterAct
                     <AlertDialogAction
                         onClick={handleOverride}
                         disabled={!canSubmit}
-                        className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     >
                         Confirmer override
                     </AlertDialogAction>

@@ -20,8 +20,8 @@ import type { LocalSubscription, RetoucheurOverlay } from './types';
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <div>
-            <p className="text-muted-foreground text-[10px] uppercase tracking-wider">{label}</p>
-            <div className="text-foreground mt-0.5">{children}</div>
+            <p className="text-[10px] tracking-wider text-muted-foreground uppercase">{label}</p>
+            <div className="mt-0.5 text-foreground">{children}</div>
         </div>
     );
 }
@@ -72,7 +72,7 @@ export function ProfileTab({ retoucheur }: { retoucheur: Repairer }) {
 
     return (
         <div className="space-y-3 text-xs">
-            <div className="border-border bg-card grid grid-cols-2 gap-3 rounded-xl border p-3">
+            <div className="grid grid-cols-2 gap-3 rounded-xl border border-border bg-card p-3">
                 <Field label="Adresse">
                     {retoucheur.atelierName ?? '-'}, {retoucheur.city}
                 </Field>
@@ -140,7 +140,7 @@ export function KycTab({ retoucheur, overlay, canVerify, onOpenVerify, onOpenRej
 
     return (
         <div className="space-y-3 text-xs">
-            <ul className="border-border bg-card divide-border divide-y rounded-xl border">
+            <ul className="divide-y divide-border rounded-xl border border-border bg-card">
                 {['Pièce d’identité', 'K-bis ou attestation CMA', 'Photos atelier'].map((doc) => (
                     <li key={doc} className="flex items-center justify-between px-3 py-2">
                         <span>{doc}</span>
@@ -151,8 +151,8 @@ export function KycTab({ retoucheur, overlay, canVerify, onOpenVerify, onOpenRej
                 ))}
             </ul>
 
-            <div className="border-border bg-card space-y-2 rounded-xl border p-3">
-                <p className="text-foreground font-medium">Abonnement LUMIRIS Local</p>
+            <div className="space-y-2 rounded-xl border border-border bg-card p-3">
+                <p className="font-medium text-foreground">Abonnement LUMIRIS Local</p>
                 <div className="grid grid-cols-2 gap-3 text-xs">
                     <Field label="Statut">
                         <Badge variant="outline" className={cn('font-mono text-[10px]', subMeta.tone)}>
@@ -172,7 +172,7 @@ export function KycTab({ retoucheur, overlay, canVerify, onOpenVerify, onOpenRej
                         )}
                     </Field>
                     <Field label="Tarification">
-                        <span className="text-muted-foreground text-[11px]">
+                        <span className="text-[11px] text-muted-foreground">
                             {LUMIRIS_LOCAL_PRICE_MONTHLY_EUR} €/mois · {LUMIRIS_LOCAL_PRICE_YEARLY_EUR} €/an
                         </span>
                     </Field>
@@ -183,7 +183,7 @@ export function KycTab({ retoucheur, overlay, canVerify, onOpenVerify, onOpenRej
                         variant="outline"
                         onClick={onResolveOverdue}
                         disabled={!canVerify}
-                        className="border-lumiris-emerald/40 text-lumiris-emerald hover:bg-lumiris-emerald/10 mt-1 gap-1.5"
+                        className="mt-1 gap-1.5 border-lumiris-emerald/40 text-lumiris-emerald hover:bg-lumiris-emerald/10"
                     >
                         <CheckCircle2 className="h-3.5 w-3.5" /> Marquer impayé résolu
                     </Button>
@@ -191,9 +191,9 @@ export function KycTab({ retoucheur, overlay, canVerify, onOpenVerify, onOpenRej
             </div>
 
             {overlay?.rejectReason ? (
-                <div className="border-lumiris-rose/30 bg-lumiris-rose/5 rounded-xl border p-3">
-                    <p className="text-lumiris-rose font-medium">Candidature rejetée</p>
-                    <p className="text-foreground mt-1">{overlay.rejectReason}</p>
+                <div className="rounded-xl border border-lumiris-rose/30 bg-lumiris-rose/5 p-3">
+                    <p className="font-medium text-lumiris-rose">Candidature rejetée</p>
+                    <p className="mt-1 text-foreground">{overlay.rejectReason}</p>
                 </div>
             ) : null}
 
@@ -202,7 +202,7 @@ export function KycTab({ retoucheur, overlay, canVerify, onOpenVerify, onOpenRej
                     size="sm"
                     onClick={onOpenVerify}
                     disabled={!canVerify}
-                    className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 gap-1.5"
+                    className="gap-1.5 bg-lumiris-emerald hover:bg-lumiris-emerald/90"
                 >
                     <ShieldCheck className="h-3.5 w-3.5" /> Vérifier KYC
                 </Button>
@@ -211,7 +211,7 @@ export function KycTab({ retoucheur, overlay, canVerify, onOpenVerify, onOpenRej
                     variant="outline"
                     onClick={onOpenReject}
                     disabled={!canVerify}
-                    className="border-lumiris-rose/40 text-lumiris-rose hover:bg-lumiris-rose/10 gap-1.5"
+                    className="gap-1.5 border-lumiris-rose/40 text-lumiris-rose hover:bg-lumiris-rose/10"
                 >
                     <ShieldX className="h-3.5 w-3.5" /> Rejeter
                 </Button>

@@ -78,7 +78,7 @@ export function PassportDetail({ passportId }: { passportId: string }) {
     );
 
     if (loading) {
-        return <div className="text-muted-foreground p-8 text-sm">Chargement…</div>;
+        return <div className="p-8 text-sm text-muted-foreground">Chargement…</div>;
     }
 
     if (notFound || !passport) {
@@ -195,18 +195,18 @@ function DeleteDraftCard({ dppId }: { dppId: string }) {
     return (
         <Card className="border-destructive/30">
             <CardHeader>
-                <CardTitle className="text-destructive flex items-center gap-1.5 text-base">
+                <CardTitle className="flex items-center gap-1.5 text-base text-destructive">
                     <AlertTriangle className="h-4 w-4" /> Supprimer ce brouillon
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-                <p className="text-muted-foreground text-sm">
+                <p className="text-sm text-muted-foreground">
                     Le brouillon et ses documents seront définitivement effacés. Une fois publié, un passeport ne peut
                     plus être supprimé.
                 </p>
                 <Button
                     variant="outline"
-                    className="text-destructive hover:text-destructive border-destructive/40 w-full gap-2"
+                    className="w-full gap-2 border-destructive/40 text-destructive hover:text-destructive"
                     onClick={() => setConfirmOpen(true)}
                     disabled={deleteDpp.isPending}
                 >
@@ -236,7 +236,7 @@ function DeleteDraftCard({ dppId }: { dppId: string }) {
                                 onConfirm();
                             }}
                             disabled={deleteDpp.isPending}
-                            className="bg-destructive hover:bg-destructive/90 text-white"
+                            className="bg-destructive text-white hover:bg-destructive/90"
                         >
                             {deleteDpp.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Supprimer définitivement
@@ -256,14 +256,14 @@ function DraftAside({ dppId }: { dppId: string }) {
                 <CardTitle className="text-base">Brouillon</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-                <p className="text-muted-foreground text-sm">
+                <p className="text-sm text-muted-foreground">
                     Ce passeport n&apos;est pas encore publié. Le score Iris et le QR code seront générés à la
                     publication.
                 </p>
                 <Button
                     onClick={() => void editDraft(dppId)}
                     disabled={loadingId === dppId}
-                    className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 w-full gap-2 text-white"
+                    className="w-full gap-2 bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90"
                 >
                     <Pencil className="h-4 w-4" /> Modifier le brouillon
                 </Button>

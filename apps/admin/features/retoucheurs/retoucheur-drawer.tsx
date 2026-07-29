@@ -206,7 +206,7 @@ export function RetoucheurDrawer({ retoucheur, overlay, onClose, onPatchOverlay 
                             />
                             <Label
                                 htmlFor="retoucheur-reject-confirm"
-                                className="text-foreground cursor-pointer text-xs"
+                                className="cursor-pointer text-xs text-foreground"
                             >
                                 Je confirme le rejet de cette candidature.
                             </Label>

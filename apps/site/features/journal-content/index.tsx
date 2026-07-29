@@ -46,12 +46,12 @@ function ArticleCard({ article, index, featured }: { article: ArticleMeta; index
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-30px' }}
             transition={{ duration: 0.4, delay: index * 0.05 }}
-            className="border-border bg-card group flex h-full flex-col overflow-hidden rounded-2xl border shadow-sm transition-shadow hover:shadow-md"
+            className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md"
         >
             <Link href={`/journal/${article.slug}`} className="flex h-full flex-col">
                 {article.coverImage ? (
                     <div
-                        className={`bg-muted relative w-full overflow-hidden ${featured ? 'aspect-16/8' : 'aspect-video'}`}
+                        className={`relative w-full overflow-hidden bg-muted ${featured ? 'aspect-16/8' : 'aspect-video'}`}
                     >
                         <Image
                             src={article.coverImage}
@@ -65,17 +65,17 @@ function ArticleCard({ article, index, featured }: { article: ArticleMeta; index
                 <div className={`flex flex-1 flex-col p-6 ${featured ? 'sm:p-8' : ''}`}>
                     <div className="mb-3 flex flex-wrap items-center gap-2">
                         <CategoryBadge category={article.category} />
-                        <span className="text-muted-foreground font-mono text-[11px]">{date}</span>
+                        <span className="font-mono text-[11px] text-muted-foreground">{date}</span>
                     </div>
                     <h3
-                        className={`text-foreground group-hover:text-grade-a text-balance font-semibold leading-snug transition-colors ${featured ? 'text-2xl sm:text-3xl' : 'text-base'}`}
+                        className={`group-hover:text-grade-a leading-snug font-semibold text-balance text-foreground transition-colors ${featured ? 'text-2xl sm:text-3xl' : 'text-base'}`}
                     >
                         {article.title}
                     </h3>
-                    <p className="text-muted-foreground mt-3 line-clamp-3 flex-1 text-sm leading-relaxed">
+                    <p className="mt-3 line-clamp-3 flex-1 text-sm leading-relaxed text-muted-foreground">
                         {article.excerpt}
                     </p>
-                    <div className="text-muted-foreground mt-5 flex items-center justify-between text-[11px]">
+                    <div className="mt-5 flex items-center justify-between text-[11px] text-muted-foreground">
                         <span className="inline-flex items-center gap-1.5">
                             <Clock className="h-3 w-3" />
                             {article.readingTime} min
@@ -104,13 +104,13 @@ export function JournalContent({ articles }: Props) {
     const rest = visible.slice(1);
 
     return (
-        <div className="pb-20 pt-28">
+        <div className="pt-28 pb-20">
             <header className="mx-auto mb-10 max-w-5xl px-6">
-                <p className="text-muted-foreground mb-4 text-xs font-medium uppercase tracking-[0.25em]">Journal</p>
-                <h1 className="text-foreground text-balance text-4xl font-bold tracking-tight sm:text-5xl">
+                <p className="mb-4 text-xs font-medium tracking-[0.25em] text-muted-foreground uppercase">Journal</p>
+                <h1 className="text-4xl font-bold tracking-tight text-balance text-foreground sm:text-5xl">
                     Le journal LUMIRIS
                 </h1>
-                <p className="text-muted-foreground mt-4 max-w-xl text-pretty text-base leading-relaxed">
+                <p className="mt-4 max-w-xl text-base leading-relaxed text-pretty text-muted-foreground">
                     Décryptages réglementaires (DPP, ESPR, AGEC), portraits d’artisans, savoir-faire et entretien des
                     pièces. Pour comprendre la filière textile française avant la loi.
                 </p>
@@ -135,7 +135,7 @@ export function JournalContent({ articles }: Props) {
 
             <section className="mx-auto max-w-5xl px-6">
                 {visible.length === 0 ? (
-                    <p className="text-muted-foreground py-12 text-center text-sm">
+                    <p className="py-12 text-center text-sm text-muted-foreground">
                         Aucun article dans cette catégorie pour l’instant.
                     </p>
                 ) : (

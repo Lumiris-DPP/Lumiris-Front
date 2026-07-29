@@ -31,10 +31,10 @@ export function GapAnalysis({ gaps, totalArtisans }: GapAnalysisProps) {
     const router = useRouter();
     const [dialogOpen, setDialogOpen] = useState(false);
     return (
-        <section className="border-border bg-card rounded-xl border">
-            <div className="border-border flex flex-wrap items-baseline justify-between gap-3 border-b px-5 py-4">
+        <section className="rounded-xl border border-border bg-card">
+            <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-border px-5 py-4">
                 <div>
-                    <h3 className="text-foreground text-sm font-semibold">
+                    <h3 className="text-sm font-semibold text-foreground">
                         Gap analysis · {gaps.length} / {totalArtisans}
                     </h3>
                 </div>
@@ -42,7 +42,7 @@ export function GapAnalysis({ gaps, totalArtisans }: GapAnalysisProps) {
                     size="sm"
                     onClick={() => setDialogOpen(true)}
                     disabled={gaps.length === 0}
-                    className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 gap-1.5"
+                    className="gap-1.5 bg-lumiris-cyan hover:bg-lumiris-cyan/90"
                 >
                     <Megaphone className="h-3.5 w-3.5" /> Lancer campagne
                 </Button>
@@ -76,11 +76,11 @@ export function GapAnalysis({ gaps, totalArtisans }: GapAnalysisProps) {
                                         router.push(`/artisans?id=${gap.artisanId}`);
                                     }
                                 }}
-                                className="hover:bg-muted/40 cursor-pointer"
+                                className="cursor-pointer hover:bg-muted/40"
                             >
                                 <TableCell>
-                                    <p className="text-foreground text-sm">{gap.artisanName}</p>
-                                    <p className="text-muted-foreground text-[11px]">
+                                    <p className="text-sm text-foreground">{gap.artisanName}</p>
+                                    <p className="text-[11px] text-muted-foreground">
                                         {gap.city} · {gap.artisanId}
                                     </p>
                                 </TableCell>
@@ -95,7 +95,7 @@ export function GapAnalysis({ gaps, totalArtisans }: GapAnalysisProps) {
                                             <Badge
                                                 key={reason}
                                                 variant="outline"
-                                                className="border-lumiris-rose/40 text-lumiris-rose font-mono text-[10px]"
+                                                className="border-lumiris-rose/40 font-mono text-[10px] text-lumiris-rose"
                                             >
                                                 {REASON_LABEL[reason]}
                                             </Badge>

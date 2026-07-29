@@ -56,10 +56,10 @@ export function PassportPreview({ passport, artisan }: PassportPreviewProps) {
     };
 
     return (
-        <div className="bg-background min-h-screen">
-            <header className="bg-lumiris-amber/10 border-lumiris-amber/40 sticky top-0 z-40 border-b backdrop-blur">
+        <div className="min-h-screen bg-background">
+            <header className="sticky top-0 z-40 border-b border-lumiris-amber/40 bg-lumiris-amber/10 backdrop-blur">
                 <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-2.5">
-                    <p className="text-foreground text-xs sm:text-sm">
+                    <p className="text-xs text-foreground sm:text-sm">
                         <span className="font-semibold">Aperçu</span> — voici ce que verra votre client après scan QR.
                     </p>
                     <Button asChild size="sm" variant="ghost" className="shrink-0 text-xs">
@@ -84,7 +84,7 @@ export function PassportPreview({ passport, artisan }: PassportPreviewProps) {
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="text-lumiris-cyan hover:text-lumiris-cyan/80 -ml-3"
+                            className="-ml-3 text-lumiris-cyan hover:text-lumiris-cyan/80"
                             onClick={scrollToStory}
                         >
                             Lire la suite
@@ -105,7 +105,7 @@ export function PassportPreview({ passport, artisan }: PassportPreviewProps) {
                 <section className="space-y-3">
                     <SectionTitle>Matières</SectionTitle>
                     {passport.materials.length === 0 ? (
-                        <p className="text-muted-foreground text-sm">Composition non renseignée.</p>
+                        <p className="text-sm text-muted-foreground">Composition non renseignée.</p>
                     ) : (
                         <ul className="space-y-3">
                             {passport.materials.map((m, i) => (
@@ -131,16 +131,16 @@ export function PassportPreview({ passport, artisan }: PassportPreviewProps) {
                     <CareGuide care={passport.care} />
                 </section>
 
-                <footer className="border-border/60 mt-8 flex flex-col items-center gap-2 border-t pt-6 text-center">
-                    <p className="text-muted-foreground inline-flex items-center gap-1.5 text-xs">
-                        <ShieldCheck className="text-lumiris-emerald h-3.5 w-3.5" />
+                <footer className="mt-8 flex flex-col items-center gap-2 border-t border-border/60 pt-6 text-center">
+                    <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <ShieldCheck className="h-3.5 w-3.5 text-lumiris-emerald" />
                         Passeport vérifié sur LUMIRIS
                     </p>
                     <a
                         href={passport.gs1.verificationUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-muted-foreground hover:text-foreground break-all font-mono text-[10px] underline underline-offset-2"
+                        className="font-mono text-[10px] break-all text-muted-foreground underline underline-offset-2 hover:text-foreground"
                     >
                         {passport.gs1.verificationUrl}
                     </a>

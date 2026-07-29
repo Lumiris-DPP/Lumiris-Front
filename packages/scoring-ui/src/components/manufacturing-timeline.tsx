@@ -13,7 +13,7 @@ export interface ManufacturingTimelineProps extends HTMLAttributes<HTMLDivElemen
 export function ManufacturingTimeline({ steps, className, ...rest }: ManufacturingTimelineProps) {
     if (steps.length === 0) {
         return (
-            <p className={cn('text-muted-foreground text-sm', className as string)} {...rest}>
+            <p className={cn('text-sm text-muted-foreground', className as string)} {...rest}>
                 Aucune étape renseignée.
             </p>
         );
@@ -26,23 +26,23 @@ export function ManufacturingTimeline({ steps, className, ...rest }: Manufacturi
             <ol className="relative space-y-4 border-l border-dashed pl-6">
                 {steps.map((step, idx) => (
                     <li key={step.id} className="relative">
-                        <span className="bg-lumiris-emerald/15 text-lumiris-emerald absolute -left-[35px] flex h-5 w-5 items-center justify-center rounded-full font-mono text-[10px] font-bold">
+                        <span className="absolute -left-[35px] flex h-5 w-5 items-center justify-center rounded-full bg-lumiris-emerald/15 font-mono text-[10px] font-bold text-lumiris-emerald">
                             {idx + 1}
                         </span>
-                        <div className="border-border bg-card rounded-xl border p-3">
+                        <div className="rounded-xl border border-border bg-card p-3">
                             <div className="flex items-baseline justify-between gap-3">
-                                <p className="text-foreground text-sm font-medium">{step.label}</p>
-                                <span className="text-muted-foreground font-mono text-[10px] uppercase tracking-wider">
+                                <p className="text-sm font-medium text-foreground">{step.label}</p>
+                                <span className="font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
                                     {STAGE_LABEL[step.kind]}
                                 </span>
                             </div>
-                            <p className="text-muted-foreground mt-0.5 text-xs">
+                            <p className="mt-0.5 text-xs text-muted-foreground">
                                 {step.performedBy} · {step.locationCity}, {step.locationCountry}
                             </p>
                             {step.photos.length > 0 ? (
                                 <div className="mt-2 flex gap-1.5">
                                     {step.photos.slice(0, 3).map((photo) => (
-                                        <div key={photo} className="bg-muted h-12 w-12 overflow-hidden rounded-md">
+                                        <div key={photo} className="h-12 w-12 overflow-hidden rounded-md bg-muted">
                                             <img src={photo} alt="" className="h-full w-full object-cover" />
                                         </div>
                                     ))}
@@ -53,17 +53,17 @@ export function ManufacturingTimeline({ steps, className, ...rest }: Manufacturi
                 ))}
             </ol>
 
-            <div className="border-border bg-card/50 rounded-xl border p-3">
-                <p className="text-muted-foreground inline-flex items-center gap-1 text-[11px] font-medium uppercase tracking-wider">
+            <div className="rounded-xl border border-border bg-card/50 p-3">
+                <p className="inline-flex items-center gap-1 text-[11px] font-medium tracking-wider text-muted-foreground uppercase">
                     <MapPin className="h-3 w-3" /> Lieux ({cities.length})
                 </p>
                 <ul className="mt-2 flex flex-wrap gap-1.5 text-xs">
                     {cities.map((c) => (
                         <li
                             key={`${c.locationCity}-${c.locationCountry}`}
-                            className="border-border bg-background inline-flex items-center gap-1 rounded-full border px-2 py-0.5"
+                            className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2 py-0.5"
                         >
-                            <CheckCircle2 className="text-lumiris-emerald h-3 w-3" />
+                            <CheckCircle2 className="h-3 w-3 text-lumiris-emerald" />
                             {c.locationCity} <span className="text-muted-foreground">({c.locationCountry})</span>
                         </li>
                     ))}

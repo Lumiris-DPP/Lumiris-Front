@@ -14,7 +14,7 @@ export interface CertificatesListProps extends HTMLAttributes<HTMLDivElement> {
 export function CertificatesList({ certificates, now, className, ...rest }: CertificatesListProps) {
     if (certificates.length === 0) {
         return (
-            <p className={cn('text-muted-foreground text-sm', className as string)} {...rest}>
+            <p className={cn('text-sm text-muted-foreground', className as string)} {...rest}>
                 Aucune certification renseignée.
             </p>
         );
@@ -43,24 +43,24 @@ export function CertificatesList({ certificates, now, className, ...rest }: Cert
                     >
                         <header className="flex items-start justify-between gap-2">
                             <div className="min-w-0">
-                                <p className="text-foreground truncate text-sm font-semibold">
+                                <p className="truncate text-sm font-semibold text-foreground">
                                     {cert.kind === 'CUSTOM' && cert.customName ? cert.customName : cert.kind}
                                 </p>
-                                <p className="text-muted-foreground truncate text-xs">{cert.issuer}</p>
+                                <p className="truncate text-xs text-muted-foreground">{cert.issuer}</p>
                             </div>
                             <Icon className={cn('h-5 w-5 shrink-0', iconTone)} aria-hidden />
                         </header>
-                        <p className="text-muted-foreground/90 text-[11px]">
+                        <p className="text-[11px] text-muted-foreground/90">
                             Délivrée le {formatDate(cert.issuedAt)} · {expired ? 'Expirée le ' : "Valide jusqu'au "}
                             {formatDate(cert.expiresAt)}
                         </p>
-                        {cert.scope ? <p className="text-foreground/80 text-xs leading-relaxed">{cert.scope}</p> : null}
+                        {cert.scope ? <p className="text-xs leading-relaxed text-foreground/80">{cert.scope}</p> : null}
                         {cert.fileUrl ? (
                             <a
                                 href={cert.fileUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-foreground/70 hover:text-foreground inline-flex items-center font-mono text-[10px] underline underline-offset-2"
+                                className="inline-flex items-center font-mono text-[10px] text-foreground/70 underline underline-offset-2 hover:text-foreground"
                             >
                                 Document officiel ↗
                             </a>

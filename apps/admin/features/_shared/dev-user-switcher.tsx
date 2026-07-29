@@ -41,19 +41,19 @@ export function DevUserSwitcher() {
                 <button
                     type="button"
                     className={cn(
-                        'border-muted-foreground/40 bg-background hover:border-muted-foreground/70 flex items-center gap-2 rounded-md border border-dashed px-2.5 py-1.5 text-xs opacity-60 transition-opacity hover:opacity-100',
+                        'flex items-center gap-2 rounded-md border border-dashed border-muted-foreground/40 bg-background px-2.5 py-1.5 text-xs opacity-60 transition-opacity hover:border-muted-foreground/70 hover:opacity-100',
                     )}
                 >
-                    <UserCog className="text-muted-foreground h-3.5 w-3.5" aria-hidden />
-                    <span className="text-foreground font-medium">{currentUser.fullName}</span>
+                    <UserCog className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
+                    <span className="font-medium text-foreground">{currentUser.fullName}</span>
                     <span className={cn('font-mono text-[10px]', ROLE_TONE[currentUser.role])}>
                         {ROLE_LABEL[currentUser.role]}
                     </span>
-                    <ChevronDown className="text-muted-foreground h-3 w-3" aria-hidden />
+                    <ChevronDown className="h-3 w-3 text-muted-foreground" aria-hidden />
                 </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-72">
-                <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-wider">
+                <DropdownMenuLabel className="font-mono text-[10px] tracking-wider uppercase">
                     Dev - impersonate
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -65,7 +65,7 @@ export function DevUserSwitcher() {
                         }}
                         className="flex items-start gap-2"
                     >
-                        <div className="bg-muted text-muted-foreground mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold">
+                        <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-semibold text-muted-foreground">
                             {user.fullName
                                 .split(' ')
                                 .map((s) => s[0])
@@ -74,14 +74,14 @@ export function DevUserSwitcher() {
                                 .toUpperCase()}
                         </div>
                         <div className="min-w-0 flex-1">
-                            <p className="text-foreground truncate text-xs font-medium">{user.fullName}</p>
-                            <p className="text-muted-foreground truncate text-[11px]">{user.email}</p>
+                            <p className="truncate text-xs font-medium text-foreground">{user.fullName}</p>
+                            <p className="truncate text-[11px] text-muted-foreground">{user.email}</p>
                             <p className={cn('mt-0.5 font-mono text-[10px]', ROLE_TONE[user.role])}>
                                 {ROLE_LABEL[user.role]}
                             </p>
                         </div>
                         {user.id === currentUser.id ? (
-                            <span className="text-lumiris-emerald font-mono text-[10px]">●</span>
+                            <span className="font-mono text-[10px] text-lumiris-emerald">●</span>
                         ) : null}
                     </DropdownMenuItem>
                 ))}

@@ -33,20 +33,20 @@ export function PassportPhonePreview({
             )}
             {...rest}
         >
-            <div className="bg-card flex flex-col overflow-hidden rounded-[1.75rem]">
-                <div className="bg-secondary/40 relative aspect-[3/4] w-full overflow-hidden">
+            <div className="flex flex-col overflow-hidden rounded-[1.75rem] bg-card">
+                <div className="relative aspect-[3/4] w-full overflow-hidden bg-secondary/40">
                     {photo ? (
                         <img src={photo} alt={passport.garment.reference} className="h-full w-full object-cover" />
                     ) : (
-                        <div className="text-muted-foreground/40 flex h-full w-full items-center justify-center text-xs">
+                        <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground/40">
                             (pas de photo)
                         </div>
                     )}
-                    <div className="absolute right-3 top-3">
+                    <div className="absolute top-3 right-3">
                         <IrisGrade grade={grade} size="lg" tone="solid" />
                     </div>
                     {overrideGrade && overrideGrade !== score.grade ? (
-                        <div className="bg-foreground/80 text-background absolute left-3 top-3 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold">
+                        <div className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-foreground/80 px-2 py-1 text-[10px] font-semibold text-background">
                             <Sparkles className="h-2.5 w-2.5" />
                             override
                         </div>
@@ -54,12 +54,12 @@ export function PassportPhonePreview({
                 </div>
 
                 <div className="space-y-2 p-4">
-                    <p className="text-foreground truncate text-sm font-semibold">{passport.garment.reference}</p>
-                    <p className="text-muted-foreground truncate text-xs">
+                    <p className="truncate text-sm font-semibold text-foreground">{passport.garment.reference}</p>
+                    <p className="truncate text-xs text-muted-foreground">
                         {artisan?.atelierName ?? artisan?.displayName ?? '-'}
                     </p>
                     <div className="flex items-baseline justify-between pt-2">
-                        <span className="text-foreground text-base font-bold">
+                        <span className="text-base font-bold text-foreground">
                             {passport.garment.retailPrice.toLocaleString('fr-FR')} €
                         </span>
                         <span

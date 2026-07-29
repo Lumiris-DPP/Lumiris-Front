@@ -30,7 +30,7 @@ export function EmptyState({ artisan, items }: EmptyStateProps) {
     return (
         <Card className="mx-auto max-w-2xl">
             <CardContent className="space-y-6 p-8 text-center">
-                <div className="border-border bg-muted text-muted-foreground mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border text-xl font-semibold">
+                <div className="mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-border bg-muted text-xl font-semibold text-muted-foreground">
                     {artisan.photoUrl ? (
                         <Image
                             src={artisan.photoUrl}
@@ -46,8 +46,8 @@ export function EmptyState({ artisan, items }: EmptyStateProps) {
                 </div>
 
                 <div>
-                    <h2 className="text-foreground text-2xl font-semibold">Bienvenue {firstName}</h2>
-                    <p className="text-muted-foreground mt-2 text-sm">
+                    <h2 className="text-2xl font-semibold text-foreground">Bienvenue {firstName}</h2>
+                    <p className="mt-2 text-sm text-muted-foreground">
                         Trois étapes pour publier votre premier passeport vivant.
                     </p>
                 </div>
@@ -56,26 +56,24 @@ export function EmptyState({ artisan, items }: EmptyStateProps) {
                     {items.map((item) => {
                         const isPrimary = item.key === 'passport';
                         return (
-                            <li key={item.key} className="border-border flex items-start gap-4 rounded-lg border p-4">
+                            <li key={item.key} className="flex items-start gap-4 rounded-lg border border-border p-4">
                                 <div className="mt-0.5">
                                     {item.done ? (
-                                        <Check className="text-lumiris-emerald h-5 w-5" />
+                                        <Check className="h-5 w-5 text-lumiris-emerald" />
                                     ) : (
-                                        <Circle className="text-muted-foreground h-5 w-5" />
+                                        <Circle className="h-5 w-5 text-muted-foreground" />
                                     )}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <p className="text-foreground text-sm font-medium">{item.label}</p>
-                                    <p className="text-muted-foreground mt-1 text-xs">{HELPERS[item.key]}</p>
+                                    <p className="text-sm font-medium text-foreground">{item.label}</p>
+                                    <p className="mt-1 text-xs text-muted-foreground">{HELPERS[item.key]}</p>
                                 </div>
                                 <Button
                                     asChild
                                     size="sm"
                                     variant={isPrimary ? 'default' : 'outline'}
                                     className={
-                                        isPrimary
-                                            ? 'bg-lumiris-cyan hover:bg-lumiris-cyan/90 text-white'
-                                            : undefined
+                                        isPrimary ? 'bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90' : undefined
                                     }
                                 >
                                     <Link href={item.href}>{CTAS[item.key]}</Link>

@@ -27,10 +27,10 @@ export function RegulatoryTimeline({ sectorFilter, now }: TimelineProps) {
     );
 
     return (
-        <section className="border-border bg-card rounded-xl border p-5">
+        <section className="rounded-xl border border-border bg-card p-5">
             <header className="mb-4">
-                <h3 className="text-foreground text-sm font-semibold">Calendrier ESPR 2026 → 2030</h3>
-                <p className="text-muted-foreground mt-1 text-xs">
+                <h3 className="text-sm font-semibold text-foreground">Calendrier ESPR 2026 → 2030</h3>
+                <p className="mt-1 text-xs text-muted-foreground">
                     Jalons réglementaires par date · couleur = secteur.
                 </p>
             </header>
@@ -44,39 +44,39 @@ export function RegulatoryTimeline({ sectorFilter, now }: TimelineProps) {
                         <li key={milestone.id} className="relative">
                             <span
                                 className={cn(
-                                    'ring-card absolute -left-[27px] top-1 block rounded-full ring-2',
+                                    'absolute top-1 -left-[27px] block rounded-full ring-2 ring-card',
                                     tone.dot,
                                     milestone.major ? 'h-3.5 w-3.5' : 'h-2.5 w-2.5',
                                 )}
                                 aria-hidden
                             />
-                            <article className="border-border bg-background space-y-1.5 rounded-lg border p-3">
+                            <article className="space-y-1.5 rounded-lg border border-border bg-background p-3">
                                 <header className="flex flex-wrap items-baseline gap-2">
-                                    <h4 className="text-foreground text-sm font-semibold">{milestone.title}</h4>
+                                    <h4 className="text-sm font-semibold text-foreground">{milestone.title}</h4>
                                     <Badge variant="outline" className={cn('font-mono text-[10px]', tone.chip)}>
                                         {SECTOR_LABEL[milestone.sector]}
                                     </Badge>
                                     {milestone.major ? (
                                         <Badge
                                             variant="outline"
-                                            className="border-lumiris-rose/40 text-lumiris-rose font-mono text-[10px]"
+                                            className="border-lumiris-rose/40 font-mono text-[10px] text-lumiris-rose"
                                         >
                                             MAJEUR
                                         </Badge>
                                     ) : null}
-                                    <span className="text-muted-foreground ml-auto font-mono text-[10px]">
+                                    <span className="ml-auto font-mono text-[10px] text-muted-foreground">
                                         {milestone.date}
                                     </span>
                                 </header>
-                                <p className="text-muted-foreground text-xs leading-relaxed">{milestone.description}</p>
-                                <div className="text-muted-foreground flex flex-wrap items-center gap-3 text-[11px]">
+                                <p className="text-xs leading-relaxed text-muted-foreground">{milestone.description}</p>
+                                <div className="flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
                                     <span className="font-mono">{milestone.legalReference}</span>
                                     {milestone.sourceUrl ? (
                                         <a
                                             href={milestone.sourceUrl}
                                             target="_blank"
                                             rel="noreferrer noopener"
-                                            className="text-lumiris-cyan inline-flex items-center gap-1 hover:underline"
+                                            className="inline-flex items-center gap-1 text-lumiris-cyan hover:underline"
                                         >
                                             <ExternalLink className="h-3 w-3" /> Source
                                         </a>

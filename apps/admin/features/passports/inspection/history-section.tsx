@@ -58,15 +58,15 @@ export function HistorySection({ passportId }: HistorySectionProps) {
     return (
         <section className="space-y-4">
             <header className="flex items-center justify-between gap-3">
-                <h2 className="text-foreground inline-flex items-center gap-2 text-base font-semibold">
-                    <History className="text-lumiris-cyan h-4 w-4" /> Historique
+                <h2 className="inline-flex items-center gap-2 text-base font-semibold text-foreground">
+                    <History className="h-4 w-4 text-lumiris-cyan" /> Historique
                 </h2>
-                <p className="text-muted-foreground text-xs">
+                <p className="text-xs text-muted-foreground">
                     {entries.length} entrée{entries.length > 1 ? 's' : ''}
                 </p>
             </header>
 
-            <div className="border-border bg-card overflow-hidden rounded-xl border">
+            <div className="overflow-hidden rounded-xl border border-border bg-card">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -87,12 +87,12 @@ export function HistorySection({ passportId }: HistorySectionProps) {
                                     </Badge>
                                 </TableCell>
                                 <TableCell className="font-mono text-xs">{formatGradeDelta(e)}</TableCell>
-                                <TableCell className="text-muted-foreground text-[11px]">
+                                <TableCell className="text-[11px] text-muted-foreground">
                                     {formatReason(e) ?? '-'}
                                 </TableCell>
                                 <TableCell className="text-xs">
                                     <span className="text-foreground">{e.actorId}</span>
-                                    <span className="text-muted-foreground ml-1 font-mono text-[10px]">
+                                    <span className="ml-1 font-mono text-[10px] text-muted-foreground">
                                         ({e.actorRole})
                                     </span>
                                 </TableCell>
@@ -100,7 +100,7 @@ export function HistorySection({ passportId }: HistorySectionProps) {
                         ))}
                         {entries.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={5} className="text-muted-foreground py-8 text-center text-xs">
+                                <TableCell colSpan={5} className="py-8 text-center text-xs text-muted-foreground">
                                     Aucun événement enregistré pour ce passeport.
                                 </TableCell>
                             </TableRow>

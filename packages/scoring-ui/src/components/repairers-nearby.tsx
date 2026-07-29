@@ -55,7 +55,7 @@ export function RepairersNearby({
 
     if (visible.length === 0) {
         return (
-            <ul className={cn('text-muted-foreground text-sm', className)} {...rest}>
+            <ul className={cn('text-sm text-muted-foreground', className)} {...rest}>
                 <li className="italic">Aucun retoucheur référencé dans la zone.</li>
             </ul>
         );
@@ -67,24 +67,24 @@ export function RepairersNearby({
                 const distance = distanceKm(userCoordinates, r.coordinates) ?? r.distanceKm;
                 const tier = priceTier(r.priceRange.min, r.priceRange.max);
                 return (
-                    <li key={r.id} className="border-border/60 bg-card flex flex-col gap-2 rounded-2xl border p-4">
+                    <li key={r.id} className="flex flex-col gap-2 rounded-2xl border border-border/60 bg-card p-4">
                         <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
-                                <p className="text-foreground truncate text-sm font-semibold">{r.displayName}</p>
-                                <p className="text-muted-foreground inline-flex items-center gap-1 text-xs">
+                                <p className="truncate text-sm font-semibold text-foreground">{r.displayName}</p>
+                                <p className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                                     <MapPin className="h-3 w-3" />
                                     {r.city}
                                     {typeof distance === 'number' ? (
-                                        <span className="text-muted-foreground font-mono">
+                                        <span className="font-mono text-muted-foreground">
                                             · {distance.toFixed(1)} km
                                         </span>
                                     ) : null}
                                 </p>
                             </div>
-                            <div className="text-foreground inline-flex items-center gap-1 text-sm font-semibold">
-                                <Star className="text-lumiris-amber h-3.5 w-3.5 fill-current" />
+                            <div className="inline-flex items-center gap-1 text-sm font-semibold text-foreground">
+                                <Star className="h-3.5 w-3.5 fill-current text-lumiris-amber" />
                                 {r.avgRating.toFixed(1)}
-                                <span className="text-muted-foreground ml-0.5 text-[10px] font-normal">
+                                <span className="ml-0.5 text-[10px] font-normal text-muted-foreground">
                                     ({r.reviewCount})
                                 </span>
                             </div>
@@ -98,7 +98,7 @@ export function RepairersNearby({
                             ))}
                         </div>
 
-                        <div className="text-muted-foreground flex items-center justify-between gap-3 text-xs">
+                        <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
                             <span className="inline-flex items-center gap-1">
                                 <Clock className="h-3 w-3" /> ~{r.avgDelayDays} j
                             </span>
@@ -107,7 +107,7 @@ export function RepairersNearby({
                                 <button
                                     type="button"
                                     onClick={() => onRepairerSelect(r)}
-                                    className="border-lumiris-emerald/30 bg-lumiris-emerald/10 text-lumiris-emerald hover:bg-lumiris-emerald/20 rounded-full border px-3 py-1 text-[11px] font-medium transition"
+                                    className="rounded-full border border-lumiris-emerald/30 bg-lumiris-emerald/10 px-3 py-1 text-[11px] font-medium text-lumiris-emerald transition hover:bg-lumiris-emerald/20"
                                 >
                                     {ctaLabel}
                                 </button>

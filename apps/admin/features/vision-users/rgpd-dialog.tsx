@@ -111,7 +111,7 @@ export function RgpdDialog({ user, status, onStatusChange, onAnnounce }: RgpdDia
                         variant="outline"
                         disabled={!canErase || isCompleted || isPendingDeletion}
                         onClick={() => setDeleteOpen(true)}
-                        className="border-lumiris-rose/40 text-lumiris-rose hover:bg-lumiris-rose/10 gap-1.5"
+                        className="gap-1.5 border-lumiris-rose/40 text-lumiris-rose hover:bg-lumiris-rose/10"
                     >
                         <Trash2 className="h-3.5 w-3.5" aria-hidden /> Supprimer compte
                     </Button>
@@ -151,7 +151,7 @@ export function RgpdDialog({ user, status, onStatusChange, onAnnounce }: RgpdDia
                                 checked={exportConfirmed}
                                 onCheckedChange={(v) => setExportConfirmed(Boolean(v))}
                             />
-                            <Label htmlFor="rgpd-export-confirm" className="text-foreground cursor-pointer text-xs">
+                            <Label htmlFor="rgpd-export-confirm" className="cursor-pointer text-xs text-foreground">
                                 Je confirme — l&apos;accès est tracé
                             </Label>
                         </div>
@@ -179,7 +179,7 @@ export function RgpdDialog({ user, status, onStatusChange, onAnnounce }: RgpdDia
             >
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle className="text-lumiris-rose inline-flex items-center gap-2">
+                        <AlertDialogTitle className="inline-flex items-center gap-2 text-lumiris-rose">
                             <ShieldAlert className="h-4 w-4" aria-hidden /> Supprimer compte
                         </AlertDialogTitle>
                         <AlertDialogDescription>Irréversible. Tracé dans l&apos;audit log.</AlertDialogDescription>
@@ -198,7 +198,7 @@ export function RgpdDialog({ user, status, onStatusChange, onAnnounce }: RgpdDia
                                 checked={deleteConfirmed}
                                 onCheckedChange={(v) => setDeleteConfirmed(Boolean(v))}
                             />
-                            <Label htmlFor="rgpd-delete-confirm" className="text-foreground cursor-pointer text-xs">
+                            <Label htmlFor="rgpd-delete-confirm" className="cursor-pointer text-xs text-foreground">
                                 Je confirme — l&apos;action est tracée
                             </Label>
                         </div>

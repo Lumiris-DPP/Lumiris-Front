@@ -30,8 +30,8 @@ export function PaginationBar({
     label = 'entrées',
 }: PaginationBarProps) {
     return (
-        <div className="border-border bg-card flex items-center justify-between gap-3 border-t px-4 py-2">
-            <p className="text-muted-foreground text-xs">
+        <div className="flex items-center justify-between gap-3 border-t border-border bg-card px-4 py-2">
+            <p className="text-xs text-muted-foreground">
                 {totalCount === 0 ? `0 / 0 ${label}` : `${rangeStart}-${rangeEnd} / ${totalCount} ${label}`}
             </p>
             <div className="flex items-center gap-2">
@@ -60,7 +60,7 @@ export function PaginationBar({
                     >
                         <ChevronLeft className="h-3.5 w-3.5" aria-hidden />
                     </Button>
-                    <span className="text-muted-foreground min-w-[64px] text-center font-mono text-xs">
+                    <span className="min-w-[64px] text-center font-mono text-xs text-muted-foreground">
                         {page} / {pageCount}
                     </span>
                     <Button

@@ -36,7 +36,7 @@ export function Kpis({ rows }: { rows: readonly PassportRow[] }) {
     return (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
             {chips.map((chip, i) => (
-                <span key={chip.label} className="text-muted-foreground inline-flex items-center gap-1.5 text-xs">
+                <span key={chip.label} className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
                     {i > 0 ? (
                         <span aria-hidden className="text-muted-foreground/40">
                             ·

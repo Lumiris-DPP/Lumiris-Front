@@ -31,7 +31,7 @@ interface UserTableProps {
 export function UserTable({ rows, onOpen, onResetFilters }: UserTableProps) {
     const pagination = usePagination(rows, 25);
     return (
-        <div className="border-border bg-card overflow-hidden rounded-xl border">
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
             <Table>
                 <TableHeader stickyHeader>
                     <TableRow>
@@ -46,7 +46,7 @@ export function UserTable({ rows, onOpen, onResetFilters }: UserTableProps) {
                 <TableBody>
                     {rows.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={6} className="text-muted-foreground py-6 text-center text-xs">
+                            <TableCell colSpan={6} className="py-6 text-center text-xs text-muted-foreground">
                                 <div className="flex flex-col items-center gap-2">
                                     <p>Aucun utilisateur ne correspond à ces filtres.</p>
                                     <Button size="sm" variant="outline" onClick={onResetFilters} className="gap-1.5">
@@ -94,8 +94,8 @@ function UserRow({ user, onOpen }: { user: MockVisionUser; onOpen: () => void })
                         </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0">
-                        <p className="text-foreground text-xs">{maskEmail(user.email)}</p>
-                        <p className="text-muted-foreground text-[10px]">
+                        <p className="text-xs text-foreground">{maskEmail(user.email)}</p>
+                        <p className="text-[10px] text-muted-foreground">
                             {user.name ?? '-'} · {user.city ?? '-'}
                         </p>
                         {visibleSegments.length > 0 ? (
@@ -114,7 +114,7 @@ function UserRow({ user, onOpen }: { user: MockVisionUser; onOpen: () => void })
                                     );
                                 })}
                                 {overflowSegments > 0 ? (
-                                    <Badge variant="outline" className="text-muted-foreground text-[10px]">
+                                    <Badge variant="outline" className="text-[10px] text-muted-foreground">
                                         +{overflowSegments}
                                     </Badge>
                                 ) : null}
@@ -149,7 +149,7 @@ function UserRow({ user, onOpen }: { user: MockVisionUser; onOpen: () => void })
 
 function ConsentIcons({ affiliation, newsletter }: { affiliation: boolean; newsletter: boolean }) {
     if (!affiliation && !newsletter) {
-        return <span className="text-muted-foreground/50 font-mono text-[10px]">-</span>;
+        return <span className="font-mono text-[10px] text-muted-foreground/50">-</span>;
     }
     return (
         <div className="flex items-center gap-2">
@@ -179,7 +179,7 @@ function ConsentIcons({ affiliation, newsletter }: { affiliation: boolean; newsl
 
 function RgpdRowBadge({ status }: { status: ReturnType<typeof getRgpdStatus> }) {
     if (status === 'none') {
-        return <span className="text-muted-foreground/50 font-mono text-[10px]">-</span>;
+        return <span className="font-mono text-[10px] text-muted-foreground/50">-</span>;
     }
     const map: Record<Exclude<typeof status, 'none'>, { label: string; tone: string; Icon?: typeof ShieldAlert }> = {
         requested: { label: RGPD_ROW_LABEL.requested, tone: 'border-lumiris-amber/40 text-lumiris-amber' },

@@ -61,13 +61,13 @@ function NavLink({ item, active, onNavigate }: { item: NavItem; active: boolean;
                 className={
                     item.primary
                         ? cn(
-                              'bg-lumiris-cyan hover:bg-lumiris-cyan/90 my-2 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white shadow-sm transition-opacity',
-                              active && 'ring-lumiris-cyan/30 ring-2 ring-offset-1',
+                              'my-2 flex items-center gap-3 rounded-lg bg-lumiris-cyan px-3 py-2.5 text-sm font-medium text-white shadow-sm transition-opacity hover:bg-lumiris-cyan/90',
+                              active && 'ring-2 ring-lumiris-cyan/30 ring-offset-1',
                           )
                         : cn(
                               'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
                               active
-                                  ? 'bg-lumiris-cyan/10 text-lumiris-cyan font-medium'
+                                  ? 'bg-lumiris-cyan/10 font-medium text-lumiris-cyan'
                                   : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                           )
                 }
@@ -100,18 +100,18 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
 
     return (
         <WorkspaceShellContext.Provider value={ctx}>
-            <div className="bg-background min-h-screen">
-                <aside className="border-border bg-card w-65 fixed left-0 top-0 z-30 hidden h-screen flex-col border-r md:flex">
+            <div className="min-h-screen bg-background">
+                <aside className="fixed top-0 left-0 z-30 hidden h-screen w-65 flex-col border-r border-border bg-card md:flex">
                     <SidebarContent />
                 </aside>
 
                 <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-                    <SheetContent side="left" className="w-70 sm:max-w-70 p-0">
+                    <SheetContent side="left" className="w-70 p-0 sm:max-w-70">
                         <SidebarContent onNavigate={() => setIsSidebarOpen(false)} />
                     </SheetContent>
                 </Sheet>
 
-                <main className="md:ml-65 flex min-h-screen flex-col">{children}</main>
+                <main className="flex min-h-screen flex-col md:ml-65">{children}</main>
             </div>
         </WorkspaceShellContext.Provider>
     );
@@ -135,7 +135,9 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     const limitLabel = isRealMode
         ? quota?.unlimited
             ? '∞'
-            : (quota?.limit != null ? String(quota.limit) : '—')
+            : quota?.limit != null
+              ? String(quota.limit)
+              : '—'
         : ATELIER_PASSPORT_LIMIT_LABEL[artisan.tier];
 
     const onToggleCycle = (annual: boolean) => {
@@ -148,11 +150,11 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
     return (
         <div className="flex h-full flex-col">
-            <div className="border-border flex items-center gap-3 border-b px-5 py-5">
+            <div className="flex items-center gap-3 border-b border-border px-5 py-5">
                 <LumirisLogo className="h-9 w-auto" />
                 <div>
-                    <p className="text-foreground text-sm font-semibold leading-none">LUMIRIS</p>
-                    <p className="text-muted-foreground font-mono text-[10px] tracking-widest">ATELIER</p>
+                    <p className="text-sm leading-none font-semibold text-foreground">LUMIRIS</p>
+                    <p className="font-mono text-[10px] tracking-widest text-muted-foreground">ATELIER</p>
                 </div>
             </div>
 
@@ -171,11 +173,11 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 </ul>
             </nav>
 
-            <div className="border-border space-y-2 border-t px-4 py-3">
+            <div className="space-y-2 border-t border-border px-4 py-3">
                 <div className="flex items-center gap-2">
                     <span
                         className={cn(
-                            'rounded-md px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider',
+                            'rounded-md px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wider uppercase',
                             artisan.tier === 'Solo' && 'bg-tier-solo/15 text-tier-solo',
                             artisan.tier === 'Studio' && 'bg-tier-studio/15 text-tier-studio',
                             artisan.tier === 'Maison' && 'bg-tier-maison/15 text-tier-maison',
@@ -184,21 +186,21 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                         {artisan.tier}
                     </span>
                     {hasAtelierPlus && (
-                        <span className="bg-lumiris-iris/10 text-lumiris-iris rounded-md px-2 py-0.5 font-mono text-[10px] font-semibold">
+                        <span className="rounded-md bg-lumiris-iris/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-lumiris-iris">
                             ATELIER+
                         </span>
                     )}
                 </div>
-                <p className="text-muted-foreground font-mono text-[11px]">
+                <p className="font-mono text-[11px] text-muted-foreground">
                     {usedCount} / {limitLabel} passeports actifs
                 </p>
                 {/* The cycle switch only ever wrote to a local mock billing store — a fake control
                     in real mode, where the true cycle is managed on the /subscription page. */}
                 {!isRealMode && (
                     <div className="flex items-center justify-between gap-2 pt-1">
-                        <span className="text-muted-foreground text-[10px] uppercase tracking-wider">Cycle</span>
-                        <div className="text-muted-foreground flex items-center gap-1.5 text-[10px]">
-                            <span className={cn(billing.billingCycle === 'monthly' && 'text-foreground font-medium')}>
+                        <span className="text-[10px] tracking-wider text-muted-foreground uppercase">Cycle</span>
+                        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                            <span className={cn(billing.billingCycle === 'monthly' && 'font-medium text-foreground')}>
                                 mois
                             </span>
                             <Switch
@@ -207,8 +209,8 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                                 aria-label="Basculer entre cycle mensuel et annuel"
                                 className="h-4 w-7"
                             />
-                            <span className={cn(billing.billingCycle === 'annual' && 'text-foreground font-medium')}>
-                                an <span className="text-lumiris-cyan font-mono">−17%</span>
+                            <span className={cn(billing.billingCycle === 'annual' && 'font-medium text-foreground')}>
+                                an <span className="font-mono text-lumiris-cyan">−17%</span>
                             </span>
                         </div>
                     </div>

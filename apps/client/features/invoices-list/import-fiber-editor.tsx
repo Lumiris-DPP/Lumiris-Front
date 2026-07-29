@@ -16,11 +16,11 @@ export function ImportFiberEditor({ fibers, onChange }: Props) {
         <div className="sm:col-span-2">
             <Label>Fibres détectées</Label>
             {fibers.length === 0 ? (
-                <p className="text-muted-foreground border-border bg-muted/30 mt-1 rounded-md border p-3 text-xs">
+                <p className="mt-1 rounded-md border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
                     Aucune fibre détectée. Lancez l’extraction pour pré-remplir.
                 </p>
             ) : (
-                <ul className="border-border bg-card mt-1 divide-y rounded-md border">
+                <ul className="mt-1 divide-y rounded-md border border-border bg-card">
                     {fibers.map((f, i) => (
                         <li key={i} className="flex items-center justify-between px-3 py-2 text-sm">
                             <span className="text-foreground capitalize">{f.fiber}</span>
@@ -39,7 +39,7 @@ export function ImportFiberEditor({ fibers, onChange }: Props) {
                                     }
                                     className="h-8 w-20"
                                 />
-                                <span className="text-muted-foreground text-xs">%</span>
+                                <span className="text-xs text-muted-foreground">%</span>
                                 <Button
                                     variant="ghost"
                                     size="icon"

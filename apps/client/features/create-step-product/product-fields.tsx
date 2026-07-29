@@ -72,7 +72,7 @@ export function PhotoField({
     return (
         <div className="space-y-2 md:col-span-2">
             <Label>Photo principale</Label>
-            <label className="border-border bg-muted/40 hover:bg-muted relative flex aspect-square w-full max-w-48 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed text-center transition-colors">
+            <label className="relative flex aspect-square w-full max-w-48 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/40 text-center transition-colors hover:bg-muted">
                 {previewUrl ? (
                     <>
                         <Image
@@ -90,7 +90,7 @@ export function PhotoField({
                                     e.preventDefault();
                                     onChange(null);
                                 }}
-                                className="bg-background/80 absolute right-2 top-2 rounded-full p-1"
+                                className="absolute top-2 right-2 rounded-full bg-background/80 p-1"
                                 aria-label="Supprimer la photo"
                             >
                                 <X className="h-4 w-4" />
@@ -99,8 +99,8 @@ export function PhotoField({
                     </>
                 ) : (
                     <>
-                        <ImagePlus className="text-muted-foreground mb-2 h-6 w-6" />
-                        <p className="text-muted-foreground text-sm">Glissez ou cliquez pour ajouter une photo</p>
+                        <ImagePlus className="mb-2 h-6 w-6 text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground">Glissez ou cliquez pour ajouter une photo</p>
                     </>
                 )}
                 <input
@@ -129,7 +129,7 @@ export function SizesField({ selected, onToggle }: { selected: readonly string[]
                             onClick={() => onToggle(size)}
                             className={`rounded-md border px-3 py-1 text-sm transition-colors ${
                                 isSelected
-                                    ? 'bg-lumiris-cyan border-lumiris-cyan text-white'
+                                    ? 'border-lumiris-cyan bg-lumiris-cyan text-white'
                                     : 'border-border text-muted-foreground hover:border-lumiris-cyan'
                             }`}
                         >
@@ -172,7 +172,7 @@ export function ColorsField({ colors, onChange }: { colors: readonly string[]; o
                 <button
                     type="button"
                     onClick={add}
-                    className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 rounded-md px-3 text-sm text-white"
+                    className="rounded-md bg-lumiris-cyan px-3 text-sm text-white hover:bg-lumiris-cyan/90"
                 >
                     Ajouter
                 </button>

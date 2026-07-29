@@ -31,7 +31,7 @@ export function Subscription() {
     if (!sub.isRealMode) {
         return (
             <Notice>
-                <p className="text-foreground font-medium">Abonnement indisponible en mode démo</p>
+                <p className="font-medium text-foreground">Abonnement indisponible en mode démo</p>
                 <p>
                     Créez un compte ou connectez-vous avec vos identifiants pour gérer votre abonnement ATELIER et
                     débloquer la création de passeports.
@@ -43,7 +43,7 @@ export function Subscription() {
     if (sub.isError) {
         return (
             <Notice>
-                <p className="text-destructive font-medium">Impossible de charger votre abonnement.</p>
+                <p className="font-medium text-destructive">Impossible de charger votre abonnement.</p>
                 <Button variant="outline" size="sm" onClick={sub.retry}>
                     Réessayer
                 </Button>
@@ -58,18 +58,18 @@ export function Subscription() {
             <AtelierPlusCard sub={sub} />
 
             <div className="flex items-center justify-center">
-                <div className="text-muted-foreground bg-muted inline-flex items-center gap-1 rounded-md p-0.5">
+                <div className="inline-flex items-center gap-1 rounded-md bg-muted p-0.5 text-muted-foreground">
                     <CycleButton active={!sub.isAnnual} onClick={() => sub.setCycle('monthly')}>
                         Mensuel
                     </CycleButton>
                     <CycleButton active={sub.isAnnual} onClick={() => sub.setCycle('annual')}>
-                        Annuel <span className="text-lumiris-cyan ml-1 font-mono text-[10px]">2 mois offerts</span>
+                        Annuel <span className="ml-1 font-mono text-[10px] text-lumiris-cyan">2 mois offerts</span>
                     </CycleButton>
                 </div>
             </div>
 
             {sub.plansLoading ? (
-                <div className="text-muted-foreground flex items-center gap-2 p-8 text-sm">
+                <div className="flex items-center gap-2 p-8 text-sm text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" /> Chargement des offres…
                 </div>
             ) : (
@@ -92,8 +92,8 @@ export function Subscription() {
                 </section>
             )}
 
-            <p className="text-muted-foreground flex items-center justify-center gap-1.5 text-xs">
-                <ShieldCheck className="text-lumiris-cyan h-3.5 w-3.5" />
+            <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                <ShieldCheck className="h-3.5 w-3.5 text-lumiris-cyan" />
                 Paiement sécurisé par Stripe · aucun acteur ne peut payer pour influencer son score Iris.
             </p>
 
@@ -127,9 +127,7 @@ export function Subscription() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Annuler</AlertDialogCancel>
-                        <AlertDialogAction onClick={sub.confirmPlanChange}>
-                            Confirmer le changement
-                        </AlertDialogAction>
+                        <AlertDialogAction onClick={sub.confirmPlanChange}>Confirmer le changement</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -144,12 +142,12 @@ function PaymentRecoveryBanner({ sub }: { sub: SubscriptionPage }) {
     const { subscription } = sub;
     if (!subscription || subscription.active) return null;
     return (
-        <div className="border-destructive/40 bg-destructive/10 flex flex-col gap-3 rounded-xl border p-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-3 rounded-xl border border-destructive/40 bg-destructive/10 p-4 md:flex-row md:items-center md:justify-between">
             <div className="flex items-start gap-2.5 text-sm">
-                <AlertTriangle className="text-destructive mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" aria-hidden />
                 <div>
-                    <p className="text-foreground font-medium">Paiement de votre abonnement en échec</p>
-                    <p className="text-muted-foreground text-xs">
+                    <p className="font-medium text-foreground">Paiement de votre abonnement en échec</p>
+                    <p className="text-xs text-muted-foreground">
                         Le paiement de votre abonnement a échoué — mettez à jour votre carte pour rétablir l&apos;accès.
                     </p>
                 </div>
@@ -175,7 +173,7 @@ function Notice({ children }: { children: ReactNode }) {
     return (
         <div className="p-4 md:p-8">
             <Card>
-                <CardContent className="text-muted-foreground space-y-3 p-6 text-sm">{children}</CardContent>
+                <CardContent className="space-y-3 p-6 text-sm text-muted-foreground">{children}</CardContent>
             </Card>
         </div>
     );
@@ -188,15 +186,15 @@ function CurrentSubscriptionCard({ sub }: { sub: SubscriptionPage }) {
             <CardContent className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
                 <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                        <p className="text-foreground text-lg font-semibold">
+                        <p className="text-lg font-semibold text-foreground">
                             {subscription ? subscription.tierLabel : 'Aucun abonnement actif'}
                         </p>
                         {subscription && (
                             <Badge
                                 className={cn(
                                     subscription.active
-                                        ? 'bg-lumiris-emerald/10 text-lumiris-emerald border-lumiris-emerald/30'
-                                        : 'bg-lumiris-amber/10 text-lumiris-amber border-lumiris-amber/30',
+                                        ? 'border-lumiris-emerald/30 bg-lumiris-emerald/10 text-lumiris-emerald'
+                                        : 'border-lumiris-amber/30 bg-lumiris-amber/10 text-lumiris-amber',
                                 )}
                             >
                                 {subscription.active ? 'Actif' : subscription.status}
@@ -204,29 +202,29 @@ function CurrentSubscriptionCard({ sub }: { sub: SubscriptionPage }) {
                         )}
                     </div>
                     {quota && (
-                        <p className="text-muted-foreground text-sm">
+                        <p className="text-sm text-muted-foreground">
                             {isLoading ? (
                                 'Chargement…'
                             ) : quota.unlimited ? (
                                 <>Passeports : {quota.used} (illimité)</>
                             ) : (
                                 <>
-                                    Passeports : <span className="text-foreground font-mono">{quota.used}</span> /{' '}
+                                    Passeports : <span className="font-mono text-foreground">{quota.used}</span> /{' '}
                                     {quota.limit ?? '—'}
                                 </>
                             )}
                             {subscription?.cancelAtPeriodEnd && (
-                                <span className="text-lumiris-amber ml-2">· se termine en fin de période</span>
+                                <span className="ml-2 text-lumiris-amber">· se termine en fin de période</span>
                             )}
                         </p>
                     )}
                     {subscription?.active && subscription.currentPeriodEnd && !subscription.cancelAtPeriodEnd && (
-                        <p className="text-muted-foreground text-xs">
+                        <p className="text-xs text-muted-foreground">
                             Prochain renouvellement : {formatDate(subscription.currentPeriodEnd, { locale: 'fr-FR' })}
                         </p>
                     )}
                     {!subscription && (
-                        <p className="text-lumiris-amber text-xs">
+                        <p className="text-xs text-lumiris-amber">
                             Souscrivez un palier ATELIER pour créer vos passeports.
                         </p>
                     )}
@@ -279,30 +277,30 @@ function AtelierPlusCard({ sub }: { sub: SubscriptionPage }) {
             <CardContent className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
                 <div className="space-y-1.5">
                     <div className="flex items-center gap-2">
-                        <div className="bg-lumiris-iris/10 flex h-8 w-8 items-center justify-center rounded-lg">
-                            <Sparkles className="text-lumiris-iris h-4 w-4" />
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-lumiris-iris/10">
+                            <Sparkles className="h-4 w-4 text-lumiris-iris" />
                         </div>
-                        <p className="text-foreground text-lg font-semibold">Option ATELIER+</p>
+                        <p className="text-lg font-semibold text-foreground">Option ATELIER+</p>
                         <Badge
                             className={cn(
                                 active
-                                    ? 'bg-lumiris-iris/10 text-lumiris-iris border-lumiris-iris/30'
-                                    : 'bg-muted text-muted-foreground border-border',
+                                    ? 'border-lumiris-iris/30 bg-lumiris-iris/10 text-lumiris-iris'
+                                    : 'border-border bg-muted text-muted-foreground',
                             )}
                         >
                             {active ? 'Activée' : 'Non activée'}
                         </Badge>
                     </div>
-                    <p className="text-muted-foreground max-w-xl text-sm">
+                    <p className="max-w-xl text-sm text-muted-foreground">
                         Option complémentaire qui s&apos;ajoute à votre palier ATELIER (elle ne le remplace pas).
                         Débloque l&apos;Analytics avancé : scans QR, score Iris vs marché et pièces les plus vues.
                     </p>
-                    <p className="text-muted-foreground flex items-center gap-1.5 text-xs">
-                        <BarChart3 className="text-lumiris-iris h-3.5 w-3.5" />
+                    <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <BarChart3 className="h-3.5 w-3.5 text-lumiris-iris" />
                         Facturée en plus de votre abonnement de base, au prorata.
                     </p>
                     {!canManage && (
-                        <p className="text-lumiris-amber text-xs">
+                        <p className="text-xs text-lumiris-amber">
                             Un abonnement ATELIER actif est requis pour ajouter cette option.
                         </p>
                     )}
@@ -321,7 +319,7 @@ function AtelierPlusCard({ sub }: { sub: SubscriptionPage }) {
                         </Button>
                     ) : (
                         <Button
-                            className="bg-lumiris-iris hover:bg-lumiris-iris/90 gap-1.5 text-white"
+                            className="gap-1.5 bg-lumiris-iris text-white hover:bg-lumiris-iris/90"
                             onClick={sub.activateAtelierPlus}
                             disabled={!canManage || pending}
                         >

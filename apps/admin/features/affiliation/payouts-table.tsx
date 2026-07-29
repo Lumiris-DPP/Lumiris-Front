@@ -37,7 +37,7 @@ export function PayoutsTable({ rows, bankStatuses, onOpen, pagination, totalCoun
         );
     }
     return (
-        <div className="border-border bg-card overflow-hidden rounded-xl border">
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
             <Table>
                 <TableHeader stickyHeader>
                     <TableRow>
@@ -55,7 +55,7 @@ export function PayoutsTable({ rows, bankStatuses, onOpen, pagination, totalCoun
                         return (
                             <TableRow
                                 key={p.id}
-                                className="hover:bg-muted/40 cursor-pointer"
+                                className="cursor-pointer hover:bg-muted/40"
                                 onClick={() => onOpen(p.id)}
                                 tabIndex={0}
                                 role="button"
@@ -67,8 +67,8 @@ export function PayoutsTable({ rows, bankStatuses, onOpen, pagination, totalCoun
                                 }}
                             >
                                 <TableCell>
-                                    <p className="text-foreground font-mono text-sm">{p.period}</p>
-                                    <p className="text-muted-foreground text-[10px]">{p.id}</p>
+                                    <p className="font-mono text-sm text-foreground">{p.period}</p>
+                                    <p className="text-[10px] text-muted-foreground">{p.id}</p>
                                 </TableCell>
                                 <TableCell className="text-right font-mono text-sm">{p.beneficiaryCount}</TableCell>
                                 <TableCell className="font-mono text-[11px]">{dateLabel(p)}</TableCell>
@@ -84,7 +84,7 @@ export function PayoutsTable({ rows, bankStatuses, onOpen, pagination, totalCoun
                                     </Badge>
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    <ChevronRight className="text-muted-foreground h-3.5 w-3.5" aria-hidden />
+                                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
                                 </TableCell>
                             </TableRow>
                         );

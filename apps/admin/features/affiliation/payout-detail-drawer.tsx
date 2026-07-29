@@ -71,11 +71,11 @@ export function PayoutDetailDrawer({
         <div className="flex flex-col gap-5">
             <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
                 <div>
-                    <dt className="text-muted-foreground text-[10px] uppercase tracking-wider">Référence</dt>
-                    <dd className="text-foreground mt-0.5 font-mono">{payout.id}</dd>
+                    <dt className="text-[10px] tracking-wider text-muted-foreground uppercase">Référence</dt>
+                    <dd className="mt-0.5 font-mono text-foreground">{payout.id}</dd>
                 </div>
                 <div>
-                    <dt className="text-muted-foreground text-[10px] uppercase tracking-wider">Statut bancaire</dt>
+                    <dt className="text-[10px] tracking-wider text-muted-foreground uppercase">Statut bancaire</dt>
                     <dd className="mt-0.5">
                         <Badge variant="outline" className={cn('font-mono text-[10px]', BANK_STATUS_TONE[bankStatus])}>
                             {BANK_STATUS_LABEL[bankStatus]}
@@ -83,36 +83,36 @@ export function PayoutDetailDrawer({
                     </dd>
                 </div>
                 <div>
-                    <dt className="text-muted-foreground text-[10px] uppercase tracking-wider">Montant total</dt>
-                    <dd className="text-lumiris-emerald mt-0.5 font-mono text-base font-semibold">
+                    <dt className="text-[10px] tracking-wider text-muted-foreground uppercase">Montant total</dt>
+                    <dd className="mt-0.5 font-mono text-base font-semibold text-lumiris-emerald">
                         {payout.totalEur.toFixed(2)} €
                     </dd>
                 </div>
                 <div>
-                    <dt className="text-muted-foreground text-[10px] uppercase tracking-wider">Bénéficiaires</dt>
-                    <dd className="text-foreground mt-0.5 font-mono">{payout.beneficiaryCount}</dd>
+                    <dt className="text-[10px] tracking-wider text-muted-foreground uppercase">Bénéficiaires</dt>
+                    <dd className="mt-0.5 font-mono text-foreground">{payout.beneficiaryCount}</dd>
                 </div>
                 <div>
-                    <dt className="text-muted-foreground text-[10px] uppercase tracking-wider">Préparé le</dt>
-                    <dd className="text-foreground mt-0.5 font-mono">
+                    <dt className="text-[10px] tracking-wider text-muted-foreground uppercase">Préparé le</dt>
+                    <dd className="mt-0.5 font-mono text-foreground">
                         {payout.preparedAt ? new Date(payout.preparedAt).toLocaleDateString('fr-FR') : '—'}
                     </dd>
                 </div>
                 <div>
-                    <dt className="text-muted-foreground text-[10px] uppercase tracking-wider">Date prévue</dt>
-                    <dd className="text-foreground mt-0.5 font-mono">
+                    <dt className="text-[10px] tracking-wider text-muted-foreground uppercase">Date prévue</dt>
+                    <dd className="mt-0.5 font-mono text-foreground">
                         {new Date(expected).toLocaleDateString('fr-FR')}
                     </dd>
                 </div>
                 <div>
-                    <dt className="text-muted-foreground text-[10px] uppercase tracking-wider">Événements exclus</dt>
-                    <dd className="text-foreground mt-0.5 font-mono">{payout.excludedEventIds.length}</dd>
+                    <dt className="text-[10px] tracking-wider text-muted-foreground uppercase">Événements exclus</dt>
+                    <dd className="mt-0.5 font-mono text-foreground">{payout.excludedEventIds.length}</dd>
                 </div>
             </dl>
 
             <section>
-                <p className="text-foreground mb-2 text-xs font-medium">Répartition par bénéficiaire</p>
-                <div className="border-border overflow-hidden rounded-lg border">
+                <p className="mb-2 text-xs font-medium text-foreground">Répartition par bénéficiaire</p>
+                <div className="overflow-hidden rounded-lg border border-border">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -125,8 +125,8 @@ export function PayoutDetailDrawer({
                             {beneficiaries.map((b) => (
                                 <TableRow key={b.id}>
                                     <TableCell>
-                                        <p className="text-foreground text-sm">{b.name}</p>
-                                        <p className="text-muted-foreground text-[10px]">{b.id}</p>
+                                        <p className="text-sm text-foreground">{b.name}</p>
+                                        <p className="text-[10px] text-muted-foreground">{b.id}</p>
                                     </TableCell>
                                     <TableCell className="text-right font-mono text-sm">{b.count}</TableCell>
                                     <TableCell className="text-right font-mono text-sm">
@@ -136,7 +136,7 @@ export function PayoutDetailDrawer({
                             ))}
                             {beneficiaries.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={3} className="text-muted-foreground py-4 text-center text-xs">
+                                    <TableCell colSpan={3} className="py-4 text-center text-xs text-muted-foreground">
                                         Aucun bénéficiaire enregistré sur la période.
                                     </TableCell>
                                 </TableRow>
@@ -147,7 +147,7 @@ export function PayoutDetailDrawer({
             </section>
 
             <section>
-                <p className="text-foreground mb-2 text-xs font-medium">Commentaire interne</p>
+                <p className="mb-2 text-xs font-medium text-foreground">Commentaire interne</p>
                 <Textarea
                     value={comment}
                     onChange={(e) => onCommentChange(e.target.value)}
@@ -164,14 +164,14 @@ export function PayoutDetailDrawer({
                 <li className="text-muted-foreground italic">Aucune entrée d&apos;audit pour ce payout.</li>
             ) : (
                 auditEntries.map((entry) => (
-                    <li key={entry.id} className="border-border bg-card rounded-lg border p-3">
+                    <li key={entry.id} className="rounded-lg border border-border bg-card p-3">
                         <div className="flex items-baseline justify-between gap-2">
-                            <p className="text-foreground font-mono text-[11px]">{entry.action}</p>
-                            <p className="text-muted-foreground font-mono text-[10px]">
+                            <p className="font-mono text-[11px] text-foreground">{entry.action}</p>
+                            <p className="font-mono text-[10px] text-muted-foreground">
                                 {new Date(entry.ts).toLocaleString('fr-FR')}
                             </p>
                         </div>
-                        <p className="text-muted-foreground mt-1 text-[11px]">
+                        <p className="mt-1 text-[11px] text-muted-foreground">
                             {entry.actorId} · {entry.actorRole}
                         </p>
                     </li>

@@ -115,7 +115,7 @@ export function ArtisanDrawer({ artisan, onClose }: ArtisanDrawerProps) {
                             variant="outline"
                             onClick={() => setSuspendOpen(true)}
                             disabled={!canSuspend}
-                            className="border-lumiris-rose/40 text-lumiris-rose hover:bg-lumiris-rose/10 gap-1.5"
+                            className="gap-1.5 border-lumiris-rose/40 text-lumiris-rose hover:bg-lumiris-rose/10"
                         >
                             <PauseCircle className="h-3.5 w-3.5" /> Suspendre
                         </Button>
@@ -146,7 +146,7 @@ export function ArtisanDrawer({ artisan, onClose }: ArtisanDrawerProps) {
                             checked={suspendConfirmed}
                             onCheckedChange={(v) => setSuspendConfirmed(v === true)}
                         />
-                        <label htmlFor="suspend-confirm" className="text-foreground cursor-pointer">
+                        <label htmlFor="suspend-confirm" className="cursor-pointer text-foreground">
                             Je confirme — l&apos;action est tracée
                         </label>
                     </div>

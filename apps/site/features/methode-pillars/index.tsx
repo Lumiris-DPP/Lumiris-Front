@@ -48,10 +48,10 @@ export function MethodePillars() {
                     transition={{ duration: 0.5 }}
                     className="mb-16 text-center"
                 >
-                    <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                         4 piliers, 100 points
                     </h2>
-                    <p className="text-muted-foreground mx-auto mt-4 max-w-xl text-lg">
+                    <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
                         Chaque passeport est évalué sur 4 axes avec des pondérations fixes et transparentes.
                     </p>
                 </motion.div>
@@ -97,7 +97,7 @@ export function MethodePillars() {
                             >
                                 {/* Weight badge */}
                                 <div
-                                    className={`absolute right-4 top-4 flex h-12 w-12 items-center justify-center rounded-full ${colorClasses.light}`}
+                                    className={`absolute top-4 right-4 flex h-12 w-12 items-center justify-center rounded-full ${colorClasses.light}`}
                                 >
                                     <span className={`text-lg font-bold ${colorClasses.text}`}>{pillar.weight}</span>
                                 </div>
@@ -106,16 +106,16 @@ export function MethodePillars() {
                                 <div className={`mb-4 text-3xl ${colorClasses.text}`}>{pillar.icon}</div>
 
                                 {/* Label */}
-                                <h3 className="text-foreground text-xl font-semibold">{pillar.label}</h3>
+                                <h3 className="text-xl font-semibold text-foreground">{pillar.label}</h3>
 
                                 {/* Description */}
-                                <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+                                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                                     {pillar.description}
                                 </p>
 
                                 {/* Weight indicator line */}
                                 <div className="mt-6">
-                                    <div className="bg-muted h-1 w-full overflow-hidden rounded-full">
+                                    <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
                                         <div
                                             className={`h-full ${colorClasses.bg} transition-all duration-500`}
                                             style={{ width: `${pillar.weight}%` }}

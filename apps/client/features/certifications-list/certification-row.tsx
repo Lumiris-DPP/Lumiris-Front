@@ -35,18 +35,18 @@ export function CertificationRow({ cert, now, onView, onRenew, onDelete }: Props
                 <div className="flex items-center gap-2">
                     <span>{certLabel(cert)}</span>
                     {isMock ? (
-                        <Badge variant="outline" className="text-muted-foreground text-[10px] uppercase tracking-wide">
+                        <Badge variant="outline" className="text-[10px] tracking-wide text-muted-foreground uppercase">
                             Démo
                         </Badge>
                     ) : null}
                 </div>
             </TableCell>
-            <TableCell className="text-muted-foreground text-xs">{cert.issuer}</TableCell>
-            <TableCell className="text-muted-foreground text-xs">
+            <TableCell className="text-xs text-muted-foreground">{cert.issuer}</TableCell>
+            <TableCell className="text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-2">
                     {formatDateFr(cert.expiresAt)}
                     {expiringSoon ? (
-                        <span className="text-lumiris-amber inline-flex items-center gap-1 text-[10px]">
+                        <span className="inline-flex items-center gap-1 text-[10px] text-lumiris-amber">
                             <Clock className="h-3 w-3" /> &lt; 90j
                         </span>
                     ) : null}

@@ -70,7 +70,7 @@ export function OverviewTab() {
             {subs.length === 0 ? (
                 <EmptyState title="Aucun abonnement." />
             ) : (
-                <div className="border-border bg-card overflow-hidden rounded-xl border">
+                <div className="overflow-hidden rounded-xl border border-border bg-card">
                     <Table>
                         <TableHeader stickyHeader>
                             <TableRow>
@@ -120,11 +120,11 @@ function SubscriptionRow({ sub, onSelect }: { sub: Subscription; onSelect: (s: S
                     onSelect(sub);
                 }
             }}
-            className="hover:bg-muted/40 cursor-pointer"
+            className="cursor-pointer hover:bg-muted/40"
         >
             <TableCell>
-                <p className="text-foreground text-sm font-medium">{sub.displayName}</p>
-                <p className="text-muted-foreground text-[10px]">
+                <p className="text-sm font-medium text-foreground">{sub.displayName}</p>
+                <p className="text-[10px] text-muted-foreground">
                     {sub.subscriberKind === 'artisan' ? 'Artisan' : 'Retoucheur'} · {sub.city}
                 </p>
             </TableCell>
@@ -136,7 +136,7 @@ function SubscriptionRow({ sub, onSelect }: { sub: Subscription; onSelect: (s: S
                     {sub.plus ? (
                         <Badge
                             variant="outline"
-                            className="border-lumiris-iris/40 text-lumiris-iris font-mono text-[10px]"
+                            className="border-lumiris-iris/40 font-mono text-[10px] text-lumiris-iris"
                         >
                             ATELIER+
                         </Badge>
@@ -163,9 +163,9 @@ function KpiTile({ label, value, variationPct }: { label: string; value: string;
             : null;
     const variationTone = variationPct !== undefined && variationPct < 0 ? 'text-lumiris-rose' : 'text-lumiris-emerald';
     return (
-        <div className="border-border bg-card flex flex-col rounded-xl border p-4">
-            <p className="text-muted-foreground text-sm">{label}</p>
-            <p className="text-foreground mt-1 text-2xl font-semibold">{value}</p>
+        <div className="flex flex-col rounded-xl border border-border bg-card p-4">
+            <p className="text-sm text-muted-foreground">{label}</p>
+            <p className="mt-1 text-2xl font-semibold text-foreground">{value}</p>
             {variation ? <p className={cn('mt-0.5 text-[11px]', variationTone)}>{variation}</p> : null}
         </div>
     );
@@ -195,10 +195,10 @@ function MrrSparkline() {
         .join(' ');
 
     return (
-        <div className="border-border bg-card flex flex-wrap items-center justify-between gap-4 rounded-xl border p-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-4">
             <div>
-                <p className="text-foreground text-sm font-medium">MRR · 6 mois</p>
-                <p className="text-muted-foreground text-[11px]">
+                <p className="text-sm font-medium text-foreground">MRR · 6 mois</p>
+                <p className="text-[11px] text-muted-foreground">
                     {points[0]?.label} → {points[points.length - 1]?.label}
                 </p>
             </div>

@@ -13,11 +13,11 @@ export function ArtisanPublicView({ artisan }: Props) {
     const name = artisan.atelierName ?? artisan.displayName ?? 'Atelier';
 
     return (
-        <article className="pb-20 pt-28">
+        <article className="pt-28 pb-20">
             <header className="mx-auto max-w-5xl px-6">
                 <Link
                     href="/artisans"
-                    className="text-muted-foreground hover:text-foreground inline-flex items-center text-xs"
+                    className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground"
                 >
                     ← Tous les artisans
                 </Link>
@@ -28,15 +28,15 @@ export function ArtisanPublicView({ artisan }: Props) {
                             alt={`Portrait de ${name}`}
                             width={160}
                             height={160}
-                            className="border-border h-32 w-32 shrink-0 rounded-2xl border object-cover sm:h-40 sm:w-40"
+                            className="h-32 w-32 shrink-0 rounded-2xl border border-border object-cover sm:h-40 sm:w-40"
                             priority
                         />
                     ) : null}
                     <div>
-                        <p className="text-muted-foreground text-xs font-medium uppercase tracking-[0.25em]">Atelier</p>
-                        <h1 className="text-foreground mt-2 text-balance text-4xl font-bold tracking-tight">{name}</h1>
+                        <p className="text-xs font-medium tracking-[0.25em] text-muted-foreground uppercase">Atelier</p>
+                        <h1 className="mt-2 text-4xl font-bold tracking-tight text-balance text-foreground">{name}</h1>
                         {artisan.displayName || artisan.city ? (
-                            <p className="text-muted-foreground mt-2 text-base">
+                            <p className="mt-2 text-base text-muted-foreground">
                                 {artisan.displayName}
                                 {artisan.displayName && artisan.city ? ' · ' : ''}
                                 {artisan.city ? (
@@ -71,7 +71,7 @@ export function ArtisanPublicView({ artisan }: Props) {
                 <section className="mx-auto mt-8 max-w-5xl px-6">
                     <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                         {artisan.photoUrls.slice(1).map((url) => (
-                            <li key={url} className="bg-muted relative aspect-square overflow-hidden rounded-xl">
+                            <li key={url} className="relative aspect-square overflow-hidden rounded-xl bg-muted">
                                 <Image src={url} alt={name} fill sizes="25vw" className="object-cover" />
                             </li>
                         ))}
@@ -85,7 +85,7 @@ export function ArtisanPublicView({ artisan }: Props) {
                         <CardHeader>
                             <CardTitle className="text-base">Histoire</CardTitle>
                         </CardHeader>
-                        <CardContent className="text-foreground/90 text-sm leading-relaxed">
+                        <CardContent className="text-sm leading-relaxed text-foreground/90">
                             {artisan.story}
                         </CardContent>
                     </Card>
@@ -95,7 +95,7 @@ export function ArtisanPublicView({ artisan }: Props) {
                         <CardHeader>
                             <CardTitle className="text-base">Méthode</CardTitle>
                         </CardHeader>
-                        <CardContent className="text-foreground/90 text-sm leading-relaxed">
+                        <CardContent className="text-sm leading-relaxed text-foreground/90">
                             {artisan.method}
                         </CardContent>
                     </Card>
@@ -105,7 +105,7 @@ export function ArtisanPublicView({ artisan }: Props) {
                         <CardHeader>
                             <CardTitle className="text-base">Parcours</CardTitle>
                         </CardHeader>
-                        <CardContent className="text-foreground/90 text-sm leading-relaxed">
+                        <CardContent className="text-sm leading-relaxed text-foreground/90">
                             {artisan.journey}
                         </CardContent>
                     </Card>

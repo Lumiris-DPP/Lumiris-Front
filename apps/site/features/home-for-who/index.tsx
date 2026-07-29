@@ -36,10 +36,10 @@ export function HomeForWho() {
                     transition={{ duration: 0.5 }}
                     className="text-center"
                 >
-                    <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                         Deux mondes, une mission
                     </h2>
-                    <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg">
+                    <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
                         Que vous créiez des pièces ou que vous les portiez, LUMIRIS vous connecte à la transparence.
                     </p>
                 </motion.div>
@@ -53,7 +53,7 @@ export function HomeForWho() {
                             viewport={{ once: true, margin: '-50px' }}
                             transition={{ duration: 0.4, delay: index * 0.1 }}
                         >
-                            <div className="bg-card border-border group relative h-full overflow-hidden rounded-2xl border p-6 transition-shadow hover:shadow-lg sm:p-8">
+                            <div className="group relative h-full overflow-hidden rounded-2xl border border-border bg-card p-6 transition-shadow hover:shadow-lg sm:p-8">
                                 <div
                                     className={`flex h-12 w-12 items-center justify-center rounded-xl ${
                                         persona.accent === 'cyan' ? 'bg-lumiris-cyan/10' : 'bg-lumiris-iris/10'
@@ -65,8 +65,8 @@ export function HomeForWho() {
                                         }`}
                                     />
                                 </div>
-                                <h3 className="text-foreground mt-5 text-xl font-semibold">{persona.title}</h3>
-                                <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
+                                <h3 className="mt-5 text-xl font-semibold text-foreground">{persona.title}</h3>
+                                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                                     {persona.description}
                                 </p>
                                 <Link

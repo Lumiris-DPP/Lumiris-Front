@@ -40,7 +40,7 @@ const TOTAL = 86; // moyenne pondérée 40/25/25/10
 
 export function HomePassportDemo() {
     return (
-        <section className="bg-muted/30 relative overflow-hidden py-24 sm:py-32">
+        <section className="relative overflow-hidden bg-muted/30 py-24 sm:py-32">
             <div className="relative mx-auto max-w-6xl px-6">
                 <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
                     {/* === Phone mockup === */}
@@ -69,19 +69,19 @@ export function HomePassportDemo() {
                                 whileInView={{ opacity: 1, scale: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.5, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                                className="absolute -right-6 -top-6 z-20 sm:-right-8"
+                                className="absolute -top-6 -right-6 z-20 sm:-right-8"
                             >
-                                <div className="bg-lumiris-emerald shadow-lumiris-emerald/40 flex h-16 w-16 items-center justify-center rounded-2xl text-3xl font-black text-white shadow-2xl sm:h-20 sm:w-20 sm:text-4xl">
+                                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-lumiris-emerald text-3xl font-black text-white shadow-2xl shadow-lumiris-emerald/40 sm:h-20 sm:w-20 sm:text-4xl">
                                     A
                                 </div>
                             </motion.div>
 
                             {/* Phone frame */}
-                            <div className="bg-foreground relative w-72 rounded-[2.75rem] p-2.5 shadow-2xl sm:w-80">
-                                <div className="bg-background overflow-hidden rounded-[2.25rem]">
+                            <div className="relative w-72 rounded-[2.75rem] bg-foreground p-2.5 shadow-2xl sm:w-80">
+                                <div className="overflow-hidden rounded-[2.25rem] bg-background">
                                     {/* Status bar (notch) */}
-                                    <div className="bg-card flex items-center justify-center py-2">
-                                        <div className="bg-foreground h-6 w-28 rounded-full" />
+                                    <div className="flex items-center justify-center bg-card py-2">
+                                        <div className="h-6 w-28 rounded-full bg-foreground" />
                                     </div>
 
                                     {/* Hero image grand format */}
@@ -94,41 +94,41 @@ export function HomePassportDemo() {
                                             className="object-cover"
                                         />
                                         {/* Overlay gradient pour la lisibilité du titre superposé */}
-                                        <div className="bg-linear-to-t absolute inset-0 from-black/60 via-black/10 to-transparent" />
+                                        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/10 to-transparent" />
                                         {/* Titre + atelier en bas image */}
-                                        <div className="absolute bottom-3 left-4 right-4 text-white">
-                                            <p className="text-[10px] font-medium uppercase tracking-wider opacity-80">
+                                        <div className="absolute right-4 bottom-3 left-4 text-white">
+                                            <p className="text-[10px] font-medium tracking-wider uppercase opacity-80">
                                                 Atelier Margaux · Roanne
                                             </p>
-                                            <p className="text-base font-semibold leading-tight">Chemise Lin</p>
+                                            <p className="text-base leading-tight font-semibold">Chemise Lin</p>
                                         </div>
                                     </div>
 
-                                    <div className="px-5 pb-5 pt-4">
+                                    <div className="px-5 pt-4 pb-5">
                                         {/* Score total en hero */}
-                                        <div className="border-border/60 flex items-baseline gap-3 border-b pb-4">
-                                            <span className="text-foreground text-4xl font-black tabular-nums">
+                                        <div className="flex items-baseline gap-3 border-b border-border/60 pb-4">
+                                            <span className="text-4xl font-black text-foreground tabular-nums">
                                                 {TOTAL}
                                             </span>
-                                            <span className="text-muted-foreground font-mono text-xs">/ 100</span>
-                                            <span className="text-lumiris-cyan ml-auto text-xs font-semibold uppercase tracking-wider">
+                                            <span className="font-mono text-xs text-muted-foreground">/ 100</span>
+                                            <span className="ml-auto text-xs font-semibold tracking-wider text-lumiris-cyan uppercase">
                                                 Score Iris
                                             </span>
                                         </div>
 
                                         {/* Composition chips */}
                                         <div className="mt-4">
-                                            <p className="text-muted-foreground mb-2 font-mono text-[10px] uppercase tracking-wider">
+                                            <p className="mb-2 font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
                                                 Composition
                                             </p>
                                             <div className="flex flex-wrap gap-1.5">
-                                                <span className="bg-muted text-foreground rounded-full px-2.5 py-1 text-[11px] font-medium">
+                                                <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-medium text-foreground">
                                                     Lin 100%
                                                 </span>
-                                                <span className="bg-muted text-foreground rounded-full px-2.5 py-1 text-[11px] font-medium">
+                                                <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-medium text-foreground">
                                                     Origine France
                                                 </span>
-                                                <span className="bg-lumiris-emerald/10 text-lumiris-emerald rounded-full px-2.5 py-1 text-[11px] font-medium">
+                                                <span className="rounded-full bg-lumiris-emerald/10 px-2.5 py-1 text-[11px] font-medium text-lumiris-emerald">
                                                     GOTS ✓
                                                 </span>
                                             </div>
@@ -136,16 +136,16 @@ export function HomePassportDemo() {
 
                                         {/* 4 piliers — barres + valeurs colorées */}
                                         <div className="mt-4">
-                                            <p className="text-muted-foreground mb-2 font-mono text-[10px] uppercase tracking-wider">
+                                            <p className="mb-2 font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
                                                 4 piliers Iris
                                             </p>
                                             <div className="space-y-2.5">
                                                 {AXES.map((axis) => (
                                                     <div key={axis.label} className="flex items-center gap-2">
-                                                        <span className="text-muted-foreground w-17 text-[10px]">
+                                                        <span className="w-17 text-[10px] text-muted-foreground">
                                                             {axis.label}
                                                         </span>
-                                                        <div className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full">
+                                                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
                                                             <motion.div
                                                                 initial={{ width: 0 }}
                                                                 whileInView={{ width: `${axis.value}%` }}
@@ -177,9 +177,9 @@ export function HomePassportDemo() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.5, delay: 0.6 }}
-                                className="bg-foreground absolute -bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full px-4 py-2 text-white shadow-2xl"
+                                className="absolute -bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full bg-foreground px-4 py-2 text-white shadow-2xl"
                             >
-                                <ScanLine className="text-lumiris-cyan h-4 w-4" aria-hidden />
+                                <ScanLine className="h-4 w-4 text-lumiris-cyan" aria-hidden />
                                 <span className="text-xs font-medium">Scanné via VISION</span>
                             </motion.div>
                         </div>
@@ -193,13 +193,13 @@ export function HomePassportDemo() {
                             viewport={{ once: true, margin: '-100px' }}
                             transition={{ duration: 0.5 }}
                         >
-                            <p className="text-muted-foreground mb-3 font-mono text-xs uppercase tracking-[0.25em]">
+                            <p className="mb-3 font-mono text-xs tracking-[0.25em] text-muted-foreground uppercase">
                                 Le passeport
                             </p>
-                            <h2 className="text-foreground text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+                            <h2 className="text-3xl font-bold tracking-tight text-balance text-foreground sm:text-4xl">
                                 Un passeport complet pour chaque pièce
                             </h2>
-                            <p className="text-muted-foreground mt-4 text-lg leading-relaxed">
+                            <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
                                 Scannez le QR code ou la puce NFC pour accéder instantanément à la traçabilité complète
                                 : composition, fabrication, atelier, score.
                             </p>
@@ -215,12 +215,12 @@ export function HomePassportDemo() {
                                     transition={{ duration: 0.4, delay: 0.1 + i * 0.08 }}
                                     className="flex gap-4"
                                 >
-                                    <div className="bg-lumiris-cyan/10 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl">
-                                        <feature.icon className="text-lumiris-cyan h-5 w-5" aria-hidden />
+                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-lumiris-cyan/10">
+                                        <feature.icon className="h-5 w-5 text-lumiris-cyan" aria-hidden />
                                     </div>
                                     <div>
-                                        <h3 className="text-foreground font-semibold">{feature.title}</h3>
-                                        <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
+                                        <h3 className="font-semibold text-foreground">{feature.title}</h3>
+                                        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                                             {feature.description}
                                         </p>
                                     </div>

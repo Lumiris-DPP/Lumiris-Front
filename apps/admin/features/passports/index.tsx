@@ -151,7 +151,7 @@ function PassportsInner() {
                                 >
                                     <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden /> Filtres avancés
                                     {advancedActiveCount > 0 ? (
-                                        <span className="bg-lumiris-cyan/15 text-lumiris-cyan ml-1 rounded-full px-1.5 font-mono text-[10px]">
+                                        <span className="ml-1 rounded-full bg-lumiris-cyan/15 px-1.5 font-mono text-[10px] text-lumiris-cyan">
                                             {advancedActiveCount}
                                         </span>
                                     ) : null}
@@ -266,7 +266,7 @@ function PassportsInner() {
 function FilterField({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <div className="space-y-1.5">
-            <Label className="text-muted-foreground text-[11px] uppercase tracking-wider">{label}</Label>
+            <Label className="text-[11px] tracking-wider text-muted-foreground uppercase">{label}</Label>
             {children}
         </div>
     );

@@ -17,7 +17,7 @@ export interface CompositionListProps extends HTMLAttributes<HTMLDivElement> {
 export function CompositionList({ composition, now, resolveSupplier, className, ...rest }: CompositionListProps) {
     if (composition.length === 0) {
         return (
-            <p className={cn('text-muted-foreground text-sm', className as string)} {...rest}>
+            <p className={cn('text-sm text-muted-foreground', className as string)} {...rest}>
                 Composition non renseignée.
             </p>
         );
@@ -30,21 +30,21 @@ export function CompositionList({ composition, now, resolveSupplier, className, 
                     ? (resolveSupplier?.(entry.supplierId) ?? entry.supplierId)
                     : '- fournisseur manquant';
                 return (
-                    <div key={`${idx}-${entry.fiber}`} className="border-border bg-card rounded-xl border p-4">
+                    <div key={`${idx}-${entry.fiber}`} className="rounded-xl border border-border bg-card p-4">
                         <div className="flex items-baseline justify-between gap-3">
                             <div className="min-w-0 flex-1">
-                                <p className="text-foreground truncate text-sm font-medium">
+                                <p className="truncate text-sm font-medium text-foreground">
                                     {FIBER_LABEL[entry.fiber]}
                                 </p>
-                                <p className="text-muted-foreground mt-0.5 truncate text-xs">
+                                <p className="mt-0.5 truncate text-xs text-muted-foreground">
                                     {supplierName} · {entry.originCountry || '-'}
                                 </p>
                             </div>
-                            <span className="text-foreground font-mono text-sm font-bold">{entry.percentage}%</span>
+                            <span className="font-mono text-sm font-bold text-foreground">{entry.percentage}%</span>
                         </div>
                         <div className="mt-3 flex flex-wrap gap-1.5">
                             {entry.certifications.length === 0 ? (
-                                <span className="text-muted-foreground text-[11px] italic">
+                                <span className="text-[11px] text-muted-foreground italic">
                                     Aucune certification fibre
                                 </span>
                             ) : (
@@ -52,7 +52,7 @@ export function CompositionList({ composition, now, resolveSupplier, className, 
                             )}
                         </div>
                         {entry.invoiceRef ? (
-                            <p className="text-muted-foreground mt-2 font-mono text-[10px]">
+                            <p className="mt-2 font-mono text-[10px] text-muted-foreground">
                                 facture: {entry.invoiceRef}
                             </p>
                         ) : null}
@@ -72,7 +72,7 @@ function CertChip({ cert, now }: { cert: CertificationRef; now: Date }) {
         <Badge
             variant="outline"
             className={cn(
-                'text-foreground gap-1 font-mono text-[11px]',
+                'gap-1 font-mono text-[11px] text-foreground',
                 expired && 'border-lumiris-rose/40 bg-lumiris-rose/10',
                 unverified && 'border-lumiris-amber/40 bg-lumiris-amber/10',
                 !expired && !unverified && 'border-lumiris-emerald/40 bg-lumiris-emerald/10',

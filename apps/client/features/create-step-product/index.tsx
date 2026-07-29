@@ -105,7 +105,7 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
                     placeholder="France, Portugal, Inde…"
                     onChange={(e) => setForm((f) => ({ ...f, originCountry: e.target.value }))}
                 />
-                <p className="text-muted-foreground text-[11px]">
+                <p className="text-[11px] text-muted-foreground">
                     Pays où a lieu la dernière transformation majeure (coupe & couture).
                 </p>
             </div>
@@ -120,7 +120,7 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
 
             <ColorsField colors={form.colors ?? []} onChange={(colors) => setForm((f) => ({ ...f, colors }))} />
 
-            <div className="border-border space-y-4 rounded-lg border p-4 md:col-span-2">
+            <div className="space-y-4 rounded-lg border border-border p-4 md:col-span-2">
                 <p className="text-sm font-medium">Documents de la pièce</p>
                 <DocUploadField
                     label="Facture d'Origine ou Certificat de Vente"

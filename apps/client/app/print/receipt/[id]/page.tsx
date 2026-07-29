@@ -36,7 +36,7 @@ export default function PrintReceiptPage({ params }: PageProps) {
             <div className="mx-auto flex min-h-screen w-[105mm] flex-col gap-4 p-6 print:min-h-0">
                 <header className="space-y-1 border-b border-neutral-300 pb-3">
                     <LumirisLogo title="" className="mb-1 h-5 w-auto" />
-                    <p className="font-mono text-[10px] uppercase tracking-widest text-neutral-500">
+                    <p className="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">
                         LUMIRIS · Atelier
                     </p>
                     <h1 className="text-base font-semibold">Reçu de facturation</h1>
@@ -70,7 +70,7 @@ export default function PrintReceiptPage({ params }: PageProps) {
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <div className="flex items-baseline justify-between gap-3">
-            <span className="text-[11px] uppercase tracking-wider text-neutral-500">{label}</span>
+            <span className="text-[11px] tracking-wider text-neutral-500 uppercase">{label}</span>
             <span className="text-right">{children}</span>
         </div>
     );

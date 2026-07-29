@@ -62,7 +62,7 @@ export function CheckoutDialog({
                 </DialogHeader>
 
                 {!intent || !stripePromise ? (
-                    <div className="text-muted-foreground flex items-center justify-center gap-2 py-10 text-sm">
+                    <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
                         <Loader2 className="h-4 w-4 animate-spin" /> Préparation du paiement…
                     </div>
                 ) : (
@@ -131,7 +131,7 @@ function CheckoutForm({ amountLabel, onConfirmed }: { amountLabel: string; onCon
         <div className="space-y-4">
             <PaymentElement options={{ layout: 'tabs', wallets: { applePay: 'never', googlePay: 'never' } }} />
             {error && (
-                <p className="text-destructive text-xs" role="alert">
+                <p className="text-xs text-destructive" role="alert">
                     {error}
                 </p>
             )}
@@ -139,7 +139,7 @@ function CheckoutForm({ amountLabel, onConfirmed }: { amountLabel: string; onCon
                 type="button"
                 onClick={handlePay}
                 disabled={!stripe || submitting}
-                className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 h-10 w-full text-white"
+                className="h-10 w-full bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90"
             >
                 {submitting ? (
                     <>

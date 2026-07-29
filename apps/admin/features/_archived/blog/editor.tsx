@@ -129,8 +129,8 @@ export function BlogEditor({ article, siblings, onChange, onValidationChange, re
                     />
                 </Field>
 
-                <div className="border-border bg-card rounded-xl border p-3">
-                    <div className="border-border flex items-center gap-1 border-b pb-2">
+                <div className="rounded-xl border border-border bg-card p-3">
+                    <div className="flex items-center gap-1 border-b border-border pb-2">
                         {TOOLBAR.map((a) => (
                             <Button
                                 key={a.label}
@@ -144,7 +144,7 @@ export function BlogEditor({ article, siblings, onChange, onValidationChange, re
                                 <a.icon className="h-3.5 w-3.5" />
                             </Button>
                         ))}
-                        <span className="text-muted-foreground ml-auto font-mono text-[10px]">
+                        <span className="ml-auto font-mono text-[10px] text-muted-foreground">
                             {article.body.length} caractères
                         </span>
                     </div>
@@ -162,26 +162,26 @@ export function BlogEditor({ article, siblings, onChange, onValidationChange, re
 
             <aside className="space-y-4">
                 {errors.length > 0 ? (
-                    <div className="border-lumiris-rose/30 bg-lumiris-rose/5 rounded-xl border p-3 text-xs">
-                        <p className="text-lumiris-rose inline-flex items-center gap-1.5 font-semibold">
+                    <div className="rounded-xl border border-lumiris-rose/30 bg-lumiris-rose/5 p-3 text-xs">
+                        <p className="inline-flex items-center gap-1.5 font-semibold text-lumiris-rose">
                             <AlertTriangle className="h-3.5 w-3.5" /> Bloquants pré-publish
                         </p>
-                        <ul className="text-muted-foreground mt-1.5 list-disc space-y-0.5 pl-4">
+                        <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-muted-foreground">
                             {errors.map((err) => (
                                 <li key={err}>{err}</li>
                             ))}
                         </ul>
                     </div>
                 ) : (
-                    <div className="border-lumiris-emerald/30 bg-lumiris-emerald/5 rounded-xl border p-3 text-xs">
-                        <p className="text-lumiris-emerald inline-flex items-center gap-1.5 font-semibold">
+                    <div className="rounded-xl border border-lumiris-emerald/30 bg-lumiris-emerald/5 p-3 text-xs">
+                        <p className="inline-flex items-center gap-1.5 font-semibold text-lumiris-emerald">
                             <Save className="h-3.5 w-3.5" /> Prêt pour publication
                         </p>
                     </div>
                 )}
 
-                <div className="border-border bg-card space-y-3 rounded-xl border p-4">
-                    <p className="text-foreground text-xs font-semibold">Méta</p>
+                <div className="space-y-3 rounded-xl border border-border bg-card p-4">
+                    <p className="text-xs font-semibold text-foreground">Méta</p>
 
                     <Field label="Catégorie">
                         <Select
@@ -237,12 +237,12 @@ export function BlogEditor({ article, siblings, onChange, onValidationChange, re
                                                     {linkedArtisan.displayName.slice(0, 2).toUpperCase()}
                                                 </AvatarFallback>
                                             </Avatar>
-                                            <span className="text-foreground truncate text-xs">
+                                            <span className="truncate text-xs text-foreground">
                                                 {linkedArtisan.atelierName}
                                             </span>
                                         </>
                                     ) : (
-                                        <span className="text-muted-foreground text-xs">Aucun artisan lié</span>
+                                        <span className="text-xs text-muted-foreground">Aucun artisan lié</span>
                                     )}
                                 </Button>
                             </PopoverTrigger>
@@ -270,8 +270,8 @@ export function BlogEditor({ article, siblings, onChange, onValidationChange, re
                                                             {a.displayName.slice(0, 2).toUpperCase()}
                                                         </AvatarFallback>
                                                     </Avatar>
-                                                    <span className="text-foreground text-xs">{a.atelierName}</span>
-                                                    <span className="text-muted-foreground ml-auto text-[10px]">
+                                                    <span className="text-xs text-foreground">{a.atelierName}</span>
+                                                    <span className="ml-auto text-[10px] text-muted-foreground">
                                                         {a.tier}
                                                     </span>
                                                 </CommandItem>
@@ -285,7 +285,7 @@ export function BlogEditor({ article, siblings, onChange, onValidationChange, re
 
                     <div className="flex items-center justify-between gap-2 pt-1">
                         <Label className="text-xs">
-                            <CalendarClock className="text-muted-foreground mr-1 inline h-3.5 w-3.5" /> Programmer la
+                            <CalendarClock className="mr-1 inline h-3.5 w-3.5 text-muted-foreground" /> Programmer la
                             publication
                         </Label>
                         <Switch
@@ -309,8 +309,8 @@ export function BlogEditor({ article, siblings, onChange, onValidationChange, re
                     ) : null}
                 </div>
 
-                <div className="border-border bg-card space-y-3 rounded-xl border p-4">
-                    <p className="text-foreground text-xs font-semibold">SEO</p>
+                <div className="space-y-3 rounded-xl border border-border bg-card p-4">
+                    <p className="text-xs font-semibold text-foreground">SEO</p>
                     <Field
                         label="Meta title"
                         hint={`${article.metaTitle.length} / 30-60`}
@@ -366,7 +366,7 @@ export function BlogEditor({ article, siblings, onChange, onValidationChange, re
                     </a>
                 </Button>
 
-                <p className="text-muted-foreground inline-flex items-center gap-1 font-mono text-[10px]">
+                <p className="inline-flex items-center gap-1 font-mono text-[10px] text-muted-foreground">
                     <Calendar className="h-3 w-3" />
                     MAJ {new Date(article.updatedAt).toLocaleString('fr-FR')}
                 </p>

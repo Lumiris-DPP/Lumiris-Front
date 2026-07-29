@@ -128,7 +128,7 @@ export function InvoicesList() {
                                         <TableRow>
                                             <TableCell
                                                 colSpan={5}
-                                                className="text-muted-foreground py-10 text-center text-sm"
+                                                className="py-10 text-center text-sm text-muted-foreground"
                                             >
                                                 Aucune facture ne correspond aux filtres.
                                             </TableCell>

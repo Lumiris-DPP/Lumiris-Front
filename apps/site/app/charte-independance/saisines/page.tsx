@@ -113,24 +113,24 @@ function DecisionBadge({ decision }: { decision: SaisineDecision }) {
 
 export default function SaisinesPage() {
     return (
-        <div className="pb-20 pt-28">
+        <div className="pt-28 pb-20">
             <header className="mx-auto max-w-3xl px-6">
                 <Link
                     href="/charte-independance"
-                    className="text-muted-foreground hover:text-foreground inline-flex items-center text-xs"
+                    className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground"
                 >
                     ← Charte d’indépendance
                 </Link>
                 <div className="mt-6 flex items-center gap-3">
                     <FileText className="text-grade-b h-7 w-7" />
-                    <p className="text-muted-foreground text-xs font-medium uppercase tracking-[0.25em]">
+                    <p className="text-xs font-medium tracking-[0.25em] text-muted-foreground uppercase">
                         Saisines de la commission
                     </p>
                 </div>
-                <h1 className="text-foreground mt-3 text-balance text-4xl font-bold tracking-tight sm:text-5xl">
+                <h1 className="mt-3 text-4xl font-bold tracking-tight text-balance text-foreground sm:text-5xl">
                     Toutes les saisines reçues sont publiées.
                 </h1>
-                <p className="text-muted-foreground mt-5 text-pretty text-base leading-relaxed">
+                <p className="mt-5 text-base leading-relaxed text-pretty text-muted-foreground">
                     Cette page liste l’intégralité des saisines reçues par la commission d’indépendance LUMIRIS - date,
                     plaignant, décision motivée, actions correctives. Aucune saisine n’est filtrée. Une saisine en cours
                     apparaît dès sa réception ; sa décision est publiée sous 30 jours maximum.
@@ -147,11 +147,11 @@ export default function SaisinesPage() {
                             <Card>
                                 <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                     <div>
-                                        <p className="text-muted-foreground font-mono text-xs">{s.id}</p>
-                                        <CardTitle className="mt-1 text-base font-semibold leading-snug">
+                                        <p className="font-mono text-xs text-muted-foreground">{s.id}</p>
+                                        <CardTitle className="mt-1 text-base leading-snug font-semibold">
                                             {s.subject}
                                         </CardTitle>
-                                        <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-2 text-xs">
+                                        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                                             <Badge variant="outline" className="text-[11px]">
                                                 {PLAIGNANT_LABEL[s.plaignant]}
                                             </Badge>
@@ -165,27 +165,27 @@ export default function SaisinesPage() {
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div>
-                                        <p className="text-foreground text-xs font-semibold uppercase tracking-wide">
+                                        <p className="text-xs font-semibold tracking-wide text-foreground uppercase">
                                             Résumé
                                         </p>
-                                        <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
+                                        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                                             {s.summary}
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-foreground text-xs font-semibold uppercase tracking-wide">
+                                        <p className="text-xs font-semibold tracking-wide text-foreground uppercase">
                                             Décision motivée
                                         </p>
-                                        <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
+                                        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                                             {s.rationale}
                                         </p>
                                     </div>
                                     {s.actionsTaken.length > 0 && (
                                         <div>
-                                            <p className="text-foreground text-xs font-semibold uppercase tracking-wide">
+                                            <p className="text-xs font-semibold tracking-wide text-foreground uppercase">
                                                 Actions correctives
                                             </p>
-                                            <ul className="text-muted-foreground mt-2 space-y-1 text-sm leading-relaxed">
+                                            <ul className="mt-2 space-y-1 text-sm leading-relaxed text-muted-foreground">
                                                 {s.actionsTaken.map((a, idx) => (
                                                     <li key={idx} className="flex gap-2">
                                                         <span className="text-grade-a/80 mt-1.5 inline-block h-1 w-1 shrink-0 rounded-full bg-current" />
@@ -203,7 +203,7 @@ export default function SaisinesPage() {
             </section>
 
             <section className="mx-auto mt-12 max-w-3xl px-6 text-center">
-                <p className="text-muted-foreground text-sm">
+                <p className="text-sm text-muted-foreground">
                     Une saisine ?{' '}
                     <a
                         href="mailto:commission@lumiris.fr"

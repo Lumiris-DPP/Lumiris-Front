@@ -87,9 +87,9 @@ function SectorNav() {
     return (
         <nav
             aria-label="Vue par secteur"
-            className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs"
+            className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground"
         >
-            <span className="text-foreground font-medium">{SECTOR_LABEL[ACTIVE_SECTOR]}</span>
+            <span className="font-medium text-foreground">{SECTOR_LABEL[ACTIVE_SECTOR]}</span>
             {FUTURE_SECTORS.map((s) => (
                 <span key={s} className="text-muted-foreground/50">
                     {SECTOR_LABEL[s]}
@@ -119,12 +119,12 @@ function ReadinessTile({
 }) {
     const t = TILE_TONE[tone];
     return (
-        <div className={cn('bg-card flex flex-col rounded-xl border p-5', t.border)}>
+        <div className={cn('flex flex-col rounded-xl border bg-card p-5', t.border)}>
             <div className={cn('w-fit rounded-lg p-1.5', t.bg)}>
                 <Icon className={cn('h-4 w-4', t.text)} />
             </div>
             <span className={cn('mt-3 font-mono text-2xl font-bold tracking-tight', t.text)}>{value}</span>
-            <p className="text-foreground mt-1 text-[13px] font-medium">{label}</p>
+            <p className="mt-1 text-[13px] font-medium text-foreground">{label}</p>
         </div>
     );
 }
