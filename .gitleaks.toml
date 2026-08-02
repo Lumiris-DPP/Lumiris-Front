@@ -1,0 +1,8 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "localStorage bucket names, not credentials"
+targetRules = ["generic-api-key"]
+paths = ['''apps/mobile/lib/migrate-legacy-keys\.ts''']
+regexes = ['''legacyKey:\s*'lumiris\.[a-z.]+\.v\d+' ''']

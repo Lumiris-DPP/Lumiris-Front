@@ -29,6 +29,7 @@
         "typecheck": "turbo run typecheck",
         "test": "turbo run test",
         "knip": "knip",
+        "knip:gate": "knip --exclude exports,types,nsExports,nsTypes,enumMembers,duplicates",
         "knip:fix": "knip --fix",
         "lhci": "lhci autorun --config=./lighthouserc.cjs",
         "topo": "bun ./scripts/check-topology.mjs",

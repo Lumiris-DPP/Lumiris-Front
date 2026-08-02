@@ -1,25 +1,17 @@
 {
     "$schema": "https://unpkg.com/knip@5/schema.json",
+    "exclude": ["optionalPeerDependencies"],
     "workspaces": {
         ".": {
-            "entry": [
-                "turbo.json",
-                "lighthouserc.cjs",
-                "knip.json",
-                "syncpack.config.mjs",
-                "scripts/*.{mjs,js,ts}",
-                "bench/scenarios/*.js"
-            ],
-            "ignoreDependencies": ["k6", "postcss-load-config", "tailwindcss"]
+            "entry": ["turbo.json", "lighthouserc.cjs", "knip.json", "syncpack.config.mjs", "scripts/*.{mjs,js,ts}"],
+            "ignoreDependencies": ["postcss-load-config"]
         },
         "apps/admin": {
             "entry": [
                 "app/**/{page,layout,loading,error,not-found,route,template}.{ts,tsx}",
                 "app/web-vitals.tsx",
                 "env.ts",
-                "features/**/index.tsx",
-                "lib/data/use-*.ts",
-                "test/setup.ts"
+                "features/**/index.tsx"
             ],
             "project": ["**/*.{ts,tsx}"]
         },
@@ -57,7 +49,6 @@
             "project": ["src/**/*.ts"]
         },
         "packages/api-client": {
-            "entry": ["src/index.ts"],
             "project": ["src/**/*.{ts,tsx}"]
         },
         "packages/config": {
