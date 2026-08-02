@@ -1,154 +1,177 @@
 name: Release
 
-# Triggered by `git tag v* && git push --tags`.
-# Builds one image per app, pushes to GHCR, generates an SBOM via syft,
-# and signs the digest keyless with cosign + GitHub OIDC.
-
 on:
     push:
-        tags:
-            - 'v*'
+        tags: ['v*']
     workflow_dispatch:
         inputs:
             tag:
-                description: 'Tag to build (e.g. v0.1.0)'
+                description: 'Version to publish (e.g. v0.4.2)'
+                type: string
                 required: true
 
 permissions:
     contents: read
-    packages: write
-    id-token: write # cosign keyless OIDC
-    attestations: write
+
+concurrency:
+    group: release-${{ github.ref }}
+    cancel-in-progress: false
 
 env:
     REGISTRY: ghcr.io
-    IMAGE_NAMESPACE: ${{ github.repository_owner }}
+    BUN_VERSION: '1.3.14'
+    NEXT_TELEMETRY_DISABLED: '1'
 
 jobs:
-    build:
-        name: Build & push · ${{ matrix.app }}
+    version:
+        name: Resolve version
         runs-on: ubuntu-latest
+        timeout-minutes: 5
+        outputs:
+            version: ${{ steps.ident.outputs.version }}
+            sha_short: ${{ steps.ident.outputs.sha_short }}
+            namespace: ${{ steps.ident.outputs.namespace }}
+        steps:
+            - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+
+            - id: ident
+              env:
+                  DISPATCH_TAG: ${{ inputs.tag }}
+              run: |
+                  set -euo pipefail
+                  if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+                    VERSION="${DISPATCH_TAG}"
+                  else
+                    VERSION="${GITHUB_REF_NAME}"
+                  fi
+                  if [[ ! "${VERSION}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+                    echo "::error::'${VERSION}' is not a semver tag (expected vMAJOR.MINOR.PATCH)."
+                    exit 1
+                  fi
+                  {
+                    echo "version=${VERSION}"
+                    echo "sha_short=$(git rev-parse --short HEAD)"
+                    echo "namespace=${GITHUB_REPOSITORY_OWNER,,}"
+                  } >> "$GITHUB_OUTPUT"
+
+    build:
+        name: Build & push · ${{ matrix.image }}
+        runs-on: ubuntu-latest
+        timeout-minutes: 40
+        needs: version
+        permissions:
+            contents: read
+            packages: write
+            id-token: write
+            attestations: write
         strategy:
             fail-fast: false
             matrix:
                 include:
-                    - app: admin
-                      context: .
-                      dockerfile: apps/admin/Dockerfile
                     - app: site
-                      context: .
-                      dockerfile: apps/site/Dockerfile
+                      image: lumiris-site
+                    - app: client
+                      image: lumiris-app
+                    - app: admin
+                      image: lumiris-admin
                     - app: mobile
-                      context: .
-                      dockerfile: apps/mobile/Dockerfile
-                    - app: api
-                      context: .
-                      dockerfile: apps/api/Dockerfile
-
-        outputs:
-            sha_short: ${{ steps.meta.outputs.sha_short }}
-
+                      image: lumiris-mobile
         steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0
+            - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
 
-            - name: Compute identifiers
-              id: meta
-              run: |
-                  SHA_SHORT=$(git rev-parse --short HEAD)
-                  TAG_NAME="${GITHUB_REF_NAME}"
-                  if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-                    TAG_NAME="${{ inputs.tag }}"
-                  fi
-                  echo "sha_short=${SHA_SHORT}"  >> "$GITHUB_OUTPUT"
-                  echo "tag_name=${TAG_NAME}"    >> "$GITHUB_OUTPUT"
-                  echo "image=${REGISTRY}/${IMAGE_NAMESPACE,,}/${{ matrix.app }}" >> "$GITHUB_OUTPUT"
-
-            - name: Set up QEMU
-              uses: docker/setup-qemu-action@v3
-
-            - name: Set up Buildx
-              uses: docker/setup-buildx-action@v3
+            - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
             - name: Log in to GHCR
-              uses: docker/login-action@v3
+              uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
               with:
                   registry: ${{ env.REGISTRY }}
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Build & push image
+            - name: Build & push
               id: build
-              uses: docker/build-push-action@v6
+              uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
               with:
-                  context: ${{ matrix.context }}
-                  file: ${{ matrix.dockerfile }}
+                  context: .
+                  file: apps/${{ matrix.app }}/Dockerfile
                   push: true
-                  # Tags: the immutable git short-SHA + the human-readable git tag.
-                  # `latest` is intentionally absent — never used in prod.
+                  platforms: linux/amd64
+                  # NEXT_PUBLIC_* is inlined into the bundle at build time, so the
+                  # published image is bound to this API origin.
+                  build-args: |
+                      NEXT_PUBLIC_API_BASE_URL=https://api.${{ vars.PROD_DOMAIN || 'lumiris.eu' }}
+                      NEXT_PUBLIC_SENTRY_DSN=${{ secrets.SENTRY_DSN_FRONT }}
                   tags: |
-                      ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.sha_short }}
-                      ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag_name }}
+                      ${{ env.REGISTRY }}/${{ needs.version.outputs.namespace }}/${{ matrix.image }}:${{ needs.version.outputs.version }}
+                      ${{ env.REGISTRY }}/${{ needs.version.outputs.namespace }}/${{ matrix.image }}:${{ needs.version.outputs.sha_short }}
                   provenance: mode=max
-                  sbom: false # generated separately via syft for richer output
+                  sbom: false
                   cache-from: type=gha,scope=${{ matrix.app }}
                   cache-to: type=gha,mode=max,scope=${{ matrix.app }}
                   labels: |
                       org.opencontainers.image.source=https://github.com/${{ github.repository }}
                       org.opencontainers.image.revision=${{ github.sha }}
-                      org.opencontainers.image.version=${{ steps.meta.outputs.tag_name }}
-                      org.opencontainers.image.title=lumiris-${{ matrix.app }}
+                      org.opencontainers.image.version=${{ needs.version.outputs.version }}
+                      org.opencontainers.image.title=${{ matrix.image }}
+                      org.opencontainers.image.licenses=UNLICENSED
 
-            - name: Install syft
-              uses: anchore/sbom-action/download-syft@v0
-
-            - name: Generate SBOM (SPDX-JSON)
-              run: |
-                  mkdir -p sbom
-                  syft "${{ steps.meta.outputs.image }}@${{ steps.build.outputs.digest }}" \
-                    -o spdx-json=sbom/${{ matrix.app }}-${{ steps.meta.outputs.sha_short }}.spdx.json
-
-            - name: Upload SBOM artifact
-              uses: actions/upload-artifact@v4
+            - name: Trivy — block on fixable CRITICAL vulnerabilities
+              uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
               with:
-                  name: sbom-${{ matrix.app }}-${{ steps.meta.outputs.sha_short }}
-                  path: sbom/${{ matrix.app }}-${{ steps.meta.outputs.sha_short }}.spdx.json
+                  image-ref: ${{ env.REGISTRY }}/${{ needs.version.outputs.namespace }}/${{ matrix.image }}@${{ steps.build.outputs.digest }}
+                  format: table
+                  severity: CRITICAL
+                  ignore-unfixed: true
+                  exit-code: '1'
+
+            - name: Generate the SBOM
+              uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
+              with:
+                  image: ${{ env.REGISTRY }}/${{ needs.version.outputs.namespace }}/${{ matrix.image }}@${{ steps.build.outputs.digest }}
+                  format: spdx-json
+                  output-file: sbom.spdx.json
+                  upload-artifact: false
+                  upload-release-assets: false
+
+            - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+              with:
+                  name: sbom-${{ matrix.image }}-${{ needs.version.outputs.version }}
+                  path: sbom.spdx.json
                   retention-days: 90
 
-            - name: Install cosign
-              uses: sigstore/cosign-installer@v3
+            - uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
 
-            - name: Cosign keyless sign (digest)
-              env:
-                  COSIGN_EXPERIMENTAL: '1'
+            - name: Sign the digest (keyless)
               run: |
                   cosign sign --yes \
-                    "${{ steps.meta.outputs.image }}@${{ steps.build.outputs.digest }}"
+                    "${{ env.REGISTRY }}/${{ needs.version.outputs.namespace }}/${{ matrix.image }}@${{ steps.build.outputs.digest }}"
 
-            - name: Cosign attest SBOM
-              env:
-                  COSIGN_EXPERIMENTAL: '1'
+            - name: Attest the SBOM
               run: |
                   cosign attest --yes \
-                    --predicate sbom/${{ matrix.app }}-${{ steps.meta.outputs.sha_short }}.spdx.json \
+                    --predicate sbom.spdx.json \
                     --type spdxjson \
-                    "${{ steps.meta.outputs.image }}@${{ steps.build.outputs.digest }}"
+                    "${{ env.REGISTRY }}/${{ needs.version.outputs.namespace }}/${{ matrix.image }}@${{ steps.build.outputs.digest }}"
 
-            - name: Build provenance attestation
-              uses: actions/attest-build-provenance@v2
+            - uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3
               with:
-                  subject-name: ${{ steps.meta.outputs.image }}
+                  subject-name: ${{ env.REGISTRY }}/${{ needs.version.outputs.namespace }}/${{ matrix.image }}
                   subject-digest: ${{ steps.build.outputs.digest }}
                   push-to-registry: true
 
-    release-summary:
+    summary:
         name: Release summary
         runs-on: ubuntu-latest
-        needs: build
+        timeout-minutes: 5
+        needs: [version, build]
         steps:
-            - name: Print deploy hint
-              run: |
-                  echo "::notice title=Release ready::Tag pushed. On the VPS run:"
-                  echo "  make deploy-zd IMAGE_TAG=${{ needs.build.outputs.sha_short }}"
+            - run: |
+                  cat >> "$GITHUB_STEP_SUMMARY" <<'SUMMARY'
+                  ## Front ${{ needs.version.outputs.version }}
+
+                  Images pushed to `ghcr.io/${{ needs.version.outputs.namespace }}`:
+                  `lumiris-site`, `lumiris-app`, `lumiris-admin`, `lumiris-mobile`
+
+                  Deploy them from the **prod-deploy** workflow in `Lumiris-Infra` with
+                  `front_tag = ${{ needs.version.outputs.version }}`.
+                  SUMMARY
