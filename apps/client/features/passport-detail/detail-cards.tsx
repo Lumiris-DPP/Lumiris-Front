@@ -14,7 +14,7 @@ import { Badge } from '@lumiris/ui/components/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import type { DetailView } from './view-model';
 
-export function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
+function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
     if (value === null || value === undefined || value === '') return null;
     return (
         <div className="flex flex-col gap-0.5">
@@ -24,7 +24,7 @@ export function InfoRow({ label, value }: { label: string; value: React.ReactNod
     );
 }
 
-export function BooleanField({ value }: { value: boolean | null | undefined }) {
+function BooleanField({ value }: { value: boolean | null | undefined }) {
     if (value === null || value === undefined) return <span className="text-sm text-muted-foreground">—</span>;
     return value ? (
         <span className="flex items-center gap-1 text-sm text-lumiris-emerald">
@@ -60,7 +60,7 @@ function FieldGroup({ label, children }: { label: string; children: React.ReactN
 }
 
 /** Statut du DPP ; rien à afficher pour un passeport local (démo/brouillon non envoyé). */
-export function DppStatusBadge({ status }: { status: DetailView['apiStatus'] }) {
+function DppStatusBadge({ status }: { status: DetailView['apiStatus'] }) {
     if (status === 'DRAFT') {
         return (
             <Badge variant="outline" className="border-lumiris-amber/40 bg-lumiris-amber/5 text-lumiris-amber">

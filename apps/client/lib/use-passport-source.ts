@@ -6,7 +6,7 @@ import { mockArtisanById, mockCertificates, mockPassportById } from '@lumiris/mo
 import type { Artisan, Passport, ScoreResult } from '@lumiris/types';
 import { draftToPassport, useDraftStore } from './draft-store';
 
-export interface PassportSource {
+interface PassportSource {
     /** Resolved passport (live draft preferred over the fixed mock), or null when the id is unknown. */
     passport: Passport | null;
     /** Owning artisan, or null when the passport (or its artisan) is unknown. */

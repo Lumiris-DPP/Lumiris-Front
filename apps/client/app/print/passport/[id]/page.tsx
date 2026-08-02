@@ -64,7 +64,8 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
     const [score, setScore] = useState<IrisScoreDto | null>(null);
     const [notFound, setNotFound] = useState(false);
 
-    const isMockOrDraft = Boolean(draft ?? fixed);
+    const mockPassport = useMemo(() => (draft ? draftToPassport(draft) : fixed), [draft, fixed]);
+    const isMockOrDraft = Boolean(mockPassport);
 
     useEffect(() => {
         if (isMockOrDraft) return;
@@ -91,9 +92,8 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
         );
     }
 
-    if (isMockOrDraft) {
-        const passport = draft ? draftToPassport(draft) : fixed!;
-        return <MockPrintSheet productName={passport.garment.name ?? passport.garment.reference} />;
+    if (mockPassport) {
+        return <MockPrintSheet productName={mockPassport.garment.name ?? mockPassport.garment.reference} />;
     }
 
     if (!dpp) {
@@ -157,10 +157,12 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                     <section className="flex gap-5">
                         <div className="h-[50mm] w-[50mm] shrink-0 overflow-hidden rounded-md border border-neutral-300 bg-neutral-100">
                             {dpp.mainPhotoUrl ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
+                                <Image
                                     src={dpp.mainPhotoUrl}
                                     alt={dpp.productName ?? ''}
+                                    width={189}
+                                    height={189}
+                                    unoptimized
                                     className="h-full w-full object-cover"
                                 />
                             ) : (

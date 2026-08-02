@@ -20,7 +20,7 @@ function titleCase(value: string): string {
     return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-export interface PriceBounds {
+interface PriceBounds {
     min: number;
     max: number;
 }
@@ -80,7 +80,7 @@ export function applyBoutiqueFilters(
     });
 }
 
-export function activeBoutiqueFilterCount(state: BoutiqueFiltersState): number {
+function activeBoutiqueFilterCount(state: BoutiqueFiltersState): number {
     return state.categories.length + state.grades.length + state.materials.length + (state.priceRange ? 1 : 0);
 }
 

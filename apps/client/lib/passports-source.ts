@@ -31,15 +31,15 @@ export function usePassports(artisanId: string, options?: UsePassportsOptions): 
     const api = useApiClient();
     const { data: summaries } = useDppForms({ enabled: isRealMode });
 
-    const ids = useMemo(
-        () => (isRealMode && detailed && summaries ? summaries.map((s) => s.id) : []),
+    const idsKey = useMemo(
+        () => (isRealMode && detailed && summaries ? summaries.map((s) => s.id).join('|') : ''),
         [isRealMode, detailed, summaries],
     );
-    const idsKey = ids.join('|');
 
     const [details, setDetails] = useState<Record<string, DppFormDto>>({});
 
     useEffect(() => {
+        const ids = idsKey ? idsKey.split('|') : [];
         if (ids.length === 0) {
             setDetails((prev) => (Object.keys(prev).length === 0 ? prev : {}));
             return;
@@ -61,8 +61,6 @@ export function usePassports(artisanId: string, options?: UsePassportsOptions): 
         return () => {
             cancelled = true;
         };
-        // idsKey is a stable projection of `ids`; `api` is stable from context.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [idsKey, api]);
 
     return useMemo(() => {

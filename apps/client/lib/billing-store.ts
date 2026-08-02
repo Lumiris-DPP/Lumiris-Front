@@ -4,10 +4,10 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { safeJSONStorage } from './persist-storage';
 import { makeHydratedHook } from './use-store-hydrated';
-import { ATELIER_ADD_ONS, ATELIER_PLANS, mockArtisanById, mockPaymentHistory } from '@lumiris/mock-data';
-import type { ArtisanTier, AtelierPlanTier } from '@lumiris/types';
+import { ATELIER_ADD_ONS, mockArtisanById, mockPaymentHistory } from '@lumiris/mock-data';
+import type { ArtisanTier } from '@lumiris/types';
 
-export type BillingCycle = 'monthly' | 'annual';
+type BillingCycle = 'monthly' | 'annual';
 type PaymentEntryKind = 'plan' | 'atelier-plus';
 
 interface PaymentEntry {
@@ -34,37 +34,11 @@ interface BillingStoreState {
     setBillingCycle: (artisanId: string, cycle: BillingCycle) => void;
 }
 
-const TIER_TO_PLAN: Record<ArtisanTier, AtelierPlanTier> = {
-    Solo: 'solo',
-    Studio: 'studio',
-    Maison: 'maison',
-};
-
-export const PLAN_TO_TIER: Record<AtelierPlanTier, ArtisanTier> = {
-    solo: 'Solo',
-    studio: 'Studio',
-    maison: 'Maison',
-};
-
-export const ATELIER_PLUS_MONTHLY_EUR = ATELIER_ADD_ONS[0]?.monthlyEur ?? 19;
+const ATELIER_PLUS_MONTHLY_EUR = ATELIER_ADD_ONS[0]?.monthlyEur ?? 19;
 const ATELIER_PLUS_YEARLY_EUR = ATELIER_ADD_ONS[0]?.yearlyEur ?? 190;
-export const ATELIER_PLUS_LABEL = ATELIER_ADD_ONS[0]?.label ?? 'ATELIER+';
+const ATELIER_PLUS_LABEL = ATELIER_ADD_ONS[0]?.label ?? 'ATELIER+';
 
-export function planMonthly(tier: ArtisanTier): number {
-    const plan = ATELIER_PLANS.find((p) => p.tier === TIER_TO_PLAN[tier]);
-    return plan?.monthlyEur ?? 0;
-}
-
-export function planYearly(tier: ArtisanTier): number {
-    const plan = ATELIER_PLANS.find((p) => p.tier === TIER_TO_PLAN[tier]);
-    return plan?.yearlyEur ?? 0;
-}
-
-export function planAmount(tier: ArtisanTier, cycle: BillingCycle): number {
-    return cycle === 'annual' ? planYearly(tier) : planMonthly(tier);
-}
-
-export function atelierPlusAmount(cycle: BillingCycle): number {
+function atelierPlusAmount(cycle: BillingCycle): number {
     return cycle === 'annual' ? ATELIER_PLUS_YEARLY_EUR : ATELIER_PLUS_MONTHLY_EUR;
 }
 

@@ -1,6 +1,5 @@
 'use client';
 
-import type { QuotaDto, SubscriptionStateDto } from '@lumiris/api-client';
 import { useSubscriptionState } from '@lumiris/api-client/react';
 
 import { useAuthStore } from './auth-store';
@@ -20,5 +19,3 @@ export function useSubscription() {
         isRealMode: Boolean(token),
     };
 }
-
-export type { QuotaDto, SubscriptionStateDto };

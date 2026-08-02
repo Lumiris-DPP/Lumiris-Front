@@ -3,7 +3,7 @@
 import { useState, type ChangeEvent } from 'react';
 import { readFileAsDataUrl } from '@lumiris/utils';
 
-export interface UseFileUploadOptions {
+interface UseFileUploadOptions {
     /** Max file size in bytes; larger files are rejected. */
     maxBytes?: number;
     /** Human label for the size limit, shown in the error message (e.g. "5 Mo"). */
@@ -12,7 +12,7 @@ export interface UseFileUploadOptions {
     initialDataUri?: string;
 }
 
-export interface FileUpload {
+interface FileUpload {
     dataUri: string;
     name: string;
     error: string;

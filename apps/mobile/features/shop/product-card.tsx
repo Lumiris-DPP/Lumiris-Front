@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -62,13 +63,14 @@ export function ProductCard({ item, index, source = 'shop' }: ProductCardProps) 
         <>
             <div className="relative flex h-28 items-center justify-center overflow-hidden bg-secondary/50">
                 {photo && !photoFailed ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                         src={photo}
                         alt=""
+                        fill
+                        sizes="(max-width: 768px) 50vw, 200px"
                         loading="lazy"
                         onError={() => setPhotoFailed(true)}
-                        className="absolute inset-0 h-full w-full object-cover"
+                        className="object-cover"
                     />
                 ) : (
                     <Shirt className="h-9 w-9 text-muted-foreground/25" aria-hidden />

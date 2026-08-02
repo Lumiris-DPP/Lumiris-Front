@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -279,10 +280,11 @@ function RequestDetailOverlay({
                     <ul className="mt-3 flex flex-wrap gap-2">
                         {request.photos.map((src, idx) => (
                             <li key={`${idx}-${src.length}`} className="h-16 w-16">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
+                                <Image
                                     src={src}
                                     alt={`Pièce jointe ${idx + 1}`}
+                                    width={64}
+                                    height={64}
                                     className="h-full w-full rounded-lg border border-border object-cover"
                                 />
                             </li>

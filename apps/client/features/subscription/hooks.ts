@@ -17,7 +17,7 @@ import { useAuthStore } from '@/lib/auth-store';
 import { useSubscription } from '@/lib/use-subscription';
 
 // Plan sélectionné par un nouveau souscripteur → alimente le CheckoutDialog embarqué.
-export interface CheckoutSelection {
+interface CheckoutSelection {
     plan: PlanDto;
     cycle: BillingCycle;
 }

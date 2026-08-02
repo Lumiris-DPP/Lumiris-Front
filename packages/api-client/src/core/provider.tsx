@@ -10,7 +10,7 @@ import { createClient, type ClientOptions, type LumirisClient } from '../client'
 const ApiClientContext = createContext<LumirisClient | null>(null);
 ApiClientContext.displayName = 'LumirisApiClientContext';
 
-export const ApiClientProvider = ApiClientContext.Provider;
+const ApiClientProvider = ApiClientContext.Provider;
 
 export function useApiClient(): LumirisClient {
     const client = useContext(ApiClientContext);

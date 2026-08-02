@@ -3,7 +3,6 @@ import { ARTISAN_PASSPORT_LIMIT } from '@lumiris/types';
 import type { Artisan, ArtisanTier, Certificate, Passport, ScoreResult, SupplierInvoice } from '@lumiris/types';
 import { MOCK_CERT_TO_ARTISAN } from '@/lib/certificates-store';
 import { mockInvoiceArtisanId } from '@/lib/invoices-store';
-import { PASSPORT_STATUS_DESCRIPTION } from '@/lib/passport-status';
 
 export interface ScoredPassport {
     passport: Passport;
@@ -112,12 +111,6 @@ export function incompletePassports(scored: readonly ScoredPassport[]): readonly
     return scored.filter((s) => s.passport.status === 'InCompletion' || s.score.cap?.applied === true);
 }
 
-export function incompleteReason(s: ScoredPassport): string {
-    if (s.score.cap?.reason) return `Plafonné D — ${s.score.cap.reason}`;
-    if (s.passport.status === 'InCompletion') return PASSPORT_STATUS_DESCRIPTION.InCompletion;
-    return 'À compléter';
-}
-
 export interface QuotaUsage {
     used: number;
     total: number;
@@ -130,14 +123,4 @@ export function quotaUsage(passports: readonly Passport[], tier: ArtisanTier): Q
     const total = ARTISAN_PASSPORT_LIMIT[tier];
     const percent = Number.isFinite(total) && total > 0 ? Math.round((used / total) * 100) : 0;
     return { used, total, percent };
-}
-
-export function publishedThisWeek(passports: readonly Passport[], now: Date): number {
-    const weekAgo = now.getTime() - 7 * 24 * 60 * 60 * 1000;
-    return passports.filter((p) => {
-        if (p.status !== 'Published') return false;
-        const ts = p.publishedAt ?? p.updatedAt;
-        const t = new Date(ts).getTime();
-        return Number.isFinite(t) && t >= weekAgo;
-    }).length;
 }

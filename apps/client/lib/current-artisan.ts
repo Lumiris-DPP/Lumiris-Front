@@ -18,7 +18,7 @@ if (!FALLBACK_RAW) {
 const FALLBACK: Artisan = FALLBACK_RAW;
 
 /** Normalises the backend subscription tier string onto the local ArtisanTier. */
-export function artisanTierFromSubscription(tier: string | null | undefined): ArtisanTier {
+function artisanTierFromSubscription(tier: string | null | undefined): ArtisanTier {
     switch ((tier ?? '').toLowerCase()) {
         case 'studio':
             return 'Studio';

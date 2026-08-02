@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type SyntheticEvent } from 'react';
+import { useEffect, useRef, useState, type SyntheticEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { CheckCircle2, ShieldCheck } from 'lucide-react';
 import { LumirisLogo } from '@lumiris/ui/components/logo';
@@ -34,6 +34,7 @@ export default function OnboardingPage() {
     const me = useArtisanMe({ enabled: Boolean(token) && isArtisan });
 
     const [step, setStep] = useState<Step>('siret');
+    const siretInputRef = useRef<HTMLInputElement>(null);
     const [siret, setSiret] = useState('');
     const [siretError, setSiretError] = useState('');
     const [certified, setCertified] = useState(false);
@@ -74,6 +75,11 @@ export default function OnboardingPage() {
         const status = getRecord(userId).status;
         if (status !== 'unregistered') router.replace('/dashboard');
     }, [hydrated, userId, isArtisan, token, me.isLoading, me.data, getRecord, router]);
+
+    // The SIRET field is the only control of its step, so land the caret in it.
+    useEffect(() => {
+        if (step === 'siret') siretInputRef.current?.focus();
+    }, [step]);
 
     if (!hydrated || !userId) return null;
     if (!isArtisan) return null;
@@ -161,7 +167,7 @@ export default function OnboardingPage() {
                                         setSiretError('');
                                     }}
                                     aria-invalid={siretError ? true : undefined}
-                                    autoFocus
+                                    ref={siretInputRef}
                                 />
                                 {siretError && (
                                     <p className="text-xs text-destructive" role="alert">

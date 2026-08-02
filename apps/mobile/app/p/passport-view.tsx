@@ -11,7 +11,7 @@ export function PassportView({ code, accessToken }: { code: string; accessToken?
     const [events, setEvents] = useState<DppEventDto[]>([]);
     const [notFound, setNotFound] = useState(false);
     const api = useApiClient();
-    const trackEvent = useTrackEvent();
+    const { mutate: trackEvent } = useTrackEvent();
     const tracked = useRef(false);
 
     useEffect(() => {
@@ -28,9 +28,8 @@ export function PassportView({ code, accessToken }: { code: string; accessToken?
     useEffect(() => {
         if (!data || tracked.current) return;
         tracked.current = true;
-        trackEvent.mutate({ publicCode: code, type: 'VIEW' });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [data, code]);
+        trackEvent({ publicCode: code, type: 'VIEW' });
+    }, [data, code, trackEvent]);
 
     if (notFound) {
         return (

@@ -16,7 +16,7 @@ export interface CartItemDetail {
     lineTotalCents: number;
 }
 
-export interface CartDetails {
+interface CartDetails {
     lines: readonly CartLine[];
     items: readonly CartItemDetail[];
     subtotalCents: number;

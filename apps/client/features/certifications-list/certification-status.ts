@@ -3,7 +3,7 @@ import { getEffectiveStatus } from '@lumiris/types';
 import type { ArtisanCertificate } from '@/lib/certificates-store';
 
 const ONE_DAY = 24 * 60 * 60 * 1000;
-export const EXPIRING_WINDOW_DAYS = 90;
+const EXPIRING_WINDOW_DAYS = 90;
 
 export type CertStatusFilter = 'all' | 'current' | 'expiring' | 'expired';
 

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useMemo } from 'react';
 import Link from 'next/link';
 import { ExternalLink, FileText } from 'lucide-react';
@@ -91,8 +92,15 @@ function DocumentPreview({ src, title }: { src: string | undefined; title: strin
     return (
         <div className="rounded-lg border border-border bg-muted/40 p-3">
             {isImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={src} alt={`Document ${title}`} className="max-h-60 w-full rounded-md object-contain" />
+                <Image
+                    src={src}
+                    alt={`Document ${title}`}
+                    width={0}
+                    height={0}
+                    sizes="100vw"
+                    unoptimized
+                    className="h-auto max-h-60 w-full rounded-md object-contain"
+                />
             ) : (
                 <div className="flex items-center gap-3">
                     <FileText className="h-7 w-7 shrink-0 text-muted-foreground" />
