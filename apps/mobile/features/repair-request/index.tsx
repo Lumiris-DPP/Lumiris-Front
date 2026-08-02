@@ -218,11 +218,12 @@ export function RepairRequestForm({ repairer, prefillPassportId }: RepairRequest
                     <ul className="flex flex-wrap gap-2">
                         {photos.map((src, idx) => (
                             <li key={`${idx}-${src.length}`} className="relative h-20 w-20">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
+                                <Image
                                     src={src}
                                     alt={`Pièce jointe ${idx + 1}`}
-                                    className="h-full w-full rounded-xl border border-border object-cover"
+                                    fill
+                                    sizes="80px"
+                                    className="rounded-xl border border-border object-cover"
                                 />
                                 <button
                                     type="button"

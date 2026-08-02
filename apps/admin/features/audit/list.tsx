@@ -121,6 +121,12 @@ export function AuditList() {
     const focusId = searchParams?.get('focus') ?? null;
 
     const [search, setSearch] = useState('');
+    const searchInputRef = useRef<HTMLInputElement>(null);
+
+    // Search is the primary action of this page, so land the caret in it.
+    useEffect(() => {
+        searchInputRef.current?.focus();
+    }, []);
     const [period, setPeriod] = useState<PeriodFilter>('all');
     const [actorFilter, setActorFilter] = useState<string>('all');
     const [actorPickerOpen, setActorPickerOpen] = useState(false);
@@ -261,8 +267,7 @@ export function AuditList() {
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Acteur, action, cible…"
                             aria-label="Rechercher dans le journal d'audit"
-                            // eslint-disable-next-line jsx-a11y/no-autofocus -- recherche est l'action principale de la page
-                            autoFocus
+                            ref={searchInputRef}
                             className="pl-9"
                         />
                     </div>

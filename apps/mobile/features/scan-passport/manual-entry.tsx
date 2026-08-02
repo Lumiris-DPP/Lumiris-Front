@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sheet, SheetContent, SheetTitle } from '@lumiris/ui/components/sheet';
 import { routes } from '@/lib/routes';
@@ -38,6 +38,12 @@ export function ManualEntrySheet({ open, onOpenChange }: ManualEntrySheetProps) 
     const router = useRouter();
     const [value, setValue] = useState('');
     const settledRef = useRef(false);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    // The code field is the only control of this sheet, so land the caret in it.
+    useEffect(() => {
+        if (open) inputRef.current?.focus();
+    }, [open]);
 
     const submit = useCallback(() => {
         if (settledRef.current) return;
@@ -60,8 +66,7 @@ export function ManualEntrySheet({ open, onOpenChange }: ManualEntrySheetProps) 
             >
                 <SheetTitle className="sr-only">Saisir un code passeport</SheetTitle>
                 <input
-                    // eslint-disable-next-line jsx-a11y/no-autofocus -- bottom-sheet d'action ciblée : le focus immédiat est intentionnel.
-                    autoFocus
+                    ref={inputRef}
                     type="text"
                     inputMode="text"
                     value={value}

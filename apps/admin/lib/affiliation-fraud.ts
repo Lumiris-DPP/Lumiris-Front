@@ -129,7 +129,7 @@ export function buildSuspicionMap(events: readonly AffiliationEvent[]): Map<stri
     return out;
 }
 
-export type FraudFilter = 'all' | 'burst' | 'self-booking' | 'geo' | 'flagged';
+type FraudFilter = 'all' | 'burst' | 'self-booking' | 'geo' | 'flagged';
 
 export function matchesFraudFilter(
     event: AffiliationEvent,

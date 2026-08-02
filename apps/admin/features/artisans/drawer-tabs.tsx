@@ -14,7 +14,7 @@ import { EmptyState } from '../_shared/empty-state';
 
 const SCORING_NOW = new Date('2026-04-30T08:00:00Z');
 
-export function fmtDate(iso: string): string {
+function fmtDate(iso: string): string {
     return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 

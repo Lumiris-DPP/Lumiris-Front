@@ -30,6 +30,7 @@ export function CheckoutDialog({
     onConfirmed,
 }: CheckoutDialogProps) {
     const createIntent = useCreateSetupIntent();
+    const { mutate: createSetupIntent, isPending: isPreparingIntent } = createIntent;
     const [intent, setIntent] = useState<SetupIntentDto | null>(null);
 
     useEffect(() => {
@@ -37,17 +38,16 @@ export function CheckoutDialog({
             setIntent(null);
             return;
         }
-        if (createIntent.isPending) return;
+        if (isPreparingIntent) return;
         if (intent && intent.tier === tier && intent.cycle === cycle) return;
-        createIntent.mutate(
+        createSetupIntent(
             { tier, cycle },
             {
                 onSuccess: setIntent,
                 onError: () => toast.error('Impossible de préparer le paiement. Réessayez.'),
             },
         );
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [open, tier, cycle, intent]);
+    }, [open, tier, cycle, intent, createSetupIntent, isPreparingIntent]);
 
     const stripePromise = intent?.publishableKey ? getStripe(intent.publishableKey) : null;
 

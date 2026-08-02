@@ -6,7 +6,7 @@ import type { ArtisanProfileResponse } from '@lumiris/api-client';
 
 export type VerificationStatus = 'unregistered' | 'pending' | 'rejected' | 'verified';
 
-export interface VerificationRecord {
+interface VerificationRecord {
     status: VerificationStatus;
     siret: string | null;
     rejectionReason: string | null;

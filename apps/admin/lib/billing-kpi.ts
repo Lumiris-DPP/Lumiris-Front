@@ -35,9 +35,9 @@ export function computeBillingKpi(
 }
 
 // Estimations conservatrices Chiffrage v4.2 § 8.2.
-export type SegmentId = PriceLineId;
+type SegmentId = PriceLineId;
 
-export interface LtvCacRow {
+interface LtvCacRow {
     id: SegmentId;
     label: string;
     arpuEur: number;
@@ -90,7 +90,7 @@ export function computeLtvCac(): readonly LtvCacRow[] {
 }
 
 // Trajectoire M0→M36 calibrée pour point-mort en M22-M24 (base) et M28-M30 (stress -30/-33 %).
-export interface ViabilityPoint {
+interface ViabilityPoint {
     month: number;
     label: string;
     revenueEur: number;

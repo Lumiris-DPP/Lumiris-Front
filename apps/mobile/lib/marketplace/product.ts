@@ -37,10 +37,6 @@ export interface MarketplaceItem {
 
 export type MarketplaceSort = 'relevance' | 'newest' | 'price-asc' | 'price-desc' | 'iris';
 
-// RÈGLE GRAVÉE : le tri par défaut est NEUTRE (pertinence). Il ne dépend JAMAIS
-// ni de la commission marketplace (~5%, masquée) ni du score Iris.
-export const DEFAULT_MARKETPLACE_SORT: MarketplaceSort = 'relevance';
-
 export const MARKETPLACE_SORT_LABEL: Record<MarketplaceSort, string> = {
     relevance: 'Pertinence',
     newest: 'Nouveautés',
@@ -49,6 +45,8 @@ export const MARKETPLACE_SORT_LABEL: Record<MarketplaceSort, string> = {
     iris: 'Score Iris',
 };
 
+// RÈGLE GRAVÉE : `relevance` vient en tête et reste le tri par défaut. Il ne dépend
+// JAMAIS ni de la commission marketplace (~5%, masquée) ni du score Iris.
 export const MARKETPLACE_SORT_ORDER: readonly MarketplaceSort[] = [
     'relevance',
     'newest',
@@ -56,9 +54,6 @@ export const MARKETPLACE_SORT_ORDER: readonly MarketplaceSort[] = [
     'price-desc',
     'iris',
 ];
-
-// Commission marketplace : interne, jamais montrée à l'acheteur, sans effet sur le tri.
-export const MARKETPLACE_COMMISSION_RATE = 0.05;
 
 const GRADES: ReadonlySet<string> = new Set(['A', 'B', 'C', 'D', 'E']);
 

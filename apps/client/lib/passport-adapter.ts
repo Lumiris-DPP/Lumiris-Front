@@ -9,8 +9,6 @@ import type {
 } from '@lumiris/types';
 import type { DraftPassport, ExistingDoc } from './draft-store';
 
-export { draftToPassport } from './draft-store';
-
 /** Maps a backend product category onto the local garment taxonomy. */
 const CATEGORY_TO_KIND: Record<string, GarmentKind> = {
     top: 'sweater',

@@ -10,7 +10,7 @@ export const INVOICE_SORT_OPTIONS: ReadonlyArray<{ label: string; value: Invoice
     { label: 'Montant ↑', value: 'amount-asc' },
 ];
 
-export interface InvoiceFilterState {
+interface InvoiceFilterState {
     search: string;
     status: InvoiceStatusFilter;
     supplier: string;

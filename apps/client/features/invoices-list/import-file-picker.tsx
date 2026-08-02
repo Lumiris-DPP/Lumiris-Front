@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useId, useRef } from 'react';
 import { FileText, Upload, X } from 'lucide-react';
 import { Button } from '@lumiris/ui/components/button';
@@ -33,10 +34,12 @@ export function ImportFilePicker({ file, dragActive, onDragActiveChange, onFiles
         return (
             <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3">
                 {isImage ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                         src={file.dataUri}
                         alt={file.name}
+                        width={64}
+                        height={64}
+                        unoptimized
                         className="h-16 w-16 rounded-md border border-border object-cover"
                     />
                 ) : (

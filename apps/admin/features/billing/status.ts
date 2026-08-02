@@ -1,9 +1,9 @@
 import type { ComponentProps } from 'react';
 import type { Badge } from '@lumiris/ui/components/badge';
 
-export type BillingTone = 'success' | 'info' | 'warning' | 'neutral' | 'destructive';
+type BillingTone = 'success' | 'info' | 'warning' | 'neutral' | 'destructive';
 
-export const BILLING_STATUS = {
+const BILLING_STATUS = {
     trialing: { label: 'Essai', tone: 'info' },
     active: { label: 'Actif', tone: 'success' },
     past_due: { label: 'Impayé', tone: 'warning' },
@@ -13,7 +13,7 @@ export const BILLING_STATUS = {
     failed: { label: 'Échec', tone: 'destructive' },
 } as const satisfies Record<string, { label: string; tone: BillingTone }>;
 
-export type BillingStatusKey = keyof typeof BILLING_STATUS;
+type BillingStatusKey = keyof typeof BILLING_STATUS;
 
 type BadgeVariant = NonNullable<ComponentProps<typeof Badge>['variant']>;
 
@@ -34,7 +34,7 @@ const TONE_STYLE: Record<BillingTone, { variant: BadgeVariant; className: string
     destructive: { variant: 'destructive', className: '' },
 };
 
-export interface StatusBadgeProps {
+interface StatusBadgeProps {
     variant: BadgeVariant;
     className: string;
     label: string;

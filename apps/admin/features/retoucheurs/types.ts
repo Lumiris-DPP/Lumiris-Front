@@ -16,14 +16,3 @@ export interface RetoucheurOverlay {
     hiddenReviewReasons?: Readonly<Record<string, string>>;
     subscriptionOverride?: Partial<LocalSubscription>;
 }
-
-export interface CommissionEntry {
-    id: string;
-    occurredAt: string;
-    /** Anonymisé après {@link COMMISSION_ANONYMIZE_AFTER_DAYS} jours. */
-    userId: string;
-    kind: 'flat' | 'pct';
-    percent?: number;
-    amountEur: number;
-    payoutStatus: 'pending' | 'paid' | 'cancelled';
-}

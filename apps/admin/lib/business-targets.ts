@@ -84,14 +84,14 @@ export const STRESS_B2C_FACTOR = 0.67;
 export const BREAKEVEN_NOMINAL_RANGE: readonly [number, number] = [22, 24];
 export const BREAKEVEN_STRESS_RANGE: readonly [number, number] = [28, 30];
 
-export type LtvCacSegmentId =
+type LtvCacSegmentId =
     | 'vision_no_account'
     | 'vision_with_account'
     | 'atelier_solo'
     | 'atelier_studio'
     | 'local_repairer';
 
-export interface LtvCacTarget {
+interface LtvCacTarget {
     readonly id: LtvCacSegmentId;
     readonly label: string;
     readonly arpuMonthlyEur: number;
@@ -139,7 +139,7 @@ export const LTV_CAC_TARGETS: readonly LtvCacTarget[] = [
 
 export const IRIS_AVERAGE_TARGET = 3.2;
 
-export type AcquisitionSource = 'Salon' | 'CMA' | 'Démarchage' | 'LinkedIn' | 'RP';
+type AcquisitionSource = 'Salon' | 'CMA' | 'Démarchage' | 'LinkedIn' | 'RP';
 
 /** Distribution des leads ATELIER par canal (somme = 1). */
 export const ACQUISITION_SOURCE_MIX: Record<AcquisitionSource, number> = {
@@ -158,7 +158,7 @@ export const FUNNEL_CONVERSION = {
 } as const;
 
 // Dates "estimées" — revérifier contre `regulatory-calendar.ts` à la publication de l'acte délégué textile.
-export interface EsprDeadline {
+interface EsprDeadline {
     readonly id: string;
     readonly date: string;
     readonly label: string;

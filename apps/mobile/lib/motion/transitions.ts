@@ -2,10 +2,6 @@ import type { Transition, Variants } from 'framer-motion';
 
 export const SPRING_TAB: Transition = { type: 'spring', stiffness: 400, damping: 35 };
 export const SPRING_INDICATOR: Transition = { type: 'spring', stiffness: 400, damping: 30 };
-export const SPRING_OVERLAY: Transition = { type: 'spring', stiffness: 260, damping: 28 };
-
-export const SPRING_BOUNCY: Transition = { type: 'spring', stiffness: 400, damping: 20 };
-export const EASE_OUT: Transition = { duration: 0.7, ease: [0.22, 1, 0.36, 1] };
 
 export const fadeInOut: Variants = {
     initial: { opacity: 0 },

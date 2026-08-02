@@ -16,7 +16,7 @@ export interface AdminSession {
 
 export type SignInError = 'invalid_credentials' | 'unknown_email' | 'not_admin';
 
-export type SignInResult = { ok: true; session: AdminSession } | { ok: false; error: SignInError };
+type SignInResult = { ok: true; session: AdminSession } | { ok: false; error: SignInError };
 
 const STORAGE_KEY = 'lumiris.admin.session';
 const SESSION_MS_DEFAULT = 24 * 60 * 60 * 1000;

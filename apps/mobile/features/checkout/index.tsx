@@ -77,8 +77,7 @@ export function Checkout() {
         return () => {
             cancelled = true;
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isLoading, items, sellerCount, isAuthenticated]);
+    }, [isLoading, items, sellerCount, isAuthenticated, client]);
 
     if (!isLoading && items.length === 0 && !intent) {
         return (

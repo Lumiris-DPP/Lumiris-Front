@@ -136,7 +136,7 @@ export function buildArtisanRow(
     } satisfies ArtisanRow;
 }
 
-export interface CohortBucketMetrics {
+interface CohortBucketMetrics {
     label: string;
     monthsAgo: number;
     cohortSize: number;

@@ -8,7 +8,7 @@ export const ESPR_CATEGORIES = [
     'batteries',
     'autres',
 ] as const;
-export type EsprCategory = (typeof ESPR_CATEGORIES)[number];
+type EsprCategory = (typeof ESPR_CATEGORIES)[number];
 
 export const ESPR_CATEGORY_LABEL: Record<EsprCategory, string> = {
     textile: 'Textile',
@@ -203,12 +203,12 @@ export function getSegments(user: MockVisionUser, now: Date): readonly SegmentKe
     return segments;
 }
 
-export interface KpiTile {
+interface KpiTile {
     label: string;
     value: string;
 }
 
-export interface TierKpis {
+interface TierKpis {
     count: number;
     arpuEur: number;
     tiles: readonly KpiTile[];

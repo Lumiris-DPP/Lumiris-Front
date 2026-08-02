@@ -296,5 +296,3 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
         </div>
     );
 }
-
-export const PAYOUT_PREPARE_STEPS = STEPS;
