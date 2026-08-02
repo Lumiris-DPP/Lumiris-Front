@@ -4,6 +4,9 @@ on:
     push:
         branches: [main]
     pull_request:
+        # `labeled` is not a default type; without it, adding the `mobile` label
+        # would never start the Tauri job it is meant to opt into.
+        types: [opened, synchronize, reopened, labeled]
 
 permissions:
     contents: read
