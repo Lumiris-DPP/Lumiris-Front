@@ -12,6 +12,7 @@ import {
     Receipt,
     ShoppingBag,
     Store,
+    Truck,
     Wallet,
 } from 'lucide-react';
 import { LumirisLogo } from '@lumiris/ui/components/logo';
@@ -19,7 +20,7 @@ import { Sheet, SheetContent } from '@lumiris/ui/components/sheet';
 import { toast } from '@lumiris/ui/components/sonner';
 import { Switch } from '@lumiris/ui/components/switch';
 import { cn } from '@lumiris/ui/lib/cn';
-import { ATELIER_PASSPORT_LIMIT_LABEL, useHasAtelierPlus, usePassportCount } from './hooks';
+import { ATELIER_PASSPORT_LIMIT_LABEL, useHasAtelierPlus, usePassportCount, usePendingOrderCount } from './hooks';
 import { useCurrentArtisan } from '@/lib/current-artisan';
 import { useBilling, useBillingStore } from '@/lib/billing-store';
 import { useAuthStore } from '@/lib/auth-store';
@@ -31,6 +32,8 @@ interface NavItem {
     icon: React.ComponentType<{ className?: string }>;
     primary?: boolean;
     plusOnly?: boolean;
+    /** Affiche le nombre de commandes en attente d'action sur cette entrée. */
+    showPendingOrders?: boolean;
 }
 
 const NAV_ITEMS: readonly NavItem[] = [
@@ -40,6 +43,7 @@ const NAV_ITEMS: readonly NavItem[] = [
     { href: '/invoices', label: 'Factures fournisseurs', icon: Receipt },
     { href: '/certifications', label: 'Mes certifications', icon: BookCheck },
     { href: '/shop', label: 'Boutique', icon: ShoppingBag },
+    { href: '/commandes', label: 'Commandes', icon: Truck, showPendingOrders: true },
     { href: '/analytics', label: 'Analytics', icon: BarChart3, plusOnly: true },
     { href: '/profile', label: 'Profil atelier', icon: Store },
     { href: '/subscription', label: 'Abonnement', icon: Wallet },
@@ -51,7 +55,17 @@ function isNavActive(pathname: string, href: string): boolean {
         : pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function NavLink({ item, active, onNavigate }: { item: NavItem; active: boolean; onNavigate?: () => void }) {
+function NavLink({
+    item,
+    active,
+    badge = 0,
+    onNavigate,
+}: {
+    item: NavItem;
+    active: boolean;
+    badge?: number;
+    onNavigate?: () => void;
+}) {
     const Icon = item.icon;
     return (
         <li>
@@ -73,7 +87,12 @@ function NavLink({ item, active, onNavigate }: { item: NavItem; active: boolean;
                 }
             >
                 <Icon className="h-4 w-4" />
-                {item.label}
+                <span className="flex-1">{item.label}</span>
+                {badge > 0 && (
+                    <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-lumiris-cyan px-1.5 text-[10px] font-bold text-white tabular-nums">
+                        {badge > 99 ? '99+' : badge}
+                    </span>
+                )}
             </Link>
         </li>
     );
@@ -123,6 +142,9 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     const isRealMode = useAuthStore((s) => s.token != null);
     const { quota, atelierPlus } = useSubscription();
 
+    // Charge de travail en attente : le vendeur doit voir depuis n'importe quel écran qu'un colis
+    // ou un litige l'attend, sans avoir à ouvrir l'onglet.
+    const pendingOrders = usePendingOrderCount();
     const demoPassportCount = usePassportCount(artisan.id);
     const demoHasPlus = useHasAtelierPlus(artisan.id);
     const billing = useBilling(artisan.id);
@@ -166,6 +188,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                                 key={item.href}
                                 item={item}
                                 active={isNavActive(pathname, item.href)}
+                                badge={item.showPendingOrders ? pendingOrders : 0}
                                 onNavigate={onNavigate}
                             />
                         ),

@@ -4,7 +4,18 @@ import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Clock, FileText, Loader2, LogIn, Mail, ShieldCheck, Sparkles } from 'lucide-react';
+import {
+    CheckCircle2,
+    ChevronRight,
+    Clock,
+    FileText,
+    Loader2,
+    LogIn,
+    Mail,
+    ShieldCheck,
+    Sparkles,
+    Truck,
+} from 'lucide-react';
 import { useMyOrders, useOrderGroup, useWardrobe } from '@lumiris/api-client/react';
 import { routes } from '@/lib/routes';
 import { useUser } from '@/lib/auth/use-user';
@@ -74,6 +85,8 @@ function OrderConfirmationInner({ routeId }: { routeId: string }) {
     const { data: wardrobe = [] } = useWardrobe({ enabled: isAuthenticated });
 
     const settling = !group || group.status === 'PENDING';
+    // Nombre d'ateliers du panier : conditionne le nombre de colis annoncé à l'acheteur.
+    const sellerCount = new Set((group?.lines ?? []).map((line) => line.sellerName ?? '')).size;
     const timedOut = pollExpired && settling;
 
     // (a) Invité : la commande n'est pas récupérable (query désactivée) → prompt de connexion
@@ -146,15 +159,33 @@ function OrderConfirmationInner({ routeId }: { routeId: string }) {
                         <h2 className="mb-3 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                             {group.lines.length > 1 ? `Articles (${group.lines.length})` : 'Article'}
                         </h2>
-                        <ul className="flex flex-col gap-2">
+                        {/* Chaque ligne mène à son propre suivi : un panier multi-atelier donne
+                            plusieurs colis, qui n'avancent pas au même rythme. */}
+                        <ul className="flex flex-col gap-1">
                             {group.lines.map((line) => (
-                                <li key={line.id} className="flex items-center justify-between gap-2">
-                                    <span className="truncate text-sm font-medium text-foreground">
-                                        {line.productName ?? 'Pièce achetée'}
-                                    </span>
-                                    <span className="shrink-0 text-sm text-foreground tabular-nums">
-                                        {formatCents(line.amountTotalCents)}
-                                    </span>
+                                <li key={line.id}>
+                                    <Link
+                                        href={routes.orderTracking(line.id)}
+                                        className="-mx-1 flex items-center justify-between gap-2 rounded-lg px-1 py-1.5 transition-colors hover:bg-muted/50"
+                                    >
+                                        <span className="min-w-0 flex-1">
+                                            <span className="block truncate text-sm font-medium text-foreground">
+                                                {line.productName ?? 'Pièce achetée'}
+                                            </span>
+                                            {line.sellerName ? (
+                                                <span className="block truncate text-[11px] text-muted-foreground">
+                                                    {line.sellerName}
+                                                </span>
+                                            ) : null}
+                                        </span>
+                                        <span className="shrink-0 text-sm text-foreground tabular-nums">
+                                            {formatCents(line.amountTotalCents)}
+                                        </span>
+                                        <ChevronRight
+                                            className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60"
+                                            aria-hidden
+                                        />
+                                    </Link>
                                 </li>
                             ))}
                         </ul>
@@ -176,6 +207,22 @@ function OrderConfirmationInner({ routeId }: { routeId: string }) {
                                 </dd>
                             </div>
                         </dl>
+                    </section>
+
+                    <section className="rounded-2xl border border-border/60 bg-card p-4">
+                        <div className="flex items-center gap-2">
+                            <Truck className="h-4 w-4 text-muted-foreground" aria-hidden />
+                            <h2 className="text-sm font-semibold text-foreground">Et maintenant ?</h2>
+                        </div>
+                        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                            {sellerCount > 1
+                                ? `${sellerCount} ateliers préparent ta commande : tu recevras ${sellerCount} colis, chacun avec son suivi. Tu es prévenu à chaque expédition.`
+                                : 'L’atelier prépare ta pièce. Tu reçois une notification avec le numéro de suivi dès l’expédition.'}
+                        </p>
+                        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                            Lumiris retient le paiement jusqu’à la livraison — tu peux demander un retour pendant 14
+                            jours après réception.
+                        </p>
                     </section>
 
                     <section className="rounded-2xl border border-lumiris-emerald/30 bg-lumiris-emerald/5 p-4">
@@ -219,8 +266,16 @@ function OrderConfirmationInner({ routeId }: { routeId: string }) {
                         </div>
                         <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
                             Ton paiement est bien reçu. La confirmation de ta commande peut prendre quelques instants —
-                            tu la retrouveras dans ta Garde-Robe dès qu&apos;elle est validée.
+                            tu la retrouveras dans « Mes commandes » dès qu&apos;elle est validée, avec son suivi.
                         </p>
+                        {/* Sans porte de sortie, l'acheteur reste sur un écran qui n'évoluera plus
+                            et croit son paiement perdu. */}
+                        <Link
+                            href="/me/orders"
+                            className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-lumiris-amber/40 px-3 py-1.5 text-xs font-semibold text-foreground"
+                        >
+                            Voir mes commandes
+                        </Link>
                     </section>
                 </div>
             ) : (

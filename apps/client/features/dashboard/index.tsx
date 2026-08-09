@@ -19,6 +19,7 @@ import { EmptyState } from './empty-state';
 import { GradeDistribution } from './grade-distribution';
 import { greeting } from './greeting';
 import { KpiTiles } from './kpi-tiles';
+import { OrdersCallout } from './orders-callout';
 import { RecentPassports } from './recent-passports';
 
 export function Dashboard() {
@@ -46,6 +47,7 @@ export function Dashboard() {
     if (isEmpty) {
         return (
             <div className="space-y-6 p-8">
+                <OrdersCallout />
                 <EmptyState artisan={artisan} items={checklist} />
             </div>
         );
@@ -73,6 +75,8 @@ export function Dashboard() {
     return (
         <div className="space-y-6 p-8">
             <p className="text-lg font-medium text-foreground">{greeting(artisan)}</p>
+
+            <OrdersCallout />
 
             {showAttention && (
                 <AttentionBlock

@@ -83,6 +83,10 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
     }
 
     const isPaid = group.status !== 'PENDING';
+    // Une facture qui ignore les remboursements ment sur ce que le client a réellement payé —
+    // c'est la pièce qu'il produit à sa comptabilité ou à sa banque.
+    const refundedCents = group.lines.reduce((sum, line) => sum + (line.refundedCents ?? 0), 0);
+    const cancelledLines = group.lines.filter((line) => line.status === 'CANCELLED');
 
     return (
         <div className="flex h-full flex-col overflow-y-auto bg-background">
@@ -156,16 +160,28 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {group.lines.map((line) => (
-                                <tr key={line.id} className="border-b border-border/40">
-                                    <td className="py-2.5 pr-3 text-foreground">
-                                        {line.productName ?? 'Pièce achetée'}
-                                    </td>
-                                    <td className="py-2.5 text-right text-foreground tabular-nums">
-                                        {formatCents(line.amountTotalCents)}
-                                    </td>
-                                </tr>
-                            ))}
+                            {group.lines.map((line) => {
+                                const cancelled = line.status === 'CANCELLED';
+                                return (
+                                    <tr key={line.id} className="border-b border-border/40">
+                                        <td className="py-2.5 pr-3 text-foreground">
+                                            {line.productName ?? 'Pièce achetée'}
+                                            {cancelled ? (
+                                                <span className="ml-2 text-[11px] text-muted-foreground">
+                                                    — annulée
+                                                </span>
+                                            ) : null}
+                                        </td>
+                                        <td
+                                            className={`py-2.5 text-right tabular-nums ${
+                                                cancelled ? 'text-muted-foreground line-through' : 'text-foreground'
+                                            }`}
+                                        >
+                                            {formatCents(line.amountTotalCents)}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
 
@@ -181,9 +197,25 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
                             </dd>
                         </div>
                         <div className="mt-1 flex items-center justify-between border-t border-border/60 pt-2 text-base font-bold">
-                            <dt>Total</dt>
+                            <dt>Total payé</dt>
                             <dd className="tabular-nums">{formatCents(group.amountChargedCents)}</dd>
                         </div>
+                        {refundedCents > 0 ? (
+                            <>
+                                <div className="flex items-center justify-between text-sm">
+                                    <dt className="text-muted-foreground">
+                                        Remboursé{cancelledLines.length > 0 ? ' (annulation)' : ''}
+                                    </dt>
+                                    <dd className="text-foreground tabular-nums">−{formatCents(refundedCents)}</dd>
+                                </div>
+                                <div className="flex items-center justify-between border-t border-border/60 pt-2 text-base font-bold">
+                                    <dt>Reste à votre charge</dt>
+                                    <dd className="tabular-nums">
+                                        {formatCents(Math.max(0, group.amountChargedCents - refundedCents))}
+                                    </dd>
+                                </div>
+                            </>
+                        ) : null}
                     </dl>
 
                     <footer className="mt-8 border-t border-border/60 pt-4 text-[11px] leading-relaxed text-muted-foreground">

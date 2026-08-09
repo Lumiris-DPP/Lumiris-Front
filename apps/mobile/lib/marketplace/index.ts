@@ -1,6 +1,7 @@
 export * from './product';
 export * from './cart-storage';
 export * from './use-cart-details';
+export * from './shipping-address';
 
 /**
  * Formatte un montant en CENTIMES vers un prix EUR (2 décimales). Source unique de formatage

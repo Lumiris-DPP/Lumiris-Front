@@ -1,5 +1,15 @@
 import type { ComponentType } from 'react';
-import { AlertTriangle, Coins, FileText, LayoutDashboard, ScrollText, ShieldCheck, Store, Users } from 'lucide-react';
+import {
+    AlertTriangle,
+    Coins,
+    FileText,
+    Gavel,
+    LayoutDashboard,
+    ScrollText,
+    ShieldCheck,
+    Store,
+    Users,
+} from 'lucide-react';
 import type { AdminAction } from '@lumiris/types';
 
 export interface NavRoute {
@@ -87,6 +97,13 @@ export const NAV_GROUPS: readonly NavGroup[] = [
                 icon: Coins,
                 requires: 'billing.read',
                 shortcut: ['g', 'v'],
+            },
+            {
+                href: '/litiges',
+                label: 'Litiges',
+                icon: Gavel,
+                requires: 'dispute.read',
+                shortcut: ['g', 'l'],
             },
         ],
     },
