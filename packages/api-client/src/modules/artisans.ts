@@ -6,6 +6,7 @@ import type {
     ArtisanRegisterRequest,
     ArtisanVitrineUpdateRequest,
 } from '../types/artisans';
+import type { KybDetailsRequest, KybDocumentLabel, KybDocumentUploadOptions } from '../types/kyb';
 
 export function artisansApi(http: Http) {
     return {
@@ -21,6 +22,22 @@ export function artisansApi(http: Http) {
         updateProfile(req: ArtisanVitrineUpdateRequest): Promise<ArtisanProfileResponse> {
             return http.request<ArtisanProfileResponse>('/api/artisans/me/profile', { method: 'PUT', body: req });
         },
+        submitKyb(req: KybDetailsRequest): Promise<ArtisanProfileResponse> {
+            return http.request<ArtisanProfileResponse>('/api/artisans/me/kyb', { method: 'PUT', body: req });
+        },
+        uploadKybDocument(
+            label: KybDocumentLabel,
+            file: File,
+            options?: KybDocumentUploadOptions,
+        ): Promise<ArtisanProfileResponse> {
+            const form = new FormData();
+            form.append('file', file);
+            return http.request<ArtisanProfileResponse>(`/api/artisans/me/kyb/documents/${label}`, {
+                method: 'POST',
+                body: form,
+                query: { expiresAt: options?.expiresAt },
+            });
+        },
         addPhoto(file: File): Promise<ArtisanPhotoResponse> {
             const form = new FormData();
             form.append('file', file);
@@ -34,6 +51,9 @@ export function artisansApi(http: Http) {
         },
         getPublicBySlug(slug: string): Promise<ArtisanPublicProfileResponse> {
             return http.request<ArtisanPublicProfileResponse>(`/v1/artisans/${slug}`);
+        },
+        listPublished(): Promise<ArtisanPublicProfileResponse[]> {
+            return http.request<ArtisanPublicProfileResponse[]>('/v1/artisans');
         },
     };
 }

@@ -11,6 +11,7 @@ import { buildArtisanRows, type ArtisanRow } from '@/lib/artisan-analytics';
 import { ArtisanDrawer } from './artisan-drawer';
 import { ArtisanTable } from './artisan-table';
 import { useDeepLinkId } from './deep-link';
+import { RealArtisanAccounts } from './real-accounts';
 import { HEALTH_OPTIONS, type HealthFilter } from './tier-status';
 
 const SCORING_NOW = new Date('2026-04-30T08:00:00Z');
@@ -84,6 +85,17 @@ function ArtisansInner() {
                     <ArtisanTable rows={filtered} onSelect={(a) => setSelectedId(a.id)} onResetFilters={resetFilters} />
 
                     <ArtisanDrawer artisan={selected} onClose={() => setSelectedId(null)} />
+
+                    <div className="space-y-3">
+                        <div>
+                            <h2 className="text-foreground text-sm font-semibold">Comptes réels (ATELIER)</h2>
+                            <p className="text-muted-foreground text-xs">
+                                Comptes artisan inscrits sur le vrai backend — distinct du jeu de données de démo
+                                ci-dessus. Cliquez sur un compte pour consulter son dossier KYB.
+                            </p>
+                        </div>
+                        <RealArtisanAccounts />
+                    </div>
                 </div>
             </FeatureLayout>
         </TooltipProvider>

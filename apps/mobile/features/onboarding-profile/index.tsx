@@ -15,7 +15,7 @@ const MAX_STYLE_PREFS = 3;
 
 export function OnboardingProfile() {
     const router = useRouter();
-    const { user, isAuthenticated, updateUser } = useUser();
+    const { user, isAuthenticated, updateUser, signOut } = useUser();
     const cityId = useId();
     const datalistId = useId();
 
@@ -54,6 +54,11 @@ export function OnboardingProfile() {
         router.push('/');
     }
 
+    function handleLogout(): void {
+        signOut();
+        router.replace('/auth');
+    }
+
     if (!isAuthenticated) {
         return null;
     }
@@ -61,14 +66,21 @@ export function OnboardingProfile() {
     const remaining = MAX_STYLE_PREFS - stylePrefs.length;
 
     return (
-        <div className="relative flex h-full flex-col px-6 pt-[max(env(safe-area-inset-top),3rem)] pb-10">
+        <div className="relative flex h-full flex-col px-6 pb-10 pt-[max(env(safe-area-inset-top),3rem)]">
             <IridescentBackground intensity="subtle" />
 
-            <header className="flex items-center justify-end">
+            <header className="flex items-center justify-between">
+                <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="text-muted-foreground hover:text-foreground rounded-full px-3 py-1 text-xs font-medium transition-colors"
+                >
+                    Se déconnecter
+                </button>
                 <button
                     type="button"
                     onClick={handleSkip}
-                    className="rounded-full px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground rounded-full px-3 py-1 text-xs font-medium transition-colors"
                 >
                     Passer
                 </button>
@@ -82,20 +94,20 @@ export function OnboardingProfile() {
             >
                 <GlassCard className="w-full max-w-sm p-7">
                     <header className="text-center">
-                        <p className="text-[10px] font-semibold tracking-[0.28em] text-muted-foreground uppercase">
+                        <p className="text-muted-foreground text-[10px] font-semibold uppercase tracking-[0.28em]">
                             Profil
                         </p>
-                        <h1 className="mt-2 text-xl font-bold tracking-tight text-foreground">
+                        <h1 className="text-foreground mt-2 text-xl font-bold tracking-tight">
                             Aide-nous à personnaliser
                         </h1>
-                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                        <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
                             Ta ville sert à proposer les bons retoucheurs. Le style affine les suggestions.
                         </p>
                     </header>
 
                     <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-5">
                         <div className="flex flex-col gap-2">
-                            <Label htmlFor={cityId} className="text-xs font-semibold text-foreground/80">
+                            <Label htmlFor={cityId} className="text-foreground/80 text-xs font-semibold">
                                 Ville
                             </Label>
                             <Input
@@ -117,9 +129,9 @@ export function OnboardingProfile() {
                         </div>
 
                         <fieldset className="flex flex-col gap-2">
-                            <legend className="text-xs font-semibold text-foreground/80">
+                            <legend className="text-foreground/80 text-xs font-semibold">
                                 Style préféré
-                                <span className="ml-2 font-normal text-muted-foreground">
+                                <span className="text-muted-foreground ml-2 font-normal">
                                     ({remaining > 0 ? `${remaining} restant${remaining > 1 ? 's' : ''}` : 'max atteint'}
                                     )
                                 </span>
@@ -150,7 +162,7 @@ export function OnboardingProfile() {
 
                         <Button
                             type="submit"
-                            className="mt-2 h-11 w-full rounded-full bg-foreground text-sm font-semibold text-background hover:bg-foreground/90"
+                            className="bg-foreground text-background hover:bg-foreground/90 mt-2 h-11 w-full rounded-full text-sm font-semibold"
                         >
                             Terminer
                         </Button>

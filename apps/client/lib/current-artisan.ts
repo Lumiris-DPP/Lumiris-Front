@@ -6,7 +6,7 @@ import { mockArtisanById } from '@lumiris/mock-data';
 import type { Artisan, ArtisanTier } from '@lumiris/types';
 import { ARTISAN_PASSPORT_LIMIT } from '@lumiris/types';
 import { signOut, useAuthStore } from './auth-store';
-import { useAuthArtisanId, useAuthUserName } from './use-auth';
+import { useAuthArtisanId, useAuthRole, useAuthUserName } from './use-auth';
 import { useSubscription } from './use-subscription';
 
 const FALLBACK_ID = 'art-marie';
@@ -32,6 +32,7 @@ function artisanTierFromSubscription(tier: string | null | undefined): ArtisanTi
 export function useCurrentArtisan(): Artisan {
     const id = useAuthArtisanId();
     const userName = useAuthUserName();
+    const role = useAuthRole();
     const router = useRouter();
     // Live plan + quota (real mode only; the hook self-disables without a token).
     const { subscription, quota } = useSubscription();
@@ -53,15 +54,19 @@ export function useCurrentArtisan(): Artisan {
 
     // Real mode: construct a minimal Artisan from stored identity, with tier + quota
     // driven by the live subscription (GET /api/subscription) — never hardcoded.
-    if (id != null && isRealMode) {
+    // Repairer accounts have no ArtisanProfile (id stays null) but still land on shared
+    // workspace chrome (header, sidebar) that reads this hook — build from userName so it
+    // shows their real identity instead of silently falling back to the mock persona below.
+    if (isRealMode) {
         const tier = artisanTierFromSubscription(subscription?.tier);
         const passportLimit = quota?.unlimited
             ? Number.POSITIVE_INFINITY
             : (quota?.limit ?? ARTISAN_PASSPORT_LIMIT[tier]);
         return {
-            id,
-            displayName: userName ?? 'Mon Atelier',
-            atelierName: userName ? `Atelier de ${userName}` : 'Mon Atelier',
+            id: id ?? 'me',
+            displayName: userName ?? 'Mon compte',
+            atelierName:
+                role === 'repairer' ? (userName ?? 'Mon compte') : userName ? `Atelier de ${userName}` : 'Mon Atelier',
             city: '',
             region: 'Île-de-France',
             tier,

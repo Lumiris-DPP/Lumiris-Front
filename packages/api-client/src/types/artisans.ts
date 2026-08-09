@@ -1,3 +1,5 @@
+import type { KybDetailsResponse } from './kyb';
+
 export type ArtisanStatus = 'PENDING' | 'VERIFIED' | 'REJECTED';
 
 export interface ArtisanProfileResponse {
@@ -26,6 +28,7 @@ export interface ArtisanProfileResponse {
     websiteUrl?: string;
     links?: Record<string, string>;
     photos: ArtisanPhotoResponse[];
+    kyb?: KybDetailsResponse;
 }
 
 export interface ArtisanRegisterRequest {

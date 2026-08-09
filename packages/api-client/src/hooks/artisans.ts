@@ -13,9 +13,11 @@ import { isApiError } from '../core/errors';
 import type {
     ArtisanPhotoResponse,
     ArtisanProfileResponse,
+    ArtisanPublicProfileResponse,
     ArtisanRegisterRequest,
     ArtisanVitrineUpdateRequest,
 } from '../types/artisans';
+import type { KybDetailsRequest, KybDocumentLabel, KybDocumentUploadOptions } from '../types/kyb';
 
 import { useApiClient } from '../core/provider';
 
@@ -84,6 +86,43 @@ export function useUpdateArtisanVitrine(
     });
 }
 
+export function useSubmitArtisanKyb(
+    options?: Omit<UseMutationOptions<ArtisanProfileResponse, Error, KybDetailsRequest>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<ArtisanProfileResponse, Error, KybDetailsRequest>({
+        mutationFn: (req) => client.artisans.submitKyb(req),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.setQueryData(artisanKeys.custom('me'), args[0]);
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+interface UploadArtisanKybDocumentInput {
+    label: KybDocumentLabel;
+    file: File;
+    expiresAt?: string;
+}
+
+export function useUploadArtisanKybDocument(
+    options?: Omit<UseMutationOptions<ArtisanProfileResponse, Error, UploadArtisanKybDocumentInput>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<ArtisanProfileResponse, Error, UploadArtisanKybDocumentInput>({
+        mutationFn: ({ label, file, expiresAt }) =>
+            client.artisans.uploadKybDocument(label, file, { expiresAt } satisfies KybDocumentUploadOptions),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.setQueryData(artisanKeys.custom('me'), args[0]);
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
 export function useAddArtisanPhoto(
     options?: Omit<UseMutationOptions<ArtisanPhotoResponse, Error, File>, 'mutationFn'>,
 ) {
@@ -114,5 +153,17 @@ export function usePublishArtisanVitrine(
             queryClient.setQueryData(artisanKeys.custom('me'), args[0]);
             return options?.onSuccess?.(...args);
         },
+    });
+}
+
+export function useArtisansDirectory(
+    options?: Omit<UseQueryOptions<ArtisanPublicProfileResponse[], Error>, 'queryKey' | 'queryFn'>,
+) {
+    const client = useApiClient();
+    return useQuery<ArtisanPublicProfileResponse[], Error>({
+        queryKey: artisanKeys.custom('directory'),
+        queryFn: () => client.artisans.listPublished(),
+        staleTime: 60 * 1000,
+        ...options,
     });
 }
