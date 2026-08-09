@@ -149,7 +149,7 @@ function Field({ label, value }: { label: string; value: string }) {
     );
 }
 
-export interface KybComparisonDrawerProps {
+interface KybComparisonDrawerProps {
     open: boolean;
     onClose: () => void;
     title: string;

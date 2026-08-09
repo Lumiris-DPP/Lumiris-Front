@@ -37,8 +37,8 @@ export function StepRole({ selected, onSelect, onNext }: StepRoleProps) {
     return (
         <div className="flex flex-col gap-6">
             <div className="text-center">
-                <h2 className="text-lg font-semibold text-foreground">Qui êtes-vous ?</h2>
-                <p className="mt-1 text-sm text-muted-foreground">Choisissez votre rôle sur la plateforme</p>
+                <h2 className="text-foreground text-lg font-semibold">Qui êtes-vous ?</h2>
+                <p className="text-muted-foreground mt-1 text-sm">Choisissez votre rôle sur la plateforme</p>
             </div>
 
             <div className="flex flex-col gap-3">
@@ -48,9 +48,9 @@ export function StepRole({ selected, onSelect, onNext }: StepRoleProps) {
                         type="button"
                         onClick={() => onSelect(role)}
                         className={cn(
-                            'flex items-center gap-4 rounded-xl border p-4 text-left transition-all focus-visible:ring-2 focus-visible:outline-none',
+                            'flex items-center gap-4 rounded-xl border p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2',
                             selected === role
-                                ? 'border-lumiris-cyan bg-lumiris-cyan/5 ring-2 ring-lumiris-cyan/20'
+                                ? 'border-lumiris-cyan bg-lumiris-cyan/5 ring-lumiris-cyan/20 ring-2'
                                 : 'border-border hover:border-lumiris-cyan/40 hover:bg-muted/40',
                         )}
                     >
@@ -63,8 +63,8 @@ export function StepRole({ selected, onSelect, onNext }: StepRoleProps) {
                             <Icon className="h-5 w-5" />
                         </div>
                         <div>
-                            <p className="text-sm font-semibold text-foreground">{label}</p>
-                            <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{description}</p>
+                            <p className="text-foreground text-sm font-semibold">{label}</p>
+                            <p className="text-muted-foreground mt-0.5 text-xs leading-relaxed">{description}</p>
                         </div>
                     </button>
                 ))}
@@ -73,7 +73,7 @@ export function StepRole({ selected, onSelect, onNext }: StepRoleProps) {
             <Button
                 onClick={onNext}
                 disabled={selected === null}
-                className="h-10 w-full bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90"
+                className="bg-lumiris-cyan hover:bg-lumiris-cyan/90 h-10 w-full text-white"
             >
                 Continuer
             </Button>

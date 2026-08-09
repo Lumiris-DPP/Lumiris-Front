@@ -37,9 +37,9 @@ export function PointCard({ point, index }: PointCardProps) {
                 href={href}
                 aria-label={ariaLabel}
                 className={cn(
-                    'opal-shadow group relative flex gap-3 rounded-2xl border border-border/60 bg-card p-3.5',
+                    'opal-shadow border-border/60 bg-card group relative flex gap-3 rounded-2xl border p-3.5',
                     'transition-colors active:scale-[0.99]',
-                    'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
+                    'focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
                     'hover:border-border',
                 )}
             >
@@ -48,15 +48,15 @@ export function PointCard({ point, index }: PointCardProps) {
                 <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                     <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                            <h3 className="line-clamp-1 text-[15px] leading-tight font-semibold text-foreground">
+                            <h3 className="text-foreground line-clamp-1 text-[15px] font-semibold leading-tight">
                                 {point.name}
                             </h3>
-                            <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
+                            <p className="text-muted-foreground mt-0.5 line-clamp-1 text-xs">
                                 {typeLabel} · {point.city}
                             </p>
                         </div>
                         {point.distanceKm !== undefined ? (
-                            <span className="inline-flex shrink-0 items-center gap-1 text-[11px] font-medium text-muted-foreground">
+                            <span className="text-muted-foreground inline-flex shrink-0 items-center gap-1 text-[11px] font-medium">
                                 <MapPin className="h-3 w-3" strokeWidth={1.5} aria-hidden />
                                 <span className="font-mono tabular-nums">{formatDistance(point.distanceKm)}</span>
                             </span>
@@ -68,13 +68,13 @@ export function PointCard({ point, index }: PointCardProps) {
                             {chips.map((chip) => (
                                 <li
                                     key={chip}
-                                    className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
+                                    className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-medium"
                                 >
                                     {chip}
                                 </li>
                             ))}
                             {extraChips > 0 ? (
-                                <li className="px-1 py-0.5 text-[10px] font-medium text-muted-foreground/70">
+                                <li className="text-muted-foreground/70 px-1 py-0.5 text-[10px] font-medium">
                                     +{extraChips}
                                 </li>
                             ) : null}
@@ -91,7 +91,7 @@ export function PointCard({ point, index }: PointCardProps) {
 function Thumb({ point, isArtisan }: { point: LocalPoint; isArtisan: boolean }) {
     if (isArtisan && point.photoUrl) {
         return (
-            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-muted">
+            <div className="bg-muted relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
                 <Image
                     src={point.photoUrl}
                     alt={`Atelier ${point.name}`}
@@ -124,10 +124,10 @@ function KpiRow({ point, isArtisan }: { point: LocalPoint; isArtisan: boolean })
     return (
         <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
             <span className="inline-flex items-center gap-1">
-                <Star className="h-3.5 w-3.5 fill-current text-lumiris-amber" strokeWidth={1.5} aria-hidden />
-                <span className="font-mono font-semibold text-foreground tabular-nums">{point.rating.toFixed(1)}</span>
+                <Star className="text-lumiris-amber h-3.5 w-3.5 fill-current" strokeWidth={1.5} aria-hidden />
+                <span className="text-foreground font-mono font-semibold tabular-nums">{point.rating.toFixed(1)}</span>
                 {point.reviewCount !== undefined ? (
-                    <span className="font-mono text-muted-foreground tabular-nums">({point.reviewCount})</span>
+                    <span className="text-muted-foreground font-mono tabular-nums">({point.reviewCount})</span>
                 ) : null}
             </span>
         </div>

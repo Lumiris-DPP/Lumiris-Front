@@ -174,7 +174,7 @@ export function ValidationQueue() {
                     icon={ClipboardCheck}
                 />
             ) : (
-                <div className="overflow-hidden rounded-xl border border-border bg-card">
+                <div className="border-border bg-card overflow-hidden rounded-xl border">
                     <div className="overflow-x-auto">
                         <Table>
                             <TableHeader stickyHeader>
@@ -202,8 +202,8 @@ export function ValidationQueue() {
                                         </TableCell>
                                         <TableCell>
                                             <div>
-                                                <p className="text-sm font-medium text-foreground">{itemName(item)}</p>
-                                                <p className="text-[11px] text-muted-foreground">
+                                                <p className="text-foreground text-sm font-medium">{itemName(item)}</p>
+                                                <p className="text-muted-foreground text-[11px]">
                                                     {itemSubtitle(item)}
                                                 </p>
                                             </div>
@@ -212,14 +212,14 @@ export function ValidationQueue() {
                                             <span className="font-mono text-xs">{formatSiret(item.data.siret)}</span>
                                         </TableCell>
                                         <TableCell>
-                                            <span className="text-xs text-muted-foreground">
+                                            <span className="text-muted-foreground text-xs">
                                                 {formatDate(item.data.createdAt)}
                                             </span>
                                         </TableCell>
                                         <TableCell>
                                             <Badge
                                                 variant="outline"
-                                                className="border-lumiris-amber/40 bg-lumiris-amber/10 font-mono text-[10px] text-lumiris-amber"
+                                                className="border-lumiris-amber/40 bg-lumiris-amber/10 text-lumiris-amber font-mono text-[10px]"
                                             >
                                                 En attente
                                             </Badge>

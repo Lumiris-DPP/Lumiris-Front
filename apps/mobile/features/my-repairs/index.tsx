@@ -54,9 +54,9 @@ export function MyRepairs() {
     const detail = requests?.find((r) => r.id === detailId) ?? null;
 
     return (
-        <div className="flex h-full flex-col overflow-y-auto bg-background pb-24">
+        <div className="bg-background flex h-full flex-col overflow-y-auto pb-24">
             <motion.header
-                className="flex items-center gap-3 px-4 pt-12 pb-3"
+                className="flex items-center gap-3 px-4 pb-3 pt-12"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
             >
@@ -64,13 +64,13 @@ export function MyRepairs() {
                     type="button"
                     onClick={() => router.back()}
                     aria-label="Retour"
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground"
+                    className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full border"
                 >
                     <ArrowLeft className="h-4 w-4" />
                 </button>
                 <div className="min-w-0 flex-1">
-                    <h1 className="text-base font-bold text-foreground">Mes demandes</h1>
-                    <p className="text-xs text-muted-foreground">
+                    <h1 className="text-foreground text-base font-bold">Mes demandes</h1>
+                    <p className="text-muted-foreground text-xs">
                         {total} demande{total > 1 ? 's' : ''}
                     </p>
                 </div>
@@ -84,7 +84,7 @@ export function MyRepairs() {
                     if (items.length === 0) return null;
                     return (
                         <section key={status} className="flex flex-col gap-2">
-                            <h2 className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+                            <h2 className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
                                 {STATUS_LABEL[status]} ({items.length})
                             </h2>
                             <ul className="flex flex-col gap-2">
@@ -113,18 +113,18 @@ function Empty() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
         >
-            <div className="flex h-16 w-16 items-center justify-center rounded-3xl border border-border/60 bg-card">
-                <Wrench className="h-7 w-7 text-muted-foreground" />
+            <div className="border-border/60 bg-card flex h-16 w-16 items-center justify-center rounded-3xl border">
+                <Wrench className="text-muted-foreground h-7 w-7" />
             </div>
             <div>
-                <h2 className="text-base font-semibold text-foreground">Aucune demande pour l&apos;instant</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <h2 className="text-foreground text-base font-semibold">Aucune demande pour l&apos;instant</h2>
+                <p className="text-muted-foreground mt-1 text-sm">
                     Trouve un retoucheur près de chez toi et lance ta première retouche.
                 </p>
             </div>
             <Link
                 href="/local"
-                className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+                className="bg-foreground text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
             >
                 <Wrench className="h-4 w-4" />
                 Voir les retoucheurs
@@ -134,9 +134,9 @@ function Empty() {
 }
 
 function StatusIcon({ status }: { status: RepairRequestStatus }) {
-    if (status === 'COMPLETED') return <CheckCircle2 className="h-3.5 w-3.5 text-lumiris-emerald" />;
-    if (status === 'REFUSED') return <XCircle className="h-3.5 w-3.5 text-muted-foreground" />;
-    return <Clock3 className="h-3.5 w-3.5 text-lumiris-cyan" />;
+    if (status === 'COMPLETED') return <CheckCircle2 className="text-lumiris-emerald h-3.5 w-3.5" />;
+    if (status === 'REFUSED') return <XCircle className="text-muted-foreground h-3.5 w-3.5" />;
+    return <Clock3 className="text-lumiris-cyan h-3.5 w-3.5" />;
 }
 
 function RequestCard({ request, onView }: { request: RepairRequestResponse; onView: () => void }) {
@@ -149,11 +149,11 @@ function RequestCard({ request, onView }: { request: RepairRequestResponse; onVi
     });
 
     return (
-        <article className="flex flex-col gap-2 rounded-2xl border border-border/60 bg-card p-4">
+        <article className="border-border/60 bg-card flex flex-col gap-2 rounded-2xl border p-4">
             <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-foreground">{repairerName}</p>
-                    <p className="truncate text-xs text-muted-foreground">{reference}</p>
+                    <p className="text-foreground truncate text-sm font-semibold">{repairerName}</p>
+                    <p className="text-muted-foreground truncate text-xs">{reference}</p>
                 </div>
                 <span className="inline-flex shrink-0 items-center gap-1 text-[11px] font-semibold">
                     <StatusIcon status={request.status} />
@@ -161,10 +161,10 @@ function RequestCard({ request, onView }: { request: RepairRequestResponse; onVi
                 </span>
             </div>
 
-            <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+            <div className="text-muted-foreground flex items-center justify-between text-[11px]">
                 <span>{date}</span>
                 {request.quoteAmountCents != null ? (
-                    <span className="font-mono text-foreground">{(request.quoteAmountCents / 100).toFixed(2)} €</span>
+                    <span className="text-foreground font-mono">{(request.quoteAmountCents / 100).toFixed(2)} €</span>
                 ) : null}
             </div>
 
@@ -172,7 +172,7 @@ function RequestCard({ request, onView }: { request: RepairRequestResponse; onVi
                 <button
                     type="button"
                     onClick={onView}
-                    className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-3 py-1 text-[11px] font-medium text-foreground"
+                    className="border-border bg-card text-foreground inline-flex items-center gap-1 rounded-full border px-3 py-1 text-[11px] font-medium"
                 >
                     <ScrollText className="h-3 w-3" />
                     Voir le détail
@@ -243,11 +243,11 @@ function RequestDetailOverlay({ request, onClose }: { request: RepairRequestResp
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
         >
-            <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" onClick={onClose} role="presentation" />
+            <div className="bg-background/70 absolute inset-0 backdrop-blur-sm" onClick={onClose} role="presentation" />
             <motion.div
                 role="dialog"
                 aria-label={`Détail demande ${request.id}`}
-                className="relative mx-4 mb-8 flex max-h-[85vh] w-full max-w-sm flex-col overflow-y-auto rounded-3xl border border-border bg-card p-5 shadow-2xl"
+                className="border-border bg-card relative mx-4 mb-8 flex max-h-[85vh] w-full max-w-sm flex-col overflow-y-auto rounded-3xl border p-5 shadow-2xl"
                 initial={{ y: 60 }}
                 animate={{ y: 0 }}
                 exit={{ y: 60 }}
@@ -257,35 +257,35 @@ function RequestDetailOverlay({ request, onClose }: { request: RepairRequestResp
                     type="button"
                     onClick={onClose}
                     aria-label="Fermer"
-                    className="absolute top-3 right-3 inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/60 bg-card text-foreground"
+                    className="border-border/60 bg-card text-foreground absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full border"
                 >
                     <X className="h-3.5 w-3.5" />
                 </button>
 
-                <h2 className="text-base font-semibold text-foreground">
+                <h2 className="text-foreground text-base font-semibold">
                     {request.repairerDisplayName ?? 'Retoucheur'}
                 </h2>
-                <p className="text-xs text-muted-foreground">{request.dppProductName ?? 'Pièce non précisée'}</p>
+                <p className="text-muted-foreground text-xs">{request.dppProductName ?? 'Pièce non précisée'}</p>
 
                 {request.message ? (
-                    <p className="mt-3 text-sm leading-relaxed whitespace-pre-line text-foreground">
+                    <p className="text-foreground mt-3 whitespace-pre-line text-sm leading-relaxed">
                         {request.message}
                     </p>
                 ) : null}
 
                 {request.quoteAmountCents != null ? (
-                    <div className="mt-3 flex flex-col gap-1 rounded-2xl border border-border/60 bg-background p-3">
-                        <p className="text-sm font-semibold text-foreground">
+                    <div className="border-border/60 bg-background mt-3 flex flex-col gap-1 rounded-2xl border p-3">
+                        <p className="text-foreground text-sm font-semibold">
                             Devis : {(request.quoteAmountCents / 100).toFixed(2)} €
                         </p>
                         {request.quoteDescription ? (
-                            <p className="text-xs text-muted-foreground">{request.quoteDescription}</p>
+                            <p className="text-muted-foreground text-xs">{request.quoteDescription}</p>
                         ) : null}
                     </div>
                 ) : null}
 
                 {request.appointmentAt ? (
-                    <p className="mt-3 text-xs text-muted-foreground">
+                    <p className="text-muted-foreground mt-3 text-xs">
                         Rendez-vous le{' '}
                         {new Date(request.appointmentAt).toLocaleString('fr-FR', {
                             day: 'numeric',
@@ -301,7 +301,7 @@ function RequestDetailOverlay({ request, onClose }: { request: RepairRequestResp
                     <form onSubmit={onAccept} className="mt-4 flex flex-col gap-2">
                         <label
                             htmlFor="appointment-at"
-                            className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
+                            className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider"
                         >
                             Rendez-vous souhaité
                         </label>
@@ -311,13 +311,13 @@ function RequestDetailOverlay({ request, onClose }: { request: RepairRequestResp
                             value={appointmentAt}
                             onChange={(e) => setAppointmentAt(e.target.value)}
                             aria-label="Rendez-vous souhaité"
-                            className="rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground"
+                            className="border-border bg-background text-foreground rounded-xl border px-3 py-2 text-sm"
                         />
                         <div className="mt-1 flex gap-2">
                             <button
                                 type="submit"
                                 disabled={acceptQuote.isPending}
-                                className="flex-1 rounded-full bg-foreground px-4 py-2 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+                                className="bg-foreground text-primary-foreground flex-1 rounded-full px-4 py-2 text-xs font-semibold disabled:opacity-50"
                             >
                                 Accepter le devis
                             </button>
@@ -325,7 +325,7 @@ function RequestDetailOverlay({ request, onClose }: { request: RepairRequestResp
                                 type="button"
                                 onClick={onRefuse}
                                 disabled={refuseQuote.isPending}
-                                className="rounded-full border border-lumiris-rose/30 px-4 py-2 text-xs font-medium text-lumiris-rose disabled:opacity-50"
+                                className="border-lumiris-rose/30 text-lumiris-rose rounded-full border px-4 py-2 text-xs font-medium disabled:opacity-50"
                             >
                                 Refuser
                             </button>
@@ -338,20 +338,20 @@ function RequestDetailOverlay({ request, onClose }: { request: RepairRequestResp
                         type="button"
                         onClick={onCancel}
                         disabled={cancelRequest.isPending}
-                        className="mt-3 self-start rounded-full border border-border px-3 py-1 text-[11px] font-medium text-muted-foreground disabled:opacity-50"
+                        className="border-border text-muted-foreground mt-3 self-start rounded-full border px-3 py-1 text-[11px] font-medium disabled:opacity-50"
                     >
                         Annuler la demande
                     </button>
                 ) : null}
 
                 {error ? (
-                    <p className="mt-2 text-xs text-destructive" role="alert">
+                    <p className="text-destructive mt-2 text-xs" role="alert">
                         {error}
                     </p>
                 ) : null}
 
                 <div className="mt-4 flex flex-col gap-2">
-                    <h3 className="inline-flex items-center gap-1 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+                    <h3 className="text-muted-foreground inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider">
                         <MessageCircle className="h-3 w-3" /> Messages
                     </h3>
                     <ul className="flex flex-col gap-1.5">
@@ -360,8 +360,8 @@ function RequestDetailOverlay({ request, onClose }: { request: RepairRequestResp
                                 key={m.id}
                                 className={`max-w-[85%] rounded-2xl px-3 py-1.5 text-xs ${
                                     m.fromRepairer
-                                        ? 'self-start bg-secondary/40 text-foreground'
-                                        : 'self-end bg-foreground text-primary-foreground'
+                                        ? 'bg-secondary/40 text-foreground self-start'
+                                        : 'bg-foreground text-primary-foreground self-end'
                                 }`}
                             >
                                 {m.body}
@@ -391,7 +391,7 @@ function RequestDetailOverlay({ request, onClose }: { request: RepairRequestResp
                     </form>
                 </div>
 
-                <p className="mt-4 text-[11px] text-muted-foreground/80">
+                <p className="text-muted-foreground/80 mt-4 text-[11px]">
                     Créée le{' '}
                     {new Date(request.createdAt).toLocaleString('fr-FR', {
                         day: 'numeric',

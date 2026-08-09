@@ -71,9 +71,9 @@ export function RepairerProfile({ repairer, reviews: initialReviews }: RepairerP
     }
 
     return (
-        <div className="flex h-full flex-col overflow-y-auto bg-background pb-24">
+        <div className="bg-background flex h-full flex-col overflow-y-auto pb-24">
             <motion.header
-                className="flex items-center gap-3 px-4 pt-12 pb-3"
+                className="flex items-center gap-3 px-4 pb-3 pt-12"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
             >
@@ -81,14 +81,14 @@ export function RepairerProfile({ repairer, reviews: initialReviews }: RepairerP
                     type="button"
                     onClick={() => router.push(forParam ? `/local?for=${encodeURIComponent(forParam)}` : '/local')}
                     aria-label="Retour"
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground"
+                    className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full border"
                 >
                     <ArrowLeft className="h-4 w-4" />
                 </button>
                 <div className="min-w-0 flex-1">
-                    <h1 className="truncate text-base font-bold text-foreground">{title}</h1>
+                    <h1 className="text-foreground truncate text-base font-bold">{title}</h1>
                     {repairer.city ? (
-                        <p className="truncate text-xs text-muted-foreground">
+                        <p className="text-muted-foreground truncate text-xs">
                             {repairer.city}
                             {repairer.region ? ` · ${repairer.region}` : ''}
                         </p>
@@ -97,11 +97,11 @@ export function RepairerProfile({ repairer, reviews: initialReviews }: RepairerP
             </motion.header>
 
             <div className="flex flex-col gap-5 px-4">
-                <section className="flex flex-col gap-3 rounded-3xl border border-border/60 bg-card p-5">
+                <section className="border-border/60 bg-card flex flex-col gap-3 rounded-3xl border p-5">
                     <div className="min-w-0">
-                        <p className="truncate text-base font-semibold text-foreground">{title}</p>
+                        <p className="text-foreground truncate text-base font-semibold">{title}</p>
                         {repairer.address ? (
-                            <p className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                            <p className="text-muted-foreground inline-flex items-center gap-1 text-xs">
                                 <MapPin className="h-3 w-3" />
                                 {repairer.address}
                             </p>
@@ -111,8 +111,8 @@ export function RepairerProfile({ repairer, reviews: initialReviews }: RepairerP
                     {repairer.averageRating != null ? (
                         <div className="flex items-center gap-3 text-xs">
                             <span className="inline-flex items-center gap-1">
-                                <Star className="h-3.5 w-3.5 fill-current text-lumiris-amber" />
-                                <span className="font-semibold text-foreground">
+                                <Star className="text-lumiris-amber h-3.5 w-3.5 fill-current" />
+                                <span className="text-foreground font-semibold">
                                     {repairer.averageRating.toFixed(1)}
                                 </span>
                                 <span className="text-muted-foreground">({repairer.reviewCount})</span>
@@ -121,13 +121,13 @@ export function RepairerProfile({ repairer, reviews: initialReviews }: RepairerP
                     ) : null}
 
                     {repairer.schedule ? (
-                        <p className="text-[11px] text-muted-foreground">{repairer.schedule}</p>
+                        <p className="text-muted-foreground text-[11px]">{repairer.schedule}</p>
                     ) : null}
                 </section>
 
                 {repairer.specialties && repairer.specialties.length > 0 ? (
                     <section className="flex flex-col gap-2">
-                        <h2 className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+                        <h2 className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
                             Spécialités
                         </h2>
                         <ul className="flex flex-wrap gap-1.5">
@@ -144,22 +144,22 @@ export function RepairerProfile({ repairer, reviews: initialReviews }: RepairerP
 
                 {repairer.zones && repairer.zones.length > 0 ? (
                     <section className="flex flex-col gap-2">
-                        <h2 className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+                        <h2 className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
                             Zones desservies
                         </h2>
-                        <p className="text-sm text-foreground/90">{repairer.zones.join(', ')}</p>
+                        <p className="text-foreground/90 text-sm">{repairer.zones.join(', ')}</p>
                     </section>
                 ) : null}
 
                 <section className="flex flex-col gap-2">
                     <Link
                         href={requestHref}
-                        className="inline-flex items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-semibold text-primary-foreground active:scale-95"
+                        className="bg-foreground text-primary-foreground inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold active:scale-95"
                     >
                         <Wrench className="h-4 w-4" />
                         Envoyer une demande
                     </Link>
-                    <p className="mt-1 text-center text-[10px] text-muted-foreground/80">
+                    <p className="text-muted-foreground/80 mt-1 text-center text-[10px]">
                         Le retoucheur te répondra avec un devis directement dans l&apos;application.
                     </p>
                 </section>
