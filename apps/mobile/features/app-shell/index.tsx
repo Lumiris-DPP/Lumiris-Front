@@ -5,9 +5,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Scan, Archive, MapPin, ShoppingBag, User } from 'lucide-react';
+import { useNotifications } from '@lumiris/api-client/react';
 import { fadeInOut, SPRING_INDICATOR, SPRING_TAB } from '@/lib/motion';
 import { migrateLegacyKeys } from '@/lib/migrate-legacy-keys';
 import { useCartCount } from '@/lib/marketplace';
+import { useUser } from '@/lib/auth/use-user';
 import { OfflineBanner } from './offline-banner';
 
 type Tab = 'scan' | 'boutique' | 'garde-robe' | 'local' | 'me';
@@ -34,7 +36,7 @@ function activeTabFor(pathname: string): Tab | null {
         pathname.startsWith('/boutique/') ||
         pathname === '/panier' ||
         pathname === '/checkout' ||
-        pathname.startsWith('/commande')
+        (pathname.startsWith('/commande') && !pathname.startsWith('/commande/suivi'))
     ) {
         return 'boutique';
     }
@@ -54,7 +56,14 @@ function activeTabFor(pathname: string): Tab | null {
     ) {
         return 'local';
     }
-    if (pathname === '/me' || pathname.startsWith('/me/') || pathname === '/about' || pathname === '/help') {
+    // Le suivi de commande se consulte depuis « Mes commandes » : il appartient à l'onglet Moi.
+    if (
+        pathname === '/me' ||
+        pathname.startsWith('/me/') ||
+        pathname.startsWith('/commande/suivi') ||
+        pathname === '/about' ||
+        pathname === '/help'
+    ) {
         return 'me';
     }
     return null;
@@ -65,7 +74,10 @@ function shouldHideTabBar(pathname: string): boolean {
     if (pathname === '/onboarding' || pathname.startsWith('/onboarding/')) return true;
     if (pathname.startsWith('/passeport/')) return true;
     if (pathname.startsWith('/boutique/')) return true;
-    if (pathname === '/panier' || pathname === '/checkout' || pathname.startsWith('/commande')) return true;
+    // Le tunnel d'achat masque la barre pour rester focalisé ; le suivi de commande, lui, est un
+    // écran de consultation dont on doit pouvoir ressortir d'un geste.
+    if (pathname === '/panier' || pathname === '/checkout') return true;
+    if (pathname.startsWith('/commande') && !pathname.startsWith('/commande/suivi')) return true;
     return false;
 }
 
@@ -89,6 +101,11 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
     const activeTab = activeTabFor(pathname);
     const tabBarHidden = hideTabBar || shouldHideTabBar(pathname);
     const cartCount = useCartCount();
+    // Une commande avance sans que l'acheteur fasse quoi que ce soit : le signal doit être visible
+    // depuis n'importe quel écran, pas seulement en ouvrant son profil.
+    const { isAuthenticated } = useUser();
+    const { data: notifications = [] } = useNotifications({ enabled: isAuthenticated });
+    const unreadCount = notifications.filter((n) => !n.read).length;
 
     useEffect(() => {
         migrateLegacyKeys();
@@ -141,12 +158,16 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
                                         <span className="relative">
                                             <Icon className="h-5 w-5" />
                                             {id === 'boutique' && cartCount > 0 ? (
-                                                <span
-                                                    aria-label={`${cartCount} article${cartCount > 1 ? 's' : ''} dans le panier`}
-                                                    className="absolute -top-1.5 -right-2 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-lumiris-cyan px-1 text-[9px] font-bold text-background tabular-nums"
-                                                >
-                                                    {cartCount > 9 ? '9+' : cartCount}
-                                                </span>
+                                                <TabBadge
+                                                    count={cartCount}
+                                                    label={`${cartCount} article${cartCount > 1 ? 's' : ''} dans le panier`}
+                                                />
+                                            ) : null}
+                                            {id === 'me' && unreadCount > 0 ? (
+                                                <TabBadge
+                                                    count={unreadCount}
+                                                    label={`${unreadCount} notification${unreadCount > 1 ? 's' : ''} non lue${unreadCount > 1 ? 's' : ''}`}
+                                                />
                                             ) : null}
                                         </span>
                                         <span className="text-[10px] font-semibold tracking-tight">{label}</span>
@@ -165,5 +186,18 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
                 )}
             </AnimatePresence>
         </div>
+    );
+}
+
+// Pastille de compteur d'un onglet (panier, notifications) — même forme pour les deux, pour que
+// l'œil apprenne un seul signal.
+function TabBadge({ count, label }: { count: number; label: string }) {
+    return (
+        <span
+            aria-label={label}
+            className="absolute -top-1.5 -right-2 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-lumiris-cyan px-1 text-[9px] font-bold text-background tabular-nums"
+        >
+            {count > 9 ? '9+' : count}
+        </span>
     );
 }

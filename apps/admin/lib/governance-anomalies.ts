@@ -60,6 +60,8 @@ const ROLE_FAMILY: Record<AdminAction, AdminUserRole | null> = {
     'billing.dunning': 'billing_ops',
     'billing.export': 'billing_ops',
     'billing.invoice_issue': 'billing_ops',
+    'dispute.read': null,
+    'dispute.arbitrate': 'billing_ops',
     'affiliation.read': null,
     'affiliation.prepare_payout': 'billing_ops',
     'affiliation.rate_change': 'platform_admin',

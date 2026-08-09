@@ -18,5 +18,6 @@ export const routes = {
     artisan: (slug: string): string => withParams('/artisans', { slug }),
     product: (id: string): string => withParams('/boutique/produit', { id }),
     order: (paymentIntentId: string): string => withParams('/commande', { pi: paymentIntentId }),
+    orderTracking: (orderId: string): string => withParams('/commande/suivi', { id: orderId }),
     orderInvoice: (paymentIntentId: string): string => withParams('/commande/facture', { pi: paymentIntentId }),
 } as const;

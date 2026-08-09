@@ -40,6 +40,16 @@ export function marketplaceApi(http: Http) {
             );
         },
 
+        // Fiches d'un panier en un appel. Les produits devenus indisponibles sont simplement
+        // absents de la réponse — l'appelant compare aux identifiants demandés pour le dire.
+        async getPublicProducts(ids: readonly string[]): Promise<MarketplaceItem[]> {
+            if (ids.length === 0) return [];
+            return parseOr(
+                marketplaceItemListSchema,
+                await http.request('/public/marketplace/products', { query: { ids: ids.join(',') } }),
+            );
+        },
+
         // Fiche produit publique unique. 404 si non publié ou vendeur non payable.
         async getPublicProduct(id: string): Promise<MarketplaceItem> {
             return parseOr(marketplaceItemSchema, await http.request(`/public/marketplace/products/${id}`));

@@ -26,6 +26,8 @@ export const ACTION_TONE: Record<AdminAction, string> = {
     'billing.dunning': 'text-lumiris-amber',
     'billing.export': 'text-muted-foreground',
     'billing.invoice_issue': 'text-lumiris-cyan',
+    'dispute.read': 'text-muted-foreground',
+    'dispute.arbitrate': 'text-lumiris-amber',
     'affiliation.read': 'text-muted-foreground',
     'affiliation.prepare_payout': 'text-lumiris-amber',
     'affiliation.rate_change': 'text-lumiris-amber',

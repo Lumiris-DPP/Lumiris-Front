@@ -25,6 +25,8 @@ export type AdminAction =
     | 'billing.dunning'
     | 'billing.export'
     | 'billing.invoice_issue'
+    | 'dispute.read'
+    | 'dispute.arbitrate'
     | 'affiliation.read'
     | 'affiliation.prepare_payout'
     | 'affiliation.rate_change'

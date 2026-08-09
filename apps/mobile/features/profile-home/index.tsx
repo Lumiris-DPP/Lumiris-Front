@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
+    Bell,
     ChevronRight,
     FileText,
     Info,
@@ -20,6 +21,7 @@ import {
 import { IrisGrade as IrisGradeBadge } from '@lumiris/scoring-ui';
 import { Button } from '@lumiris/ui/components/button';
 import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
+import { useNotifications } from '@lumiris/api-client/react';
 import { useUser } from '@/lib/auth';
 import { useWardrobeStats } from '@/lib/iris/wardrobe-stats';
 
@@ -81,6 +83,8 @@ function LoggedIn({ displayName, email, city }: LoggedInProps) {
     const stats = useWardrobeStats();
     const { signOut } = useUser();
     const [signingOut, setSigningOut] = useState(false);
+    const { data: notifications = [] } = useNotifications();
+    const unreadCount = notifications.filter((n) => !n.read).length;
 
     const initial = displayName.trim().charAt(0).toUpperCase() || 'L';
     const items = stats.items.length;
@@ -149,6 +153,7 @@ function LoggedIn({ displayName, email, city }: LoggedInProps) {
                 initial="initial"
                 animate="animate"
             >
+                <ActionLink href="/me/notifications" Icon={Bell} label="Notifications" badge={unreadCount} />
                 <ActionLink href="/me/orders" Icon={Package} label="Mes commandes" />
                 <ActionLink href="/me/repairs" Icon={Wrench} label="Mes demandes" />
                 <ActionLink href="/me/documents" Icon={FileText} label="Mes documents" />
@@ -197,9 +202,11 @@ interface ActionLinkProps {
     Icon: typeof SettingsIcon;
     label: string;
     external?: boolean;
+    /** Compteur affiché à droite du libellé (ex. notifications non lues). 0 ⇒ rien. */
+    badge?: number;
 }
 
-function ActionLink({ href, Icon, label, external = false }: ActionLinkProps) {
+function ActionLink({ href, Icon, label, external = false, badge = 0 }: ActionLinkProps) {
     const className =
         'border-border/60 bg-card/60 hover:bg-card/80 flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-sm backdrop-blur-md transition-colors';
     const content = (
@@ -208,7 +215,14 @@ function ActionLink({ href, Icon, label, external = false }: ActionLinkProps) {
                 <Icon className="h-4 w-4 text-muted-foreground" />
                 {label}
             </span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+            <span className="inline-flex items-center gap-2">
+                {badge > 0 ? (
+                    <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-lumiris-cyan px-1.5 text-[10px] font-bold text-background tabular-nums">
+                        {badge > 9 ? '9+' : badge}
+                    </span>
+                ) : null}
+                <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+            </span>
         </>
     );
 

@@ -6,8 +6,9 @@ import { AlertTriangle, Bell, Info } from 'lucide-react';
 import { Badge } from '@lumiris/ui/components/badge';
 import { Button } from '@lumiris/ui/components/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@lumiris/ui/components/popover';
+import { useMarkNotificationsRead } from '@lumiris/api-client/react';
 import { cn } from '@lumiris/ui/lib/cn';
-import type { AtelierNotification } from '@/lib/notifications-mock';
+import type { AtelierNotification } from '@/lib/notifications';
 import { useDismissedNotifications, useNotificationsStore } from '@/lib/notifications-store';
 import { useAuthArtisanId } from '@/lib/use-auth';
 
@@ -20,6 +21,9 @@ export function NotificationsBell({ notifications }: NotificationsBellProps) {
     const dismissed = useDismissedNotifications(artisanId);
     const dismissAll = useNotificationsStore((s) => s.dismissAll);
     const pruneStale = useNotificationsStore((s) => s.pruneStale);
+    // Les alertes dérivées de l'état local se masquent côté client ; celles qui viennent du
+    // serveur doivent être marquées lues chez lui, sinon elles reviennent au prochain chargement.
+    const markRead = useMarkNotificationsRead();
 
     useEffect(() => {
         pruneStale(
@@ -71,12 +75,13 @@ export function NotificationsBell({ notifications }: NotificationsBellProps) {
                             variant="ghost"
                             size="sm"
                             className="w-full text-xs font-normal text-muted-foreground hover:text-foreground"
-                            onClick={() =>
+                            onClick={() => {
                                 dismissAll(
                                     artisanId,
                                     notifications.map((n) => n.id),
-                                )
-                            }
+                                );
+                                markRead.mutate(undefined);
+                            }}
                         >
                             Tout marquer comme lu
                         </Button>

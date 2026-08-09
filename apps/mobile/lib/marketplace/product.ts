@@ -10,7 +10,7 @@ export interface MarketplaceItem {
     id: string;
     /** DPP source (passeport numérique) rattaché à l'annonce, s'il existe. */
     dppFormId: string | null;
-    /** Atelier vendeur — sert à garantir un panier mono-vendeur (destination charge unique). */
+    /** Atelier vendeur — regroupe les lignes du panier en colis (un par atelier). */
     artisanProfileId: string;
     name: string;
     description: string | null;

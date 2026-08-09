@@ -1,3 +1,4 @@
+import type { Notification } from '@lumiris/api-client';
 import type { Artisan, CertificationRef, Passport } from '@lumiris/types';
 import { INCOMPLETION_FULL_LABEL, PASSPORT_STATUS_DESCRIPTION } from './passport-status';
 
@@ -16,6 +17,29 @@ interface BuildInput {
     artisan: Artisan;
     passports: readonly Passport[];
     certificates: readonly CertificationRef[];
+    /** Une notification serveur déjà présente rend le message d'accueil inutile. */
+    hasServerNotifications?: boolean;
+}
+
+// Notifications serveur (cycle de vie des commandes) projetées dans le format de la cloche.
+// Un litige ou un retour appelle une action : ils passent en sévérité haute.
+const HIGH_SEVERITY_TYPES: ReadonlySet<Notification['type']> = new Set([
+    'DISPUTE_OPENED',
+    'RETURN_REQUESTED',
+    'ORDER_TO_SHIP',
+]);
+
+export function toAtelierNotifications(notifications: readonly Notification[]): AtelierNotification[] {
+    return notifications
+        .filter((n) => !n.read)
+        .map((n) => ({
+            id: n.id,
+            severity: HIGH_SEVERITY_TYPES.has(n.type) ? ('warn' as const) : ('info' as const),
+            title: n.title,
+            description: n.body,
+            href: n.href ?? undefined,
+            date: n.createdAt ?? new Date().toISOString(),
+        }));
 }
 
 const MAX_NOTIFICATIONS = 8;
@@ -24,7 +48,7 @@ const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 const SEVERITY_RANK: Record<NotificationSeverity, number> = { warn: 0, info: 1 };
 
 export function buildNotifications(
-    { artisan, passports, certificates }: BuildInput,
+    { artisan, passports, certificates, hasServerNotifications = false }: BuildInput,
     now: Date = new Date(),
 ): readonly AtelierNotification[] {
     const out: AtelierNotification[] = [];
@@ -61,7 +85,7 @@ export function buildNotifications(
         });
     }
 
-    if (out.length === 0) {
+    if (out.length === 0 && !hasServerNotifications) {
         out.push({
             id: 'welcome',
             severity: 'info',

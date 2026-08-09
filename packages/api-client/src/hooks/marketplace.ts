@@ -30,6 +30,7 @@ export const marketplaceKeys = {
     suggest: (input?: SuggestInput | null) => ['marketplace', 'suggest', input] as const,
     products: () => ['marketplace', 'products'] as const,
     publicProduct: (id: string) => ['marketplace', 'public-product', id] as const,
+    publicProducts: (ids: readonly string[]) => ['marketplace', 'public-products', [...ids].sort()] as const,
     productByDpp: (dppFormId: string) => ['marketplace', 'product-by-dpp', dppFormId] as const,
     decisionLog: (id: string) => ['marketplace', 'decision-log', id] as const,
 };
@@ -45,6 +46,22 @@ export function useMarketplaceProduct(
         queryKey: marketplaceKeys.publicProduct(id ?? ''),
         queryFn: () => client.marketplace.getPublicProduct(id as string),
         enabled: Boolean(id),
+        staleTime: CACHE_TIMES.DETAIL,
+        ...options,
+    });
+}
+
+// Fiches d'un panier en un appel, par identifiants. Les produits devenus indisponibles sont
+// simplement absents de la réponse : l'appelant en déduit ce qui a disparu, et peut le nommer.
+export function useMarketplaceProductsByIds(
+    ids: readonly string[],
+    options?: Omit<UseQueryOptions<MarketplaceItem[], Error>, 'queryKey' | 'queryFn'>,
+) {
+    const client = useApiClient();
+    return useQuery<MarketplaceItem[], Error>({
+        queryKey: marketplaceKeys.publicProducts(ids),
+        queryFn: () => client.marketplace.getPublicProducts(ids),
+        enabled: ids.length > 0,
         staleTime: CACHE_TIMES.DETAIL,
         ...options,
     });

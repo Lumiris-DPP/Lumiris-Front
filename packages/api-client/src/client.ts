@@ -10,6 +10,9 @@ import { marketplaceApi } from './modules/marketplace';
 import { trackApi } from './modules/track';
 import { sellerApi } from './modules/seller';
 import { wardrobeApi } from './modules/wardrobe';
+import { ordersApi, sellerOrdersApi } from './modules/orders';
+import { notificationsApi } from './modules/notifications';
+import { disputesApi } from './modules/disputes';
 import { irisApi } from './modules/iris';
 import { atelierStatsApi, eventsApi } from './modules/atelier-stats';
 
@@ -29,6 +32,10 @@ export function createClient(opts: ClientOptions) {
         track: trackApi(http),
         seller: sellerApi(http),
         wardrobe: wardrobeApi(http),
+        orders: ordersApi(http),
+        sellerOrders: sellerOrdersApi(http),
+        notifications: notificationsApi(http),
+        disputes: disputesApi(http),
         iris: irisApi(http),
         atelierStats: atelierStatsApi(http),
         events: eventsApi(http),

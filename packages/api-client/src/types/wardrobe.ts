@@ -11,16 +11,3 @@ export const wardrobeItemDtoSchema = z.object({
     acquiredAt: z.string().nullish(),
 });
 export type WardrobeItemDto = z.infer<typeof wardrobeItemDtoSchema>;
-
-// Une commande d'achat direct de l'acheteur. status : PENDING | PAID | FULFILLED | CANCELLED | REFUNDED.
-export const orderDtoSchema = z.object({
-    id: z.string(),
-    productName: z.string().nullish(),
-    amountTotalCents: z.number(),
-    commissionCents: z.number(),
-    currency: z.string().nullish(),
-    status: z.string(),
-    invoiceNumber: z.string().nullish(),
-    createdAt: z.string().nullish(),
-});
-export type OrderDto = z.infer<typeof orderDtoSchema>;

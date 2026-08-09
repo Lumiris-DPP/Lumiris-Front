@@ -18,6 +18,7 @@ export const USER_KEYS = {
     affiliateClicks: 'affiliate.clicks.v1',
     repairs: 'repairs.v1',
     cart: 'cart.v1',
+    shippingAddress: 'shipping-address.v1',
     orders: 'orders.v1',
 } as const;
 

@@ -124,63 +124,52 @@ export const convertDppRequestSchema = z.object({
 });
 export type ConvertDppRequest = z.infer<typeof convertDppRequestSchema>;
 
-// ── Achat direct in-app (LUMIRIS-22) ────────────────────────────────────────
-// Panier → PaymentIntent Stripe Connect confirmé via Payment Element EMBARQUÉ
-// (pas de redirection). Un seul vendeur par panier (destination charge unique).
+// ── Achat direct in-app (LUMIRIS-22/24) ─────────────────────────────────────
+// Panier → PaymentIntent Stripe confirmé via Payment Element EMBARQUÉ (pas de redirection).
+// Le panier peut couvrir PLUSIEURS ateliers : un colis (et un port) par atelier, un seul débit.
 export const cartIntentLineSchema = z.object({
     productId: z.string(),
     quantity: z.number().int().positive(),
 });
 export type CartIntentLine = z.infer<typeof cartIntentLineSchema>;
 
+// Adresse saisie AVANT le paiement : sans elle, l'atelier n'a rien pour expédier.
+export const cartShippingAddressSchema = z.object({
+    fullName: z.string().min(2),
+    line1: z.string().min(3),
+    line2: z.string().optional(),
+    postalCode: z.string().min(4),
+    city: z.string().min(2),
+    country: z.string().optional(),
+    phone: z.string().optional(),
+});
+export type CartShippingAddress = z.infer<typeof cartShippingAddressSchema>;
+
 export const cartIntentRequestSchema = z.object({
     items: z.array(cartIntentLineSchema).min(1),
+    shipping: cartShippingAddressSchema,
 });
 export type CartIntentRequest = z.infer<typeof cartIntentRequestSchema>;
 
-// Secret client du PaymentIntent + clé publiable (pour Stripe.js). Montant = articles + port.
+// Secret client du PaymentIntent + clé publiable (pour Stripe.js). `shipments` détaille le port
+// retenu par atelier, seule façon d'expliquer le total à l'acheteur sur un panier multi-atelier.
+export const paymentShipmentSchema = z.object({
+    sellerName: z.string().nullish(),
+    itemCount: z.number(),
+    shippingCents: z.number(),
+});
+export type PaymentShipment = z.infer<typeof paymentShipmentSchema>;
+
 export const paymentIntentResponseSchema = z.object({
     clientSecret: z.string(),
     publishableKey: z.string(),
     amountTotalCents: z.number(),
+    itemsTotalCents: z.number(),
+    shippingTotalCents: z.number(),
     commissionCents: z.number(),
+    shipments: z.array(paymentShipmentSchema),
 });
 export type PaymentIntentResponse = z.infer<typeof paymentIntentResponseSchema>;
-
-// ── Commandes d'achat direct (LUMIRIS-22) ───────────────────────────────────
-// Miroir de OrderResponse (backend), enrichi de `shippingCents` + `paymentIntentId`.
-// Un paiement (un PaymentIntent) peut couvrir PLUSIEURS lignes → chaque ligne partage
-// le même `paymentIntentId`. status : PENDING | PAID | FULFILLED | CANCELLED | REFUNDED.
-// (Défini ici plutôt que dans types/wardrobe car rattaché au flux d'achat marketplace.)
-export const orderResponseSchema = z.object({
-    id: z.string(),
-    productName: z.string().nullish(),
-    amountTotalCents: z.number(),
-    commissionCents: z.number(),
-    shippingCents: z.number().nullish(),
-    paymentIntentId: z.string().nullish(),
-    currency: z.string().nullish(),
-    status: z.string(),
-    invoiceNumber: z.string().nullish(),
-    createdAt: z.string().nullish(),
-});
-export type OrderResponse = z.infer<typeof orderResponseSchema>;
-
-// GET /api/orders/group/{paymentIntentId} — regroupe toutes les lignes d'un même paiement
-// et expose le total RÉELLEMENT facturé par Stripe (`amountChargedCents` = articles + port),
-// seule source de vérité correcte pour l'écran de confirmation.
-export const orderGroupSchema = z.object({
-    paymentIntentId: z.string(),
-    lines: z.array(orderResponseSchema),
-    itemsTotalCents: z.number(),
-    shippingCents: z.number(),
-    amountChargedCents: z.number(),
-    currency: z.string().nullish(),
-    status: z.string(),
-    invoiceNumber: z.string().nullish(),
-    createdAt: z.string().nullish(),
-});
-export type OrderGroup = z.infer<typeof orderGroupSchema>;
 
 // Payload CRUD produit (POST/PUT /api/marketplace/products).
 export const productPayloadSchema = z.object({
