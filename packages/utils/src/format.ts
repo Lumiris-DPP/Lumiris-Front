@@ -94,6 +94,35 @@ export function formatDateFr(value: string | Date | undefined | null): string {
     return d.toLocaleDateString('fr-FR');
 }
 
+type FrenchDateInput = string | Date | undefined | null;
+
+function frenchDateParts(value: FrenchDateInput, parts: Intl.DateTimeFormatOptions): string | null {
+    if (!value) return null;
+    const date = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(date.getTime())) return null;
+    return new Intl.DateTimeFormat('fr-FR', parts).format(date);
+}
+
+/** « 12 août » — null si la date est absente ou invalide, à l'appelant de choisir son repli. */
+export function formatDayMonthFr(value: FrenchDateInput): string | null {
+    return frenchDateParts(value, { day: 'numeric', month: 'long' });
+}
+
+/** « 12 août 2026 » — null si la date est absente ou invalide. */
+export function formatLongDateFr(value: FrenchDateInput): string | null {
+    return frenchDateParts(value, { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+/** « 12 août, 14:05 » — null si la date est absente ou invalide. */
+export function formatDayMonthTimeFr(value: FrenchDateInput): string | null {
+    return frenchDateParts(value, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+
+/** Assemble les fragments réellement présents : évite les « · · » et les séparateurs orphelins. */
+export function joinNonEmpty(parts: ReadonlyArray<string | null | undefined | false>, separator = ' · '): string {
+    return parts.filter((part): part is string => Boolean(part)).join(separator);
+}
+
 /** Montant en euros, sans décimales (locale FR). */
 export function formatEur(n: number): string {
     return n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });

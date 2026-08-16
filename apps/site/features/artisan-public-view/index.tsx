@@ -1,8 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Award, ExternalLink, MapPin } from 'lucide-react';
+import { Award, CalendarClock, ExternalLink, MapPin } from 'lucide-react';
 import { Badge } from '@lumiris/ui/components/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
+import { formatDateFr } from '@lumiris/utils';
 import type { ArtisanPublicProfileDto } from '@/lib/public-artisan-api';
 
 interface Props {
@@ -46,6 +47,12 @@ export function ArtisanPublicView({ artisan }: Props) {
                                         {artisan.region ? `, ${artisan.region}` : ''}
                                     </span>
                                 ) : null}
+                            </p>
+                        ) : null}
+                        {artisan.pausedUntil ? (
+                            <p className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-lumiris-cyan/40 bg-lumiris-cyan/10 px-3 py-1 text-xs font-medium text-foreground">
+                                <CalendarClock className="h-3.5 w-3.5 text-lumiris-cyan" aria-hidden />
+                                Atelier en pause — de retour le {formatDateFr(artisan.pausedUntil)}
                             </p>
                         ) : null}
                         <div className="mt-4 flex flex-wrap gap-2">

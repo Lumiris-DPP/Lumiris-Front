@@ -5,11 +5,12 @@ import { useMutation, useQuery, type UseMutationOptions, type UseQueryOptions } 
 import { CACHE_TIMES } from '../core/cache';
 import { useApiClient } from '../core/provider';
 import type { CheckoutDto } from '../types/subscription';
-import type { SellerStatsDto, SellerStatusDto } from '../types/seller';
+import type { SellerPayoutSchedule, SellerStatsDto, SellerStatusDto } from '../types/seller';
 
 export const sellerKeys = {
     status: () => ['seller', 'status'] as const,
     stats: () => ['seller', 'stats'] as const,
+    payouts: () => ['seller', 'payouts'] as const,
 };
 
 export function useSellerStatus(options?: Omit<UseQueryOptions<SellerStatusDto, Error>, 'queryKey' | 'queryFn'>) {
@@ -37,6 +38,17 @@ export function useSellerStats(options?: Omit<UseQueryOptions<SellerStatsDto, Er
     return useQuery<SellerStatsDto, Error>({
         queryKey: sellerKeys.stats(),
         queryFn: () => client.seller.stats(),
+        staleTime: CACHE_TIMES.LIST,
+        ...options,
+    });
+}
+
+// Échéancier de versement : une ligne par vente en cours, la plus proche en tête.
+export function useSellerPayouts(options?: Omit<UseQueryOptions<SellerPayoutSchedule, Error>, 'queryKey' | 'queryFn'>) {
+    const client = useApiClient();
+    return useQuery<SellerPayoutSchedule, Error>({
+        queryKey: sellerKeys.payouts(),
+        queryFn: () => client.seller.payouts(),
         staleTime: CACHE_TIMES.LIST,
         ...options,
     });

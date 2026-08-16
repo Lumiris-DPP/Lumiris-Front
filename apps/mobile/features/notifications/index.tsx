@@ -19,6 +19,7 @@ const ACTIONABLE_TYPES: ReadonlySet<Notification['type']> = new Set([
     'RETURN_REFUSED',
     'DISPUTE_RESOLVED',
     'DISPUTE_REJECTED',
+    'FAVORITE_LOW_STOCK',
 ]);
 
 function formatWhen(iso?: string | null): string {

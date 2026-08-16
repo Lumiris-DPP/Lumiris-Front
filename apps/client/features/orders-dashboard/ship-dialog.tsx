@@ -85,7 +85,9 @@ export function ShipDialog({
             <DialogContent className="sm:max-w-md">
                 <form onSubmit={onSubmit}>
                     <DialogHeader>
-                        <DialogTitle>Expédier « {order.productName} »</DialogTitle>
+                        <DialogTitle>
+                            Expédier « {order.productName} »{order.variantLabel ? ` (${order.variantLabel})` : ''}
+                        </DialogTitle>
                         <DialogDescription>
                             Le suivi est transmis à l’acheteur immédiatement. Vos fonds sont versés dès la livraison.
                         </DialogDescription>

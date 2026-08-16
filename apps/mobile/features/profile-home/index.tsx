@@ -9,6 +9,7 @@ import {
     Bell,
     ChevronRight,
     FileText,
+    Heart,
     Info,
     LifeBuoy,
     LogOut,
@@ -154,6 +155,7 @@ function LoggedIn({ displayName, email, city }: LoggedInProps) {
                 animate="animate"
             >
                 <ActionLink href="/me/notifications" Icon={Bell} label="Notifications" badge={unreadCount} />
+                <ActionLink href="/me/favoris" Icon={Heart} label="Mes favoris" />
                 <ActionLink href="/me/orders" Icon={Package} label="Mes commandes" />
                 <ActionLink href="/me/repairs" Icon={Wrench} label="Mes demandes" />
                 <ActionLink href="/me/documents" Icon={FileText} label="Mes documents" />

@@ -9,6 +9,7 @@ export const notificationTypeSchema = z.enum([
     'ORDER_DELIVERED',
     'ORDER_COMPLETED',
     'ORDER_CANCELLED',
+    'ORDER_MESSAGE',
     'RETURN_REQUESTED',
     'RETURN_APPROVED',
     'RETURN_REFUSED',
@@ -18,6 +19,8 @@ export const notificationTypeSchema = z.enum([
     'DISPUTE_RESOLVED',
     'DISPUTE_REJECTED',
     'FUNDS_RELEASED',
+    'FAVORITE_LOW_STOCK',
+    'FAVORITE_PRICE_DROP',
 ]);
 export type NotificationType = z.infer<typeof notificationTypeSchema>;
 

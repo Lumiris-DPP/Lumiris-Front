@@ -6,11 +6,13 @@ import { Archive, ExternalLink, Eye, EyeOff, Loader2, ShoppingBag, Wallet, Wand2
 import { useSellerStats, useSellerStatus, useStartSellerOnboarding } from '@lumiris/api-client/react';
 import { Button } from '@lumiris/ui/components/button';
 import { toast } from '@lumiris/ui/components/sonner';
+import { StatCard } from '@lumiris/ui/components/stat-card';
 import { formatPriceCents } from '@lumiris/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { useSubscription } from '@/lib/use-subscription';
 import { ConvertDppDialog } from './convert-dpp-dialog';
 import { ProductsTab } from './products-tab';
+import { VacationBanner } from './vacation-banner';
 
 export function MarketplaceProducts() {
     const [convertOpen, setConvertOpen] = useState(false);
@@ -22,6 +24,7 @@ export function MarketplaceProducts() {
     return (
         <div className="space-y-4 p-8">
             <SellerConnectBanner />
+            <VacationBanner />
             <SellerStatsCards />
 
             <div className="flex flex-col items-end gap-1.5">
@@ -118,15 +121,8 @@ function SellerStatsCards() {
 
     return (
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            {cards.map(({ label, value, icon: Icon, hint }) => (
-                <div key={label} className="rounded-xl border bg-card p-4">
-                    <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                        <Icon className="h-3.5 w-3.5" />
-                        {label}
-                    </div>
-                    <p className="mt-1 text-2xl font-semibold text-foreground tabular-nums">{value}</p>
-                    <p className="mt-0.5 text-[11px] text-muted-foreground">{hint}</p>
-                </div>
+            {cards.map((card) => (
+                <StatCard key={card.label} {...card} />
             ))}
         </div>
     );

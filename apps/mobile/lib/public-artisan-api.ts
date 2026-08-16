@@ -17,6 +17,8 @@ export interface ArtisanPublicProfileDto {
     ofgLabeled: boolean;
     gotsLabeled: boolean;
     oekoTexLabeled: boolean;
+    /** Date de retour de l'atelier, absente quand il n'est pas en congés. */
+    pausedUntil?: string | null;
 }
 
 export async function fetchPublicArtisanProfile(slug: string): Promise<ArtisanPublicProfileDto> {

@@ -7,6 +7,7 @@ import { SELLER_ORDER_TABS, SELLER_ORDER_TAB_LABEL, sellerOrderTab } from '@lumi
 import { useSellerOrders } from '@lumiris/api-client/react';
 import { Badge } from '@lumiris/ui/components/badge';
 import { Skeleton } from '@lumiris/ui/components/skeleton';
+import { StatCard } from '@lumiris/ui/components/stat-card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@lumiris/ui/components/tabs';
 import { formatPriceCents } from '@lumiris/utils';
 import { useAuthStore } from '@/lib/auth-store';
@@ -143,15 +144,8 @@ function OrdersSummary({ orders }: { orders: readonly SellerOrder[] }) {
 
     return (
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            {cards.map(({ label, value, icon: Icon, hint }) => (
-                <div key={label} className="rounded-xl border border-border bg-card p-4">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                        <Icon className="h-4 w-4" />
-                        <span className="text-xs font-medium">{label}</span>
-                    </div>
-                    <p className="mt-2 text-2xl font-semibold text-foreground tabular-nums">{value}</p>
-                    <p className="mt-0.5 text-[11px] text-muted-foreground">{hint}</p>
-                </div>
+            {cards.map((card) => (
+                <StatCard key={card.label} {...card} />
             ))}
         </div>
     );

@@ -9,6 +9,29 @@ export type MarketplaceProductStatus = z.infer<typeof marketplaceProductStatusSc
 // Grade Iris (A→E). Aligné sur @lumiris/types.
 export const marketplaceGradeSchema = z.enum(['A', 'B', 'C', 'D', 'E']);
 
+// Une déclinaison vendable : taille, couleur, stock propre. Jamais de prix — une annonce a un
+// prix unique, adossé à un seul Price Stripe.
+export const marketplaceVariantSchema = z.object({
+    id: z.string(),
+    sizeLabel: z.string().nullish(),
+    colorLabel: z.string().nullish(),
+    colorHex: z.string().nullish(),
+    sku: z.string().nullish(),
+    stock: z.number(),
+    position: z.number().nullish(),
+    version: z.number().nullish(),
+});
+export type MarketplaceVariant = z.infer<typeof marketplaceVariantSchema>;
+
+// Cote relevée par l'atelier pour une taille, en millimètres entiers.
+export const sizeMeasurementSchema = z.object({
+    sizeLabel: z.string(),
+    label: z.string(),
+    valueMm: z.number(),
+    position: z.number().nullish(),
+});
+export type SizeMeasurement = z.infer<typeof sizeMeasurementSchema>;
+
 export const marketplaceItemSchema = z.object({
     id: z.string(),
     artisanProfileId: z.string(),
@@ -22,6 +45,8 @@ export const marketplaceItemSchema = z.object({
     priceCents: z.number(),
     currency: z.string(),
     stock: z.number(),
+    variants: z.array(marketplaceVariantSchema).nullish(),
+    sizeGuide: z.array(sizeMeasurementSchema).nullish(),
     externalOrderUrl: z.string().nullish(),
     photoUrl: z.string().nullish(),
     status: marketplaceProductStatusSchema,
@@ -38,6 +63,12 @@ export const marketplaceItemSchema = z.object({
     shippingCents: z.number().nullish(),
     returnPolicy: z.string().nullish(),
     warrantyDescription: z.string().nullish(),
+    // preparationDays est la valeur BRUTE saisie par l'artisan (celle que son formulaire
+    // réenregistre) ; effectivePreparationDays est ce qui est promis à l'acheteur, congés de
+    // l'atelier inclus. Ne jamais renvoyer l'effectif dans un payload d'édition.
+    preparationDays: z.number().nullish(),
+    effectivePreparationDays: z.number().nullish(),
+    atelierPausedUntil: z.string().nullish(),
 });
 export type MarketplaceItem = z.infer<typeof marketplaceItemSchema>;
 
@@ -84,6 +115,8 @@ export type SuggestionResult = z.infer<typeof suggestionResultSchema>;
 // ── Entrées (requêtes) ──────────────────────────────────────────────────────
 
 export interface MarketplaceSearchParams {
+    /** Recherche plein texte sur le nom, la matière et la description. */
+    q?: string;
     category?: string;
     material?: string;
     origin?: string;
@@ -109,15 +142,38 @@ export interface AffiliateTrackInput {
     referrer?: string;
 }
 
+export const productVariantPayloadSchema = z.object({
+    id: z.string().nullish(),
+    sizeLabel: z.string().nullish(),
+    colorLabel: z.string().nullish(),
+    colorHex: z.string().nullish(),
+    sku: z.string().nullish(),
+    stock: z.number().int().nonnegative(),
+    position: z.number().int().nonnegative(),
+    version: z.number().nullish(),
+});
+export type ProductVariantPayload = z.infer<typeof productVariantPayloadSchema>;
+
+export const sizeMeasurementPayloadSchema = z.object({
+    sizeLabel: z.string(),
+    label: z.string(),
+    valueMm: z.number().int().positive(),
+    position: z.number().int().nonnegative(),
+});
+export type SizeMeasurementPayload = z.infer<typeof sizeMeasurementPayloadSchema>;
+
 export const convertDppRequestSchema = z.object({
     priceCents: z.number().int().nonnegative(),
     currency: z.string().nullish(),
     description: z.string().nullish(),
     material: z.string().nullish(),
     stock: z.number().int().nonnegative().nullish(),
+    variants: z.array(productVariantPayloadSchema).nullish(),
+    sizeGuide: z.array(sizeMeasurementPayloadSchema).nullish(),
     // Vente directe (LUMIRIS-22) : frais de port + conditions de retour de l'offre.
     shippingCents: z.number().int().nonnegative().nullish(),
     returnPolicy: z.string().nullish(),
+    preparationDays: z.number().int().nonnegative().nullish(),
     externalOrderUrl: z.string().nullish(),
     photoUrl: z.string().nullish(),
     status: marketplaceProductStatusSchema.nullish(),
@@ -129,6 +185,9 @@ export type ConvertDppRequest = z.infer<typeof convertDppRequestSchema>;
 // Le panier peut couvrir PLUSIEURS ateliers : un colis (et un port) par atelier, un seul débit.
 export const cartIntentLineSchema = z.object({
     productId: z.string(),
+    // Optionnel : un bundle mobile antérieur aux déclinaisons tourne encore depuis un cache
+    // navigateur ou un shell Tauri. Le serveur résout la déclinaison unique d'une annonce.
+    variantId: z.string().optional(),
     quantity: z.number().int().positive(),
 });
 export type CartIntentLine = z.infer<typeof cartIntentLineSchema>;
@@ -157,6 +216,7 @@ export const paymentShipmentSchema = z.object({
     sellerName: z.string().nullish(),
     itemCount: z.number(),
     shippingCents: z.number(),
+    preparationDays: z.number().nullish(),
 });
 export type PaymentShipment = z.infer<typeof paymentShipmentSchema>;
 
@@ -180,7 +240,13 @@ export const productPayloadSchema = z.object({
     originCountry: z.string().nullish(),
     priceCents: z.number().int().nonnegative(),
     currency: z.string().nullish(),
-    stock: z.number().int().nonnegative(),
+    // Miroir des @NotNull backend : un champ oublié doit casser le typecheck, pas écraser la
+    // donnée par 0 au premier enregistrement du formulaire.
+    shippingCents: z.number().int().nonnegative(),
+    returnPolicy: z.string().nullish(),
+    preparationDays: z.number().int().nonnegative(),
+    variants: z.array(productVariantPayloadSchema),
+    sizeGuide: z.array(sizeMeasurementPayloadSchema),
     externalOrderUrl: z.string().nullish(),
     photoUrl: z.string().nullish(),
     dppFormId: z.string().nullish(),

@@ -9,6 +9,7 @@ import {
     ArrowLeft,
     BadgeCheck,
     Check,
+    Clock,
     Info,
     MapPin,
     RotateCcw,
@@ -21,8 +22,18 @@ import { isApiError, useApiClient, useMarketplaceProduct } from '@lumiris/api-cl
 import { IrisGrade } from '@lumiris/scoring-ui';
 import { Button } from '@lumiris/ui/components/button';
 import { Skeleton } from '@lumiris/ui/components/skeleton';
-import { addToCart, formatCents, toMarketplaceItem, useCart, type MarketplaceItem } from '@/lib/marketplace';
+import {
+    addToCart,
+    formatCents,
+    preparationLabel,
+    toMarketplaceItem,
+    useCart,
+    type MarketplaceItem,
+} from '@/lib/marketplace';
 import { toast } from '@/lib/toast';
+import { FavoriteButton } from './favorite-button';
+import { SizeGuideSheet } from './size-guide-sheet';
+import { PURCHASE_CTA_LABEL, VariantPicker, purchaseStateOf, type VariantSelection } from './variant-picker';
 
 // Une vue comptée au plus une fois par produit et par chargement de page (évite le double
 // StrictMode + les refetch). Le backend agrège ces vues pour le tableau de bord vendeur.
@@ -91,20 +102,32 @@ function DetailBody({
 }) {
     const cart = useCart();
     const [added, setAdded] = useState(false);
-    const inCart = cart.some((line) => line.productId === product.id);
-    const soldOut = product.stock <= 0;
+    const [guideOpen, setGuideOpen] = useState(false);
+    // Une annonce à déclinaison unique présélectionne : rien ne change pour une pièce sans axe.
+    const [selection, setSelection] = useState<VariantSelection>(() => {
+        const only = product.variants.length === 1 ? product.variants[0] : undefined;
+        return { size: only?.sizeLabel?.trim() ?? null, color: only?.colorLabel?.trim() ?? null };
+    });
+
+    const state = purchaseStateOf(product, selection);
+    const variant = state.kind === 'ready' || state.kind === 'sold-out' ? state.variant : null;
+    const buyable = state.kind === 'ready';
+    const inCart = cart.some((line) => line.productId === product.id && line.variantId === (variant?.id ?? null));
+    const prepLabel = preparationLabel(product.preparationDays);
 
     const onAdd = useCallback(() => {
-        addToCart(product.id, 1);
+        if (!variant) return;
+        addToCart(product.id, variant.id, 1);
         setAdded(true);
         toast.success('Ajouté au panier');
         window.setTimeout(() => setAdded(false), 1600);
-    }, [product.id]);
+    }, [product.id, variant]);
 
     const buyNow = useCallback(() => {
-        addToCart(product.id, 1);
+        if (!variant) return;
+        addToCart(product.id, variant.id, 1);
         onBuyNow();
-    }, [product.id, onBuyNow]);
+    }, [product.id, variant, onBuyNow]);
 
     return (
         <div className="relative flex h-full flex-col overflow-y-auto bg-background pb-44">
@@ -117,6 +140,8 @@ function DetailBody({
                 <ArrowLeft className="h-4 w-4" />
             </button>
 
+            <FavoriteButton item={product} className="absolute top-12 right-4 z-20 h-9 w-9" />
+
             <div className="relative flex h-72 w-full items-center justify-center bg-muted">
                 {product.photoUrl ? (
                     <Image src={product.photoUrl} alt={product.name} fill className="object-cover" unoptimized />
@@ -124,7 +149,7 @@ function DetailBody({
                     <Shirt className="h-16 w-16 text-muted-foreground/25" strokeWidth={1.25} aria-hidden />
                 )}
                 {product.irisGrade ? (
-                    <span className="absolute top-12 right-4">
+                    <span className="absolute right-4 bottom-4">
                         <IrisGrade grade={product.irisGrade} size="md" tone="solid" />
                     </span>
                 ) : null}
@@ -145,6 +170,13 @@ function DetailBody({
                 {product.description ? (
                     <p className="text-sm leading-relaxed text-foreground/90">{product.description}</p>
                 ) : null}
+
+                <VariantPicker
+                    item={product}
+                    selection={selection}
+                    onChange={setSelection}
+                    onOpenSizeGuide={product.sizeGuide.length > 0 ? () => setGuideOpen(true) : undefined}
+                />
 
                 <dl className="grid grid-cols-2 gap-3 rounded-2xl border border-border/60 bg-card p-4 text-sm">
                     {product.material ? (
@@ -187,6 +219,15 @@ function DetailBody({
                     aria-label="Livraison, retours et garantie"
                     className="flex flex-col divide-y divide-border/50 rounded-2xl border border-border/60 bg-card text-sm"
                 >
+                    {prepLabel ? (
+                        <InfoRow Icon={Clock} label="Préparation">
+                            Cette pièce est préparée par l&apos;atelier — expédiée sous {product.preparationDays} jour
+                            {product.preparationDays > 1 ? 's' : ''} après ta commande.
+                            {product.atelierPausedUntil
+                                ? ` L'atelier est en pause, de retour le ${formatShortDate(product.atelierPausedUntil)}.`
+                                : ''}
+                        </InfoRow>
+                    ) : null}
                     <InfoRow Icon={Truck} label="Livraison">
                         {product.shippingCents === null
                             ? 'Expédiée à domicile.'
@@ -223,18 +264,23 @@ function DetailBody({
                         </p>
                         <p className="mt-1 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
                             <Truck className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
-                            {product.shippingCents === null
-                                ? 'Livraison à domicile'
-                                : product.shippingCents === 0
-                                  ? 'Livraison offerte'
-                                  : `Livraison ${formatCents(product.shippingCents)}`}
+                            {[
+                                prepLabel,
+                                product.shippingCents === null
+                                    ? 'Livraison à domicile'
+                                    : product.shippingCents === 0
+                                      ? 'Livraison offerte'
+                                      : `Livraison ${formatCents(product.shippingCents)}`,
+                            ]
+                                .filter(Boolean)
+                                .join(' · ')}
                         </p>
                     </div>
-                    {soldOut ? (
+                    {variant && variant.stock <= 0 ? (
                         <span className="text-xs font-semibold text-lumiris-rose">Épuisé</span>
-                    ) : product.stock <= 3 ? (
+                    ) : variant && variant.stock <= 3 ? (
                         <span className="text-[11px] font-medium text-lumiris-amber">
-                            Plus que {product.stock} en stock
+                            Plus que {variant.stock} en stock
                         </span>
                     ) : null}
                 </div>
@@ -244,7 +290,7 @@ function DetailBody({
                         type="button"
                         variant="outline"
                         onClick={onAdd}
-                        disabled={soldOut}
+                        disabled={!buyable}
                         className="h-11 flex-1 rounded-full text-sm font-semibold"
                     >
                         {added || inCart ? (
@@ -262,15 +308,21 @@ function DetailBody({
                     <Button
                         type="button"
                         onClick={buyNow}
-                        disabled={soldOut}
+                        disabled={!buyable}
                         className="h-11 flex-[1.4] rounded-full bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90"
                     >
-                        Acheter — {formatCents(product.priceCents)}
+                        {buyable ? `Acheter — ${formatCents(product.priceCents)}` : PURCHASE_CTA_LABEL[state.kind]}
                     </Button>
                 </div>
             </motion.aside>
+
+            <SizeGuideSheet open={guideOpen} onOpenChange={setGuideOpen} measurements={product.sizeGuide} />
         </div>
     );
+}
+
+function formatShortDate(value: string): string {
+    return new Date(value).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
 }
 
 function InfoRow({ Icon, label, children }: { Icon: typeof Truck; label: string; children: ReactNode }) {

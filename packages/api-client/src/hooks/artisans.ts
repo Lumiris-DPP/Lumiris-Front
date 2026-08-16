@@ -11,6 +11,7 @@ import {
 import { createKeys } from '../core/keys';
 import { isApiError } from '../core/errors';
 import type {
+    ArtisanPauseRequest,
     ArtisanPhotoResponse,
     ArtisanProfileResponse,
     ArtisanRegisterRequest,
@@ -76,6 +77,36 @@ export function useUpdateArtisanVitrine(
     const queryClient = useQueryClient();
     return useMutation<ArtisanProfileResponse, Error, ArtisanVitrineUpdateRequest>({
         mutationFn: (req) => client.artisans.updateProfile(req),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.setQueryData(artisanKeys.custom('me'), args[0]);
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+export function usePauseAtelier(
+    options?: Omit<UseMutationOptions<ArtisanProfileResponse, Error, ArtisanPauseRequest>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<ArtisanProfileResponse, Error, ArtisanPauseRequest>({
+        mutationFn: (req) => client.artisans.pause(req),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.setQueryData(artisanKeys.custom('me'), args[0]);
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+export function useResumeAtelier(
+    options?: Omit<UseMutationOptions<ArtisanProfileResponse, Error, void>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<ArtisanProfileResponse, Error, void>({
+        mutationFn: () => client.artisans.resume(),
         ...options,
         onSuccess: (...args) => {
             queryClient.setQueryData(artisanKeys.custom('me'), args[0]);

@@ -1,5 +1,6 @@
 import type { Http } from '../core/http';
 import type {
+    ArtisanPauseRequest,
     ArtisanPhotoResponse,
     ArtisanProfileResponse,
     ArtisanPublicProfileResponse,
@@ -28,6 +29,14 @@ export function artisansApi(http: Http) {
         },
         removePhoto(photoId: string): Promise<void> {
             return http.request<void>(`/api/artisans/me/photos/${photoId}`, { method: 'DELETE', skipJson: true });
+        },
+        // Congés : les pièces restent achetables, le délai d'expédition annoncé est allongé
+        // jusqu'à la date de retour, visible sur la vitrine publique.
+        pause(req: ArtisanPauseRequest): Promise<ArtisanProfileResponse> {
+            return http.request<ArtisanProfileResponse>('/api/artisans/me/pause', { method: 'PUT', body: req });
+        },
+        resume(): Promise<ArtisanProfileResponse> {
+            return http.request<ArtisanProfileResponse>('/api/artisans/me/pause', { method: 'DELETE' });
         },
         publish(): Promise<ArtisanProfileResponse> {
             return http.request<ArtisanProfileResponse>('/api/artisans/me/publish', { method: 'POST' });
