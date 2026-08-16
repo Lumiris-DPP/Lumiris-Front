@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUpDown, Check, SlidersHorizontal, X } from 'lucide-react';
+import { ArrowUpDown, Search, SlidersHorizontal, X } from 'lucide-react';
 import type { IrisGrade } from '@lumiris/types';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@lumiris/ui/components/sheet';
 import { Slider } from '@lumiris/ui/components/slider';
 import { cn } from '@lumiris/ui/lib/cn';
+import { Chip } from '@/components/chip';
 import {
     MARKETPLACE_SORT_LABEL,
     MARKETPLACE_SORT_ORDER,
@@ -26,6 +27,8 @@ interface PriceBounds {
 }
 
 export interface BoutiqueFiltersState {
+    /** Recherche plein texte, envoyée au backend (nom, matière, description). */
+    q: string;
     /** Catégories produit (chaînes réelles du catalogue). */
     categories: readonly string[];
     grades: readonly IrisGrade[];
@@ -37,6 +40,7 @@ export interface BoutiqueFiltersState {
 }
 
 export const EMPTY_BOUTIQUE_FILTERS: BoutiqueFiltersState = {
+    q: '',
     categories: [],
     grades: [],
     materials: [],
@@ -107,47 +111,51 @@ export function BoutiqueFilters({
 
     return (
         <motion.div
-            className="sticky top-0 z-30 flex items-center gap-2 bg-background/85 px-5 pt-2 pb-3 backdrop-blur-xl"
+            className="sticky top-0 z-30 flex flex-col gap-2 bg-background/85 px-5 pt-2 pb-3 backdrop-blur-xl"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.08 }}
         >
-            <button
-                type="button"
-                onClick={() => setOpen(true)}
-                aria-haspopup="dialog"
-                className={cn(
-                    'inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold transition-colors',
-                    activeCount > 0
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-card text-foreground hover:border-foreground/40',
-                )}
-            >
-                <SlidersHorizontal className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
-                Filtres
-                {activeCount > 0 ? (
-                    <span className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary-foreground/20 px-1 text-[10px] tabular-nums">
-                        {activeCount}
-                    </span>
-                ) : null}
-            </button>
+            <SearchField value={state.q} onChange={(q) => onChange({ ...state, q })} />
 
-            <label className="relative ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card py-1.5 pr-2 pl-3 text-xs font-semibold text-foreground">
-                <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.5} aria-hidden />
-                <span className="sr-only">Trier par</span>
-                <select
-                    value={state.sort}
-                    onChange={(e) => onChange({ ...state, sort: e.target.value as MarketplaceSort })}
-                    className="bg-transparent pr-1 text-xs font-semibold outline-none"
-                    aria-label="Trier les pièces"
+            <div className="flex items-center gap-2">
+                <button
+                    type="button"
+                    onClick={() => setOpen(true)}
+                    aria-haspopup="dialog"
+                    className={cn(
+                        'inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold transition-colors',
+                        activeCount > 0
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-border bg-card text-foreground hover:border-foreground/40',
+                    )}
                 >
-                    {MARKETPLACE_SORT_ORDER.map((sort) => (
-                        <option key={sort} value={sort}>
-                            {MARKETPLACE_SORT_LABEL[sort]}
-                        </option>
-                    ))}
-                </select>
-            </label>
+                    <SlidersHorizontal className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+                    Filtres
+                    {activeCount > 0 ? (
+                        <span className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary-foreground/20 px-1 text-[10px] tabular-nums">
+                            {activeCount}
+                        </span>
+                    ) : null}
+                </button>
+
+                <label className="relative ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card py-1.5 pr-2 pl-3 text-xs font-semibold text-foreground">
+                    <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.5} aria-hidden />
+                    <span className="sr-only">Trier par</span>
+                    <select
+                        value={state.sort}
+                        onChange={(e) => onChange({ ...state, sort: e.target.value as MarketplaceSort })}
+                        className="bg-transparent pr-1 text-xs font-semibold outline-none"
+                        aria-label="Trier les pièces"
+                    >
+                        {MARKETPLACE_SORT_ORDER.map((sort) => (
+                            <option key={sort} value={sort}>
+                                {MARKETPLACE_SORT_LABEL[sort]}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+            </div>
 
             <BoutiqueFilterSheet
                 open={open}
@@ -205,39 +213,39 @@ function BoutiqueFilterSheet({
                     {categoryOptions.length > 0 ? (
                         <FilterGroup label="Catégorie">
                             {categoryOptions.map((cat) => (
-                                <FilterChip
+                                <Chip
                                     key={cat}
-                                    active={state.categories.includes(cat)}
+                                    selected={state.categories.includes(cat)}
                                     onClick={() => onChange({ ...state, categories: toggle(state.categories, cat) })}
                                 >
                                     {titleCase(cat)}
-                                </FilterChip>
+                                </Chip>
                             ))}
                         </FilterGroup>
                     ) : null}
 
                     <FilterGroup label="Score Iris">
                         {GRADE_OPTIONS.map((grade) => (
-                            <FilterChip
+                            <Chip
                                 key={grade}
-                                active={state.grades.includes(grade)}
+                                selected={state.grades.includes(grade)}
                                 onClick={() => onChange({ ...state, grades: toggle(state.grades, grade) })}
                             >
                                 {grade}
-                            </FilterChip>
+                            </Chip>
                         ))}
                     </FilterGroup>
 
                     {materialOptions.length > 0 ? (
                         <FilterGroup label="Matière principale">
                             {materialOptions.map((material) => (
-                                <FilterChip
+                                <Chip
                                     key={material}
-                                    active={state.materials.includes(material)}
+                                    selected={state.materials.includes(material)}
                                     onClick={() => onChange({ ...state, materials: toggle(state.materials, material) })}
                                 >
                                     {titleCase(material)}
-                                </FilterChip>
+                                </Chip>
                             ))}
                         </FilterGroup>
                     ) : null}
@@ -269,7 +277,7 @@ function BoutiqueFilterSheet({
                 <div className="mt-7 flex items-center gap-3">
                     <button
                         type="button"
-                        onClick={() => onChange({ ...EMPTY_BOUTIQUE_FILTERS, sort: state.sort })}
+                        onClick={() => onChange({ ...EMPTY_BOUTIQUE_FILTERS, sort: state.sort, q: state.q })}
                         className="inline-flex h-12 items-center justify-center gap-1.5 px-4 text-sm font-medium text-muted-foreground hover:text-foreground"
                     >
                         <X className="h-4 w-4" strokeWidth={1.5} aria-hidden />
@@ -299,30 +307,54 @@ function FilterGroup({ label, children }: { label: string; children: React.React
     );
 }
 
-function FilterChip({
-    active,
-    onClick,
-    children,
-}: {
-    active: boolean;
-    onClick: () => void;
-    children: React.ReactNode;
-}) {
+// Le champ pilote un brouillon local et ne remonte qu'après 300 ms : chaque frappe déclencherait
+// sinon une requête catalogue. La soumission du formulaire vide le délai (touche Entrée / Rechercher).
+function SearchField({ value, onChange }: { value: string; onChange: (next: string) => void }) {
+    const [draft, setDraft] = useState(value);
+
+    useEffect(() => {
+        if (draft === value) return;
+        const timer = window.setTimeout(() => onChange(draft), 300);
+        return () => window.clearTimeout(timer);
+    }, [draft, value, onChange]);
+
     return (
-        <button
-            type="button"
-            onClick={onClick}
-            aria-pressed={active}
-            className={cn(
-                'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
-                'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:outline-none',
-                active
-                    ? 'border-primary bg-primary/10 text-primary'
-                    : 'border-border/60 bg-card text-muted-foreground hover:text-foreground',
-            )}
+        <form
+            role="search"
+            onSubmit={(e) => {
+                e.preventDefault();
+                onChange(draft);
+            }}
+            className="relative flex items-center"
         >
-            {active ? <Check className="h-3 w-3" strokeWidth={2} aria-hidden /> : null}
-            {children}
-        </button>
+            <Search
+                className="pointer-events-none absolute left-3 h-4 w-4 text-muted-foreground"
+                strokeWidth={1.5}
+                aria-hidden
+            />
+            <input
+                type="search"
+                inputMode="search"
+                enterKeyHint="search"
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                placeholder="Rechercher une pièce, une matière…"
+                aria-label="Rechercher dans la Boutique"
+                className="h-10 w-full rounded-full border border-border bg-card pr-10 pl-9 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            />
+            {draft.length > 0 ? (
+                <button
+                    type="button"
+                    aria-label="Effacer la recherche"
+                    onClick={() => {
+                        setDraft('');
+                        onChange('');
+                    }}
+                    className="absolute right-3 text-muted-foreground hover:text-foreground"
+                >
+                    <X className="h-4 w-4" strokeWidth={1.5} />
+                </button>
+            ) : null}
+        </form>
     );
 }

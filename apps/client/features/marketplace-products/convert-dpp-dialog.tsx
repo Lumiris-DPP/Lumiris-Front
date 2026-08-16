@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertTriangle, Wand2 } from 'lucide-react';
-import { useConvertDppToProduct, useDppForms } from '@lumiris/api-client/react';
+import { useConvertDppToProduct, useDppForm, useDppForms } from '@lumiris/api-client/react';
 import { isApiError } from '@lumiris/api-client';
 import { Button } from '@lumiris/ui/components/button';
 import {
@@ -19,6 +19,20 @@ import { Label } from '@lumiris/ui/components/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@lumiris/ui/components/select';
 import { toast } from '@lumiris/ui/components/sonner';
 import { useSubscription } from '@/lib/use-subscription';
+import {
+    EMPTY_SIZE_GUIDE,
+    newVariantRow,
+    sizesOf,
+    toSizeGuidePayload,
+    toVariantPayload,
+    variantRowsError,
+    type SizeGuideDraft,
+    type VariantRow,
+} from './product-payload';
+import { SizeGuideEditor } from './size-guide-editor';
+import { VariantsEditor } from './variants-editor';
+
+const MAX_PREPARATION_DAYS = 90;
 
 export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
     const router = useRouter();
@@ -32,20 +46,36 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
     const [priceEuros, setPriceEuros] = useState('');
     const [shippingEuros, setShippingEuros] = useState('');
     const [stock, setStock] = useState('');
+    const [preparationDays, setPreparationDays] = useState('0');
+    const [variants, setVariants] = useState<VariantRow[]>([]);
+    const [sizeGuide, setSizeGuide] = useState<SizeGuideDraft>(EMPTY_SIZE_GUIDE);
     const [returnPolicy, setReturnPolicy] = useState('');
     const [externalOrderUrl, setExternalOrderUrl] = useState('');
     const [photoUrl, setPhotoUrl] = useState('');
 
     const priceCents = useMemo(() => Math.round(parseFloat(priceEuros.replace(',', '.')) * 100), [priceEuros]);
+    // Le détail du DPP porte les tailles et couleurs déjà déclarées au passeport : la grille se
+    // pré-remplit, et l'artisan n'a plus qu'un clic à faire.
+    const { data: selectedDpp } = useDppForm(dppFormId, { enabled: dppFormId !== '' });
+    const sizes = sizesOf(variants);
+    const variantsInvalid = variants.length > 0 && variantRowsError(variants) !== null;
     // A live product needs a real price: require strictly > 0, not just non-negative.
     const canSubmit =
-        dppFormId !== '' && Number.isFinite(priceCents) && priceCents > 0 && !convert.isPending && !sellBlocked;
+        dppFormId !== '' &&
+        Number.isFinite(priceCents) &&
+        priceCents > 0 &&
+        !variantsInvalid &&
+        !convert.isPending &&
+        !sellBlocked;
 
     const reset = () => {
         setDppFormId('');
         setPriceEuros('');
         setShippingEuros('');
         setStock('');
+        setPreparationDays('0');
+        setVariants([]);
+        setSizeGuide(EMPTY_SIZE_GUIDE);
         setReturnPolicy('');
         setExternalOrderUrl('');
         setPhotoUrl('');
@@ -60,6 +90,12 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                     priceCents,
                     currency: 'EUR',
                     stock: stock ? Number(stock) : undefined,
+                    variants: variants.length > 0 ? toVariantPayload(variants) : undefined,
+                    sizeGuide: variants.length > 0 ? toSizeGuidePayload(sizeGuide, sizes) : undefined,
+                    preparationDays: Math.min(
+                        MAX_PREPARATION_DAYS,
+                        Math.max(0, Math.round(Number(preparationDays) || 0)),
+                    ),
                     shippingCents: shippingEuros
                         ? Math.round(parseFloat(shippingEuros.replace(',', '.')) * 100)
                         : undefined,
@@ -94,7 +130,7 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
 
     return (
         <Dialog open={open} onOpenChange={(o) => (o ? onOpenChange(true) : (reset(), onOpenChange(false)))}>
-            <DialogContent>
+            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>Convertir un DPP en produit</DialogTitle>
                     <DialogDescription>
@@ -160,17 +196,19 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                                 onChange={(e) => setPriceEuros(e.target.value)}
                             />
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="convert-stock">Stock (défaut : quantité du DPP)</Label>
-                            <Input
-                                id="convert-stock"
-                                type="number"
-                                min={0}
-                                value={stock}
-                                placeholder="ex. 10"
-                                onChange={(e) => setStock(e.target.value)}
-                            />
-                        </div>
+                        {variants.length === 0 ? (
+                            <div className="space-y-2">
+                                <Label htmlFor="convert-stock">Stock (défaut : quantité du DPP)</Label>
+                                <Input
+                                    id="convert-stock"
+                                    type="number"
+                                    min={0}
+                                    value={stock}
+                                    placeholder="ex. 10"
+                                    onChange={(e) => setStock(e.target.value)}
+                                />
+                            </div>
+                        ) : null}
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
@@ -196,6 +234,43 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                             />
                         </div>
                     </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="convert-prep">Délai de préparation (jours)</Label>
+                        <Input
+                            id="convert-prep"
+                            type="number"
+                            min={0}
+                            max={MAX_PREPARATION_DAYS}
+                            step="1"
+                            value={preparationDays}
+                            onChange={(e) => setPreparationDays(e.target.value)}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            Affiché à l’acheteur avant l’achat : « expédiée sous X jours ». 0 = pièce en stock.
+                        </p>
+                    </div>
+
+                    {variants.length === 0 ? (
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setVariants([newVariantRow()])}
+                        >
+                            Décliner en plusieurs tailles ou couleurs
+                        </Button>
+                    ) : (
+                        <>
+                            <VariantsEditor
+                                value={variants}
+                                onChange={setVariants}
+                                sizeSuggestions={selectedDpp?.availableSizes ?? undefined}
+                                colorSuggestions={selectedDpp?.colors ?? undefined}
+                            />
+                            <SizeGuideEditor sizes={sizes} value={sizeGuide} onChange={setSizeGuide} />
+                        </>
+                    )}
 
                     <div className="space-y-2">
                         <Label htmlFor="convert-photo">Photo du produit (URL, optionnel)</Label>

@@ -6,3 +6,4 @@ export * from './assert-never';
 export * from './gs1';
 export * from './file';
 export * from './countries';
+export * from './size-guide';

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Eye, EyeOff, PackagePlus, Pencil, Trash2 } from 'lucide-react';
-import type { MarketplaceItem, MarketplaceProductStatus, ProductPayload } from '@lumiris/api-client';
+import type { MarketplaceItem, MarketplaceProductStatus } from '@lumiris/api-client';
 import { isApiError } from '@lumiris/api-client';
 import { useDeleteProduct, useMyProducts, useUpdateProduct } from '@lumiris/api-client/react';
 import { Badge } from '@lumiris/ui/components/badge';
@@ -23,30 +23,10 @@ import { formatPriceCents } from '@lumiris/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { EmptyState } from '@/features/empty-state';
 import { ProductFormDialog } from './product-form-dialog';
+import { MIN_PUBLISHED_PRICE_CENTS, productPayloadFrom } from './product-payload';
 import { STATUS_LABEL } from './labels';
 
 // onCreate : la conversion DPP → produit est pilotée au niveau page (bouton toujours visible).
-// Prix minimum d'un produit publié (le backend rejette sinon en 422).
-const MIN_PUBLISHED_PRICE_CENTS = 50;
-
-// Reconstruit un ProductPayload complet à partir d'un produit existant (l'update backend
-// attend le payload complet), avec un statut éventuellement forcé.
-function toPayload(p: MarketplaceItem, status?: MarketplaceProductStatus): ProductPayload {
-    return {
-        name: p.name,
-        description: p.description ?? undefined,
-        category: p.category ?? undefined,
-        material: p.material ?? undefined,
-        originCountry: p.originCountry ?? undefined,
-        priceCents: p.priceCents,
-        currency: p.currency,
-        stock: p.stock,
-        externalOrderUrl: p.externalOrderUrl ?? undefined,
-        photoUrl: p.photoUrl ?? undefined,
-        dppFormId: p.dppFormId ?? undefined,
-        status: status ?? p.status,
-    };
-}
 
 export function ProductsTab({ onCreate }: { onCreate: () => void }) {
     const token = useAuthStore((s) => s.token);
@@ -67,7 +47,7 @@ export function ProductsTab({ onCreate }: { onCreate: () => void }) {
     const setStatus = (product: MarketplaceItem, status: MarketplaceProductStatus) => {
         if (updateMutation.isPending) return;
         updateMutation.mutate(
-            { id: product.id, payload: toPayload(product, status) },
+            { id: product.id, payload: productPayloadFrom(product, status) },
             {
                 onSuccess: () => toast.success(status === 'ARCHIVED' ? 'Produit archivé.' : 'Produit publié.'),
                 onError: (e) => toast.error(e.message || 'Échec de la mise à jour.'),
@@ -163,7 +143,14 @@ export function ProductsTab({ onCreate }: { onCreate: () => void }) {
                                         </div>
                                     </TableCell>
                                     <TableCell>{formatPriceCents(product.priceCents, product.currency)}</TableCell>
-                                    <TableCell>{product.stock}</TableCell>
+                                    <TableCell>
+                                        <span className="tabular-nums">{product.stock}</span>
+                                        {(product.variants?.length ?? 0) > 1 ? (
+                                            <span className="block text-[11px] text-muted-foreground">
+                                                {product.variants?.length} déclinaisons
+                                            </span>
+                                        ) : null}
+                                    </TableCell>
                                     <TableCell className="text-right text-muted-foreground tabular-nums">
                                         {product.views ?? 0}
                                     </TableCell>

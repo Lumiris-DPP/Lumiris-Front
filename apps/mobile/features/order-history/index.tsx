@@ -128,7 +128,12 @@ function OrderRow({ order }: { order: OrderResponse }) {
             </div>
 
             <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-foreground">{order.productName ?? 'Commande'}</p>
+                <p className="truncate text-sm font-medium text-foreground">
+                    {order.productName ?? 'Commande'}
+                    {order.variantLabel ? (
+                        <span className="font-normal text-muted-foreground"> · {order.variantLabel}</span>
+                    ) : null}
+                </p>
                 <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[11px] text-muted-foreground">
                     <span className={disputed ? 'font-semibold text-lumiris-amber' : 'font-semibold text-lumiris-cyan'}>
                         {disputed ? 'Litige en cours' : ORDER_STATUS_LABEL_BUYER[order.status]}

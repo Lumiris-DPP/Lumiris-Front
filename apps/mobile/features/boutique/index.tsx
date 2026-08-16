@@ -20,18 +20,30 @@ import {
 
 export function Boutique() {
     const [filters, setFilters] = useState<BoutiqueFiltersState>(EMPTY_BOUTIQUE_FILTERS);
+    const query = filters.q.trim();
 
-    // Catalogue public RÉEL, trié côté backend (le tri est neutre par défaut).
-    const { data, isLoading, isError } = useMarketplaceSearch({ sort: filters.sort });
+    // Deux requêtes, et c'est délibéré : les facettes et les bornes de prix dérivent du catalogue
+    // ENTIER. Les faire dériver du résultat textuel ferait disparaître les puces à mesure qu'on tape
+    // et sauter les bornes du curseur sous le doigt, avec une sélection de prix devenue hors bornes.
+    // Le spread conditionnel garde la MÊME clé TanStack quand la recherche est vide : une requête.
+    const catalogue = useMarketplaceSearch({ sort: filters.sort });
+    const results = useMarketplaceSearch(
+        { sort: filters.sort, ...(query ? { q: query } : {}) },
+        { placeholderData: (previous) => previous },
+    );
+    const isLoading = results.isLoading;
+    const isError = results.isError;
 
     // Seules les pièces réellement en vente in-app (inAppSale) apparaissent en Boutique.
-    const sorted = useMemo<readonly MarketplaceItem[]>(
-        () => (data?.items ?? []).filter((p) => p.inAppSale !== false).map(toMarketplaceItem),
-        [data],
+    const sellable = useMemo(() => (results.data?.items ?? []).filter((p) => p.inAppSale !== false), [results.data]);
+    const sorted = useMemo<readonly MarketplaceItem[]>(() => sellable.map(toMarketplaceItem), [sellable]);
+    const facetSource = useMemo<readonly MarketplaceItem[]>(
+        () => (catalogue.data?.items ?? []).filter((p) => p.inAppSale !== false).map(toMarketplaceItem),
+        [catalogue.data],
     );
-    const priceBounds = useMemo(() => priceBoundsOf(sorted), [sorted]);
-    const categoryOptions = useMemo(() => categoryOptionsOf(sorted), [sorted]);
-    const materialOptions = useMemo(() => materialOptionsOf(sorted), [sorted]);
+    const priceBounds = useMemo(() => priceBoundsOf(facetSource), [facetSource]);
+    const categoryOptions = useMemo(() => categoryOptionsOf(facetSource), [facetSource]);
+    const materialOptions = useMemo(() => materialOptionsOf(facetSource), [facetSource]);
 
     const items = useMemo<readonly MarketplaceItem[]>(() => applyBoutiqueFilters(sorted, filters), [sorted, filters]);
 
@@ -79,7 +91,21 @@ export function Boutique() {
                 ) : isError ? (
                     <BoutiqueError />
                 ) : items.length === 0 ? (
-                    <BoutiqueEmpty />
+                    query ? (
+                        <BoutiqueEmpty
+                            title={`Aucune pièce pour « ${query} »`}
+                            body="Essaie un mot plus simple — « veste », « lin », ou le nom d'une matière."
+                            action={{
+                                label: 'Effacer la recherche',
+                                onClick: () => setFilters({ ...filters, q: '' }),
+                            }}
+                        />
+                    ) : (
+                        <BoutiqueEmpty
+                            title="Aucune pièce ne correspond"
+                            body="Ajuste les filtres pour découvrir d'autres pièces d'artisans en vente."
+                        />
+                    )
                 ) : (
                     <div className="flex flex-col gap-3">
                         {hero ? <BoutiqueCard item={hero} index={0} featured /> : null}
@@ -125,7 +151,15 @@ function BoutiqueError() {
     );
 }
 
-function BoutiqueEmpty() {
+function BoutiqueEmpty({
+    title,
+    body,
+    action,
+}: {
+    title: string;
+    body: string;
+    action?: { label: string; onClick: () => void };
+}) {
     return (
         <div className="mt-10 flex flex-col items-center gap-3 rounded-2xl border border-border/60 bg-card/60 p-8 text-center">
             <span
@@ -134,10 +168,17 @@ function BoutiqueEmpty() {
             >
                 <PackageOpen className="h-5 w-5 text-muted-foreground" strokeWidth={1.5} />
             </span>
-            <p className="text-sm font-semibold text-foreground">Aucune pièce ne correspond</p>
-            <p className="text-xs leading-relaxed text-muted-foreground">
-                Ajuste les filtres pour découvrir d&apos;autres pièces d&apos;artisans en vente.
-            </p>
+            <p className="text-sm font-semibold text-foreground">{title}</p>
+            <p className="text-xs leading-relaxed text-muted-foreground">{body}</p>
+            {action ? (
+                <button
+                    type="button"
+                    onClick={action.onClick}
+                    className="mt-1 rounded-full border border-border px-4 py-2 text-xs font-semibold text-foreground"
+                >
+                    {action.label}
+                </button>
+            ) : null}
         </div>
     );
 }

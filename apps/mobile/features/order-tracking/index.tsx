@@ -9,6 +9,7 @@ import {
     AlertTriangle,
     ArrowLeft,
     CheckCircle2,
+    Clock,
     ExternalLink,
     Loader2,
     LogIn,
@@ -154,6 +155,9 @@ function OrderTrackingInner() {
                     <div className="min-w-0 flex-1">
                         <h1 className="truncate text-lg font-bold text-foreground">
                             {order.productName ?? 'Ta commande'}
+                            {order.variantLabel ? (
+                                <span className="font-normal text-muted-foreground"> · {order.variantLabel}</span>
+                            ) : null}
                         </h1>
                         <p className="text-xs text-muted-foreground">{order.sellerName ?? 'Atelier Lumiris'}</p>
                         <p className="mt-1 text-sm font-semibold text-lumiris-cyan">
@@ -170,6 +174,8 @@ function OrderTrackingInner() {
                 <GlassCard className="p-4" intensity="subtle">
                     <TrackingSteps status={order.status} />
                 </GlassCard>
+
+                {order.status === 'PAID' && order.shipDueAt ? <PreparationCard shipDueAt={order.shipDueAt} /> : null}
 
                 {order.trackingNumber ? <TrackingCard detail={data} /> : null}
 
@@ -376,6 +382,25 @@ function ReturnInstructions({ detail }: { detail: OrderDetail }) {
                     : 'Si tu contestes cette décision, tu peux signaler un problème : Lumiris arbitrera.'}
             </p>
         </div>
+    );
+}
+
+// Le trou visuel de la fenêtre « payée, pas encore expédiée » : sans cette carte, l'acheteur d'une
+// pièce fabriquée à la commande ne voit rien bouger et finit par écrire, voire ouvrir un litige.
+function PreparationCard({ shipDueAt }: { shipDueAt: string }) {
+    return (
+        <GlassCard className="p-4" intensity="subtle">
+            <div className="flex items-start gap-3">
+                <Clock className="mt-0.5 h-4 w-4 shrink-0 text-primary" strokeWidth={1.5} aria-hidden />
+                <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground">En préparation à l&apos;atelier</p>
+                    <p className="mt-0.5 text-[13px] leading-relaxed text-muted-foreground">
+                        L&apos;atelier s&apos;est engagé à expédier ta pièce au plus tard le {formatDate(shipDueAt)}. Tu
+                        recevras le suivi dès que le colis part.
+                    </p>
+                </div>
+            </div>
+        </GlassCard>
     );
 }
 

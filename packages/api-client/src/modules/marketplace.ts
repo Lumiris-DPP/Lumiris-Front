@@ -30,6 +30,7 @@ export function marketplaceApi(http: Http) {
                 searchResultSchema,
                 await http.request('/public/marketplace/search', {
                     query: {
+                        q: params?.q || undefined,
                         category: params?.category,
                         material: params?.material,
                         origin: params?.origin,

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ExternalLink, MapPin } from 'lucide-react';
+import { ArrowLeft, CalendarClock, ExternalLink, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { ArtisanPublicProfileDto } from '@/lib/public-artisan-api';
 
@@ -36,6 +36,16 @@ export function ArtisanPublicProfile({ artisan }: { artisan: ArtisanPublicProfil
                     ) : null}
                 </div>
             </motion.header>
+
+            {artisan.pausedUntil ? (
+                <div className="mx-4 mb-2 flex items-start gap-2 rounded-2xl border border-lumiris-cyan/30 bg-lumiris-cyan/10 p-3">
+                    <CalendarClock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-lumiris-cyan" aria-hidden />
+                    <p className="text-xs text-foreground">
+                        Atelier en pause — de retour le {formatArtisanDate(artisan.pausedUntil)}. Ses pièces restent
+                        achetables, avec un délai d&apos;expédition allongé.
+                    </p>
+                </div>
+            ) : null}
 
             <div className="flex flex-col gap-5 px-4">
                 {artisan.photoUrls.length > 0 ? (
@@ -111,4 +121,8 @@ export function ArtisanPublicProfile({ artisan }: { artisan: ArtisanPublicProfil
             </div>
         </div>
     );
+}
+
+function formatArtisanDate(value: string): string {
+    return new Date(value).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
 }

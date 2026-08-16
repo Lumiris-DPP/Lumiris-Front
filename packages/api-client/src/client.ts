@@ -6,6 +6,7 @@ import { subscriptionApi } from './modules/subscription';
 import { dppApi } from './modules/dpp';
 import { artisansApi } from './modules/artisans';
 import { adminArtisansApi } from './modules/admin-artisans';
+import { favoritesApi } from './modules/favorites';
 import { marketplaceApi } from './modules/marketplace';
 import { trackApi } from './modules/track';
 import { sellerApi } from './modules/seller';
@@ -29,6 +30,7 @@ export function createClient(opts: ClientOptions) {
         artisans: artisansApi(http),
         adminArtisans: adminArtisansApi(http),
         marketplace: marketplaceApi(http),
+        favorites: favoritesApi(http),
         track: trackApi(http),
         seller: sellerApi(http),
         wardrobe: wardrobeApi(http),

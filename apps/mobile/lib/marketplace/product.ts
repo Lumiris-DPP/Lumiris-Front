@@ -2,7 +2,7 @@
 // (MarketplaceItemResponse, catalogue public réel). Le passeport (DPP) reste lié
 // via dppFormId ; la fiche produit affiche les données réelles de l'annonce.
 
-import type { MarketplaceItem as MarketplaceItemDto } from '@lumiris/api-client';
+import type { MarketplaceItem as MarketplaceItemDto, MarketplaceVariant, SizeMeasurement } from '@lumiris/api-client';
 import type { IrisGrade } from '@lumiris/types';
 
 export interface MarketplaceItem {
@@ -33,6 +33,16 @@ export interface MarketplaceItem {
     returnPolicy: string | null;
     /** Garantie / SAV annoncés par l'atelier. */
     warrantyDescription: string | null;
+    /** Déclinaisons vendables. Une annonce en a toujours au moins une. */
+    variants: MarketplaceVariant[];
+    /** Cotes relevées par l'atelier, en millimètres. */
+    sizeGuide: SizeMeasurement[];
+    /** Délai d'expédition promis à l'acheteur, congés de l'atelier inclus. 0 = pièce en stock. */
+    preparationDays: number;
+    /** Date de retour de l'atelier, quand il est en congés. */
+    atelierPausedUntil: string | null;
+    /** DTO d'origine — le cache des favoris est indexé dessus. */
+    source: MarketplaceItemDto;
 }
 
 export type MarketplaceSort = 'relevance' | 'newest' | 'price-asc' | 'price-desc' | 'iris';
@@ -84,5 +94,60 @@ export function toMarketplaceItem(dto: MarketplaceItemDto): MarketplaceItem {
         shippingCents: dto.shippingCents ?? null,
         returnPolicy: dto.returnPolicy ?? null,
         warrantyDescription: dto.warrantyDescription ?? null,
+        variants: dto.variants ?? [],
+        sizeGuide: dto.sizeGuide ?? [],
+        preparationDays: dto.effectivePreparationDays ?? 0,
+        atelierPausedUntil: dto.atelierPausedUntil ?? null,
+        source: dto,
     };
+}
+
+/** Libellé lisible d'une déclinaison, nul quand elle ne porte aucun axe. */
+export function variantLabel(variant: MarketplaceVariant): string | null {
+    const size = variant.sizeLabel?.trim();
+    const color = variant.colorLabel?.trim();
+    if (size && color) return `${size} · ${color}`;
+    return size || color || null;
+}
+
+export function sizeOptionsOf(item: MarketplaceItem): readonly string[] {
+    const sizes: string[] = [];
+    for (const variant of item.variants) {
+        const size = variant.sizeLabel?.trim();
+        if (size && !sizes.includes(size)) sizes.push(size);
+    }
+    return sizes;
+}
+
+interface ColorOption {
+    label: string;
+    hex: string | null;
+}
+
+export function colorOptionsOf(item: MarketplaceItem): readonly ColorOption[] {
+    const colors: ColorOption[] = [];
+    for (const variant of item.variants) {
+        const label = variant.colorLabel?.trim();
+        if (label && !colors.some((c) => c.label === label)) {
+            colors.push({ label, hex: variant.colorHex?.trim() || null });
+        }
+    }
+    return colors;
+}
+
+export function findVariant(
+    item: MarketplaceItem,
+    size: string | null,
+    color: string | null,
+): MarketplaceVariant | null {
+    return (
+        item.variants.find(
+            (variant) => (variant.sizeLabel?.trim() || null) === size && (variant.colorLabel?.trim() || null) === color,
+        ) ?? null
+    );
+}
+
+/** « Expédiée sous N jours », ou null pour une pièce en stock. */
+export function preparationLabel(days: number): string | null {
+    return days >= 1 ? `Expédiée sous ${days} jour${days > 1 ? 's' : ''}` : null;
 }

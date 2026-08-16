@@ -18,11 +18,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@lumiris/ui/components/textarea';
 import { toast } from '@lumiris/ui/components/sonner';
 import { STATUS_LABEL, STATUSES } from './labels';
+import {
+    MIN_PUBLISHED_PRICE_CENTS,
+    sizeGuideFrom,
+    sizesOf,
+    toSizeGuidePayload,
+    toVariantPayload,
+    variantRowsError,
+    variantRowsFrom,
+    type SizeGuideDraft,
+    type VariantRow,
+} from './product-payload';
+import { SizeGuideEditor } from './size-guide-editor';
+import { VariantsEditor } from './variants-editor';
 
 const NO_DPP = 'none';
-
-// Prix minimum d'un produit publié (le backend rejette sinon en 422).
-const MIN_PUBLISHED_PRICE_CENTS = 50;
+const MAX_PREPARATION_DAYS = 90;
 
 interface FormState {
     name: string;
@@ -31,7 +42,11 @@ interface FormState {
     material: string;
     originCountry: string;
     priceEuros: string;
-    stock: string;
+    shippingEuros: string;
+    returnPolicy: string;
+    preparationDays: string;
+    variants: VariantRow[];
+    sizeGuide: SizeGuideDraft;
     externalOrderUrl: string;
     photoUrl: string;
     dppFormId: string;
@@ -46,7 +61,11 @@ function initialState(product?: MarketplaceItem): FormState {
         material: product?.material ?? '',
         originCountry: product?.originCountry ?? '',
         priceEuros: product ? String(product.priceCents / 100) : '',
-        stock: product ? String(product.stock) : '0',
+        shippingEuros: product ? String((product.shippingCents ?? 0) / 100) : '0',
+        returnPolicy: product?.returnPolicy ?? '',
+        preparationDays: String(product?.preparationDays ?? 0),
+        variants: variantRowsFrom(product),
+        sizeGuide: sizeGuideFrom(product),
         externalOrderUrl: product?.externalOrderUrl ?? '',
         photoUrl: product?.photoUrl ?? '',
         dppFormId: product?.dppFormId ?? NO_DPP,
@@ -67,6 +86,7 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
     const { data: dpps = [] } = useDppForms({ enabled: open });
     const updateMutation = useUpdateProduct();
     const pending = updateMutation.isPending;
+    const sizes = sizesOf(form.variants);
 
     // Réinitialise le formulaire à chaque ouverture / changement de produit édité.
     useEffect(() => {
@@ -90,6 +110,17 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
             });
             return;
         }
+        const preparationDays = Math.round(Number(form.preparationDays) || 0);
+        if (preparationDays < 0 || preparationDays > MAX_PREPARATION_DAYS) {
+            toast.error('Délai de préparation invalide', { description: 'Entre 0 et 90 jours.' });
+            return;
+        }
+        const variantsError = variantRowsError(form.variants);
+        if (variantsError) {
+            toast.error('Déclinaisons incomplètes', { description: variantsError });
+            return;
+        }
+
         const payload: ProductPayload = {
             name: form.name.trim(),
             description: form.description.trim() || undefined,
@@ -98,7 +129,11 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
             originCountry: form.originCountry.trim() || undefined,
             priceCents,
             currency: 'EUR',
-            stock: Math.max(0, Math.round(Number(form.stock) || 0)),
+            shippingCents: Math.max(0, Math.round((Number(form.shippingEuros) || 0) * 100)),
+            returnPolicy: form.returnPolicy.trim() || undefined,
+            preparationDays,
+            variants: toVariantPayload(form.variants),
+            sizeGuide: toSizeGuidePayload(form.sizeGuide, sizes),
             externalOrderUrl: form.externalOrderUrl.trim() || undefined,
             photoUrl: form.photoUrl.trim() || undefined,
             dppFormId: form.dppFormId === NO_DPP ? undefined : form.dppFormId,
@@ -116,7 +151,7 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>Modifier le produit</DialogTitle>
                     <DialogDescription>
@@ -179,14 +214,14 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
-                        <Field label="Stock" htmlFor="mp-stock">
+                        <Field label="Frais de port (€)" htmlFor="mp-shipping">
                             <Input
-                                id="mp-stock"
+                                id="mp-shipping"
                                 type="number"
                                 min={0}
-                                step="1"
-                                value={form.stock}
-                                onChange={(e) => set('stock', e.target.value)}
+                                step="0.01"
+                                value={form.shippingEuros}
+                                onChange={(e) => set('shippingEuros', e.target.value)}
                             />
                         </Field>
                         <Field label="Statut" htmlFor="mp-status">
@@ -207,6 +242,35 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
                             </Select>
                         </Field>
                     </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                        <Field label="Délai de préparation (jours)" htmlFor="mp-prep">
+                            <Input
+                                id="mp-prep"
+                                type="number"
+                                min={0}
+                                max={MAX_PREPARATION_DAYS}
+                                step="1"
+                                value={form.preparationDays}
+                                onChange={(e) => set('preparationDays', e.target.value)}
+                            />
+                            <p className="text-[11px] text-muted-foreground">
+                                Affiché avant l’achat : « expédiée sous X jours ». 0 = pièce en stock.
+                            </p>
+                        </Field>
+                        <Field label="Conditions de retour" htmlFor="mp-return">
+                            <Input
+                                id="mp-return"
+                                placeholder="Retour sous 14 jours"
+                                value={form.returnPolicy}
+                                onChange={(e) => set('returnPolicy', e.target.value)}
+                            />
+                        </Field>
+                    </div>
+
+                    <VariantsEditor value={form.variants} onChange={(next) => set('variants', next)} />
+
+                    <SizeGuideEditor sizes={sizes} value={form.sizeGuide} onChange={(next) => set('sizeGuide', next)} />
 
                     <Field label="Passeport lié (score Iris)" htmlFor="mp-dpp">
                         <Select value={form.dppFormId} onValueChange={(v) => set('dppFormId', v)}>

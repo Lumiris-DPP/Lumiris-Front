@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
     BarChart3,
     BookCheck,
+    CalendarClock,
     FileText,
     LayoutDashboard,
     PlusCircle,
@@ -44,6 +45,7 @@ const NAV_ITEMS: readonly NavItem[] = [
     { href: '/certifications', label: 'Mes certifications', icon: BookCheck },
     { href: '/shop', label: 'Boutique', icon: ShoppingBag },
     { href: '/commandes', label: 'Commandes', icon: Truck, showPendingOrders: true },
+    { href: '/tresorerie', label: 'Trésorerie', icon: CalendarClock },
     { href: '/analytics', label: 'Analytics', icon: BarChart3, plusOnly: true },
     { href: '/profile', label: 'Profil atelier', icon: Store },
     { href: '/subscription', label: 'Abonnement', icon: Wallet },

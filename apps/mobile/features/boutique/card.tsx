@@ -7,7 +7,8 @@ import { Shirt, BadgeCheck } from 'lucide-react';
 import { IrisGrade } from '@lumiris/scoring-ui';
 import { cn } from '@lumiris/ui/lib/cn';
 import { routes } from '@/lib/routes';
-import { formatCents, type MarketplaceItem } from '@/lib/marketplace';
+import { formatCents, preparationLabel, type MarketplaceItem } from '@/lib/marketplace';
+import { FavoriteButton } from './favorite-button';
 
 interface BoutiqueCardProps {
     item: MarketplaceItem;
@@ -19,9 +20,11 @@ export function BoutiqueCard({ item, index, featured = false }: BoutiqueCardProp
     const grade = item.irisGrade;
     const isE = grade === 'E';
     const lowStock = item.stock <= 2;
+    const prepLabel = preparationLabel(item.preparationDays);
 
     return (
         <motion.div
+            className="relative"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.04 + index * 0.03 }}
@@ -55,7 +58,7 @@ export function BoutiqueCard({ item, index, featured = false }: BoutiqueCardProp
                         <Shirt className="h-10 w-10 text-muted-foreground/25" strokeWidth={1.5} aria-hidden />
                     )}
                     {grade ? (
-                        <span className="absolute top-2 right-2">
+                        <span className="absolute right-2 bottom-2">
                             <IrisGrade grade={grade} size="sm" tone="solid" />
                         </span>
                     ) : null}
@@ -78,6 +81,9 @@ export function BoutiqueCard({ item, index, featured = false }: BoutiqueCardProp
                         {item.name}
                     </h3>
                     <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{item.artisanName}</p>
+                    {prepLabel ? (
+                        <p className="mt-0.5 truncate text-[10px] text-muted-foreground">{prepLabel}</p>
+                    ) : null}
                     <div className="mt-1.5 flex items-center justify-between gap-2">
                         <p className="font-mono text-sm font-semibold text-foreground">
                             {formatCents(item.priceCents)}
@@ -90,6 +96,8 @@ export function BoutiqueCard({ item, index, featured = false }: BoutiqueCardProp
                     </div>
                 </div>
             </Link>
+
+            <FavoriteButton item={item} className="absolute top-2 right-2 z-10 h-7 w-7" />
         </motion.div>
     );
 }

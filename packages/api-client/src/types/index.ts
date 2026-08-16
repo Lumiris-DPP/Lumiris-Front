@@ -13,3 +13,4 @@ export * from './atelier-stats';
 export * from './orders';
 export * from './notifications';
 export * from './order-labels';
+export * from './seller-labels';

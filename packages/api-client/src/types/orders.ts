@@ -79,6 +79,7 @@ export type ShippingAddress = z.infer<typeof shippingAddressSchema>;
 export const orderResponseSchema = z.object({
     id: z.string(),
     productName: z.string().nullish(),
+    variantLabel: z.string().nullish(),
     productPhotoUrl: z.string().nullish(),
     sellerName: z.string().nullish(),
     quantity: z.number().nullish(),
@@ -94,6 +95,7 @@ export const orderResponseSchema = z.object({
     carrier: z.string().nullish(),
     trackingNumber: z.string().nullish(),
     trackingUrl: z.string().nullish(),
+    shipDueAt: z.string().nullish(),
     shippedAt: z.string().nullish(),
     deliveredAt: z.string().nullish(),
     returnDeadline: z.string().nullish(),
@@ -139,6 +141,7 @@ export type SellerOrderTab = z.infer<typeof sellerOrderTabSchema>;
 export const sellerOrderSchema = z.object({
     id: z.string(),
     productName: z.string().nullish(),
+    variantLabel: z.string().nullish(),
     productPhotoUrl: z.string().nullish(),
     buyerName: z.string().nullish(),
     quantity: z.number().nullish(),
@@ -159,6 +162,7 @@ export const sellerOrderSchema = z.object({
     disputeReason: z.string().nullish(),
     released: z.boolean(),
     releasedAt: z.string().nullish(),
+    shipDueAt: z.string().nullish(),
     shippedAt: z.string().nullish(),
     deliveredAt: z.string().nullish(),
     returnRequestedAt: z.string().nullish(),

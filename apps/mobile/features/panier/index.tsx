@@ -11,6 +11,7 @@ import {
     removeFromCart,
     setCartQuantity,
     useCartDetails,
+    variantLabel,
     type CartItemDetail,
     type CartShipment,
     type UnavailableLine,
@@ -26,6 +27,7 @@ export function Panier() {
         count,
         unavailable,
         overstocked,
+        needsVariant,
         hasBlockingIssue,
         isLoading,
     } = useCartDetails();
@@ -56,6 +58,7 @@ export function Panier() {
             </motion.header>
 
             {unavailable.length > 0 ? <UnavailableNotice lines={unavailable} /> : null}
+            {needsVariant.length > 0 ? <ChooseVariantNotice lines={needsVariant} /> : null}
             {overstocked.length > 0 ? <StockNotice items={overstocked} /> : null}
 
             {isLoading && empty ? (
@@ -108,7 +111,7 @@ function ShipmentCard({ shipment, index, total }: { shipment: CartShipment; inde
 
             <ul className="flex flex-col">
                 {shipment.items.map((item) => (
-                    <CartRow key={item.product.id} item={item} />
+                    <CartRow key={`${item.product.id}:${item.variant.id}`} item={item} />
                 ))}
             </ul>
 
@@ -123,7 +126,8 @@ function ShipmentCard({ shipment, index, total }: { shipment: CartShipment; inde
 }
 
 function CartRow({ item }: { item: CartItemDetail }) {
-    const { product } = item;
+    const { product, variant } = item;
+    const label = variantLabel(variant);
     return (
         <li className="flex gap-3 border-b border-border/40 p-3 last:border-b-0">
             <Link
@@ -148,6 +152,7 @@ function CartRow({ item }: { item: CartItemDetail }) {
             <div className="flex min-w-0 flex-1 flex-col">
                 <Link href={routes.product(product.id)} className="min-w-0">
                     <p className="truncate text-sm font-semibold text-foreground">{product.name}</p>
+                    {label ? <p className="truncate text-xs text-muted-foreground">{label}</p> : null}
                     <p className="text-xs text-muted-foreground">{formatCents(product.priceCents)} l&apos;unité</p>
                 </Link>
 
@@ -156,7 +161,7 @@ function CartRow({ item }: { item: CartItemDetail }) {
                         <button
                             type="button"
                             aria-label="Diminuer la quantité"
-                            onClick={() => setCartQuantity(product.id, item.quantity - 1)}
+                            onClick={() => setCartQuantity(product.id, variant.id, item.quantity - 1)}
                             className="inline-flex h-7 w-7 items-center justify-center text-foreground"
                         >
                             <Minus className="h-3.5 w-3.5" />
@@ -167,8 +172,8 @@ function CartRow({ item }: { item: CartItemDetail }) {
                         <button
                             type="button"
                             aria-label="Augmenter la quantité"
-                            disabled={item.quantity >= product.stock}
-                            onClick={() => setCartQuantity(product.id, item.quantity + 1)}
+                            disabled={item.quantity >= item.availableQuantity}
+                            onClick={() => setCartQuantity(product.id, variant.id, item.quantity + 1)}
                             className="inline-flex h-7 w-7 items-center justify-center text-foreground disabled:opacity-30"
                         >
                             <Plus className="h-3.5 w-3.5" />
@@ -184,12 +189,37 @@ function CartRow({ item }: { item: CartItemDetail }) {
             <button
                 type="button"
                 aria-label={`Retirer ${product.name} du panier`}
-                onClick={() => removeFromCart(product.id)}
+                onClick={() => removeFromCart(product.id, variant.id)}
                 className="self-start text-muted-foreground hover:text-lumiris-rose"
             >
                 <Trash2 className="h-4 w-4" />
             </button>
         </li>
+    );
+}
+
+// L'atelier a décliné sa pièce depuis l'ajout au panier : l'acheteur doit choisir sa taille avant
+// de payer, plutôt que de découvrir un refus au moment du paiement.
+function ChooseVariantNotice({ lines }: { lines: readonly UnavailableLine[] }) {
+    return (
+        <div className="mb-2 px-4">
+            <div className="rounded-2xl border border-lumiris-amber/30 bg-lumiris-amber/10 p-3" role="status">
+                <p className="flex items-center gap-1.5 text-xs font-semibold text-lumiris-amber">
+                    <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
+                    {lines.length > 1 ? 'Des tailles restent à choisir' : 'Une taille reste à choisir'}
+                </p>
+                <ul className="mt-1 flex flex-col gap-1 text-xs text-muted-foreground">
+                    {lines.map((line) => (
+                        <li key={`${line.productId}:${line.variantId ?? ''}`}>
+                            <Link href={routes.product(line.productId)} className="underline underline-offset-2">
+                                {line.name ?? 'Cette pièce'}
+                            </Link>{' '}
+                            est désormais proposée en plusieurs déclinaisons.
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </div>
     );
 }
 
@@ -210,7 +240,7 @@ function UnavailableNotice({ lines }: { lines: readonly UnavailableLine[] }) {
                 </p>
                 <button
                     type="button"
-                    onClick={() => lines.forEach((line) => removeFromCart(line.productId))}
+                    onClick={() => lines.forEach((line) => removeFromCart(line.productId, line.variantId))}
                     className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-lumiris-amber/40 px-3 py-1.5 text-xs font-semibold text-foreground"
                 >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -233,8 +263,9 @@ function StockNotice({ items }: { items: readonly CartItemDetail[] }) {
                 </p>
                 <ul className="mt-1 flex flex-col gap-0.5 text-xs text-muted-foreground">
                     {items.map((it) => (
-                        <li key={it.product.id}>
-                            {it.product.name} —{' '}
+                        <li key={`${it.product.id}:${it.variant.id}`}>
+                            {it.product.name}
+                            {variantLabel(it.variant) ? ` (${variantLabel(it.variant)})` : ''} —{' '}
                             {it.availableQuantity === 0
                                 ? 'épuisée'
                                 : `plus que ${it.availableQuantity} disponible${it.availableQuantity > 1 ? 's' : ''}`}
@@ -246,8 +277,8 @@ function StockNotice({ items }: { items: readonly CartItemDetail[] }) {
                     onClick={() =>
                         items.forEach((it) =>
                             it.availableQuantity === 0
-                                ? removeFromCart(it.product.id)
-                                : setCartQuantity(it.product.id, it.availableQuantity),
+                                ? removeFromCart(it.product.id, it.variant.id)
+                                : setCartQuantity(it.product.id, it.variant.id, it.availableQuantity),
                         )
                     }
                     className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-lumiris-amber/40 px-3 py-1.5 text-xs font-semibold text-foreground"

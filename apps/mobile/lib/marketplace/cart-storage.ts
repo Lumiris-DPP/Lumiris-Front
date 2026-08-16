@@ -10,6 +10,8 @@ import { USER_KEYS, userScopedKey } from '../storage-keys';
 
 export interface CartLine {
     productId: string;
+    /** Déclinaison achetée. `null` sur les lignes créées avant les déclinaisons. */
+    variantId: string | null;
     quantity: number;
     addedAt: string;
 }
@@ -29,10 +31,24 @@ function notify(): void {
     subscribers.forEach((cb) => cb());
 }
 
+// Le champ `variantId` est additif : une ligne écrite par un bundle antérieur reste valide, et un
+// bundle antérieur relit sans broncher les lignes écrites ici. C'est ce qui permet de garder la
+// clé `cart.v1` — un bump ferait voir deux paniers différents sur le même téléphone.
 function isCartLine(value: unknown): value is CartLine {
     if (!value || typeof value !== 'object') return false;
     const v = value as Record<string, unknown>;
-    return typeof v.productId === 'string' && typeof v.quantity === 'number' && typeof v.addedAt === 'string';
+    if (typeof v.productId !== 'string' || typeof v.quantity !== 'number' || typeof v.addedAt !== 'string') {
+        return false;
+    }
+    return v.variantId === undefined || v.variantId === null || typeof v.variantId === 'string';
+}
+
+function sameLine(line: CartLine, productId: string, variantId: string | null): boolean {
+    return line.productId === productId && line.variantId === variantId;
+}
+
+function lineKey(productId: string, variantId: string | null): string {
+    return `${productId}:${variantId ?? ''}`;
 }
 
 function read(): CartLine[] {
@@ -42,7 +58,10 @@ function read(): CartLine[] {
         if (!raw) return [];
         const parsed: unknown = JSON.parse(raw);
         if (!Array.isArray(parsed)) return [];
-        return parsed.filter(isCartLine).filter((line) => line.quantity > 0);
+        return parsed
+            .filter(isCartLine)
+            .map((line) => ({ ...line, variantId: line.variantId ?? null }))
+            .filter((line) => line.quantity > 0);
     } catch {
         return [];
     }
@@ -54,28 +73,28 @@ function write(lines: readonly CartLine[]): void {
     notify();
 }
 
-export function addToCart(productId: string, quantity = 1): void {
+export function addToCart(productId: string, variantId: string | null, quantity = 1): void {
     const current = read();
-    const existing = current.find((line) => line.productId === productId);
+    const existing = current.find((line) => sameLine(line, productId, variantId));
     if (existing) {
         const next = Math.max(1, existing.quantity + quantity);
-        write(current.map((line) => (line.productId === productId ? { ...line, quantity: next } : line)));
+        write(current.map((line) => (sameLine(line, productId, variantId) ? { ...line, quantity: next } : line)));
         return;
     }
-    write([...current, { productId, quantity: Math.max(1, quantity), addedAt: new Date().toISOString() }]);
+    write([...current, { productId, variantId, quantity: Math.max(1, quantity), addedAt: new Date().toISOString() }]);
 }
 
-export function setCartQuantity(productId: string, quantity: number): void {
+export function setCartQuantity(productId: string, variantId: string | null, quantity: number): void {
     const current = read();
     if (quantity <= 0) {
-        write(current.filter((line) => line.productId !== productId));
+        write(current.filter((line) => !sameLine(line, productId, variantId)));
         return;
     }
-    write(current.map((line) => (line.productId === productId ? { ...line, quantity } : line)));
+    write(current.map((line) => (sameLine(line, productId, variantId) ? { ...line, quantity } : line)));
 }
 
-export function removeFromCart(productId: string): void {
-    write(read().filter((line) => line.productId !== productId));
+export function removeFromCart(productId: string, variantId: string | null): void {
+    write(read().filter((line) => !sameLine(line, productId, variantId)));
 }
 
 export function clearCart(): void {
@@ -89,7 +108,10 @@ function readKey(key: string): CartLine[] {
         if (!raw) return [];
         const parsed: unknown = JSON.parse(raw);
         if (!Array.isArray(parsed)) return [];
-        return parsed.filter(isCartLine).filter((line) => line.quantity > 0);
+        return parsed
+            .filter(isCartLine)
+            .map((line) => ({ ...line, variantId: line.variantId ?? null }))
+            .filter((line) => line.quantity > 0);
     } catch {
         return [];
     }
@@ -115,14 +137,14 @@ export function migrateAnonCartToUser(userId: string): void {
         return;
     }
 
+    // La clé de fusion porte la déclinaison : sans elle, un invité qui avait ajouté du M et du L
+    // n'en garderait qu'un après connexion.
     const merged = new Map<string, CartLine>();
-    for (const line of readKey(userKey)) merged.set(line.productId, line);
+    for (const line of readKey(userKey)) merged.set(lineKey(line.productId, line.variantId), line);
     for (const line of anonLines) {
-        const existing = merged.get(line.productId);
-        merged.set(
-            line.productId,
-            existing ? { ...existing, quantity: Math.max(existing.quantity, line.quantity) } : line,
-        );
+        const key = lineKey(line.productId, line.variantId);
+        const existing = merged.get(key);
+        merged.set(key, existing ? { ...existing, quantity: Math.max(existing.quantity, line.quantity) } : line);
     }
 
     window.localStorage.setItem(userKey, JSON.stringify([...merged.values()]));

@@ -30,9 +30,13 @@ const CHECKOUT_RETURN = encodeURIComponent('/checkout');
 // créer des PaymentIntents (et des commandes en attente) orphelins à chaque montage.
 const intentCache = new Map<string, Promise<PaymentIntentResponse>>();
 
-function checkoutSignature(items: ReadonlyArray<{ product: { id: string }; quantity: number }>): string {
+// La signature porte la DÉCLINAISON : sans elle, deux choix de taille du même produit partagent une
+// entrée de cache et le second réutiliserait le PaymentIntent du premier.
+function checkoutSignature(
+    items: ReadonlyArray<{ product: { id: string }; variant: { id: string }; quantity: number }>,
+): string {
     return items
-        .map((it) => `${it.product.id}:${it.quantity}`)
+        .map((it) => `${it.product.id}:${it.variant.id}:${it.quantity}`)
         .sort()
         .join('|');
 }
@@ -62,7 +66,11 @@ export function Checkout() {
         let promise = intentCache.get(signature);
         if (!promise) {
             promise = client.marketplace.checkoutIntent({
-                items: items.map((it) => ({ productId: it.product.id, quantity: it.quantity })),
+                items: items.map((it) => ({
+                    productId: it.product.id,
+                    variantId: it.variant.id,
+                    quantity: it.quantity,
+                })),
                 shipping: address,
             });
             intentCache.set(signature, promise);

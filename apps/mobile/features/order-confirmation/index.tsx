@@ -171,6 +171,7 @@ function OrderConfirmationInner({ routeId }: { routeId: string }) {
                                         <span className="min-w-0 flex-1">
                                             <span className="block truncate text-sm font-medium text-foreground">
                                                 {line.productName ?? 'Pièce achetée'}
+                                                {line.variantLabel ? ` (${line.variantLabel})` : ''}
                                             </span>
                                             {line.sellerName ? (
                                                 <span className="block truncate text-[11px] text-muted-foreground">

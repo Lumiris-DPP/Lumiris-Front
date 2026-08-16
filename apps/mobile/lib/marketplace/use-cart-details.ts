@@ -12,12 +12,15 @@
 // qu'il paie et combien de colis il recevra — le backend applique exactement le même calcul.
 
 import { useMemo } from 'react';
+import type { MarketplaceVariant } from '@lumiris/api-client';
 import { useMarketplaceProductsByIds } from '@lumiris/api-client/react';
 import { useCart, type CartLine } from './cart-storage';
 import { toMarketplaceItem, type MarketplaceItem } from './product';
 
 export interface CartItemDetail {
     product: MarketplaceItem;
+    /** Déclinaison achetée — porte le stock réel de la ligne. */
+    variant: MarketplaceVariant;
     quantity: number;
     lineTotalCents: number;
     /** Quantité réellement disponible, si elle est devenue inférieure à celle du panier. */
@@ -46,6 +49,8 @@ interface CartDetails {
     unavailable: readonly UnavailableLine[];
     /** Pièces dont le stock ne couvre plus la quantité choisie. */
     overstocked: readonly CartItemDetail[];
+    /** Lignes héritées dont la déclinaison n'est plus déterminable : l'acheteur doit rechoisir. */
+    needsVariant: readonly UnavailableLine[];
     /** Vrai tant qu'une ligne empêche de payer en l'état. */
     hasBlockingIssue: boolean;
     isLoading: boolean;
@@ -53,7 +58,9 @@ interface CartDetails {
 
 export interface UnavailableLine {
     productId: string;
+    variantId: string | null;
     quantity: number;
+    name?: string;
 }
 
 export function useCartDetails(): CartDetails {
@@ -67,21 +74,39 @@ export function useCartDetails(): CartDetails {
 
         const items: CartItemDetail[] = [];
         const unavailable: UnavailableLine[] = [];
+        const needsVariant: UnavailableLine[] = [];
         for (const line of lines) {
             const product = byId.get(line.productId);
             if (!product) {
                 // Tant que la requête n'a pas répondu, on ne déclare rien indisponible : ce serait
                 // annoncer une rupture à chaque ouverture du panier.
                 if (!isLoading) {
-                    unavailable.push({ productId: line.productId, quantity: line.quantity });
+                    unavailable.push({ productId: line.productId, variantId: line.variantId, quantity: line.quantity });
                 }
+                continue;
+            }
+            // Une ligne sans déclinaison vient d'un bundle antérieur : elle se résout tant que
+            // l'annonce n'en a qu'une. Dès que l'atelier a décliné sa pièce, l'acheteur doit choisir.
+            const variant = line.variantId
+                ? (product.variants.find((v) => v.id === line.variantId) ?? null)
+                : product.variants.length === 1
+                  ? (product.variants[0] ?? null)
+                  : null;
+            if (!variant) {
+                needsVariant.push({
+                    productId: line.productId,
+                    variantId: line.variantId,
+                    quantity: line.quantity,
+                    name: product.name,
+                });
                 continue;
             }
             items.push({
                 product,
+                variant,
                 quantity: line.quantity,
                 lineTotalCents: product.priceCents * line.quantity,
-                availableQuantity: product.stock,
+                availableQuantity: variant.stock,
             });
         }
 
@@ -100,7 +125,8 @@ export function useCartDetails(): CartDetails {
             count: items.reduce((sum, it) => sum + it.quantity, 0),
             unavailable,
             overstocked,
-            hasBlockingIssue: unavailable.length > 0 || overstocked.length > 0,
+            needsVariant,
+            hasBlockingIssue: unavailable.length > 0 || overstocked.length > 0 || needsVariant.length > 0,
             isLoading,
         };
     }, [lines, data, isLoading]);

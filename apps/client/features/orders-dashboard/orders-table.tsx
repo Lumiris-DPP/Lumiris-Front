@@ -42,6 +42,11 @@ export function OrdersTable({
                                 {order.quantity && order.quantity > 1 ? (
                                     <span className="text-muted-foreground"> ×{order.quantity}</span>
                                 ) : null}
+                                {order.variantLabel ? (
+                                    <span className="block text-[11px] font-normal text-muted-foreground">
+                                        {order.variantLabel}
+                                    </span>
+                                ) : null}
                             </TableCell>
                             <TableCell className="text-muted-foreground">
                                 <span className="block">{order.buyerName ?? '—'}</span>

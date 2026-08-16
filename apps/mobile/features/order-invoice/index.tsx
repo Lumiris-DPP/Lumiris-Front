@@ -166,6 +166,7 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
                                     <tr key={line.id} className="border-b border-border/40">
                                         <td className="py-2.5 pr-3 text-foreground">
                                             {line.productName ?? 'Pièce achetée'}
+                                            {line.variantLabel ? ` (${line.variantLabel})` : ''}
                                             {cancelled ? (
                                                 <span className="ml-2 text-[11px] text-muted-foreground">
                                                     — annulée

@@ -43,6 +43,7 @@ export function OrderDetailSheet({ order, onClose }: { order: SellerOrder | null
                         <SheetHeader>
                             <SheetTitle className="pr-8">{order.productName ?? 'Commande'}</SheetTitle>
                             <SheetDescription>
+                                {order.variantLabel ? `${order.variantLabel} · ` : ''}
                                 Commandée le {formatDateFr(order.createdAt)}
                                 {order.invoiceNumber ? ` · facture ${order.invoiceNumber}` : ''}
                             </SheetDescription>

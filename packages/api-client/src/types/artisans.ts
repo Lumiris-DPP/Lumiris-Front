@@ -16,6 +16,8 @@ export interface ArtisanProfileResponse {
 
     slug?: string;
     published: boolean;
+    /** Date de retour de l'atelier, absente quand il n'est pas en congés. */
+    pausedUntil?: string;
     atelierName?: string;
     story?: string;
     method?: string;
@@ -26,6 +28,12 @@ export interface ArtisanProfileResponse {
     websiteUrl?: string;
     links?: Record<string, string>;
     photos: ArtisanPhotoResponse[];
+}
+
+// Mise en congés de l'atelier : les pièces restent achetables, le délai d'expédition annoncé est
+// allongé jusqu'à cette date.
+export interface ArtisanPauseRequest {
+    until: string;
 }
 
 export interface ArtisanRegisterRequest {
@@ -66,4 +74,6 @@ export interface ArtisanPublicProfileResponse {
     ofgLabeled: boolean;
     gotsLabeled: boolean;
     oekoTexLabeled: boolean;
+    /** Date de retour de l'atelier, absente quand il n'est pas en congés. */
+    pausedUntil?: string;
 }
