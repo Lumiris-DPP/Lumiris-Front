@@ -16,16 +16,3 @@ export function formatCents(cents: number): string {
 export function shippingCostLabel(cents: number): string {
     return cents === 0 ? 'Offerte' : formatCents(cents);
 }
-
-/** Promesse de livraison sur la fiche produit — un port inconnu n'invente pas un montant. */
-export function homeDeliveryNotice(cents: number | null): string {
-    if (cents === null) return 'Expédiée à domicile.';
-    return `${shippingCostLabel(cents)} — expédiée à domicile.`;
-}
-
-/** Même promesse, condensée pour la barre d'achat collante. */
-export function shippingSummaryLabel(cents: number | null): string {
-    if (cents === null) return 'Livraison à domicile';
-    if (cents === 0) return 'Livraison offerte';
-    return `Livraison ${formatCents(cents)}`;
-}
