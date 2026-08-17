@@ -3,6 +3,7 @@
 import { use } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { LumirisLogo } from '@lumiris/ui/components/logo';
+import { PrintMessage } from '@/features/print-message';
 import { usePassportSource } from '@/lib/use-passport-source';
 import { useAutoPrint } from '@/lib/use-auto-print';
 
@@ -12,12 +13,19 @@ interface PageProps {
 
 export default function PrintLabelPage({ params }: PageProps) {
     const { id } = use(params);
-    const { passport } = usePassportSource(id);
+    const { passport, isLoading } = usePassportSource(id);
 
     useAutoPrint(Boolean(passport));
 
+    if (isLoading) return null;
     if (!passport) {
-        return <p className="p-12 text-center font-mono text-sm">Passeport introuvable.</p>;
+        return (
+            <PrintMessage
+                title="Passeport introuvable"
+                description="Cet identifiant ne correspond à aucun passeport de votre atelier."
+                back={{ href: '/passports', label: 'Retour à mes passeports' }}
+            />
+        );
     }
 
     return (

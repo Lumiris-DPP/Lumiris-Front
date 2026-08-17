@@ -99,18 +99,3 @@ export function JournalArticle({ article }: JournalArticleProps) {
         </div>
     );
 }
-
-export function JournalArticleNotFound() {
-    return (
-        <div className="flex h-full flex-col items-center justify-center gap-4 bg-background px-8 text-center">
-            <p className="text-lg font-semibold text-foreground">Article introuvable</p>
-            <p className="text-sm text-muted-foreground">Cet article n&apos;existe pas ou a été retiré du Journal.</p>
-            <Button asChild variant="outline" size="sm" className="rounded-full">
-                <Link href="/discover">
-                    <ChevronLeft className="h-4 w-4" />
-                    Retour à Découvrir
-                </Link>
-            </Button>
-        </div>
-    );
-}

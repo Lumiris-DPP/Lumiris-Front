@@ -22,8 +22,7 @@ import { useAdminAuditLog, useLogAction, usePermission } from '@/lib/auth';
 import { buildArtisanRow } from '@/lib/artisan-analytics';
 import { ContactDialog } from './contact-dialog';
 import { ActionsTab, PassportsTab, SynthesisTab } from './drawer-tabs';
-
-const SCORING_NOW = new Date('2026-04-30T08:00:00Z');
+import { FIXTURE_NOW } from '@/lib/fixture-clock';
 
 interface ArtisanDrawerProps {
     artisan: Artisan | null;
@@ -53,7 +52,7 @@ export function ArtisanDrawer({ artisan, onClose }: ArtisanDrawerProps) {
 
     const passports = mockPassports.filter((p) => p.artisanId === artisan.id);
     const combinedAuditLog = [...auditLog, ...mockAdminAuditLog];
-    const row = buildArtisanRow(artisan, mockPassports, mockRepairers, combinedAuditLog, SCORING_NOW);
+    const row = buildArtisanRow(artisan, mockPassports, mockRepairers, combinedAuditLog, FIXTURE_NOW);
 
     const handleSuspend = () => {
         if (!suspendConfirmed) return;

@@ -20,6 +20,8 @@ import type {
     ReturnDecisionInput,
     SellerOrder,
     ShipOrderInput,
+    ShippingAvailability,
+    ShippingLabel,
 } from '../types/orders';
 
 export const orderKeys = {
@@ -30,6 +32,7 @@ export const orderKeys = {
     sellerAll: () => ['seller-orders'] as const,
     sellerList: () => ['seller-orders', 'list'] as const,
     sellerDetail: (id: string) => ['seller-orders', 'detail', id] as const,
+    shipping: () => ['seller-orders', 'shipping'] as const,
 };
 
 // ── Acheteur (VISION) ───────────────────────────────────────────────────────
@@ -164,6 +167,40 @@ export function useShipOrder(
         ({ orderId, input }) => client.sellerOrders.ship(orderId, input),
         options,
     );
+}
+
+// État de l'intégration transporteur. Il ne change qu'au rythme d'une configuration serveur ou
+// d'une saisie d'adresse par l'atelier : inutile de le rafraîchir en boucle comme les commandes.
+export function useShippingAvailability(
+    options?: Omit<UseQueryOptions<ShippingAvailability, Error>, 'queryKey' | 'queryFn'>,
+) {
+    const client = useApiClient();
+    return useQuery<ShippingAvailability, Error>({
+        queryKey: orderKeys.shipping(),
+        queryFn: () => client.sellerOrders.shipping(),
+        staleTime: CACHE_TIMES.DETAIL,
+        ...options,
+    });
+}
+
+// Génération du bordereau : c'est une TRANSITION (la commande passe expédiée), d'où la même
+// invalidation que les autres actions vendeur — l'écran doit refléter le nouvel état, pas
+// seulement afficher le PDF.
+export function useGenerateShippingLabel(
+    options?: Omit<UseMutationOptions<ShippingLabel, Error, string>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<ShippingLabel, Error, string>({
+        mutationFn: (orderId) => client.sellerOrders.generateLabel(orderId),
+        ...options,
+        onSuccess: (...args) => {
+            void queryClient.invalidateQueries({ queryKey: orderKeys.all() });
+            void queryClient.invalidateQueries({ queryKey: orderKeys.sellerAll() });
+            void queryClient.invalidateQueries({ queryKey: notificationKeys.all() });
+            return options?.onSuccess?.(...args);
+        },
+    });
 }
 
 export function useDecideReturn(

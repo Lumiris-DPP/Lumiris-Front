@@ -5,6 +5,7 @@ import { parseOr } from '../core/validate';
 import {
     marketplaceItemSchema,
     paymentIntentResponseSchema,
+    paymentOptionsSchema,
     searchResultSchema,
     suggestionResultSchema,
     decisionLogSchema,
@@ -13,6 +14,7 @@ import {
     type MarketplaceItem,
     type MarketplaceSearchParams,
     type PaymentIntentResponse,
+    type PaymentOptions,
     type ProductPayload,
     type SearchResult,
     type SuggestInput,
@@ -49,6 +51,12 @@ export function marketplaceApi(http: Http) {
                 marketplaceItemListSchema,
                 await http.request('/public/marketplace/products', { query: { ids: ids.join(',') } }),
             );
+        },
+
+        // Facilités de paiement annonçables (fractionné Stripe). Public et sans état : la fiche
+        // produit et le panier doivent pouvoir l'afficher au moment où l'acheteur hésite.
+        async paymentOptions(): Promise<PaymentOptions> {
+            return parseOr(paymentOptionsSchema, await http.request('/public/marketplace/payment-options'));
         },
 
         // Fiche produit publique unique. 404 si non publié ou vendeur non payable.

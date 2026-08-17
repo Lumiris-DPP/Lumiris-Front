@@ -32,7 +32,6 @@ interface NavItem {
     label: string;
     icon: React.ComponentType<{ className?: string }>;
     primary?: boolean;
-    plusOnly?: boolean;
     /** Affiche le nombre de commandes en attente d'action sur cette entrée. */
     showPendingOrders?: boolean;
 }
@@ -46,7 +45,7 @@ const NAV_ITEMS: readonly NavItem[] = [
     { href: '/shop', label: 'Boutique', icon: ShoppingBag },
     { href: '/commandes', label: 'Commandes', icon: Truck, showPendingOrders: true },
     { href: '/tresorerie', label: 'Trésorerie', icon: CalendarClock },
-    { href: '/analytics', label: 'Analytics', icon: BarChart3, plusOnly: true },
+    { href: '/analytics', label: 'Analytics', icon: BarChart3 },
     { href: '/profile', label: 'Profil atelier', icon: Store },
     { href: '/subscription', label: 'Abonnement', icon: Wallet },
 ];
@@ -184,17 +183,15 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
             <nav className="flex-1 overflow-y-auto px-3 py-4">
                 <ul className="space-y-1">
-                    {NAV_ITEMS.map((item) =>
-                        item.plusOnly && !hasAtelierPlus ? null : (
-                            <NavLink
-                                key={item.href}
-                                item={item}
-                                active={isNavActive(pathname, item.href)}
-                                badge={item.showPendingOrders ? pendingOrders : 0}
-                                onNavigate={onNavigate}
-                            />
-                        ),
-                    )}
+                    {NAV_ITEMS.map((item) => (
+                        <NavLink
+                            key={item.href}
+                            item={item}
+                            active={isNavActive(pathname, item.href)}
+                            badge={item.showPendingOrders ? pendingOrders : 0}
+                            onNavigate={onNavigate}
+                        />
+                    ))}
                 </ul>
             </nav>
 

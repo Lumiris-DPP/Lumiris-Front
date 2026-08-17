@@ -11,8 +11,7 @@ import { Button } from '@lumiris/ui/components/button';
 import type { buildArtisanRow } from '@/lib/artisan-analytics';
 import { PLUS_ADDON, TIER_MRR } from '@/lib/artisan-analytics';
 import { EmptyState } from '../_shared/empty-state';
-
-const SCORING_NOW = new Date('2026-04-30T08:00:00Z');
+import { FIXTURE_NOW } from '@/lib/fixture-clock';
 
 function fmtDate(iso: string): string {
     return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -134,7 +133,7 @@ export function PassportsTab({ artisan }: { artisan: Artisan }) {
                         certificates: p.materials.flatMap((m) => m.certifications),
                         artisan,
                         retoucheurs: mockRepairers,
-                        now: SCORING_NOW,
+                        now: FIXTURE_NOW,
                     });
                     return {
                         id: p.id,

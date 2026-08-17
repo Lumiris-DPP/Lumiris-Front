@@ -7,6 +7,8 @@ import {
     orderGroupSchema,
     orderResponseSchema,
     sellerOrderSchema,
+    shippingAvailabilitySchema,
+    shippingLabelSchema,
     type OrderDetail,
     type OrderGroup,
     type OrderResponse,
@@ -15,6 +17,8 @@ import {
     type ReturnDecisionInput,
     type SellerOrder,
     type ShipOrderInput,
+    type ShippingAvailability,
+    type ShippingLabel,
 } from '../types/orders';
 
 const orderListSchema = z.array(orderResponseSchema);
@@ -89,6 +93,19 @@ export function sellerOrdersApi(http: Http) {
                 body: input,
                 skipJson: true,
             });
+        },
+        // État de l'intégration transporteur, lu AVANT d'afficher le bouton d'impression.
+        async shipping(): Promise<ShippingAvailability> {
+            return parseOr(shippingAvailabilitySchema, await http.request('/api/seller/orders/shipping'));
+        },
+        // Étiquette en un clic : bordereau fabriqué depuis l'adresse déjà stockée sur la commande,
+        // suivi rempli, commande passée en expédiée sans saisie. `ship` ci-dessus reste le chemin
+        // d'une remise en main propre ou d'un transporteur hors agrégateur.
+        async generateLabel(orderId: string): Promise<ShippingLabel> {
+            return parseOr(
+                shippingLabelSchema,
+                await http.request(`/api/seller/orders/${orderId}/label`, { method: 'POST' }),
+            );
         },
         decideReturn(orderId: string, input: ReturnDecisionInput): Promise<void> {
             return http.request<void>(`/api/seller/orders/${orderId}/return/decision`, {

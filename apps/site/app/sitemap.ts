@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { mockPassportsPublic } from '@lumiris/mock-data';
-import { getAllArtisans } from '@/lib/artisans';
+import { fetchPublicArtisans } from '@/lib/public-artisan-api';
 import { getAllArticles } from '@/lib/journal';
 import { getAllRegulations } from '@/lib/reglementation';
 
@@ -18,7 +18,7 @@ const STATIC_PATHS: ReadonlyArray<{ path: string; priority: number; changeFreque
     { path: '/cgu', priority: 0.3, changeFrequency: 'monthly' },
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const now = new Date();
 
     const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.map((s) => ({
@@ -35,9 +35,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.7,
     }));
 
-    const artisanEntries: MetadataRoute.Sitemap = getAllArtisans().map((a) => ({
+    const artisanEntries: MetadataRoute.Sitemap = (await fetchPublicArtisans()).map((a) => ({
         url: `${SITE_URL}/artisans/${a.slug}`,
-        lastModified: new Date(a.joinedAt),
+        lastModified: now,
         changeFrequency: 'monthly' as const,
         priority: 0.7,
     }));

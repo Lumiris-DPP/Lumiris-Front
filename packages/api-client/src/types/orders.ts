@@ -41,8 +41,22 @@ export const orderEventTypeSchema = z.enum([
     'CANCELLED',
     'FUNDS_RELEASED',
     'MESSAGE',
+    'LABEL_GENERATED',
+    'TRACKING_UPDATE',
 ]);
 export type OrderEventType = z.infer<typeof orderEventTypeSchema>;
+
+// Ce que le TRANSPORTEUR constate, distinct de `orderStatus` qui dit où en est la commande :
+// « expédiée » est une promesse de l'atelier, « pris en charge » est un fait du transporteur.
+export const trackingStatusSchema = z.enum([
+    'ANNOUNCED',
+    'IN_TRANSIT',
+    'OUT_FOR_DELIVERY',
+    'DELIVERED',
+    'EXCEPTION',
+    'RETURNED',
+]);
+export type TrackingStatus = z.infer<typeof trackingStatusSchema>;
 
 // Preuve jointe à un évènement. `url` est présignée et expire — à afficher, pas à conserver.
 export const orderAttachmentSchema = z.object({
@@ -95,6 +109,11 @@ export const orderResponseSchema = z.object({
     carrier: z.string().nullish(),
     trackingNumber: z.string().nullish(),
     trackingUrl: z.string().nullish(),
+    trackingStatus: trackingStatusSchema.nullish(),
+    // Libellé brut de l'agrégateur : lui seul sait dire « disponible au point relais » là où
+    // l'union ne connaît que OUT_FOR_DELIVERY.
+    trackingStatusLabel: z.string().nullish(),
+    trackingUpdatedAt: z.string().nullish(),
     shipDueAt: z.string().nullish(),
     shippedAt: z.string().nullish(),
     deliveredAt: z.string().nullish(),
@@ -157,6 +176,12 @@ export const sellerOrderSchema = z.object({
     carrier: z.string().nullish(),
     trackingNumber: z.string().nullish(),
     trackingUrl: z.string().nullish(),
+    trackingStatus: trackingStatusSchema.nullish(),
+    trackingStatusLabel: z.string().nullish(),
+    trackingUpdatedAt: z.string().nullish(),
+    // URL présignée du bordereau déjà fabriqué : l'atelier le réimprime sans repasser commande
+    // d'une étiquette. Expire — à afficher, pas à conserver.
+    labelUrl: z.string().nullish(),
     shipTo: shippingAddressSchema.nullish(),
     returnReason: z.string().nullish(),
     disputeReason: z.string().nullish(),
@@ -175,6 +200,25 @@ export const sellerOrderSchema = z.object({
     timeline: z.array(orderEventSchema),
 });
 export type SellerOrder = z.infer<typeof sellerOrderSchema>;
+
+// Étiquette en un clic : bordereau fabriqué depuis l'adresse déjà stockée sur la commande. La
+// commande est DÉJÀ passée expédiée quand cette réponse arrive.
+export const shippingLabelSchema = z.object({
+    labelUrl: z.string(),
+    carrier: z.string().nullish(),
+    trackingNumber: z.string().nullish(),
+    trackingUrl: z.string().nullish(),
+});
+export type ShippingLabel = z.infer<typeof shippingLabelSchema>;
+
+// Lu AVANT d'afficher le bouton d'impression : sans cet état, l'atelier découvrirait qu'il lui
+// manque une adresse d'enlèvement au moment précis où il essaie d'imprimer.
+export const shippingAvailabilitySchema = z.object({
+    enabled: z.boolean(),
+    provider: z.string().nullish(),
+    senderAddressReady: z.boolean(),
+});
+export type ShippingAvailability = z.infer<typeof shippingAvailabilitySchema>;
 
 // ── Entrées ─────────────────────────────────────────────────────────────────
 

@@ -66,7 +66,7 @@ export function RegisterForm() {
                     }}
                 />
             )}
-            {step === 'success' && <StepSuccess name={createdName} />}
+            {step === 'success' && role !== null && <StepSuccess name={createdName} role={role} />}
         </div>
     );
 }

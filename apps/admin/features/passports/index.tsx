@@ -13,7 +13,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { TooltipProvider } from '@lumiris/ui/components/tooltip';
 import { BulkActionsBar } from './bulk-actions-bar';
 import { CurationStoreProvider } from './curation-store';
-import { usePassportDeepLink } from './deep-link';
+import { useDeepLinkId } from '../_shared/use-deep-link-id';
 import { FifoViolationsAlert, useFifoAudit } from './fifo-equity-audit';
 import { usePassportRows } from './hooks';
 import { Kpis } from './kpis';
@@ -85,7 +85,7 @@ function applyFilters(rows: readonly PassportRow[], f: Filters): readonly Passpo
 function PassportsInner() {
     const rows = usePassportRows(mockPassports);
     const audit = useFifoAudit(rows);
-    const { selectedId, setSelectedId } = usePassportDeepLink();
+    const { selectedId, setSelectedId } = useDeepLinkId();
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState<StatusFilterValue>('all');
     const [tierFilter, setTierFilter] = useState<TierFilter>('all');

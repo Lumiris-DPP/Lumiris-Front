@@ -11,10 +11,19 @@ import { formatDateFr } from '@lumiris/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { usePendingOrderCount } from '@/features/workspace-shell/hooks';
 
+// Date au format d'un <input type="date">, construite sur le calendrier LOCAL. `toISOString()`
+// repasse en UTC : passé 22 h en France, « demain » y redevenait « aujourd'hui », donc une pause
+// de zéro jour proposée par défaut et acceptée par le `min`.
+function localDateInput(date: Date): string {
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${date.getFullYear()}-${month}-${day}`;
+}
+
 function tomorrow(): string {
     const date = new Date();
     date.setDate(date.getDate() + 1);
-    return date.toISOString().slice(0, 10);
+    return localDateInput(date);
 }
 
 // Congés : les pièces restent achetables, le délai d'expédition annoncé est allongé jusqu'à la date

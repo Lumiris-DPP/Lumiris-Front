@@ -1,10 +1,9 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { mockPassportsPublic, passportPublicByIdOrSlug } from '@lumiris/mock-data';
+import { mockArtisanById, mockPassportsPublic, passportPublicByIdOrSlug } from '@lumiris/mock-data';
 import { KIND_LABEL_FR } from '@lumiris/utils';
 import { JsonLd } from '@/features/json-ld';
 import { PassportPublicViewSection } from '@/features/passport-public-view';
-import { getArtisanById } from '@/lib/artisans';
 
 export const dynamicParams = false;
 
@@ -56,7 +55,7 @@ export default async function PassportPage({ params }: RouteProps) {
     const view = passportPublicByIdOrSlug(id);
     if (!view) notFound();
 
-    const artisan = getArtisanById(view.artisan.id);
+    const artisan = mockArtisanById(view.artisan.id);
     const artisanSlug = artisan?.slug ?? view.artisan.id;
 
     const productLabel = KIND_LABEL_FR[view.passport.garment.kind] ?? KIND_LABEL_FR.other;

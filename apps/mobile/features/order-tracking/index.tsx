@@ -16,13 +16,14 @@ import {
     MapPin,
     MessageSquare,
     PackageCheck,
+    Radio,
     Shirt,
     Truck,
     Undo2,
     XCircle,
 } from 'lucide-react';
 import type { OrderDetail } from '@lumiris/api-client';
-import { ORDER_STATUS_LABEL_BUYER } from '@lumiris/api-client';
+import { ORDER_STATUS_LABEL_BUYER, TRACKING_STATUS_LABEL } from '@lumiris/api-client';
 import {
     useCancelOrder,
     useConfirmDelivery,
@@ -415,6 +416,20 @@ function TrackingCard({ detail }: { detail: OrderDetail }) {
             <p className="mt-2 text-sm text-foreground">
                 {order.carrier} · <span className="font-mono text-xs">{order.trackingNumber}</span>
             </p>
+            {/* Ce que le transporteur constate, quand il le pousse : c'est la seule ligne de cet
+                écran qui bouge sans que personne n'ait agi. Le libellé vient du transporteur
+                lui-même — il sait dire « disponible au point relais », pas nous. */}
+            {order.trackingStatus ? (
+                <p className="mt-1 inline-flex items-center gap-1.5 text-xs font-medium text-lumiris-cyan">
+                    <Radio className="h-3.5 w-3.5" aria-hidden />
+                    {order.trackingStatusLabel ?? TRACKING_STATUS_LABEL[order.trackingStatus]}
+                    {order.trackingUpdatedAt ? (
+                        <span className="font-normal text-muted-foreground">
+                            · {formatDate(order.trackingUpdatedAt)}
+                        </span>
+                    ) : null}
+                </p>
+            ) : null}
             {order.shippedAt ? (
                 <p className="text-[11px] text-muted-foreground">Expédié le {formatDate(order.shippedAt)}</p>
             ) : null}

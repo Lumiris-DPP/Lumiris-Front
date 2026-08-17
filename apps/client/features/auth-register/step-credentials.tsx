@@ -100,7 +100,9 @@ export function StepCredentials({ role, onBack, onSuccess }: StepCredentialsProp
                     </Label>
                     <Input
                         id="reg-name"
+                        name="name"
                         type="text"
+                        required
                         autoComplete="name"
                         placeholder="Marie Dupont"
                         value={fields.name}
@@ -120,7 +122,9 @@ export function StepCredentials({ role, onBack, onSuccess }: StepCredentialsProp
                     </Label>
                     <Input
                         id="reg-email"
+                        name="email"
                         type="email"
+                        required
                         autoComplete="email"
                         inputMode="email"
                         placeholder="marie@atelier.fr"
@@ -141,7 +145,9 @@ export function StepCredentials({ role, onBack, onSuccess }: StepCredentialsProp
                     </Label>
                     <Input
                         id="reg-password"
+                        name="new-password"
                         type="password"
+                        required
                         autoComplete="new-password"
                         placeholder="8 caractères minimum"
                         value={fields.password}
@@ -161,7 +167,9 @@ export function StepCredentials({ role, onBack, onSuccess }: StepCredentialsProp
                     </Label>
                     <Input
                         id="reg-confirm"
+                        name="confirm-password"
                         type="password"
+                        required
                         autoComplete="new-password"
                         placeholder="Répétez votre mot de passe"
                         value={fields.confirm}

@@ -5,9 +5,11 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { AlertTriangle, ArrowLeft, Loader2, Minus, Package, Plus, Shirt, ShoppingBag, Trash2 } from 'lucide-react';
+import { usePaymentOptions } from '@lumiris/api-client/react';
 import { routes } from '@/lib/routes';
 import {
     formatCents,
+    installmentLabel,
     removeFromCart,
     setCartQuantity,
     useCartDetails,
@@ -128,6 +130,8 @@ function ShipmentCard({ shipment, index, total }: { shipment: CartShipment; inde
 function CartRow({ item }: { item: CartItemDetail }) {
     const { product, variant } = item;
     const label = variantLabel(variant);
+    // Un « + » grisé sans motif se lit comme une panne : on dit ce qui bloque.
+    const atStockLimit = item.quantity >= item.availableQuantity;
     return (
         <li className="flex gap-3 border-b border-border/40 p-3 last:border-b-0">
             <Link
@@ -156,6 +160,14 @@ function CartRow({ item }: { item: CartItemDetail }) {
                     <p className="text-xs text-muted-foreground">{formatCents(product.priceCents)} l&apos;unité</p>
                 </Link>
 
+                {atStockLimit ? (
+                    <p className="mt-1 text-[11px] text-lumiris-amber">
+                        {item.availableQuantity <= 1
+                            ? 'Dernière pièce disponible dans cette déclinaison.'
+                            : `Stock limité : ${item.availableQuantity} pièces disponibles.`}
+                    </p>
+                ) : null}
+
                 <div className="mt-auto flex items-center justify-between gap-2 pt-2">
                     <div className="inline-flex items-center rounded-full border border-border">
                         <button
@@ -172,7 +184,8 @@ function CartRow({ item }: { item: CartItemDetail }) {
                         <button
                             type="button"
                             aria-label="Augmenter la quantité"
-                            disabled={item.quantity >= item.availableQuantity}
+                            disabled={atStockLimit}
+                            title={atStockLimit ? `Stock disponible : ${item.availableQuantity}` : undefined}
                             onClick={() => setCartQuantity(product.id, variant.id, item.quantity + 1)}
                             className="inline-flex h-7 w-7 items-center justify-center text-foreground disabled:opacity-30"
                         >
@@ -303,6 +316,9 @@ function CartSummary({
     shipmentCount: number;
     blocked: boolean;
 }) {
+    const { data: paymentOptions } = usePaymentOptions();
+    const installment = installmentLabel(totalCents, paymentOptions);
+
     return (
         <div className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-md border-t border-border/60 bg-background/90 px-4 pt-3 pb-6 backdrop-blur">
             <dl className="mb-3 flex flex-col gap-1">
@@ -322,6 +338,11 @@ function CartSummary({
                     <dt className="text-foreground">Total</dt>
                     <dd className="text-foreground tabular-nums">{formatCents(totalCents)}</dd>
                 </div>
+                {installment ? (
+                    <div className="flex justify-end">
+                        <dd className="text-[11px] font-medium text-lumiris-cyan">{installment}</dd>
+                    </div>
+                ) : null}
             </dl>
             {blocked ? (
                 <span className="flex w-full items-center justify-center gap-2 rounded-full bg-muted py-3 text-sm font-semibold text-muted-foreground">

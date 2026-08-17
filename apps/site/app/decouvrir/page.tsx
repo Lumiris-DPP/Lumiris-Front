@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { DiscoverCatalog } from '@/features/discover-catalog';
+import { fetchPublicArtisans } from '@/lib/public-artisan-api';
 
 export const metadata: Metadata = {
     title: 'Découvrir | LUMIRIS',
@@ -7,10 +8,10 @@ export const metadata: Metadata = {
         'Explorez les pièces traçées et les ateliers artisans partenaires LUMIRIS. Filtrez par score Iris, catégorie, région et certification.',
 };
 
-export default function DecouvrirPage() {
+export default async function DecouvrirPage() {
     return (
         <main className="min-h-screen pt-28 pb-20">
-            <DiscoverCatalog />
+            <DiscoverCatalog artisans={await fetchPublicArtisans()} />
         </main>
     );
 }

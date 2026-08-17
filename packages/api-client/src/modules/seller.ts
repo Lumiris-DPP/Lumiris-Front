@@ -5,9 +5,12 @@ import {
     sellerPayoutScheduleSchema,
     sellerStatsDtoSchema,
     sellerStatusDtoSchema,
+    shipFromAddressSchema,
     type SellerPayoutSchedule,
     type SellerStatsDto,
     type SellerStatusDto,
+    type ShipFromAddress,
+    type ShipFromAddressInput,
 } from '../types/seller';
 
 // LUMIRIS-22 · Onboarding vendeur Stripe Connect (Express) + tableau de bord côté ATELIER.
@@ -31,6 +34,19 @@ export function sellerApi(http: Http) {
         // Lien vers le tableau de bord Stripe Express (solde + virements encaissés) — à ouvrir.
         async dashboardLink(): Promise<CheckoutDto> {
             return parseOr(checkoutDtoSchema, await http.request('/api/seller/dashboard-link'));
+        },
+        // Adresse d'enlèvement (expéditeur des bordereaux), hors de la vitrine qui est publique.
+        async shipFromAddress(): Promise<ShipFromAddress> {
+            return parseOr(shipFromAddressSchema, await http.request('/api/seller/shipping-address'));
+        },
+        async updateShipFromAddress(input: ShipFromAddressInput): Promise<ShipFromAddress> {
+            return parseOr(
+                shipFromAddressSchema,
+                await http.request('/api/seller/shipping-address', {
+                    method: 'PUT',
+                    body: input,
+                }),
+            );
         },
     };
 }

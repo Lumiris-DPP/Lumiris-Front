@@ -71,7 +71,7 @@ export function sizesOf(rows: readonly VariantRow[]): string[] {
     return sizes;
 }
 
-const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
+export const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
 
 /** Première raison pour laquelle la grille n'est pas enregistrable, ou null. */
 export function variantRowsError(rows: readonly VariantRow[]): string | null {
@@ -137,6 +137,7 @@ export function productPayloadFrom(product: MarketplaceItem, status?: Marketplac
         shippingCents: product.shippingCents ?? 0,
         returnPolicy: product.returnPolicy ?? undefined,
         preparationDays: product.preparationDays ?? 0,
+        weightGrams: product.weightGrams ?? 0,
         variants: (product.variants ?? []).map((variant, index) => ({
             id: variant.id,
             sizeLabel: variant.sizeLabel ?? undefined,

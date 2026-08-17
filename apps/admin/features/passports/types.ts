@@ -1,7 +1,7 @@
 import type { IrisGrade, Passport } from '@lumiris/types';
-import type { CurationOverlayStatus } from './curation-store';
+import type { CurationStatus } from '@/lib/curation-status';
 
-export type EffectiveStatus = CurationOverlayStatus;
+export type EffectiveStatus = CurationStatus;
 
 export interface PassportRow {
     passport: Passport;
@@ -11,6 +11,8 @@ export interface PassportRow {
     capApplied: boolean;
     hasMissingRegulatoryField: boolean;
     isAtelierPlus: boolean;
+    /** Date de la décision de curation — nulle tant que le passeport n'a pas été tranché. */
+    decidedAt: string | null;
 }
 
 export const FLAG_TAGS: readonly string[] = [

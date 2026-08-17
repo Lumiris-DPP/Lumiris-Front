@@ -21,6 +21,27 @@ export interface ArtisanPublicProfileDto {
     pausedUntil?: string | null;
 }
 
+/**
+ * Annuaire public. Les erreurs réseau renvoient une liste vide plutôt qu'une exception :
+ * la page et le sitemap sont prérendus au build, et une API injoignable ne doit pas
+ * faire échouer le build du site vitrine.
+ */
+export async function fetchPublicArtisans(): Promise<readonly ArtisanPublicProfileDto[]> {
+    try {
+        const res = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/v1/artisans`, {
+            next: { revalidate: 300 },
+        });
+        if (!res.ok) {
+            console.error(`GET /v1/artisans → ${res.status}`);
+            return [];
+        }
+        return (await res.json()) as ArtisanPublicProfileDto[];
+    } catch (error) {
+        console.error('GET /v1/artisans injoignable', error);
+        return [];
+    }
+}
+
 export async function fetchPublicArtisanProfile(slug: string): Promise<ArtisanPublicProfileDto | null> {
     const res = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/v1/artisans/${slug}`, {
         next: { revalidate: 300 },

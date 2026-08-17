@@ -24,13 +24,13 @@ interface PassportTableProps {
     onToggleAll: (ids: readonly string[], value: boolean) => void;
 }
 
-const DAY_MS = 86_400_000;
+const HOURS_PER_DAY = 24;
 
-function relativeDay(iso: string): string {
-    const diffDays = Math.floor((Date.now() - new Date(iso).getTime()) / DAY_MS);
-    if (diffDays <= 0) return "aujourd'hui";
-    if (diffDays === 1) return 'hier';
-    return `il y a ${diffDays} j`;
+function relativeAge(ageHours: number): string {
+    if (ageHours < 1) return "à l'instant";
+    if (ageHours < HOURS_PER_DAY) return `il y a ${ageHours} h`;
+    const days = Math.floor(ageHours / HOURS_PER_DAY);
+    return days === 1 ? 'hier' : `il y a ${days} j`;
 }
 
 function ageTone(ageHours: number): string {
@@ -117,7 +117,7 @@ export function PassportTable({ rows, onSelect, selectedIds, onToggleSelected, o
                             </TableCell>
                             <TableCell>
                                 <span className={cn('font-mono text-[11px]', ageTone(row.ageHours))}>
-                                    {relativeDay(row.passport.createdAt)}
+                                    {relativeAge(row.ageHours)}
                                 </span>
                             </TableCell>
                             <TableCell>

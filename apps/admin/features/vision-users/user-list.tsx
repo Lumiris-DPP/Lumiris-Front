@@ -20,8 +20,7 @@ import { useAdminAuditLog, useLogAction } from '@/lib/auth';
 import { SEGMENT_KEYS, SEGMENT_META, getSegments, type SegmentKey } from './segments';
 import { UserDetailDrawer } from './user-detail-drawer';
 import { UserTable } from './user-table';
-
-const SCORING_NOW = new Date('2026-04-30T08:00:00Z');
+import { FIXTURE_NOW } from '@/lib/fixture-clock';
 
 export function UserList() {
     const searchParams = useSearchParams();
@@ -59,7 +58,7 @@ export function UserList() {
                 )
             )
                 return false;
-            if (segmentFilter !== 'all' && !getSegments(u, SCORING_NOW).includes(segmentFilter)) return false;
+            if (segmentFilter !== 'all' && !getSegments(u, FIXTURE_NOW).includes(segmentFilter)) return false;
             return true;
         });
     }, [accountUsers, search, segmentFilter]);

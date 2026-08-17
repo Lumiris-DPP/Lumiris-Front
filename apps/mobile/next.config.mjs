@@ -4,24 +4,9 @@
 // énumérables au build sont pré-rendus (cf. generateStaticParams) — les identifiants créés à
 // l'exécution passent par la query string (cf. lib/routes.ts).
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-    reactStrictMode: true,
-    output: 'export',
-    trailingSlash: true,
-    images: { unoptimized: true },
-    transpilePackages: [
-        '@lumiris/ui',
-        '@lumiris/scoring-ui',
-        '@lumiris/core',
-        '@lumiris/types',
-        '@lumiris/mock-data',
-        '@lumiris/telemetry',
-        '@lumiris/api-client',
-    ],
-    experimental: {
-        optimizePackageImports: ['lucide-react', '@lumiris/ui'],
-    },
-};
+import { createNextConfig } from '@lumiris/config/next';
 
-export default nextConfig;
+export default createNextConfig({
+    target: 'static',
+    transpilePackages: ['@lumiris/scoring-ui', '@lumiris/mock-data'],
+});

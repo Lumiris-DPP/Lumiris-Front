@@ -8,6 +8,7 @@
         "./eslint/base": "./eslint/base.mjs",
         "./eslint/react": "./eslint/react.mjs",
         "./eslint/next": "./eslint/next.mjs",
+        "./next": "./next/base.mjs",
         "./prettier": "./prettier/prettier.config.mjs",
         "./stylelint": "./stylelint/stylelint.config.mjs",
         "./tsconfig/base.json": "./tsconfig/base.json",
@@ -16,6 +17,7 @@
     },
     "files": [
         "eslint",
+        "next",
         "prettier",
         "stylelint",
         "tsconfig",

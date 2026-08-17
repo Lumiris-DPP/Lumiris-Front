@@ -173,36 +173,42 @@ export function ProductsTab({ onCreate }: { onCreate: () => void }) {
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => toggleVisibility(product)}
-                                            disabled={updateMutation.isPending}
-                                            aria-label={product.status === 'PUBLISHED' ? 'Archiver' : 'Publier'}
-                                            title={product.status === 'PUBLISHED' ? 'Archiver' : 'Publier'}
-                                        >
-                                            {product.status === 'PUBLISHED' ? (
-                                                <EyeOff className="h-4 w-4" />
-                                            ) : (
-                                                <Eye className="h-4 w-4" />
-                                            )}
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => openEdit(product)}
-                                            aria-label="Modifier"
-                                        >
-                                            <Pencil className="h-4 w-4" />
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => setToDelete(product)}
-                                            aria-label="Supprimer"
-                                        >
-                                            <Trash2 className="h-4 w-4 text-destructive" />
-                                        </Button>
+                                        {/* Libellés en clair : trois icônes nues laissent l'artisan deviner
+                                            laquelle dépublie et laquelle supprime définitivement. */}
+                                        <div className="flex flex-wrap items-center justify-end gap-1">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="gap-1.5"
+                                                onClick={() => toggleVisibility(product)}
+                                                disabled={updateMutation.isPending}
+                                            >
+                                                {product.status === 'PUBLISHED' ? (
+                                                    <EyeOff className="h-4 w-4" aria-hidden />
+                                                ) : (
+                                                    <Eye className="h-4 w-4" aria-hidden />
+                                                )}
+                                                {product.status === 'PUBLISHED' ? 'Dépublier' : 'Publier'}
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="gap-1.5"
+                                                onClick={() => openEdit(product)}
+                                            >
+                                                <Pencil className="h-4 w-4" aria-hidden />
+                                                Modifier
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="gap-1.5 text-destructive hover:text-destructive"
+                                                onClick={() => setToDelete(product)}
+                                            >
+                                                <Trash2 className="h-4 w-4" aria-hidden />
+                                                Supprimer
+                                            </Button>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))}

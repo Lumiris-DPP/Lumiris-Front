@@ -20,6 +20,9 @@ const ACTIONABLE_TYPES: ReadonlySet<Notification['type']> = new Set([
     'DISPUTE_RESOLVED',
     'DISPUTE_REJECTED',
     'FAVORITE_LOW_STOCK',
+    // Dernière fenêtre pour signaler un défaut à l'atelier : passé l'échéance, il n'y a plus rien
+    // à faire. Le rappel d'entretien, lui, reste une suggestion — donc de l'information.
+    'WARDROBE_WARRANTY_ENDING',
 ]);
 
 function formatWhen(iso?: string | null): string {

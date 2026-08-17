@@ -113,7 +113,7 @@ function SellerStatsCards() {
             label: 'Revenus nets',
             value: formatPriceCents(stats.netCents, 'EUR'),
             icon: Wallet,
-            hint: `net de ${formatPriceCents(stats.commissionCents, 'EUR')} de commission`,
+            hint: `net de ${formatPriceCents(stats.commissionCents, 'EUR')} de commission, hors frais de port`,
         },
         { label: 'Vues', value: String(stats.totalViews), icon: Eye, hint: 'sur vos fiches produit' },
         { label: 'En garde-robe', value: String(stats.wardrobeCount), icon: Archive, hint: 'pièces chez vos clients' },

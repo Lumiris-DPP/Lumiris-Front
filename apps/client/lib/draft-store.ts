@@ -208,7 +208,7 @@ export function draftToPassport(draft: DraftPassport): Passport {
         steps: [],
         certifications: [],
         warranty: {
-            durationMonths: 0,
+            durationMonths: draft.eco.warrantyMonths ?? 0,
             terms: draft.eco.warrantyDescription ?? '',
             repairabilityCommitment: draft.eco.isRepairable ? 'Facilement réparable' : undefined,
         },
