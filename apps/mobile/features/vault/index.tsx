@@ -36,6 +36,7 @@ import { useWardrobe, type WardrobeItem, type WardrobeSector } from '@/lib/wardr
 import { getGradeDistribution, getOverallScore } from '@/lib/iris/wardrobe-stats';
 import { COMPARE_MAX, clearCompare, setCompare, toggleCompare, useCompare } from '@/lib/iris/compare-store';
 import { toast } from '@/lib/toast';
+import { CarePanel } from './care-panel';
 import { ComparisonOverlay, type VaultItem } from './comparison-overlay';
 import { FiltersSheet, VAULT_DEFAULT_FILTERS, type VaultFilters } from './filters-sheet';
 import { ItemActionsSheet } from './item-actions-sheet';
@@ -96,6 +97,7 @@ interface PurchasedVaultRow {
     publicCode: string | null;
     invoiceNumber: string | null;
     warrantyDescription: string | null;
+    warrantyUntil: string | null;
 }
 
 type VaultRow = ScoredVaultRow | PublicDppRow | ManualVaultRow | PurchasedVaultRow;
@@ -179,6 +181,22 @@ function buildRow(item: WardrobeItem, now: Date): VaultRow | null {
     return null;
 }
 
+// Une échéance datée prime sur la phrase libre de l'atelier : « jusqu'au 12 mars 2028 » se
+// vérifie d'un coup d'œil là où « garantie 2 ans » oblige à recalculer depuis la date d'achat.
+function warrantyLabel(row: PurchasedVaultRow): string | null {
+    if (row.warrantyUntil) {
+        const until = new Date(row.warrantyUntil);
+        if (!Number.isNaN(until.getTime())) {
+            return `Garantie jusqu'au ${until.toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+            })}`;
+        }
+    }
+    return row.warrantyDescription;
+}
+
 function buildPurchasedRow(item: WardrobeItemDto): PurchasedVaultRow {
     return {
         kind: 'purchased',
@@ -190,6 +208,7 @@ function buildPurchasedRow(item: WardrobeItemDto): PurchasedVaultRow {
         publicCode: item.dppPublicCode ?? null,
         invoiceNumber: item.invoiceNumber ?? null,
         warrantyDescription: item.warrantyDescription ?? null,
+        warrantyUntil: item.warrantyUntil ?? null,
     };
 }
 
@@ -435,6 +454,8 @@ export function Vault() {
                 {grades.length > 0 ? (
                     <DistributionChips distribution={distribution} activeGrade={gradeFilter} onSelect={onChipTap} />
                 ) : null}
+
+                <CarePanel items={purchased} />
 
                 <AnimatePresence>
                     {compareMode && remaining > 0 ? (
@@ -744,10 +765,10 @@ function VaultCard({ row, index, compareMode, isSelected, onTap, onOpenActions }
                                     {row.invoiceNumber}
                                 </p>
                             ) : null}
-                            {row.warrantyDescription ? (
+                            {warrantyLabel(row) ? (
                                 <p className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
                                     <ShieldCheck className="h-3 w-3 shrink-0 text-lumiris-emerald" aria-hidden />
-                                    <span className="truncate">{row.warrantyDescription}</span>
+                                    <span className="truncate">{warrantyLabel(row)}</span>
                                 </p>
                             ) : null}
                         </div>

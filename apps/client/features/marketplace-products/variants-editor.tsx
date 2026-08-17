@@ -6,7 +6,7 @@ import { Button } from '@lumiris/ui/components/button';
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
-import { newVariantRow, variantRowsError, type VariantRow } from './product-payload';
+import { HEX_COLOR, newVariantRow, variantRowsError, type VariantRow } from './product-payload';
 
 interface VariantsEditorProps {
     value: VariantRow[];
@@ -80,12 +80,26 @@ export function VariantsEditor({ value, onChange, sizeSuggestions, colorSuggesti
                                     />
                                 </TableCell>
                                 <TableCell className="p-1.5">
-                                    <Input
-                                        aria-label="Teinte hexadécimale"
-                                        placeholder="#1B3A5C"
-                                        value={row.colorHex}
-                                        onChange={(e) => patch(row.key, 'colorHex', e.target.value)}
-                                    />
+                                    <div className="flex items-center gap-2">
+                                        {/* Le sélecteur natif exige une valeur hexadécimale valide : sans teinte
+                                            saisie, il afficherait du noir comme si une couleur était choisie. */}
+                                        <input
+                                            type="color"
+                                            aria-label="Choisir la teinte"
+                                            value={
+                                                HEX_COLOR.test(row.colorHex.trim()) ? row.colorHex.trim() : '#ffffff'
+                                            }
+                                            onChange={(e) => patch(row.key, 'colorHex', e.target.value.toUpperCase())}
+                                            className="h-8 w-8 shrink-0 cursor-pointer rounded-md border border-border bg-card p-0.5"
+                                        />
+                                        <Input
+                                            aria-label="Teinte hexadécimale"
+                                            placeholder="#1B3A5C"
+                                            value={row.colorHex}
+                                            onChange={(e) => patch(row.key, 'colorHex', e.target.value)}
+                                            className="min-w-24"
+                                        />
+                                    </div>
                                 </TableCell>
                                 <TableCell className="p-1.5">
                                     <Input

@@ -29,6 +29,11 @@ const TABS: readonly TabConfig[] = [
     { id: 'me', href: '/me', label: 'Moi', Icon: User },
 ];
 
+function normalizePathname(pathname: string): string {
+    const withoutTrailingSlash = pathname.replace(/\/+$/, '');
+    return withoutTrailingSlash === '' ? '/' : withoutTrailingSlash;
+}
+
 function activeTabFor(pathname: string): Tab | null {
     if (pathname === '/') return 'scan';
     if (
@@ -97,7 +102,7 @@ interface AppShellProps {
 }
 
 export function AppShell({ children, hideTabBar = false }: AppShellProps) {
-    const pathname = usePathname() ?? '/';
+    const pathname = normalizePathname(usePathname() ?? '/');
     const activeTab = activeTabFor(pathname);
     const tabBarHidden = hideTabBar || shouldHideTabBar(pathname);
     const cartCount = useCartCount();

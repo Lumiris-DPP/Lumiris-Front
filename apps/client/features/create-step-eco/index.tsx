@@ -20,6 +20,8 @@ import { toast } from '@lumiris/ui/components/sonner';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+const WARRANTY_MONTHS_MAX = 1200;
+
 export function CreateStepEco({ draftId }: { draftId: string }) {
     const draft = useDraftStore((s) => s.drafts[draftId]);
     const setEco = useDraftStore((s) => s.setEco);
@@ -84,6 +86,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
         reachCompliant: d.traceability.reachCompliant,
         recycledPct: form.recycledPct ?? null,
         warrantyDescription: form.warrantyDescription ?? null,
+        warrantyMonths: form.warrantyMonths ?? null,
         isRepairable: form.isRepairable ?? false,
         endOfLifeInstructions: form.endOfLifeInstructions ?? null,
     });
@@ -208,6 +211,29 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
                     placeholder="2 ans, garantie à vie sur les coutures…"
                     onChange={(e) => setForm((f) => ({ ...f, warrantyDescription: e.target.value }))}
                 />
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="warranty-months">Durée de garantie (mois)</Label>
+                <Input
+                    id="warranty-months"
+                    type="number"
+                    min={0}
+                    max={WARRANTY_MONTHS_MAX}
+                    step="1"
+                    value={form.warrantyMonths ?? ''}
+                    placeholder="24"
+                    onChange={(e) =>
+                        setForm((f) => ({
+                            ...f,
+                            warrantyMonths: e.target.value === '' ? undefined : Number(e.target.value),
+                        }))
+                    }
+                />
+                <p className="text-xs text-muted-foreground">
+                    Compte dans le score Iris à partir de 6 mois, et prévient l&apos;acheteur avant l&apos;échéance.
+                    Laissez vide si vous ne vous engagez pas sur une durée.
+                </p>
             </div>
 
             {/* Réparabilité */}

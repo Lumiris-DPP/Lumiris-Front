@@ -179,6 +179,10 @@ export interface TraceabilityInfo {
 export interface EcoInfo {
     recycledPct?: number;
     warrantyDescription?: string;
+    /** Durée chiffrée de la garantie. `warrantyDescription` est une phrase libre : c'est cette
+     *  valeur-ci qui alimente le score (cf. `warranty.durationMonths`) et l'alerte de fin de
+     *  garantie en Garde-Robe. Absente ⇒ aucune échéance n'est affichée ni annoncée. */
+    warrantyMonths?: number;
     isRepairable?: boolean;
     endOfLifeInstructions?: string;
 }

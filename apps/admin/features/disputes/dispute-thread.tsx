@@ -121,6 +121,8 @@ function ArbitratorReply({ orderId }: { orderId: string }) {
         );
     };
 
+    const tooShort = message.trim().length < 3;
+
     return (
         <>
             <Textarea
@@ -128,12 +130,20 @@ function ArbitratorReply({ orderId }: { orderId: string }) {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Demander une photo, une preuve d’expédition, une précision…"
+                aria-describedby="arbitrator-reply-hint"
             />
+            {/* Un bouton grisé sans motif se lit comme une action morte — l'arbitre doit savoir
+                qu'il attend un message, pas une permission. */}
+            <p id="arbitrator-reply-hint" className="mt-1 text-[11px] text-muted-foreground">
+                {tooShort
+                    ? 'Saisissez votre message ci-dessus pour l’envoyer aux deux parties.'
+                    : 'Envoyé simultanément à l’acheteur et à l’atelier, et tracé au dossier.'}
+            </p>
             <Button
                 size="sm"
                 variant="outline"
                 className="mt-2 gap-1.5"
-                disabled={message.trim().length < 3 || postMessage.isPending}
+                disabled={tooShort || postMessage.isPending}
                 onClick={send}
             >
                 {postMessage.isPending ? (

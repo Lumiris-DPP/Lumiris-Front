@@ -8,7 +8,7 @@ import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { mockRepairers } from '@lumiris/mock-data';
 import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
-import { useUser } from '@/lib/auth';
+import { useAuthHydrated, useUser } from '@/lib/auth';
 
 const STYLE_OPTIONS: readonly string[] = ['Casual', 'Formel', 'Streetwear', 'Vintage', 'Sport', 'Workwear'];
 const MAX_STYLE_PREFS = 3;
@@ -16,6 +16,7 @@ const MAX_STYLE_PREFS = 3;
 export function OnboardingProfile() {
     const router = useRouter();
     const { user, isAuthenticated, updateUser } = useUser();
+    const hydrated = useAuthHydrated();
     const cityId = useId();
     const datalistId = useId();
 
@@ -29,8 +30,8 @@ export function OnboardingProfile() {
     const [stylePrefs, setStylePrefs] = useState<readonly string[]>(user?.stylePrefs ?? []);
 
     useEffect(() => {
-        if (!isAuthenticated) router.replace('/auth');
-    }, [isAuthenticated, router]);
+        if (hydrated && !isAuthenticated) router.replace('/auth');
+    }, [hydrated, isAuthenticated, router]);
 
     function toggleStyle(value: string): void {
         setStylePrefs((current) => {

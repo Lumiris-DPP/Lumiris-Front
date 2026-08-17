@@ -1,11 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CreditCard, Loader2, Lock, Pencil, ShieldCheck } from 'lucide-react';
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { routes } from '@/lib/routes';
 import { formatCents, type CartShipment, type ShippingAddress } from '@/lib/marketplace';
 import { CheckoutRecap } from './recap';
+
+const PAYMENT_REFUSED =
+    'Ta carte a été refusée. Aucun montant n’a été prélevé — saisis une autre carte pour réessayer.';
 
 export function PaymentStep({
     address,
@@ -28,6 +31,13 @@ export function PaymentStep({
     const elements = useElements();
     const [submitting, setSubmitting] = useState(false);
     const [payError, setPayError] = useState<string | null>(null);
+    const errorRef = useRef<HTMLParagraphElement | null>(null);
+
+    // Le bouton de paiement vit dans une barre fixe : sans ce recentrage, le refus s'affiche
+    // au-dessus de la zone visible et l'écran paraît n'avoir rien fait.
+    useEffect(() => {
+        if (payError) errorRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }, [payError]);
 
     async function handleSubmit(event: React.SyntheticEvent) {
         event.preventDefault();
@@ -35,37 +45,45 @@ export function PaymentStep({
         setSubmitting(true);
         setPayError(null);
 
-        const { error, paymentIntent } = await stripe.confirmPayment({
-            elements,
-            confirmParams: {
-                // Retour après redirection (3-D Secure) : Stripe ajoute ?payment_intent=…
-                // que l'écran de confirmation lit pour charger le groupe de commande.
-                return_url: `${window.location.origin}${routes.order('latest')}`,
-                shipping: {
-                    name: address.fullName,
-                    phone: address.phone,
-                    address: {
-                        line1: address.line1,
-                        line2: address.line2,
-                        postal_code: address.postalCode,
-                        city: address.city,
-                        country: address.country ?? 'FR',
+        try {
+            const { error, paymentIntent } = await stripe.confirmPayment({
+                elements,
+                confirmParams: {
+                    // Retour après redirection (3-D Secure) : Stripe ajoute ?payment_intent=…
+                    // que l'écran de confirmation lit pour charger le groupe de commande.
+                    return_url: `${window.location.origin}${routes.order('latest')}`,
+                    shipping: {
+                        name: address.fullName,
+                        phone: address.phone,
+                        address: {
+                            line1: address.line1,
+                            line2: address.line2,
+                            postal_code: address.postalCode,
+                            city: address.city,
+                            country: address.country ?? 'FR',
+                        },
                     },
                 },
-            },
-            redirect: 'if_required',
-        });
+                redirect: 'if_required',
+            });
 
-        if (error) {
-            setPayError(error.message ?? 'Le paiement a échoué. Vérifie ta carte et réessaie.');
+            if (error) {
+                setPayError(error.message ?? PAYMENT_REFUSED);
+                return;
+            }
+            if (paymentIntent?.status === 'succeeded' || paymentIntent?.status === 'processing') {
+                onPaid(paymentIntent.id);
+                return;
+            }
+            // Tout autre état (`requires_payment_method` sur une carte refusée, `canceled`) laisse
+            // l'acheteur sur l'écran de paiement : sans message, l'écran semblait simplement ne
+            // rien faire et il ne savait pas qu'il pouvait ressaisir sa carte.
+            setPayError(PAYMENT_REFUSED);
+        } catch {
+            setPayError('Le paiement n’a pas pu être confirmé. Vérifie ta connexion et réessaie.');
+        } finally {
             setSubmitting(false);
-            return;
         }
-        if (paymentIntent && (paymentIntent.status === 'succeeded' || paymentIntent.status === 'processing')) {
-            onPaid(paymentIntent.id);
-            return;
-        }
-        setSubmitting(false);
     }
 
     const payAction = (
@@ -105,7 +123,15 @@ export function PaymentStep({
                         <div className="rounded-2xl border border-border/60 bg-card p-4">
                             <PaymentElement options={{ layout: 'tabs' }} />
                         </div>
-                        {payError ? <p className="text-xs text-lumiris-rose">{payError}</p> : null}
+                        {payError ? (
+                            <p
+                                ref={errorRef}
+                                role="alert"
+                                className="rounded-xl border border-lumiris-rose/40 bg-lumiris-rose/10 px-3 py-2 text-xs font-medium text-lumiris-rose"
+                            >
+                                {payError}
+                            </p>
+                        ) : null}
                         <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
                             <ShieldCheck className="h-3 w-3" />
                             Paiement sécurisé par Stripe. Lumiris retient les fonds jusqu&apos;à la livraison et ne

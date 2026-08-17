@@ -3,20 +3,38 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { CheckCircle2 } from 'lucide-react';
+import type { UserRole } from '@lumiris/types';
 import { Button } from '@lumiris/ui/components/button';
+
+const REDIRECT_DELAY_MS = 3000;
 
 interface StepSuccessProps {
     name: string;
+    role: UserRole;
 }
 
-export function StepSuccess({ name }: StepSuccessProps) {
+export function StepSuccess({ name, role }: StepSuccessProps) {
     const router = useRouter();
     const firstName = name.split(' ')[0] ?? name;
 
+    const next =
+        role === 'artisan'
+            ? {
+                  href: '/onboarding',
+                  label: 'Vérifier mon atelier',
+                  description:
+                      'Il reste une étape : vérifier votre atelier avec son SIRET. Le tableau de bord s’ouvre juste après.',
+              }
+            : {
+                  href: '/dashboard',
+                  label: 'Aller au tableau de bord',
+                  description: 'Vous allez être redirigé vers le tableau de bord…',
+              };
+
     useEffect(() => {
-        const timer = setTimeout(() => router.replace('/dashboard'), 3000);
+        const timer = setTimeout(() => router.replace(next.href), REDIRECT_DELAY_MS);
         return () => clearTimeout(timer);
-    }, [router]);
+    }, [router, next.href]);
 
     return (
         <div className="flex flex-col items-center gap-6 py-4 text-center">
@@ -29,15 +47,15 @@ export function StepSuccess({ name }: StepSuccessProps) {
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                     Votre compte a été créé avec succès.
                     <br />
-                    Vous allez être redirigé vers le tableau de bord…
+                    {next.description}
                 </p>
             </div>
 
             <Button
-                onClick={() => router.replace('/dashboard')}
+                onClick={() => router.replace(next.href)}
                 className="h-10 w-full bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90"
             >
-                Aller au tableau de bord
+                {next.label}
             </Button>
         </div>
     );

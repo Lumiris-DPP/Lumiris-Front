@@ -79,9 +79,9 @@ describe('buildCurationKpi — file de validation', () => {
         expect(kpi.medianValidationDays).toBe(3);
     });
 
-    it('pending inclut tous les status != Published OU les Published en PendingReview', () => {
+    it('pending = même file que /passeports : tout ce que la modération n’a pas tranché', () => {
         const passports = [
-            makePassport({ status: 'Draft' }),
+            makePassport({ status: 'Draft', moderation: undefined }),
             makePassport({
                 status: 'Published',
                 moderation: { status: 'PendingReview', reviewerId: 'CUR', reviewedAt: '2026-04-10T00:00:00Z' },
@@ -89,6 +89,10 @@ describe('buildCurationKpi — file de validation', () => {
             makePassport({
                 status: 'Published',
                 moderation: { status: 'Approved', reviewerId: 'CUR', reviewedAt: '2026-04-15T00:00:00Z' },
+            }),
+            makePassport({
+                status: 'Published',
+                moderation: { status: 'Rejected', reviewerId: 'CUR', reviewedAt: '2026-04-15T00:00:00Z' },
             }),
         ];
         const kpi = buildCurationKpi(passports);

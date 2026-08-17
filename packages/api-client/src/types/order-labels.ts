@@ -1,4 +1,4 @@
-import type { DisputeStatus, OrderEventType, OrderStatus, SellerOrderTab } from './orders';
+import type { DisputeStatus, OrderEventType, OrderStatus, SellerOrderTab, TrackingStatus } from './orders';
 
 // Vocabulaire du cycle de vie d'une commande, partagé par ATELIER et VISION. Il vit à côté des
 // unions dont il est indexé : un état ajouté au backend casse la compilation ici tant que son
@@ -76,6 +76,19 @@ export const ORDER_EVENT_LABEL: Record<OrderEventType, string> = {
     CANCELLED: 'Commande annulée',
     FUNDS_RELEASED: 'Fonds versés à l’atelier',
     MESSAGE: 'Message',
+    LABEL_GENERATED: 'Étiquette d’expédition éditée',
+    TRACKING_UPDATE: 'Suivi transporteur',
+};
+
+// Le transporteur pousse son propre libellé avec chaque événement ; celui-ci n'est que le repli
+// quand il n'en fournit aucun. Court, factuel, sans promesse de date.
+export const TRACKING_STATUS_LABEL: Record<TrackingStatus, string> = {
+    ANNOUNCED: 'Colis annoncé',
+    IN_TRANSIT: 'En transit',
+    OUT_FOR_DELIVERY: 'En cours de livraison',
+    DELIVERED: 'Livré',
+    EXCEPTION: 'Incident de livraison',
+    RETURNED: 'Retourné à l’atelier',
 };
 
 export const SELLER_ORDER_TAB_LABEL: Record<SellerOrderTab, string> = {

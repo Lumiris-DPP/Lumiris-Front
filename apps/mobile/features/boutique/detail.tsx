@@ -18,13 +18,14 @@ import {
     ShoppingCart,
     Truck,
 } from 'lucide-react';
-import { isApiError, useApiClient, useMarketplaceProduct } from '@lumiris/api-client/react';
+import { isApiError, useApiClient, useMarketplaceProduct, usePaymentOptions } from '@lumiris/api-client/react';
 import { IrisGrade } from '@lumiris/scoring-ui';
 import { Button } from '@lumiris/ui/components/button';
 import { Skeleton } from '@lumiris/ui/components/skeleton';
 import {
     addToCart,
     formatCents,
+    installmentLabel,
     preparationLabel,
     toMarketplaceItem,
     useCart,
@@ -109,6 +110,8 @@ function DetailBody({
         return { size: only?.sizeLabel?.trim() ?? null, color: only?.colorLabel?.trim() ?? null };
     });
 
+    const { data: paymentOptions } = usePaymentOptions();
+    const installment = installmentLabel(product.priceCents, paymentOptions);
     const state = purchaseStateOf(product, selection);
     const variant = state.kind === 'ready' || state.kind === 'sold-out' ? state.variant : null;
     const buyable = state.kind === 'ready';
@@ -262,6 +265,9 @@ function DetailBody({
                         <p className="font-mono text-xl leading-none font-bold text-foreground">
                             {formatCents(product.priceCents)}
                         </p>
+                        {installment ? (
+                            <p className="mt-0.5 text-[11px] font-medium text-lumiris-cyan">{installment}</p>
+                        ) : null}
                         <p className="mt-1 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
                             <Truck className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
                             {[

@@ -10,7 +10,9 @@ export const KIND_LABEL_FR: Record<GarmentKind, string> = {
     other: 'Autre',
 };
 
-export const DEFAULT_LOCALE = 'en-US';
+// Les quatre surfaces s'adressent à un public français : un défaut en-US faisait ressortir des
+// dates « Aug 17, 2026 » et des pourcentages au point au milieu d'écrans entièrement français.
+export const DEFAULT_LOCALE = 'fr-FR';
 
 export interface FormatOptions {
     locale?: string;
@@ -129,7 +131,10 @@ export function formatEur(n: number): string {
 }
 
 /**
- * Prix stocké en centimes → montant sans décimales (locale FR, devise EUR par défaut).
+ * Prix stocké en centimes → montant AU CENTIME (locale FR, devise EUR par défaut).
+ * Les centimes ne sont pas décoratifs : cette fonction sert les montants d'une commande, d'un
+ * remboursement et d'un versement. Arrondir à l'euro faisait afficher « maximum remboursable
+ * 205 € » au-dessus d'un champ prérempli à 204,90, et 195 € pour 194,95 encaissés.
  * Robuste : `cents` non-fini → 0 ; une devise non ISO-4217 (drift back / `parseOr`) ferait
  * lever `RangeError: Invalid currency code` à `Intl` et tomber toute la grille → repli EUR.
  */
@@ -139,13 +144,15 @@ export function formatPriceCents(cents: number, currency = 'EUR'): string {
         return new Intl.NumberFormat('fr-FR', {
             style: 'currency',
             currency: currency || 'EUR',
-            maximumFractionDigits: 0,
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
         }).format(amount);
     } catch {
         return new Intl.NumberFormat('fr-FR', {
             style: 'currency',
             currency: 'EUR',
-            maximumFractionDigits: 0,
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
         }).format(amount);
     }
 }

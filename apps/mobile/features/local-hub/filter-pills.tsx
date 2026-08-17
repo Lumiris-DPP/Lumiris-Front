@@ -19,7 +19,7 @@ interface PillDef {
 const PILLS: readonly PillDef[] = [
     { key: 'all', label: 'Tout' },
     { key: 'buy', label: 'Acheter' },
-    { key: 'repair', label: 'Reparer' },
+    { key: 'repair', label: 'Réparer' },
 ];
 
 export function FilterPills({ value, onChange, counts }: FilterPillsProps) {

@@ -52,18 +52,23 @@ export function AddressStep({
 
                 <Field
                     label="Nom complet"
+                    name="name"
+                    required
                     value={address.fullName}
                     onChange={(v) => set('fullName', v)}
                     autoComplete="name"
                 />
                 <Field
                     label="Adresse"
+                    name="address-line1"
+                    required
                     value={address.line1}
                     onChange={(v) => set('line1', v)}
                     autoComplete="address-line1"
                 />
                 <Field
                     label="Complément (facultatif)"
+                    name="address-line2"
                     value={address.line2 ?? ''}
                     onChange={(v) => set('line2', v)}
                     autoComplete="address-line2"
@@ -72,6 +77,8 @@ export function AddressStep({
                 <div className="flex gap-3">
                     <Field
                         label="Code postal"
+                        name="postal-code"
+                        required
                         value={address.postalCode}
                         onChange={(v) => set('postalCode', onlyDigits(v).slice(0, 5))}
                         autoComplete="postal-code"
@@ -80,6 +87,8 @@ export function AddressStep({
                     />
                     <Field
                         label="Ville"
+                        name="city"
+                        required
                         value={address.city}
                         onChange={(v) => set('city', v)}
                         autoComplete="address-level2"
@@ -88,6 +97,7 @@ export function AddressStep({
                 </div>
                 <Field
                     label="Téléphone (facultatif)"
+                    name="tel"
                     value={address.phone ?? ''}
                     onChange={(v) => set('phone', v)}
                     autoComplete="tel"
@@ -117,6 +127,8 @@ export function AddressStep({
     );
 }
 
+// `min-w-0` sur le conteneur et `w-full` sur le champ : sans eux un input garde sa largeur
+// intrinsèque (~20 caractères) et déborde du viewport dès qu'il partage sa ligne.
 function Field({
     label,
     value,
@@ -130,13 +142,13 @@ function Field({
     className?: string;
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'className'>) {
     return (
-        <label className={`flex flex-col gap-1 ${className ?? ''}`}>
+        <label className={`flex min-w-0 flex-col gap-1 ${className ?? ''}`}>
             <span className="text-[11px] font-medium text-muted-foreground">{label}</span>
             <input
                 {...rest}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none focus:border-foreground"
+                className="w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none focus:border-foreground"
             />
         </label>
     );

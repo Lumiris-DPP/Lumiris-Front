@@ -5,7 +5,9 @@ export interface JournalArticlePublic extends JournalArticle {
     slug: string;
 }
 
-const PUBLIC_STATUSES: ReadonlyArray<JournalArticle['status']> = ['Published', 'Scheduled'];
+// « Scheduled » = programmé, donc pas encore paru : l'inclure faisait apparaître des brouillons
+// dans le Journal public.
+const PUBLIC_STATUSES: ReadonlyArray<JournalArticle['status']> = ['Published'];
 
 function slugify(input: string): string {
     return input

@@ -24,6 +24,7 @@ import {
     STRESS_B2C_FACTOR,
     type MonthlyTarget,
 } from './business-targets';
+import { deriveCurationStatus, isAwaitingCuration } from './curation-status';
 
 const DAY_MS = 86_400_000;
 
@@ -68,7 +69,9 @@ function median(values: readonly number[]): number | null {
 }
 
 export function buildCurationKpi(passports: readonly Passport[]): CurationKpi {
-    const pending = passports.filter((p) => p.status !== 'Published' || p.moderation?.status === 'PendingReview');
+    // Même définition de la file que l'écran /passeports : sans elle, la tuile du Cockpit et
+    // l'en-tête de la file annoncent deux nombres différents pour la même chose.
+    const pending = passports.filter((p) => isAwaitingCuration(deriveCurationStatus(p, undefined)));
     const draftCount = passports.filter((p) => p.status === 'Draft').length;
     const inCompletionCount = passports.filter((p) => p.status === 'InCompletion').length;
 

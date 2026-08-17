@@ -1,39 +1,7 @@
-import { fileURLToPath } from 'node:url';
-import path from 'node:path';
+import { createNextConfig } from '@lumiris/config/next';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-    reactStrictMode: true,
-    output: 'standalone',
-    outputFileTracingRoot: path.resolve(__dirname, '../..'),
-    transpilePackages: [
-        '@lumiris/ui',
-        '@lumiris/scoring-ui',
-        '@lumiris/core',
-        '@lumiris/types',
-        '@lumiris/mock-data',
-        '@lumiris/telemetry',
-        '@lumiris/api-client',
-    ],
-    serverExternalPackages: [
-        '@opentelemetry/sdk-node',
-        '@opentelemetry/auto-instrumentations-node',
-        '@opentelemetry/exporter-trace-otlp-http',
-        '@opentelemetry/exporter-metrics-otlp-http',
-    ],
-    experimental: {
-        optimizePackageImports: ['lucide-react', '@lumiris/ui'],
-    },
-    images: {
-        remotePatterns: [
-            { protocol: 'https', hostname: 'cdn.lumiris.local' },
-            { protocol: 'https', hostname: 'cdn.lumiris.eu' },
-            { protocol: 'http', hostname: 'localhost', port: '9000' },
-            { protocol: 'https', hostname: 'placehold.co' },
-        ],
-    },
-};
-
-export default nextConfig;
+export default createNextConfig({
+    target: 'server',
+    transpilePackages: ['@lumiris/scoring-ui', '@lumiris/mock-data'],
+    imageHosts: [{ protocol: 'https', hostname: 'placehold.co' }],
+});

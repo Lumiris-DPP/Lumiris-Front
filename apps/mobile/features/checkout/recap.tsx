@@ -3,8 +3,10 @@
 import Image from 'next/image';
 import { Package, RotateCcw, ShieldCheck, Shirt } from 'lucide-react';
 import { joinNonEmpty } from '@lumiris/utils';
+import { usePaymentOptions } from '@lumiris/api-client/react';
 import {
     formatCents,
+    installmentLabel,
     preparationLabel,
     shippingCostLabel,
     variantLabel,
@@ -25,6 +27,9 @@ export function CheckoutRecap({
     shippingCents: number;
     totalCents: number;
 }) {
+    const { data: paymentOptions } = usePaymentOptions();
+    const installment = installmentLabel(totalCents, paymentOptions);
+
     return (
         <div className="opal-shadow rounded-2xl border border-border/60 bg-card p-4">
             <h2 className="text-sm font-semibold text-foreground">Récapitulatif</h2>
@@ -55,6 +60,13 @@ export function CheckoutRecap({
                     <dt className="text-foreground">Total</dt>
                     <dd className="text-foreground tabular-nums">{formatCents(totalCents)}</dd>
                 </div>
+                {installment ? (
+                    <div className="flex items-center justify-end">
+                        <dd className="text-[11px] font-medium text-lumiris-cyan">
+                            {installment} — à choisir au paiement
+                        </dd>
+                    </div>
+                ) : null}
             </dl>
 
             <Reassurance shipments={shipments} />

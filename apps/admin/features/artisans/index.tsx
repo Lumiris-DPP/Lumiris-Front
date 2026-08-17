@@ -10,10 +10,9 @@ import { useAdminAuditLog } from '@/lib/auth';
 import { buildArtisanRows, type ArtisanRow } from '@/lib/artisan-analytics';
 import { ArtisanDrawer } from './artisan-drawer';
 import { ArtisanTable } from './artisan-table';
-import { useDeepLinkId } from './deep-link';
+import { useDeepLinkId } from '../_shared/use-deep-link-id';
 import { HEALTH_OPTIONS, type HealthFilter } from './tier-status';
-
-const SCORING_NOW = new Date('2026-04-30T08:00:00Z');
+import { FIXTURE_NOW } from '@/lib/fixture-clock';
 
 function ArtisansComponent() {
     return (
@@ -31,7 +30,7 @@ function ArtisansInner() {
     const [healthFilter, setHealthFilter] = useState<HealthFilter>('all');
 
     const rows: readonly ArtisanRow[] = useMemo(
-        () => buildArtisanRows(mockArtisans, mockPassports, mockRepairers, auditLog, SCORING_NOW),
+        () => buildArtisanRows(mockArtisans, mockPassports, mockRepairers, auditLog, FIXTURE_NOW),
         [auditLog],
     );
 

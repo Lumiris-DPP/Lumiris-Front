@@ -5,11 +5,13 @@ import { QRCodeCanvas } from 'qrcode.react';
 import { CheckCircle, XCircle } from 'lucide-react';
 import Image from 'next/image';
 import { mockPassportById } from '@lumiris/mock-data';
-import type { IrisGrade } from '@lumiris/types';
+import type { IrisGrade, ScoreResult } from '@lumiris/types';
 import { useApiClient } from '@lumiris/api-client/react';
-import type { DppFormDto, IrisScoreDto } from '@lumiris/api-client';
+import { useAuthHydrated } from '@/lib/use-auth';
+import type { DppFormDto } from '@lumiris/api-client';
 import { fiberLabel } from '@lumiris/scoring-ui';
 import { LumirisLogo } from '@lumiris/ui/components/logo';
+import { PrintMessage } from '@/features/print-message';
 import { draftToPassport, useDraftStore } from '@/lib/draft-store';
 import { publicPassportUrl } from '@/features/passport-detail/access-levels';
 
@@ -57,26 +59,37 @@ const DOC_TYPE_LABELS: Record<string, string> = {
 export default function PrintPassportSheetPage({ params }: PageProps) {
     const { id } = use(params);
     const api = useApiClient();
+    const hydrated = useAuthHydrated();
     const draft = useDraftStore((s) => s.drafts[id]);
     const fixed = useMemo(() => mockPassportById(id), [id]);
 
     const [dpp, setDpp] = useState<DppFormDto | null>(null);
-    const [score, setScore] = useState<IrisScoreDto | null>(null);
+    const [score, setScore] = useState<ScoreResult | null>(null);
     const [notFound, setNotFound] = useState(false);
 
     const mockPassport = useMemo(() => (draft ? draftToPassport(draft) : fixed), [draft, fixed]);
     const isMockOrDraft = Boolean(mockPassport);
 
+    // La fiche s'imprime depuis l'atelier, sur un identifiant de passeport — pas sur un code
+    // public. `/public/dpp_forms/{code}` répondait donc 404 sur des passeports pourtant valides.
+    // La requête part APRÈS l'hydratation du store d'auth : sans en-tête Authorization, l'API
+    // répond 401 et la page conclut à tort à une fiche introuvable.
     useEffect(() => {
-        if (isMockOrDraft) return;
-        api.dpp
-            .getPublic(id)
-            .then(({ dpp: fetchedDpp, irisScore }) => {
+        if (isMockOrDraft || !hydrated) return;
+        let cancelled = false;
+        Promise.all([api.dpp.get(id), api.dpp.getIrisScore(id).catch(() => null)])
+            .then(([fetchedDpp, irisScore]) => {
+                if (cancelled) return;
                 setDpp(fetchedDpp);
-                setScore(irisScore ?? null);
+                setScore(irisScore);
             })
-            .catch(() => setNotFound(true));
-    }, [id, isMockOrDraft, api]);
+            .catch(() => {
+                if (!cancelled) setNotFound(true);
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [id, isMockOrDraft, api, hydrated]);
 
     useEffect(() => {
         if (!isMockOrDraft && !dpp) return;
@@ -86,9 +99,11 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
 
     if (notFound) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-white p-12">
-                <p className="font-mono text-sm text-neutral-700">Fiche introuvable.</p>
-            </div>
+            <PrintMessage
+                title="Fiche introuvable"
+                description="Cet identifiant ne correspond à aucun passeport de votre atelier."
+                back={{ href: '/passports', label: 'Retour à mes passeports' }}
+            />
         );
     }
 
@@ -107,11 +122,11 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
     // A draft has no public code yet, so there is no QR to print.
     if (!dpp.publicCode) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-white p-12">
-                <p className="font-mono text-sm text-neutral-700">
-                    Ce passeport est un brouillon : publiez-le pour générer son QR code.
-                </p>
-            </div>
+            <PrintMessage
+                title="Brouillon non publié"
+                description="Publiez ce passeport pour générer son QR code, puis relancez l'impression."
+                back={{ href: `/passports/${id}`, label: 'Retour au passeport' }}
+            />
         );
     }
 

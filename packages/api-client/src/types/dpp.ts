@@ -29,6 +29,7 @@ export const dppFormPayloadSchema = z.object({
     reachCompliant: z.boolean().nullish(),
     recycledPct: z.number().nullish(),
     warrantyDescription: z.string().nullish(),
+    warrantyMonths: z.number().nullish(),
     isRepairable: z.boolean().nullish(),
     endOfLifeInstructions: z.string().nullish(),
     quantity: z.number().int().min(1).nullish(),

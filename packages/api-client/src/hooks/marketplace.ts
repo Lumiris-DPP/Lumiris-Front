@@ -18,6 +18,7 @@ import type {
     MarketplaceItem,
     MarketplaceSearchParams,
     PaymentIntentResponse,
+    PaymentOptions,
     ProductPayload,
     SearchResult,
     SuggestInput,
@@ -33,7 +34,21 @@ export const marketplaceKeys = {
     publicProducts: (ids: readonly string[]) => ['marketplace', 'public-products', [...ids].sort()] as const,
     productByDpp: (dppFormId: string) => ['marketplace', 'product-by-dpp', dppFormId] as const,
     decisionLog: (id: string) => ['marketplace', 'decision-log', id] as const,
+    paymentOptions: () => ['marketplace', 'payment-options'] as const,
 };
+
+// Facilités de paiement annonçables. Configuration serveur, donc quasi immuable : mise en cache
+// longue, et un échec ne doit rien casser — l'appelant retombe simplement sur « pas de mention ».
+export function usePaymentOptions(options?: Omit<UseQueryOptions<PaymentOptions, Error>, 'queryKey' | 'queryFn'>) {
+    const client = useApiClient();
+    return useQuery<PaymentOptions, Error>({
+        queryKey: marketplaceKeys.paymentOptions(),
+        queryFn: () => client.marketplace.paymentOptions(),
+        staleTime: CACHE_TIMES.STATIC,
+        retry: false,
+        ...options,
+    });
+}
 
 // Fiche produit publique unique (catalogue). La query reste désactivée tant qu'aucun id n'est
 // fourni ; un 404 (NOT_FOUND, non rejoué) signifie « pièce introuvable / plus publiée ».

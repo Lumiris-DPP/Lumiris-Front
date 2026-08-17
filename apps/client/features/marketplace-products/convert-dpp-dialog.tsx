@@ -33,6 +33,7 @@ import { SizeGuideEditor } from './size-guide-editor';
 import { VariantsEditor } from './variants-editor';
 
 const MAX_PREPARATION_DAYS = 90;
+const MAX_WEIGHT_GRAMS = 30000;
 
 export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
     const router = useRouter();
@@ -47,6 +48,7 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
     const [shippingEuros, setShippingEuros] = useState('');
     const [stock, setStock] = useState('');
     const [preparationDays, setPreparationDays] = useState('0');
+    const [weightGrams, setWeightGrams] = useState('');
     const [variants, setVariants] = useState<VariantRow[]>([]);
     const [sizeGuide, setSizeGuide] = useState<SizeGuideDraft>(EMPTY_SIZE_GUIDE);
     const [returnPolicy, setReturnPolicy] = useState('');
@@ -74,6 +76,7 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
         setShippingEuros('');
         setStock('');
         setPreparationDays('0');
+        setWeightGrams('');
         setVariants([]);
         setSizeGuide(EMPTY_SIZE_GUIDE);
         setReturnPolicy('');
@@ -96,6 +99,9 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                         MAX_PREPARATION_DAYS,
                         Math.max(0, Math.round(Number(preparationDays) || 0)),
                     ),
+                    weightGrams: weightGrams
+                        ? Math.min(MAX_WEIGHT_GRAMS, Math.max(0, Math.round(Number(weightGrams) || 0)))
+                        : undefined,
                     shippingCents: shippingEuros
                         ? Math.round(parseFloat(shippingEuros.replace(',', '.')) * 100)
                         : undefined,
@@ -248,6 +254,24 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                         />
                         <p className="text-xs text-muted-foreground">
                             Affiché à l’acheteur avant l’achat : « expédiée sous X jours ». 0 = pièce en stock.
+                        </p>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="convert-weight">Poids du colis (g)</Label>
+                        <Input
+                            id="convert-weight"
+                            type="number"
+                            min={0}
+                            max={MAX_WEIGHT_GRAMS}
+                            step="10"
+                            value={weightGrams}
+                            placeholder="800"
+                            onChange={(e) => setWeightGrams(e.target.value)}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            Emballage compris. Détermine le tarif du transporteur et permet d’imprimer l’étiquette en un
+                            clic depuis la commande.
                         </p>
                     </div>
 

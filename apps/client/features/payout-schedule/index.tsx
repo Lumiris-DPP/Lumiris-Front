@@ -50,13 +50,13 @@ export function PayoutSchedule() {
                 <StatCard
                     label="Attendus"
                     value={formatPriceCents(data.scheduledCents, currency)}
-                    hint="versés à la livraison"
+                    hint="versés à la livraison, port compris"
                     icon={CalendarClock}
                 />
                 <StatCard
                     label="Déjà versés"
                     value={formatPriceCents(data.releasedCents, currency)}
-                    hint="virements partis sur votre compte"
+                    hint="virements partis sur votre compte, port compris"
                     icon={Wallet}
                 />
                 <StatCard

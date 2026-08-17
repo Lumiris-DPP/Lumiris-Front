@@ -13,11 +13,13 @@ import { cn } from '@lumiris/ui/lib/cn';
 import { useAdminAuditLog } from '@/lib/auth';
 import { CuratorActions } from './curator-actions';
 import { useCurationStore } from './curation-store';
-import { deriveEffectiveStatus, useIrisScore } from './hooks';
+import { deriveCurationStatus } from '@/lib/curation-status';
+import { useIrisScore } from './hooks';
 import { BreakdownSection } from './inspection/breakdown-section';
 import { HistorySection } from './inspection/history-section';
 import { SimulatorSection } from './inspection/simulator-section';
 import { STATUS_LABEL, STATUS_TONE } from './status';
+import { FIXTURE_NOW } from '@/lib/fixture-clock';
 
 interface PassportDrawerProps {
     passport: Passport | null;
@@ -75,7 +77,7 @@ function DetailTab({ passport }: { passport: Passport }) {
 
             <section>
                 <h3 className="mb-2 text-sm font-semibold text-foreground">Composition</h3>
-                <CompositionList composition={passport.materials} now={new Date('2026-04-30T08:00:00Z')} />
+                <CompositionList composition={passport.materials} now={FIXTURE_NOW} />
             </section>
 
             <section>
@@ -245,7 +247,7 @@ function DrawerFooter({ passport }: { passport: Passport }) {
     const score = useIrisScore(passport);
     const { overlays } = useCurationStore();
     const overlay = overlays.get(passport.id);
-    const status = deriveEffectiveStatus(passport, overlay?.status);
+    const status = deriveCurationStatus(passport, overlay?.status);
     const [lastAction, setLastAction] = useState<AdminAuditLogEntry | null>(null);
 
     return (

@@ -27,8 +27,7 @@ import {
     type RgpdLocalStatus,
 } from './segments';
 import { maskEmail } from './user-table';
-
-const SCORING_NOW = new Date('2026-04-30T08:00:00Z');
+import { FIXTURE_NOW } from '@/lib/fixture-clock';
 
 function fmt(iso: string): string {
     return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -54,7 +53,7 @@ export function UserDetailDrawer({ user, onClose, lastAccessAt }: UserDetailDraw
 
     if (!user) return null;
 
-    const segments = getSegments(user, SCORING_NOW);
+    const segments = getSegments(user, FIXTURE_NOW);
     const subtitle = lastAccessAt
         ? `${user.email ?? user.id} · dernier accès admin ${new Date(lastAccessAt).toLocaleString('fr-FR')}`
         : (user.email ?? user.id);
@@ -95,7 +94,7 @@ function IdentityTab({
     user: MockVisionUser;
     segments: ReadonlyArray<ReturnType<typeof getSegments>[number]>;
 }) {
-    const scans30d = getScans30d(user, SCORING_NOW);
+    const scans30d = getScans30d(user, FIXTURE_NOW);
     const wardrobeTotal = totalWardrobeSize(user);
     const affiliation = getAffiliationCommissionsEur(user);
 
@@ -170,7 +169,7 @@ function WardrobeTab({ user }: { user: MockVisionUser }) {
                         certificates: passport.materials.flatMap((m) => m.certifications),
                         ...(artisan ? { artisan } : {}),
                         retoucheurs: mockRepairers,
-                        now: SCORING_NOW,
+                        now: FIXTURE_NOW,
                     });
                     return {
                         id: passport.id,

@@ -47,7 +47,6 @@ export function Boutique() {
 
     const items = useMemo<readonly MarketplaceItem[]>(() => applyBoutiqueFilters(sorted, filters), [sorted, filters]);
 
-    const [hero, ...rest] = items;
     const cartCount = useCartCount();
 
     return (
@@ -107,13 +106,10 @@ export function Boutique() {
                         />
                     )
                 ) : (
-                    <div className="flex flex-col gap-3">
-                        {hero ? <BoutiqueCard item={hero} index={0} featured /> : null}
-                        <div className="grid grid-cols-2 gap-3">
-                            {rest.map((item, idx) => (
-                                <BoutiqueCard key={item.id} item={item} index={idx + 1} />
-                            ))}
-                        </div>
+                    <div className="grid grid-cols-2 gap-3">
+                        {items.map((item, idx) => (
+                            <BoutiqueCard key={item.id} item={item} index={idx} />
+                        ))}
                     </div>
                 )}
             </div>
@@ -123,13 +119,10 @@ export function Boutique() {
 
 function BoutiqueSkeleton() {
     return (
-        <div className="flex flex-col gap-3" aria-hidden>
-            <Skeleton className="h-32 w-full rounded-2xl" />
-            <div className="grid grid-cols-2 gap-3">
-                {Array.from({ length: 4 }).map((_, i) => (
-                    <Skeleton key={i} className="h-48 w-full rounded-2xl" />
-                ))}
-            </div>
+        <div className="grid grid-cols-2 gap-3" aria-hidden>
+            {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-48 w-full rounded-2xl" />
+            ))}
         </div>
     );
 }

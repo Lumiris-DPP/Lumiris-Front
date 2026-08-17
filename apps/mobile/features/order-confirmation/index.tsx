@@ -12,11 +12,13 @@ import {
     Loader2,
     LogIn,
     Mail,
+    RotateCcw,
     ShieldCheck,
     Sparkles,
     Truck,
 } from 'lucide-react';
 import { useMyOrders, useOrderGroup, useWardrobe } from '@lumiris/api-client/react';
+import { cn } from '@lumiris/ui/lib/cn';
 import { routes } from '@/lib/routes';
 import { useUser } from '@/lib/auth/use-user';
 import { clearCart, formatCents } from '@/lib/marketplace';
@@ -85,6 +87,10 @@ function OrderConfirmationInner({ routeId }: { routeId: string }) {
     const { data: wardrobe = [] } = useWardrobe({ enabled: isAuthenticated });
 
     const settling = !group || group.status === 'PENDING';
+    // Une commande remboursée ou annulée n'est plus une commande confirmée : sans ce cas, l'écran
+    // continuait d'annoncer « Ta pièce a rejoint ta Garde-Robe » après un arbitrage et un
+    // remboursement effectifs.
+    const unwound = group?.status === 'REFUNDED' || group?.status === 'CANCELLED';
     // Nombre d'ateliers du panier : conditionne le nombre de colis annoncé à l'acheteur.
     const sellerCount = new Set((group?.lines ?? []).map((line) => line.sellerName ?? '')).size;
     const timedOut = pollExpired && settling;
@@ -121,9 +127,12 @@ function OrderConfirmationInner({ routeId }: { routeId: string }) {
                     initial={{ scale: 0.6, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ type: 'spring', stiffness: 260, damping: 18 }}
-                    className="flex h-20 w-20 items-center justify-center rounded-full bg-lumiris-emerald/10 text-lumiris-emerald"
+                    className={cn(
+                        'flex h-20 w-20 items-center justify-center rounded-full',
+                        unwound ? 'bg-muted text-muted-foreground' : 'bg-lumiris-emerald/10 text-lumiris-emerald',
+                    )}
                 >
-                    <CheckCircle2 className="h-10 w-10" />
+                    {unwound ? <RotateCcw className="h-10 w-10" /> : <CheckCircle2 className="h-10 w-10" />}
                 </motion.div>
                 <motion.h1
                     className="mt-5 text-xl font-bold text-balance text-foreground"
@@ -131,11 +140,15 @@ function OrderConfirmationInner({ routeId }: { routeId: string }) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
                 >
-                    {settling
-                        ? timedOut
-                            ? 'Paiement en cours de confirmation'
-                            : 'Paiement reçu'
-                        : 'Commande confirmée'}
+                    {unwound
+                        ? group.status === 'REFUNDED'
+                            ? 'Commande remboursée'
+                            : 'Commande annulée'
+                        : settling
+                          ? timedOut
+                              ? 'Paiement en cours de confirmation'
+                              : 'Paiement reçu'
+                          : 'Commande confirmée'}
                 </motion.h1>
                 {group?.invoiceNumber ? (
                     <p className="mt-1 text-sm text-muted-foreground">
@@ -149,7 +162,9 @@ function OrderConfirmationInner({ routeId }: { routeId: string }) {
                 ) : null}
                 <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-muted-foreground/90">
                     <Mail className="h-3.5 w-3.5" aria-hidden />
-                    Un reçu t&apos;a été envoyé par email.
+                    {unwound
+                        ? 'Le détail du remboursement t’a été envoyé par email.'
+                        : 'Un reçu t’a été envoyé par email.'}
                 </p>
             </div>
 
@@ -202,7 +217,9 @@ function OrderConfirmationInner({ routeId }: { routeId: string }) {
                                 </dd>
                             </div>
                             <div className="mt-1 flex items-center justify-between border-t border-border/60 pt-2 font-semibold">
-                                <dt className="text-foreground">Total payé</dt>
+                                <dt className="text-foreground">
+                                    {group.status === 'REFUNDED' ? 'Total remboursé' : 'Total payé'}
+                                </dt>
                                 <dd className="text-foreground tabular-nums">
                                     {formatCents(group.amountChargedCents)}
                                 </dd>
@@ -212,21 +229,37 @@ function OrderConfirmationInner({ routeId }: { routeId: string }) {
 
                     <section className="rounded-2xl border border-border/60 bg-card p-4">
                         <div className="flex items-center gap-2">
-                            <Truck className="h-4 w-4 text-muted-foreground" aria-hidden />
+                            {unwound ? (
+                                <RotateCcw className="h-4 w-4 text-muted-foreground" aria-hidden />
+                            ) : (
+                                <Truck className="h-4 w-4 text-muted-foreground" aria-hidden />
+                            )}
                             <h2 className="text-sm font-semibold text-foreground">Et maintenant ?</h2>
                         </div>
-                        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                        {unwound ? (
+                            <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                                {group.status === 'REFUNDED'
+                                    ? 'Le remboursement est parti vers ton moyen de paiement — compte 5 à 10 jours ouvrés selon ta banque. Ta facture reste consultable : elle porte le montant remboursé.'
+                                    : 'Cette commande a été annulée : rien ne t’a été débité, et la pièce est retournée au catalogue de l’atelier.'}
+                            </p>
+                        ) : null}
+                        <p className={cn('mt-1.5 text-xs leading-relaxed text-muted-foreground', unwound && 'hidden')}>
                             {sellerCount > 1
                                 ? `${sellerCount} ateliers préparent ta commande : tu recevras ${sellerCount} colis, chacun avec son suivi. Tu es prévenu à chaque expédition.`
                                 : 'L’atelier prépare ta pièce. Tu reçois une notification avec le numéro de suivi dès l’expédition.'}
                         </p>
-                        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                        <p className={cn('mt-1.5 text-xs leading-relaxed text-muted-foreground', unwound && 'hidden')}>
                             Lumiris retient le paiement jusqu’à la livraison — tu peux demander un retour pendant 14
                             jours après réception.
                         </p>
                     </section>
 
-                    <section className="rounded-2xl border border-lumiris-emerald/30 bg-lumiris-emerald/5 p-4">
+                    <section
+                        className={cn(
+                            'rounded-2xl border border-lumiris-emerald/30 bg-lumiris-emerald/5 p-4',
+                            unwound && 'hidden',
+                        )}
+                    >
                         <div className="flex items-center gap-2">
                             <Sparkles className="h-4 w-4 text-lumiris-emerald" />
                             <h2 className="text-sm font-semibold text-foreground">Ajouté à ta Garde-Robe</h2>
@@ -250,7 +283,7 @@ function OrderConfirmationInner({ routeId }: { routeId: string }) {
                         ) : null}
                     </section>
 
-                    {!settling && wardrobe.length > 0 ? (
+                    {!settling && !unwound && wardrobe.length > 0 ? (
                         <p className="text-center text-xs text-muted-foreground">
                             {wardrobe.length} pièce{wardrobe.length > 1 ? 's' : ''} dans ta Garde-Robe.
                         </p>

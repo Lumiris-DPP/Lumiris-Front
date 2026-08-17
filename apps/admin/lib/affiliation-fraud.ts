@@ -1,7 +1,9 @@
 import type { AffiliationEvent } from '@lumiris/types';
 
+import { FIXTURE_NOW_MS } from './fixture-clock';
+
 export const ANONYMISATION_THRESHOLD_DAYS = 30;
-export const NOW_REF = new Date('2026-04-30T08:00:00Z').getTime();
+export const NOW_REF = FIXTURE_NOW_MS;
 
 const BURST_WINDOW_MS = 10 * 60_000;
 export const BURST_THRESHOLD = 5;

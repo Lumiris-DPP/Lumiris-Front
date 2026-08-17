@@ -12,8 +12,8 @@ import { cn } from '@lumiris/ui/lib/cn';
 import { PaginationBar } from '../_shared/pagination-bar';
 import { usePagination } from '../_shared/use-pagination';
 import { SEGMENT_META, getRgpdStatus, getSegments } from './segments';
+import { FIXTURE_NOW } from '@/lib/fixture-clock';
 
-const SCORING_NOW = new Date('2026-04-30T08:00:00Z');
 const SEGMENT_VISIBLE_MAX = 2;
 
 const RGPD_ROW_LABEL: Record<'requested' | 'pending_deletion' | 'completed', string> = {
@@ -79,7 +79,7 @@ export function UserTable({ rows, onOpen, onResetFilters }: UserTableProps) {
 }
 
 function UserRow({ user, onOpen }: { user: MockVisionUser; onOpen: () => void }) {
-    const segments = useMemo(() => getSegments(user, SCORING_NOW), [user]);
+    const segments = useMemo(() => getSegments(user, FIXTURE_NOW), [user]);
     const rgpd = useMemo(() => getRgpdStatus(user), [user]);
     const visibleSegments = segments.slice(0, SEGMENT_VISIBLE_MAX);
     const overflowSegments = segments.length - visibleSegments.length;

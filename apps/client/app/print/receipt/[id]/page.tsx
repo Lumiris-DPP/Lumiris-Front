@@ -3,6 +3,7 @@
 import { use, useMemo } from 'react';
 import { formatDateFr } from '@lumiris/utils';
 import { LumirisLogo } from '@lumiris/ui/components/logo';
+import { PrintMessage } from '@/features/print-message';
 import { useBilling, useBillingHydrated } from '@/lib/billing-store';
 import { useCurrentArtisan } from '@/lib/current-artisan';
 import { useAutoPrint } from '@/lib/use-auto-print';
@@ -26,7 +27,13 @@ export default function PrintReceiptPage({ params }: PageProps) {
     }
 
     if (!entry) {
-        return <p className="p-12 text-center font-mono text-sm text-neutral-700">Reçu introuvable.</p>;
+        return (
+            <PrintMessage
+                title="Reçu introuvable"
+                description="Cette page imprime les reçus de votre abonnement LUMIRIS. Les factures de vos ventes s'impriment depuis la commande, dans Commandes."
+                back={{ href: '/subscription', label: "Retour à l'abonnement" }}
+            />
+        );
     }
 
     const date = new Date(entry.date);

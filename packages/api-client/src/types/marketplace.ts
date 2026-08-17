@@ -69,6 +69,9 @@ export const marketplaceItemSchema = z.object({
     preparationDays: z.number().nullish(),
     effectivePreparationDays: z.number().nullish(),
     atelierPausedUntil: z.string().nullish(),
+    // Poids du colis en grammes : c'est là-dessus que le transporteur tarife, et sans lui aucun
+    // bordereau n'est fabricable. 0 ⇒ non renseigné, le poids par défaut du serveur prend le relais.
+    weightGrams: z.number().nullish(),
 });
 export type MarketplaceItem = z.infer<typeof marketplaceItemSchema>;
 
@@ -174,6 +177,7 @@ export const convertDppRequestSchema = z.object({
     shippingCents: z.number().int().nonnegative().nullish(),
     returnPolicy: z.string().nullish(),
     preparationDays: z.number().int().nonnegative().nullish(),
+    weightGrams: z.number().int().nonnegative().nullish(),
     externalOrderUrl: z.string().nullish(),
     photoUrl: z.string().nullish(),
     status: marketplaceProductStatusSchema.nullish(),
@@ -231,6 +235,16 @@ export const paymentIntentResponseSchema = z.object({
 });
 export type PaymentIntentResponse = z.infer<typeof paymentIntentResponseSchema>;
 
+// Facilités de paiement annonçables AVANT le tunnel. Stripe (Klarna) encaisse déjà le fractionné
+// et en porte le risque ; ces valeurs ne pilotent QUE l'affichage — Lumiris ne prête rien.
+// `installmentsEnabled` faux ⇒ aucune mention nulle part.
+export const paymentOptionsSchema = z.object({
+    installmentsEnabled: z.boolean(),
+    installmentCount: z.number(),
+    installmentMinCents: z.number(),
+});
+export type PaymentOptions = z.infer<typeof paymentOptionsSchema>;
+
 // Payload CRUD produit (POST/PUT /api/marketplace/products).
 export const productPayloadSchema = z.object({
     name: z.string(),
@@ -245,6 +259,7 @@ export const productPayloadSchema = z.object({
     shippingCents: z.number().int().nonnegative(),
     returnPolicy: z.string().nullish(),
     preparationDays: z.number().int().nonnegative(),
+    weightGrams: z.number().int().nonnegative(),
     variants: z.array(productVariantPayloadSchema),
     sizeGuide: z.array(sizeMeasurementPayloadSchema),
     externalOrderUrl: z.string().nullish(),

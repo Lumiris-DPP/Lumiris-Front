@@ -21,6 +21,9 @@ export const notificationTypeSchema = z.enum([
     'FUNDS_RELEASED',
     'FAVORITE_LOW_STOCK',
     'FAVORITE_PRICE_DROP',
+    // Garde-Robe active : les seuls rappels envoyés APRÈS la livraison, sans rien vendre.
+    'WARDROBE_CARE',
+    'WARDROBE_WARRANTY_ENDING',
 ]);
 export type NotificationType = z.infer<typeof notificationTypeSchema>;
 

@@ -16,3 +16,26 @@ export function formatCents(cents: number): string {
 export function shippingCostLabel(cents: number): string {
     return cents === 0 ? 'Offerte' : formatCents(cents);
 }
+/**
+ * Mention « ou 3× 99,97 € » du paiement fractionné. Stripe l'encaisse déjà via le Payment Element
+ * et en porte le risque — Lumiris ne prête rien : cette fonction n'est qu'un affichage, et elle
+ * n'affiche RIEN tant que le serveur ne le déclare pas activé ou que le montant est sous le seuil.
+ *
+ * Le fractionné se décide sur la fiche produit, pas au dernier écran du tunnel : c'est là que
+ * l'acheteur regarde un prix à 300 € et renonce.
+ */
+export function installmentLabel(
+    totalCents: number,
+    options: { installmentsEnabled: boolean; installmentCount: number; installmentMinCents: number } | undefined,
+): string | null {
+    if (!options?.installmentsEnabled || options.installmentCount < 2) return null;
+    if (totalCents < options.installmentMinCents) return null;
+    // Le reliquat de la division part sur la première échéance : la somme des échéances annoncées
+    // fait alors exactement le total. Un arrondi uniforme au centime supérieur le dépassait
+    // (3× 66,34 € annoncés pour 199,00 € à payer).
+    const count = options.installmentCount;
+    const base = Math.floor(totalCents / count);
+    const remainder = totalCents - base * count;
+    if (remainder === 0) return `ou ${count}× ${formatCents(base)}`;
+    return `ou ${formatCents(base + remainder)} puis ${count - 1}× ${formatCents(base)}`;
+}

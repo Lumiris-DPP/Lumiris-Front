@@ -44,6 +44,29 @@ export type SellerPayoutEntry = z.infer<typeof sellerPayoutEntrySchema>;
 
 // Les totaux viennent du serveur : les re-sommer côté client ferait diverger l'écran de la
 // trésorerie réelle dès qu'un statut de commande change de sens.
+// Adresse d'enlèvement de l'atelier — expéditeur des bordereaux. Volontairement hors de la
+// vitrine publique, qui n'expose qu'une ville. `complete` vient du serveur : le front ne redérive
+// pas la règle « quels champs suffisent à fabriquer une étiquette ».
+export const shipFromAddressSchema = z.object({
+    line1: z.string().nullish(),
+    line2: z.string().nullish(),
+    postalCode: z.string().nullish(),
+    city: z.string().nullish(),
+    country: z.string().nullish(),
+    phone: z.string().nullish(),
+    complete: z.boolean(),
+});
+export type ShipFromAddress = z.infer<typeof shipFromAddressSchema>;
+
+export interface ShipFromAddressInput {
+    line1: string;
+    line2?: string;
+    postalCode: string;
+    city: string;
+    country?: string;
+    phone?: string;
+}
+
 export const sellerPayoutScheduleSchema = z.object({
     scheduledCents: z.number(),
     releasedCents: z.number(),

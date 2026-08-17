@@ -8,7 +8,7 @@ import { ArrowLeft, ArrowUpRight, Info, Sparkles } from 'lucide-react';
 import type { JournalCategory } from '@lumiris/types';
 import { useMarketplaceSearch } from '@lumiris/api-client/react';
 import { GlassCard } from '@/lib/motion';
-import { useUser } from '@/lib/auth';
+import { useAuthHydrated, useUser } from '@/lib/auth';
 import { toMarketplaceItem, type MarketplaceItem } from '@/lib/marketplace';
 import { articlesForStyles } from '@/lib/discover/for-you';
 import { articleToFeedItem, JOURNAL_CATEGORIES_ORDERED, type DiscoverFeedItem } from '@/lib/discover/feed';
@@ -24,6 +24,7 @@ const MAX_PIECES = 6;
 export function DiscoverForYou() {
     const router = useRouter();
     const { user, isAuthenticated } = useUser();
+    const hydrated = useAuthHydrated();
     const [showStyleToast, setShowStyleToast] = useState(false);
     const [filter, setFilter] = useState<CategoryFilter>('all');
 
@@ -33,8 +34,8 @@ export function DiscoverForYou() {
     const { data: marketplace, isLoading: piecesLoading } = useMarketplaceSearch();
 
     useEffect(() => {
-        if (!isAuthenticated) router.replace('/auth');
-    }, [isAuthenticated, router]);
+        if (hydrated && !isAuthenticated) router.replace('/auth');
+    }, [hydrated, isAuthenticated, router]);
 
     const stylePrefs = useMemo(() => user?.stylePrefs ?? [], [user]);
     const stylePrefsEmpty = isAuthenticated && stylePrefs.length === 0;
@@ -106,12 +107,12 @@ export function DiscoverForYou() {
                     >
                         <Info className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                         <span>
-                            Choisis ton style pour personnaliser{' '}
+                            Cette sélection est générique tant que ton style n’est pas renseigné.{' '}
                             <Link
                                 href="/onboarding/profile"
                                 className="font-semibold text-foreground underline-offset-2 hover:underline"
                             >
-                                renseigner
+                                Choisir mon style
                             </Link>
                         </span>
                     </motion.div>
@@ -127,7 +128,11 @@ export function DiscoverForYou() {
                     onFilterChange={setFilter}
                     stylePrefsEmpty={stylePrefsEmpty}
                 />
-                <PiecesSection pieces={pieces} isLoading={piecesLoading} />
+                <PiecesSection
+                    pieces={pieces}
+                    isLoading={piecesLoading}
+                    catalogueSize={(marketplace?.items ?? []).length}
+                />
             </div>
         </div>
     );
@@ -238,9 +243,11 @@ function groupByCategory(items: readonly DiscoverFeedItem[]): Partial<Record<Jou
 interface PiecesSectionProps {
     pieces: readonly MarketplaceItem[];
     isLoading: boolean;
+    /** Taille du catalogue AVANT curation : distingue « rien en vente » de « rien d'assez bien noté ». */
+    catalogueSize: number;
 }
 
-function PiecesSection({ pieces, isLoading }: PiecesSectionProps) {
+function PiecesSection({ pieces, isLoading, catalogueSize }: PiecesSectionProps) {
     return (
         <section className="mt-10">
             <h2 className="px-1 text-base font-semibold tracking-tight text-foreground">
@@ -251,7 +258,11 @@ function PiecesSection({ pieces, isLoading }: PiecesSectionProps) {
                 <p className="mt-3 px-1 text-xs text-muted-foreground">Chargement des pièces…</p>
             ) : pieces.length === 0 ? (
                 <EmptyHint
-                    text="Aucune pièce en vente pour le moment. Découvre la Boutique."
+                    text={
+                        catalogueSize > 0
+                            ? `Aucune pièce notée A ou B pour l’instant. La Boutique en compte ${catalogueSize} en vente.`
+                            : 'Aucune pièce en vente pour le moment. Découvre la Boutique.'
+                    }
                     href="/boutique"
                     cta="Voir la Boutique"
                 />

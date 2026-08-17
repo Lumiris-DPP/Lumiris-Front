@@ -1,16 +1,30 @@
 'use client';
 
-import { useMutation, useQuery, type UseMutationOptions, type UseQueryOptions } from '@tanstack/react-query';
+import {
+    useMutation,
+    useQuery,
+    useQueryClient,
+    type UseMutationOptions,
+    type UseQueryOptions,
+} from '@tanstack/react-query';
 
 import { CACHE_TIMES } from '../core/cache';
 import { useApiClient } from '../core/provider';
+import { orderKeys } from './orders';
 import type { CheckoutDto } from '../types/subscription';
-import type { SellerPayoutSchedule, SellerStatsDto, SellerStatusDto } from '../types/seller';
+import type {
+    SellerPayoutSchedule,
+    SellerStatsDto,
+    SellerStatusDto,
+    ShipFromAddress,
+    ShipFromAddressInput,
+} from '../types/seller';
 
 export const sellerKeys = {
     status: () => ['seller', 'status'] as const,
     stats: () => ['seller', 'stats'] as const,
     payouts: () => ['seller', 'payouts'] as const,
+    shipFromAddress: () => ['seller', 'ship-from-address'] as const,
 };
 
 export function useSellerStatus(options?: Omit<UseQueryOptions<SellerStatusDto, Error>, 'queryKey' | 'queryFn'>) {
@@ -60,5 +74,34 @@ export function useSellerDashboardLink(options?: Omit<UseMutationOptions<Checkou
     return useMutation<CheckoutDto, Error, void>({
         mutationFn: () => client.seller.dashboardLink(),
         ...options,
+    });
+}
+
+// Adresse d'enlèvement de l'atelier (expéditeur des bordereaux).
+export function useShipFromAddress(options?: Omit<UseQueryOptions<ShipFromAddress, Error>, 'queryKey' | 'queryFn'>) {
+    const client = useApiClient();
+    return useQuery<ShipFromAddress, Error>({
+        queryKey: sellerKeys.shipFromAddress(),
+        queryFn: () => client.seller.shipFromAddress(),
+        staleTime: CACHE_TIMES.DETAIL,
+        ...options,
+    });
+}
+
+// La saisie de l'adresse débloque l'impression d'étiquette : on réinvalide aussi la disponibilité
+// de l'intégration, sinon l'atelier vient de renseigner son adresse et le bouton reste grisé.
+export function useUpdateShipFromAddress(
+    options?: Omit<UseMutationOptions<ShipFromAddress, Error, ShipFromAddressInput>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<ShipFromAddress, Error, ShipFromAddressInput>({
+        mutationFn: (input) => client.seller.updateShipFromAddress(input),
+        ...options,
+        onSuccess: (...args) => {
+            void queryClient.invalidateQueries({ queryKey: sellerKeys.shipFromAddress() });
+            void queryClient.invalidateQueries({ queryKey: orderKeys.shipping() });
+            return options?.onSuccess?.(...args);
+        },
     });
 }

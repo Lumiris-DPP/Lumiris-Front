@@ -34,6 +34,7 @@ import { VariantsEditor } from './variants-editor';
 
 const NO_DPP = 'none';
 const MAX_PREPARATION_DAYS = 90;
+const MAX_WEIGHT_GRAMS = 30000;
 
 interface FormState {
     name: string;
@@ -45,6 +46,7 @@ interface FormState {
     shippingEuros: string;
     returnPolicy: string;
     preparationDays: string;
+    weightGrams: string;
     variants: VariantRow[];
     sizeGuide: SizeGuideDraft;
     externalOrderUrl: string;
@@ -64,6 +66,7 @@ function initialState(product?: MarketplaceItem): FormState {
         shippingEuros: product ? String((product.shippingCents ?? 0) / 100) : '0',
         returnPolicy: product?.returnPolicy ?? '',
         preparationDays: String(product?.preparationDays ?? 0),
+        weightGrams: String(product?.weightGrams ?? 0),
         variants: variantRowsFrom(product),
         sizeGuide: sizeGuideFrom(product),
         externalOrderUrl: product?.externalOrderUrl ?? '',
@@ -115,6 +118,11 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
             toast.error('Délai de préparation invalide', { description: 'Entre 0 et 90 jours.' });
             return;
         }
+        const weightGrams = Math.round(Number(form.weightGrams) || 0);
+        if (weightGrams < 0 || weightGrams > MAX_WEIGHT_GRAMS) {
+            toast.error('Poids invalide', { description: 'Entre 0 et 30 000 g.' });
+            return;
+        }
         const variantsError = variantRowsError(form.variants);
         if (variantsError) {
             toast.error('Déclinaisons incomplètes', { description: variantsError });
@@ -132,6 +140,7 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
             shippingCents: Math.max(0, Math.round((Number(form.shippingEuros) || 0) * 100)),
             returnPolicy: form.returnPolicy.trim() || undefined,
             preparationDays,
+            weightGrams,
             variants: toVariantPayload(form.variants),
             sizeGuide: toSizeGuidePayload(form.sizeGuide, sizes),
             externalOrderUrl: form.externalOrderUrl.trim() || undefined,
@@ -267,6 +276,22 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
                             />
                         </Field>
                     </div>
+
+                    <Field label="Poids du colis (g)" htmlFor="mp-weight">
+                        <Input
+                            id="mp-weight"
+                            type="number"
+                            min={0}
+                            max={MAX_WEIGHT_GRAMS}
+                            step="10"
+                            value={form.weightGrams}
+                            onChange={(e) => set('weightGrams', e.target.value)}
+                        />
+                        <p className="text-[11px] text-muted-foreground">
+                            Emballage compris. C’est le poids qui détermine le tarif du transporteur et permet
+                            d’imprimer l’étiquette en un clic. 0 = poids par défaut.
+                        </p>
+                    </Field>
 
                     <VariantsEditor value={form.variants} onChange={(next) => set('variants', next)} />
 

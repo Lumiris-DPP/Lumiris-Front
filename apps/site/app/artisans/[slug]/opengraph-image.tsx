@@ -1,13 +1,13 @@
 import { ImageResponse } from 'next/og';
-import { getAllArtisans, getArtisanBySlug } from '@/lib/artisans';
+import { fetchPublicArtisanProfile, fetchPublicArtisans } from '@/lib/public-artisan-api';
 import { OG_LOGO_DATA_URI } from '@/lib/og-logo';
 
 export const alt = 'Artisan LUMIRIS';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-export function generateStaticParams() {
-    return getAllArtisans().map((a) => ({ slug: a.slug }));
+export async function generateStaticParams() {
+    return (await fetchPublicArtisans()).map((a) => ({ slug: a.slug }));
 }
 
 interface OgProps {
@@ -16,10 +16,11 @@ interface OgProps {
 
 export default async function Image({ params }: OgProps) {
     const { slug } = await params;
-    const artisan = getArtisanBySlug(slug);
-    const title = artisan?.atelierName ?? 'Atelier LUMIRIS';
-    const sub = artisan ? `${artisan.displayName} · ${artisan.city}, ${artisan.region}` : '';
-    const tier = artisan?.tier ?? '';
+    const artisan = await fetchPublicArtisanProfile(slug);
+    const title = artisan?.atelierName ?? artisan?.displayName ?? 'Atelier LUMIRIS';
+    const sub = [artisan?.displayName, [artisan?.city, artisan?.region].filter(Boolean).join(', ')]
+        .filter(Boolean)
+        .join(' · ');
 
     return new ImageResponse(
         <div
@@ -39,7 +40,7 @@ export default async function Image({ params }: OgProps) {
                 {}
                 <img src={OG_LOGO_DATA_URI} width={51} height={36} alt="" />
                 <div style={{ display: 'flex', fontSize: 20, letterSpacing: 4, color: '#475569' }}>
-                    LUMIRIS · ARTISAN {tier ? `· ${tier.toUpperCase()}` : ''}
+                    LUMIRIS · ARTISAN
                 </div>
             </div>
 

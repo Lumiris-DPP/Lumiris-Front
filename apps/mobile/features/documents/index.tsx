@@ -20,6 +20,7 @@ import { decryptToBlob } from '@/lib/documents/crypto';
 import { useUser } from '@/lib/auth';
 import { toast } from '@/lib/toast';
 import { DOCUMENT_KIND_ICON, DOCUMENT_KIND_LABEL, humanSize } from '@/features/passport-detail/documents-sheet';
+import { PurchaseDocuments } from './purchase-documents';
 
 type Filter = 'all' | DocumentKind;
 
@@ -110,10 +111,12 @@ export function MyDocuments() {
                 <div className="min-w-0 flex-1">
                     <h1 className="text-base font-bold text-foreground">Mes documents</h1>
                     <p className="text-xs text-muted-foreground">
-                        {total} document{total > 1 ? 's' : ''} chiffré{total > 1 ? 's' : ''}
+                        {total} document{total > 1 ? 's' : ''} chiffré{total > 1 ? 's' : ''} dans ton coffre
                     </p>
                 </div>
             </motion.header>
+
+            <PurchaseDocuments enabled={Boolean(userId)} />
 
             <KindFilter filter={filter} counts={counts} total={total} onChange={setFilter} />
 

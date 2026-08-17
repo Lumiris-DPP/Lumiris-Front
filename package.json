@@ -18,6 +18,8 @@
         "dev:client": "turbo run dev --filter=@lumiris/client",
         "dev:site": "turbo run dev --filter=@lumiris/site",
         "dev:mobile": "turbo run dev --filter=@lumiris/mobile",
+        "dev:fresh": "bun run clean:next && bun run dev",
+        "clean:next": "rimraf \"apps/*/.next\"",
         "build": "turbo run build",
         "start": "turbo run start",
         "lint": "turbo run lint",

@@ -8,13 +8,10 @@ interface DemoAccount {
     label: string;
 }
 
-const DEMO_ACCOUNTS: readonly DemoAccount[] = [
-    { email: 'lea.marchand@lumiris.fr', label: 'Admin' },
-    { email: 'agathe.gervais@lumiris.fr', label: 'Lead curator' },
-    { email: 'antoine.berger@lumiris.fr', label: 'Curator' },
-    { email: 'thomas.morel@lumiris.fr', label: 'Billing ops' },
-    { email: 'nadia.khelifi@lumiris.fr', label: 'DPO' },
-];
+// Les comptes du seed backend (db/seed), seuls capables de s'authentifier : la connexion passe par
+// POST /api/auth/sign-in. Les personas de curation ne sont qu'un habillage RBAC côté console, sans
+// compte serveur — les proposer ici menait à « Identifiants invalides » à chaque essai.
+const DEMO_ACCOUNTS: readonly DemoAccount[] = [{ email: 'admin@lumiris.com', label: 'Admin · mot de passe admin123' }];
 
 interface DemoAccountsHelperProps {
     onSelect: (email: string) => void;
