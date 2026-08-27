@@ -6,7 +6,7 @@ import { useSubscription } from './use-subscription';
 
 export const SUBSCRIPTION_REQUIRED_MESSAGE = 'Cette action requiert un abonnement actif';
 
-export interface SubscriptionGate {
+interface SubscriptionGate {
     blocked: boolean;
     isLoading: boolean;
     notifyBlocked: () => void;

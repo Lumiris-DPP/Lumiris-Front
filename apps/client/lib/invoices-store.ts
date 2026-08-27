@@ -88,7 +88,7 @@ function supplierNameFor(supplierId: string): string {
     return mockSuppliers.find((s) => s.id === supplierId)?.name ?? supplierId;
 }
 
-export function mockInvoiceArtisanId(inv: SupplierInvoice): string | null {
+function mockInvoiceArtisanId(inv: SupplierInvoice): string | null {
     for (const pid of inv.linkedPassportIds) {
         const p = mockPassportById(pid);
         if (p) return p.artisanId;
