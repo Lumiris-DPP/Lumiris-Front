@@ -92,6 +92,8 @@ export function IrisMethodologyInfo({ className, side = 'left' }: IrisMethodolog
 }
 
 function SectionBlock({ section }: { section: IrisMethodologySection }) {
+    const actions = section.howToImprove ?? [];
+
     return (
         <section className="space-y-1.5">
             <div className="flex items-baseline gap-2">
@@ -103,23 +105,17 @@ function SectionBlock({ section }: { section: IrisMethodologySection }) {
                     </span>
                 )}
             </div>
-            <p className="pl-3.5 text-[11px] leading-relaxed text-muted-foreground">{section.summary}</p>
-            <ul className="space-y-1.5 pl-3.5">
-                {section.criteria.map((criterion) => (
-                    <li key={criterion.label} className="text-[11px] leading-relaxed">
-                        <span className="font-medium text-foreground">
-                            {criterion.label}
-                            {criterion.points != null && (
-                                <span className="font-mono font-normal text-muted-foreground">
-                                    {' '}
-                                    · {criterion.points} pts
-                                </span>
-                            )}
-                        </span>
-                        <p className="text-muted-foreground">{criterion.description}</p>
-                    </li>
-                ))}
-            </ul>
+            <p className="pl-3.5 text-[11px] leading-relaxed text-muted-foreground">{section.what}</p>
+            {actions.length > 0 && (
+                <>
+                    <p className="pl-3.5 text-[11px] font-medium text-foreground">Pour l&apos;améliorer</p>
+                    <ul className="list-disc space-y-0.5 pl-7 text-[11px] leading-relaxed text-muted-foreground marker:text-muted-foreground/50">
+                        {actions.map((action) => (
+                            <li key={action}>{action}</li>
+                        ))}
+                    </ul>
+                </>
+            )}
         </section>
     );
 }

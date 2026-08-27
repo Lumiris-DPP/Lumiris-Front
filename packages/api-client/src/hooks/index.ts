@@ -15,3 +15,4 @@ export * from './orders';
 export * from './notifications';
 export * from './disputes';
 export * from './favorites';
+export * from './dashboard';

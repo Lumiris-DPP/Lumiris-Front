@@ -1,20 +1,8 @@
 'use client';
 
-import { useMemo } from 'react';
-import { computeScore } from '@lumiris/core/scoring';
-import { useCurrentArtisan } from '@/lib/current-artisan';
-import { usePassports } from '@/lib/passports-source';
+import { useDashboardInfo } from '@lumiris/api-client/react';
 import { isEsprWindowActive } from '@/lib/regulatory';
 import { AttentionBlock } from './attention-block';
-import {
-    expiringCertificates,
-    incompletePassports,
-    loadMergedCertificates,
-    loadMergedInvoices,
-    onboardingChecklist,
-    quotaUsage,
-    type ScoredPassport,
-} from './derive';
 import { EmptyState } from './empty-state';
 import { GradeDistribution } from './grade-distribution';
 import { greeting } from './greeting';
@@ -23,81 +11,56 @@ import { OrdersCallout } from './orders-callout';
 import { RecentPassports } from './recent-passports';
 
 export function Dashboard() {
-    const artisan = useCurrentArtisan();
-    // Detailed = fetch each DPP's full data in real mode so Iris scores/grades reflect real
-    // materials & eco fields (never a fabricated E from an empty summary).
-    const passports = usePassports(artisan.id, { detailed: true });
+    const { data, isLoading } = useDashboardInfo();
 
-    const now = useMemo(() => new Date(), []);
-    const certificates = useMemo(() => loadMergedCertificates(artisan.id), [artisan.id]);
-    const invoices = useMemo(() => loadMergedInvoices(artisan.id), [artisan.id]);
+    if (isLoading) {
+        return <p className="p-8 text-sm text-muted-foreground">Chargement du tableau de bord…</p>;
+    }
+    if (!data) {
+        return <p className="p-8 text-sm text-muted-foreground">Tableau de bord indisponible.</p>;
+    }
 
-    const scored: readonly ScoredPassport[] = useMemo(
-        () =>
-            passports.map((passport) => ({
-                passport,
-                score: computeScore(passport, { artisan, certificates, now }),
-            })),
-        [artisan, passports, certificates, now],
-    );
-
-    const isEmpty = passports.length === 0;
-    const checklist = useMemo(() => onboardingChecklist(artisan, passports, invoices), [artisan, passports, invoices]);
-
-    if (isEmpty) {
+    if (data.published + data.inCompletion + data.drafts === 0) {
         return (
             <div className="space-y-6 p-8">
                 <OrdersCallout />
-                <EmptyState artisan={artisan} items={checklist} />
+                <EmptyState info={data} />
             </div>
         );
     }
 
-    const expiring = expiringCertificates(certificates, now);
-    const incomplete = incompletePassports(scored);
-    const quota = quotaUsage(passports, artisan.tier);
-    const showEspr = isEsprWindowActive(now);
-
-    const published = scored.filter((s) => s.passport.status === 'Published');
-    const stats = {
-        published: published.length,
-        incompletion: scored.filter((s) => s.passport.status === 'InCompletion').length,
-        drafts: scored.filter((s) => s.passport.status === 'Draft').length,
-        avgScore:
-            published.length === 0
-                ? 0
-                : Math.round((published.reduce((acc, s) => acc + s.score.total, 0) / published.length) * 10) / 10,
-    };
-
-    const showAttention = expiring.length > 0 || incomplete.length > 0 || quota.percent > 80 || showEspr;
-    const recent = [...scored].sort((a, b) => (a.passport.updatedAt < b.passport.updatedAt ? 1 : -1)).slice(0, 5);
+    const quotaPercent = data.quotaLimit ? Math.round((data.quotaUsed / data.quotaLimit) * 100) : 0;
+    const esprWindowOpen = isEsprWindowActive(new Date());
+    const showAttention = data.expiringCertificates > 0 || data.inCompletion > 0 || quotaPercent > 80 || esprWindowOpen;
 
     return (
         <div className="space-y-6 p-8">
-            <p className="text-lg font-medium text-foreground">{greeting(artisan)}</p>
+            <p className="text-lg font-medium text-foreground">{greeting(data.artisanName)}</p>
 
             <OrdersCallout />
 
             {showAttention && (
                 <AttentionBlock
-                    expiring={expiring}
-                    incomplete={incomplete}
-                    quota={quota}
-                    esprWindowOpen={showEspr}
-                    publishedCount={stats.published}
+                    expiringCertificates={data.expiringCertificates}
+                    incomplete={data.inCompletion}
+                    quotaUsed={data.quotaUsed}
+                    quotaLimit={data.quotaLimit}
+                    quotaPercent={quotaPercent}
+                    esprWindowOpen={esprWindowOpen}
+                    publishedCount={data.published}
                 />
             )}
 
             <KpiTiles
-                published={stats.published}
-                incompletion={stats.incompletion}
-                drafts={stats.drafts}
-                avgScore={stats.avgScore}
+                published={data.published}
+                incompletion={data.inCompletion}
+                drafts={data.drafts}
+                avgScore={data.averageIrisScore}
             />
 
-            <GradeDistribution scored={scored} />
+            <GradeDistribution distribution={data.gradeDistribution} />
 
-            <RecentPassports items={recent} />
+            <RecentPassports items={data.recentPassports} />
         </div>
     );
 }

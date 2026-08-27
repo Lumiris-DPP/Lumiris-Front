@@ -41,18 +41,30 @@ export function WizardShell({
     const draftPayload = useMemo(
         (): DppScoreInput => ({
             originCountry: draft?.garment?.originCountry,
+            productCategory: draft?.garment?.category,
             repairable: draft?.eco?.isRepairable,
             reachCompliant: draft?.traceability?.reachCompliant,
             endOfLifeInstructions: draft?.eco?.endOfLifeInstructions,
-            materialOriginCountries: draft?.materials?.map((m) => m.originCountry) ?? [],
-            presentDocuments: Object.keys(draft?.files ?? {}),
+            weightGrams: draft?.garment?.dimensions?.weightG,
+            recycledPct: draft?.eco?.recycledPct,
+            warrantyMonths: draft?.eco?.warrantyMonths,
+            materials:
+                draft?.materials?.map((m) => ({
+                    fiber: m.fiber,
+                    percentage: m.percentage,
+                    originCountry: m.originCountry,
+                })) ?? [],
+            presentDocuments: [
+                ...new Set([...Object.keys(draft?.files ?? {}), ...Object.keys(draft?.existingDocs ?? {})]),
+            ],
         }),
         [
-            draft?.garment?.originCountry,
+            draft?.garment,
             draft?.traceability?.reachCompliant,
             draft?.eco,
             draft?.materials,
             draft?.files,
+            draft?.existingDocs,
         ],
     );
 

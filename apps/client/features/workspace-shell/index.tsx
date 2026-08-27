@@ -9,6 +9,7 @@ import {
     CalendarClock,
     FileText,
     LayoutDashboard,
+    Lock,
     PlusCircle,
     Receipt,
     ShoppingBag,
@@ -26,6 +27,7 @@ import { useCurrentArtisan } from '@/lib/current-artisan';
 import { useBilling, useBillingStore } from '@/lib/billing-store';
 import { useAuthStore } from '@/lib/auth-store';
 import { useSubscription } from '@/lib/use-subscription';
+import { useSubscriptionGate } from '@/lib/use-subscription-gate';
 
 interface NavItem {
     href: string;
@@ -34,12 +36,13 @@ interface NavItem {
     primary?: boolean;
     /** Affiche le nombre de commandes en attente d'action sur cette entrée. */
     showPendingOrders?: boolean;
+    requiresSubscription?: boolean;
 }
 
 const NAV_ITEMS: readonly NavItem[] = [
     { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
     { href: '/passports', label: 'Mes passeports', icon: FileText },
-    { href: '/create', label: 'Création', icon: PlusCircle, primary: true },
+    { href: '/create', label: 'Création', icon: PlusCircle, primary: true, requiresSubscription: true },
     { href: '/invoices', label: 'Factures fournisseurs', icon: Receipt },
     { href: '/certifications', label: 'Mes certifications', icon: BookCheck },
     { href: '/shop', label: 'Boutique', icon: ShoppingBag },
@@ -68,33 +71,45 @@ function NavLink({
     onNavigate?: () => void;
 }) {
     const Icon = item.icon;
+    const { blocked, notifyBlocked } = useSubscriptionGate();
+    // Sans abonnement actif, l'entrée reste cliquable mais n'ouvre rien : elle explique le refus.
+    const locked = Boolean(item.requiresSubscription) && blocked;
+
+    const className = item.primary
+        ? cn(
+              'my-2 flex w-full items-center gap-3 rounded-lg bg-lumiris-cyan px-3 py-2.5 text-sm font-medium text-white shadow-sm transition-opacity hover:bg-lumiris-cyan/90',
+              active && 'ring-2 ring-lumiris-cyan/30 ring-offset-1',
+          )
+        : cn(
+              'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
+              active
+                  ? 'bg-lumiris-cyan/10 font-medium text-lumiris-cyan'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+          );
+
+    const content = (
+        <>
+            {locked ? <Lock className="h-4 w-4" aria-hidden /> : <Icon className="h-4 w-4" />}
+            <span className="flex-1 text-left">{item.label}</span>
+            {badge > 0 && (
+                <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-lumiris-cyan px-1.5 text-[10px] font-bold text-white tabular-nums">
+                    {badge > 99 ? '99+' : badge}
+                </span>
+            )}
+        </>
+    );
+
     return (
         <li>
-            <Link
-                href={item.href}
-                onClick={onNavigate}
-                className={
-                    item.primary
-                        ? cn(
-                              'my-2 flex items-center gap-3 rounded-lg bg-lumiris-cyan px-3 py-2.5 text-sm font-medium text-white shadow-sm transition-opacity hover:bg-lumiris-cyan/90',
-                              active && 'ring-2 ring-lumiris-cyan/30 ring-offset-1',
-                          )
-                        : cn(
-                              'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
-                              active
-                                  ? 'bg-lumiris-cyan/10 font-medium text-lumiris-cyan'
-                                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                          )
-                }
-            >
-                <Icon className="h-4 w-4" />
-                <span className="flex-1">{item.label}</span>
-                {badge > 0 && (
-                    <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-lumiris-cyan px-1.5 text-[10px] font-bold text-white tabular-nums">
-                        {badge > 99 ? '99+' : badge}
-                    </span>
-                )}
-            </Link>
+            {locked ? (
+                <button type="button" onClick={notifyBlocked} className={className}>
+                    {content}
+                </button>
+            ) : (
+                <Link href={item.href} onClick={onNavigate} className={className}>
+                    {content}
+                </Link>
+            )}
         </li>
     );
 }

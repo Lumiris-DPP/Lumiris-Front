@@ -2,13 +2,15 @@
 
 import Link from 'next/link';
 import { ArrowRight, FileText } from 'lucide-react';
+import type { DashboardRecentPassport } from '@lumiris/api-client';
+import type { IrisGrade as IrisGradeLetter } from '@lumiris/types';
 import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
-import { AtelierStatusBadge, IrisGrade, MissingFieldsBadge } from '@lumiris/scoring-ui';
+import { AtelierStatusBadge, IrisGrade } from '@lumiris/scoring-ui';
 import { formatDateFr } from '@lumiris/utils';
-import type { ScoredPassport } from './derive';
+import { passportStatusFromDpp } from '@/lib/passport-adapter';
 
-export function RecentPassports({ items }: { items: readonly ScoredPassport[] }) {
+export function RecentPassports({ items }: { items: readonly DashboardRecentPassport[] }) {
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
@@ -29,25 +31,28 @@ export function RecentPassports({ items }: { items: readonly ScoredPassport[] })
                         Aucun passeport - démarrez par la création.
                     </p>
                 ) : (
-                    items.map(({ passport, score }) => (
+                    items.map((item) => (
                         <Link
-                            key={passport.id}
-                            href={`/passports/${passport.id}`}
+                            key={item.id}
+                            href={`/passports/${item.id}`}
                             className="-mx-3 flex items-center gap-4 rounded-md px-3 py-3 transition-colors hover:bg-muted/50"
                         >
-                            <IrisGrade grade={score.grade} size="sm" />
+                            {item.grade ? (
+                                <IrisGrade grade={item.grade as IrisGradeLetter} size="sm" />
+                            ) : (
+                                <span className="w-6 text-center text-xs text-muted-foreground">-</span>
+                            )}
                             <div className="min-w-0 flex-1">
                                 <p className="truncate text-sm font-medium text-foreground">
-                                    {passport.garment.reference || 'Brouillon sans référence'}
+                                    {item.productName || 'Brouillon sans référence'}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                    {passport.garment.kind} · modifié le {formatDateFr(passport.updatedAt)}
+                                    {item.updatedAt ? `Modifié le ${formatDateFr(item.updatedAt)}` : 'Jamais modifié'}
                                 </p>
                             </div>
-                            <AtelierStatusBadge status={passport.status} />
-                            <MissingFieldsBadge passport={passport} className="hidden lg:inline-flex" />
+                            <AtelierStatusBadge status={passportStatusFromDpp(item.status)} />
                             <span className="hidden font-mono text-xs text-muted-foreground sm:inline">
-                                {score.total.toFixed(1)}/100
+                                {item.score.toFixed(1)}/100
                             </span>
                         </Link>
                     ))

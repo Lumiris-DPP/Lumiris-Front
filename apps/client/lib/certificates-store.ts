@@ -8,7 +8,7 @@ import { appendToArtisan, removeFromArtisan } from './artisan-list';
 import { mockCertificates } from '@lumiris/mock-data';
 import type { CertificationKind, CertificationRef } from '@lumiris/types';
 
-export const MOCK_CERT_TO_ARTISAN: Record<string, string> = {
+const MOCK_CERT_TO_ARTISAN: Record<string, string> = {
     'cert-gots-marie-lin': 'art-marie',
     'cert-oeko-claire-laine': 'art-claire',
     'cert-epv-paul': 'art-paul',

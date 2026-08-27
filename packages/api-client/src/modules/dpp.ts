@@ -89,6 +89,13 @@ export function dppApi(http: Http) {
         async remove(id: string): Promise<void> {
             await http.request(`/api/dpp-forms/${id}`, { method: 'DELETE' });
         },
+
+        async duplicate(id: string): Promise<DppFormCreatedDto> {
+            return parseOr(
+                dppFormCreatedDtoSchema,
+                await http.request(`/api/dpp-forms/${id}/duplicate`, { method: 'POST' }),
+            );
+        },
         // Finalises a draft: assigns the QR code, freezes the hash, persists the Iris score and anchors it.
         async publish(id: string): Promise<DppFormCreatedDto> {
             return parseOr(

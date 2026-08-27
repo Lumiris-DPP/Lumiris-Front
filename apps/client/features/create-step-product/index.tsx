@@ -37,9 +37,10 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
         () => draft?.files?.['CREATION_PASSPORT'] ?? null,
     );
 
+    const persistedGarment = draft?.garment;
     useEffect(() => {
-        if (draft) setForm(draft.garment);
-    }, [draft]);
+        if (persistedGarment) setForm(persistedGarment);
+    }, [persistedGarment]);
 
     const validation = useMemo(() => validateStep(draftToValidationInput(draft, { garment: form })), [form, draft]);
 
@@ -107,6 +108,32 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
                 />
                 <p className="text-[11px] text-muted-foreground">
                     Pays où a lieu la dernière transformation majeure (coupe & couture).
+                </p>
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="weight">Poids du vêtement (grammes)</Label>
+                <Input
+                    id="weight"
+                    type="number"
+                    min={1}
+                    max={50000}
+                    className="w-40"
+                    value={form.dimensions?.weightG ?? ''}
+                    placeholder="450"
+                    onChange={(e) =>
+                        setForm((f) => ({
+                            ...f,
+                            dimensions: {
+                                ...f.dimensions,
+                                weightG: e.target.value === '' ? undefined : Math.max(1, Number(e.target.value) || 1),
+                            },
+                        }))
+                    }
+                />
+                <p className="text-[11px] text-muted-foreground">
+                    Facultatif. Renseigné, il affine les sous-scores carbone et eau ; laissé vide, ils sont simplement
+                    exclus du calcul sans pénaliser le passeport.
                 </p>
             </div>
 

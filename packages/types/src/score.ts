@@ -37,11 +37,24 @@ export interface ScoreResult {
     cap?: ScoreCap;
 }
 
+export interface DppScoreInputMaterial {
+    fiber?: string;
+    percentage?: number;
+    originCountry?: string;
+}
+
+/**
+ * Entrée de la prévisualisation Iris.
+ */
 export interface DppScoreInput {
     originCountry?: string;
+    productCategory?: string;
     repairable?: boolean;
     reachCompliant?: boolean;
     endOfLifeInstructions?: string;
-    materialOriginCountries?: string[];
+    weightGrams?: number;
+    recycledPct?: number;
+    warrantyMonths?: number;
+    materials?: DppScoreInputMaterial[];
     presentDocuments?: string[];
 }

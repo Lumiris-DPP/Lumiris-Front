@@ -16,6 +16,7 @@ import { notificationsApi } from './modules/notifications';
 import { disputesApi } from './modules/disputes';
 import { irisApi } from './modules/iris';
 import { atelierStatsApi, eventsApi } from './modules/atelier-stats';
+import { dashboardApi } from './modules/dashboard';
 
 export type ClientOptions = HttpOptions;
 
@@ -41,6 +42,7 @@ export function createClient(opts: ClientOptions) {
         iris: irisApi(http),
         atelierStats: atelierStatsApi(http),
         events: eventsApi(http),
+        dashboard: dashboardApi(http),
     };
 }
 

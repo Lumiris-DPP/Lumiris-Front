@@ -1,6 +1,4 @@
-import type { Artisan } from '@lumiris/types';
-
-export function greeting(artisan: Artisan): string {
-    const firstName = artisan.displayName.split(' ')[0] ?? artisan.displayName;
+export function greeting(artisanName: string): string {
+    const firstName = artisanName.split(' ')[0] ?? artisanName;
     return `Bonjour ${firstName}`;
 }

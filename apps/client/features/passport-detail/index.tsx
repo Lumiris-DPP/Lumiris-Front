@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { AlertTriangle, ArrowLeft, Loader2, Pencil, Trash2 } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Copy, Loader2, Pencil, Trash2 } from 'lucide-react';
 import { computeScore } from '@lumiris/core/scoring';
 import { mockCertificates, mockPassportById } from '@lumiris/mock-data';
 import type { Passport } from '@lumiris/types';
@@ -21,7 +21,7 @@ import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import { Toaster, toast } from '@lumiris/ui/components/sonner';
 import { IrisScoreCard } from '@lumiris/scoring-ui';
-import { useDeleteDppForm, useDppForm } from '@lumiris/api-client/react';
+import { useDeleteDppForm, useDppForm, useDuplicateDppForm } from '@lumiris/api-client/react';
 import { isApiError, type DppFormDto } from '@lumiris/api-client';
 import { useAuthStore } from '@/lib/auth-store';
 import { useCurrentArtisan } from '@/lib/current-artisan';
@@ -153,6 +153,7 @@ export function PassportDetail({ passportId }: { passportId: string }) {
                                         documents={apiDpp.documents ?? []}
                                     />
                                 )}
+                                <DuplicateDppButton dppId={passportId} label="Dupliquer ce passeport" />
                             </div>
                         )}
                     </aside>
@@ -250,6 +251,7 @@ function DeleteDraftCard({ dppId }: { dppId: string }) {
 
 function DraftAside({ dppId }: { dppId: string }) {
     const { editDraft, loadingId } = useEditDraft();
+
     return (
         <Card>
             <CardHeader>
@@ -267,7 +269,32 @@ function DraftAside({ dppId }: { dppId: string }) {
                 >
                     <Pencil className="h-4 w-4" /> Modifier le brouillon
                 </Button>
+                <DuplicateDppButton dppId={dppId} label="Dupliquer le brouillon" />
             </CardContent>
         </Card>
+    );
+}
+
+function DuplicateDppButton({ dppId, label }: { dppId: string; label: string }) {
+    const router = useRouter();
+    const duplicateDpp = useDuplicateDppForm();
+
+    const onDuplicate = () => {
+        duplicateDpp.mutate(dppId, {
+            onSuccess: (created) => {
+                toast.success('Passeport dupliqué.');
+                router.push(`/passports/${created.id}`);
+            },
+            onError: (e) => {
+                toast.error('La duplication a échoué', { description: e.message });
+            },
+        });
+    };
+
+    return (
+        <Button variant="outline" onClick={onDuplicate} disabled={duplicateDpp.isPending} className="w-full gap-2">
+            {duplicateDpp.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Copy className="h-4 w-4" />}
+            {label}
+        </Button>
     );
 }

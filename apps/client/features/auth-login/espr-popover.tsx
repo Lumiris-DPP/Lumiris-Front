@@ -4,13 +4,13 @@ import { ShieldCheck } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@lumiris/ui/components/popover';
 import { ESPR_TEXTILE_TIMELINE } from '@/lib/regulatory';
 
-/** ESPR-compliance footer chip with the textile DPP regulatory timeline. */
+/** Chip de pied de page « prêt pour l'ESPR » ouvrant le calendrier réglementaire du DPP textile. */
 export function EsprTimelinePopover() {
     return (
         <Popover>
             <PopoverTrigger className="mx-auto mt-8 flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground focus:outline-none">
                 <ShieldCheck className="h-3.5 w-3.5 text-lumiris-cyan" />
-                Conforme ESPR · acte délégué textile attendu 2027 · application mi-2028
+                Prêt pour l&apos;ESPR · acte délégué textile attendu 2027 · application mi-2028
             </PopoverTrigger>
             <PopoverContent align="center" className="w-80">
                 <p className="text-sm font-medium text-foreground">Calendrier ESPR textile</p>

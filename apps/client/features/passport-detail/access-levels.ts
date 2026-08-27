@@ -31,7 +31,7 @@ export const ACCESS_LEVELS: Record<DppAccessLevel, AccessLevelMeta> = {
         badgeClass: 'bg-muted text-muted-foreground border-border',
     },
     CIRCULAR_OPERATORS: {
-        label: 'Réparation',
+        label: 'Opérateur',
         audience: 'Réparateurs, recycleurs, ressourceries',
         icon: Wrench,
         visibilities: ['PUBLIC_USERS', 'CIRCULAR_OPERATORS'],

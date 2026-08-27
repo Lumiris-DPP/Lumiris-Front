@@ -12,10 +12,6 @@ import { useDraftStore } from '@/lib/draft-store';
 import { draftToValidationInput } from '@/features/wizard-shell/validation-input';
 import { validateStep } from './schema';
 
-function generateId(prefix: string): string {
-    return `${prefix}-${Date.now().toString(36).toUpperCase()}`;
-}
-
 export function CreateStepTraceability({ draftId }: { draftId: string }) {
     const draft = useDraftStore((s) => s.drafts[draftId]);
     const setTraceability = useDraftStore((s) => s.setTraceability);
@@ -41,9 +37,10 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
         () => draft?.files?.['ORIGIN_CERTIFICATES'] ?? null,
     );
 
+    const persistedTraceability = draft?.traceability;
     useEffect(() => {
-        if (draft) setForm(draft.traceability);
-    }, [draft]);
+        if (persistedTraceability) setForm(persistedTraceability);
+    }, [persistedTraceability]);
 
     const validation = useMemo(
         () => validateStep(draftToValidationInput(draft, { traceability: form })),
@@ -103,21 +100,12 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
             {/* Numéro de lot */}
             <div className="space-y-2">
                 <Label htmlFor="batch">Numéro de lot (Batch)</Label>
-                <div className="flex gap-2">
-                    <Input
-                        id="batch"
-                        value={form.batchNumber ?? ''}
-                        placeholder="LOT-2026-001"
-                        onChange={(e) => setForm((f) => ({ ...f, batchNumber: e.target.value }))}
-                    />
-                    <button
-                        type="button"
-                        onClick={() => setForm((f) => ({ ...f, batchNumber: generateId('LOT') }))}
-                        className="shrink-0 rounded-md border border-border px-3 text-xs text-muted-foreground transition-colors hover:border-lumiris-cyan hover:text-lumiris-cyan"
-                    >
-                        Générer
-                    </button>
-                </div>
+                <Input
+                    id="batch"
+                    value={form.batchNumber ?? ''}
+                    placeholder="LOT-2026-001"
+                    onChange={(e) => setForm((f) => ({ ...f, batchNumber: e.target.value }))}
+                />
             </div>
 
             <div className="space-y-2">
@@ -138,42 +126,24 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
             {/* GTIN / EAN */}
             <div className="space-y-2">
                 <Label htmlFor="gtin">GTIN / EAN (code-barres)</Label>
-                <div className="flex gap-2">
-                    <Input
-                        id="gtin"
-                        value={form.gtin ?? ''}
-                        placeholder="1234567890123"
-                        maxLength={14}
-                        onChange={(e) => setForm((f) => ({ ...f, gtin: e.target.value }))}
-                    />
-                    <button
-                        type="button"
-                        onClick={() => setForm((f) => ({ ...f, gtin: generateId('EAN') }))}
-                        className="shrink-0 rounded-md border border-border px-3 text-xs text-muted-foreground transition-colors hover:border-lumiris-cyan hover:text-lumiris-cyan"
-                    >
-                        Générer
-                    </button>
-                </div>
+                <Input
+                    id="gtin"
+                    value={form.gtin ?? ''}
+                    placeholder="1234567890123"
+                    maxLength={14}
+                    onChange={(e) => setForm((f) => ({ ...f, gtin: e.target.value }))}
+                />
             </div>
 
             {/* SKU */}
             <div className="space-y-2">
                 <Label htmlFor="sku">SKU (référence interne)</Label>
-                <div className="flex gap-2">
-                    <Input
-                        id="sku"
-                        value={form.sku ?? ''}
-                        placeholder="SKU-001"
-                        onChange={(e) => setForm((f) => ({ ...f, sku: e.target.value }))}
-                    />
-                    <button
-                        type="button"
-                        onClick={() => setForm((f) => ({ ...f, sku: generateId('SKU') }))}
-                        className="shrink-0 rounded-md border border-border px-3 text-xs text-muted-foreground transition-colors hover:border-lumiris-cyan hover:text-lumiris-cyan"
-                    >
-                        Générer
-                    </button>
-                </div>
+                <Input
+                    id="sku"
+                    value={form.sku ?? ''}
+                    placeholder="SKU-001"
+                    onChange={(e) => setForm((f) => ({ ...f, sku: e.target.value }))}
+                />
             </div>
 
             {/* Conformité REACH */}

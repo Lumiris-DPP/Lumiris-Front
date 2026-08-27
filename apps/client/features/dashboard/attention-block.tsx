@@ -4,26 +4,28 @@ import Link from 'next/link';
 import { AlertCircle, BarChart3, Clock, ShieldCheck } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import { Progress } from '@lumiris/ui/components/progress';
-import type { ExpiringCertificate, QuotaUsage, ScoredPassport } from './derive';
 
 interface AttentionBlockProps {
-    expiring: readonly ExpiringCertificate[];
-    incomplete: readonly ScoredPassport[];
-    quota: QuotaUsage;
-    esprWindowOpen?: boolean;
-    publishedCount?: number;
+    expiringCertificates: number;
+    incomplete: number;
+    quotaUsed: number;
+    quotaLimit: number | null;
+    quotaPercent: number;
+    esprWindowOpen: boolean;
+    publishedCount: number;
 }
 
 export function AttentionBlock({
-    expiring,
+    expiringCertificates,
     incomplete,
-    quota,
+    quotaUsed,
+    quotaLimit,
+    quotaPercent,
     esprWindowOpen,
-    publishedCount = 0,
+    publishedCount,
 }: AttentionBlockProps) {
-    const unlimited = !Number.isFinite(quota.total);
-    const totalLabel = unlimited ? '∞' : quota.total.toString();
-    const overThreshold = quota.percent > 80;
+    const unlimited = quotaLimit === null;
+    const totalLabel = unlimited ? '∞' : String(quotaLimit);
 
     return (
         <Card>
@@ -34,14 +36,14 @@ export function AttentionBlock({
                 <Row
                     icon={<Clock className="h-4 w-4 text-lumiris-amber" />}
                     label="Certifs qui expirent"
-                    count={expiring.length}
+                    count={expiringCertificates}
                     href="/certifications"
                     emptyLabel="aucune"
                 />
                 <Row
                     icon={<AlertCircle className="h-4 w-4 text-lumiris-amber" />}
                     label="Passeports incomplets"
-                    count={incomplete.length}
+                    count={incomplete}
                     href="/passports"
                     emptyLabel="aucun"
                 />
@@ -52,10 +54,10 @@ export function AttentionBlock({
                     </div>
                     <div className="flex items-center gap-3">
                         <span className="font-mono text-xs tabular-nums">
-                            {quota.used} / {totalLabel}
+                            {quotaUsed} / {totalLabel}
                         </span>
-                        {!unlimited && <Progress value={Math.min(100, quota.percent)} className="h-1.5 w-24" />}
-                        {overThreshold && (
+                        {!unlimited && <Progress value={Math.min(100, quotaPercent)} className="h-1.5 w-24" />}
+                        {quotaPercent > 80 && (
                             <Link href="/subscription" className="text-xs text-lumiris-cyan hover:underline">
                                 Mettre à niveau →
                             </Link>
@@ -66,7 +68,7 @@ export function AttentionBlock({
                     <div className="flex items-center gap-2 py-2.5">
                         <ShieldCheck className="h-4 w-4 text-lumiris-cyan" />
                         <span className="text-sm text-foreground">
-                            ESPR — DPP textile obligatoire mi-2028. {publishedCount} passeport
+                            ESPR — DPP textile obligatoire mi-2028. {publishedCount} passeport(s)
                             {publishedCount > 1 ? 's' : ''} prêt{publishedCount > 1 ? 's' : ''}.
                         </span>
                     </div>
