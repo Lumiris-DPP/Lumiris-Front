@@ -5,13 +5,17 @@ import type { IrisGrade as IrisGradeLetter } from '@lumiris/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import { ChartContainer, type ChartConfig } from '@lumiris/ui/components/chart';
 import { GRADE_COLOR } from '@lumiris/scoring-ui';
-import type { ScoredPassport } from './derive';
 
 const GRADES: readonly IrisGradeLetter[] = ['A', 'B', 'C', 'D', 'E'];
 const CHART_CONFIG: ChartConfig = { count: { label: 'Passeports' } };
 
-export function GradeDistribution({ scored }: { scored: readonly ScoredPassport[] }) {
-    const data = buildDistribution(scored);
+export function GradeDistribution({ distribution }: { distribution: Record<string, number> }) {
+    const data = GRADES.map((grade) => ({
+        grade,
+        count: distribution[grade] ?? 0,
+        fill: `var(--${GRADE_COLOR[grade]})`,
+    }));
+
     return (
         <Card>
             <CardHeader>
@@ -32,17 +36,4 @@ export function GradeDistribution({ scored }: { scored: readonly ScoredPassport[
             </CardContent>
         </Card>
     );
-}
-
-function buildDistribution(scored: readonly ScoredPassport[]) {
-    const buckets: Record<IrisGradeLetter, number> = { A: 0, B: 0, C: 0, D: 0, E: 0 };
-    for (const { score, passport } of scored) {
-        if (passport.status === 'Draft') continue;
-        buckets[score.grade] += 1;
-    }
-    return GRADES.map((grade) => ({
-        grade,
-        count: buckets[grade],
-        fill: `var(--${GRADE_COLOR[grade]})`,
-    }));
 }
