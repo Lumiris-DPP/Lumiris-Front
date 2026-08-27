@@ -8,7 +8,7 @@ export const PASSPORT_STATUS_LABEL: Record<PassportStatus, string> = {
 
 export const PASSPORT_STATUS_DESCRIPTION: Record<PassportStatus, string> = {
     Draft: 'Édition en cours, non visible par les clients',
-    InCompletion: 'Champ ESPR/AGEC manquant — score plafonné à D',
+    InCompletion: 'Passeport en brouillon',
     Published: 'Publié, visible via QR/NFC',
 };
 

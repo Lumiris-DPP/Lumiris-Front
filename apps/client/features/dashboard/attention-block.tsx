@@ -68,7 +68,7 @@ export function AttentionBlock({
                     <div className="flex items-center gap-2 py-2.5">
                         <ShieldCheck className="h-4 w-4 text-lumiris-cyan" />
                         <span className="text-sm text-foreground">
-                            ESPR — DPP textile obligatoire mi-2028. {publishedCount} passeport
+                            ESPR — DPP textile obligatoire mi-2028. {publishedCount} passeport(s)
                             {publishedCount > 1 ? 's' : ''} prêt{publishedCount > 1 ? 's' : ''}.
                         </span>
                     </div>
