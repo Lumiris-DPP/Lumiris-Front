@@ -38,8 +38,8 @@ export default function AtelierPage() {
                             Publiez vos passeports DPP en minutes, pas en mois.
                         </h1>
                         <p className="mt-4 max-w-lg text-lg leading-relaxed text-muted-foreground">
-                            ATELIER vous guide de la facture fournisseur au QR code conforme ESPR. Score Iris calcule
-                            automatiquement, jamais achetable.
+                            ATELIER vous guide de la facture fournisseur au QR code prêt pour l&apos;ESPR. Score Iris
+                            calcule automatiquement, jamais achetable.
                         </p>
                         <div className="mt-8 flex flex-wrap gap-4">
                             <a

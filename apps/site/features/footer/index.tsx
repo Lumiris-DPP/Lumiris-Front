@@ -80,7 +80,7 @@ export function Footer() {
                 <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-border pt-8 sm:flex-row sm:items-center">
                     <p className="text-xs text-muted-foreground">© 2026 LUMIRIS. Tous droits réservés.</p>
                     <p className="text-xs text-muted-foreground">
-                        Conforme ESPR / AGEC · Construit en transparence radicale.
+                        Prêt pour l&apos;ESPR / AGEC · Construit en transparence radicale.
                     </p>
                 </div>
             </div>
