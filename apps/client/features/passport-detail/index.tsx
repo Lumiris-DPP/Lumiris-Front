@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { AlertTriangle, ArrowLeft, Loader2, Pencil, Trash2 } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Copy, Loader2, Pencil, Trash2 } from 'lucide-react';
 import { computeScore } from '@lumiris/core/scoring';
 import { mockCertificates, mockPassportById } from '@lumiris/mock-data';
 import type { Passport } from '@lumiris/types';
@@ -21,7 +21,7 @@ import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import { Toaster, toast } from '@lumiris/ui/components/sonner';
 import { IrisScoreCard } from '@lumiris/scoring-ui';
-import { useDeleteDppForm, useDppForm } from '@lumiris/api-client/react';
+import { useDeleteDppForm, useDppForm, useDuplicateDppForm } from '@lumiris/api-client/react';
 import { isApiError, type DppFormDto } from '@lumiris/api-client';
 import { useAuthStore } from '@/lib/auth-store';
 import { useCurrentArtisan } from '@/lib/current-artisan';
@@ -249,7 +249,28 @@ function DeleteDraftCard({ dppId }: { dppId: string }) {
 }
 
 function DraftAside({ dppId }: { dppId: string }) {
+    const router = useRouter();
     const { editDraft, loadingId } = useEditDraft();
+    const duplicateDpp = useDuplicateDppForm();
+
+    const onDuplicate = () => {
+        duplicateDpp.mutate(dppId, {
+            onSuccess: (created) => {
+                toast.success('Brouillon dupliqué.');
+                router.push(`/passports/${created.id}`);
+            },
+            onError: (e) => {
+                if (isApiError(e) && e.status === 409) {
+                    toast.error('Duplication impossible', {
+                        description: e.message || 'Seul un brouillon peut être dupliqué.',
+                    });
+                    return;
+                }
+                toast.error('La duplication a échoué', { description: e.message });
+            },
+        });
+    };
+
     return (
         <Card>
             <CardHeader>
@@ -266,6 +287,19 @@ function DraftAside({ dppId }: { dppId: string }) {
                     className="w-full gap-2 bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90"
                 >
                     <Pencil className="h-4 w-4" /> Modifier le brouillon
+                </Button>
+                <Button
+                    variant="outline"
+                    onClick={onDuplicate}
+                    disabled={duplicateDpp.isPending}
+                    className="w-full gap-2"
+                >
+                    {duplicateDpp.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                        <Copy className="h-4 w-4" />
+                    )}
+                    Dupliquer le brouillon
                 </Button>
             </CardContent>
         </Card>

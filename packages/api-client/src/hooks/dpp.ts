@@ -148,6 +148,21 @@ export function useDeleteDppForm(options?: Omit<UseMutationOptions<void, Error, 
     });
 }
 
+export function useDuplicateDppForm(
+    options?: Omit<UseMutationOptions<DppFormCreatedDto, Error, string>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<DppFormCreatedDto, Error, string>({
+        mutationFn: (id) => client.dpp.duplicate(id),
+        ...options,
+        onSuccess: (...args) => {
+            void queryClient.invalidateQueries({ queryKey: dppKeys.all });
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
 export function usePublishDppForm(options?: Omit<UseMutationOptions<DppFormCreatedDto, Error, string>, 'mutationFn'>) {
     const client = useApiClient();
     const queryClient = useQueryClient();
