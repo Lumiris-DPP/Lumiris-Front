@@ -1,6 +1,6 @@
 'use client';
 
-import { Download } from 'lucide-react';
+import { Printer } from 'lucide-react';
 import type { DppAccessLevel, DppFormDocument } from '@lumiris/api-client';
 import { useDppAccessTokens } from '@lumiris/api-client/react';
 import { Badge } from '@lumiris/ui/components/badge';
@@ -117,8 +117,8 @@ function LevelPanel({
                         className="w-full"
                         onClick={() => window.open(`/print/passport/${dppId}`, '_blank')}
                     >
-                        <Download className="mr-1.5 h-3.5 w-3.5" />
-                        Télécharger le PDF
+                        <Printer className="mr-1.5 h-3.5 w-3.5" />
+                        Imprimer la fiche
                     </Button>
                 </>
             )}
