@@ -48,6 +48,7 @@ export function AccessQrCard({ dppId, publicCode, documents }: AccessQrCardProps
                         <TabsContent key={level} value={level} className="pt-4">
                             <LevelPanel
                                 level={level}
+                                dppId={dppId}
                                 publicCode={publicCode}
                                 token={tokenByLevel.get(level) ?? null}
                                 documents={documents}
@@ -63,12 +64,14 @@ export function AccessQrCard({ dppId, publicCode, documents }: AccessQrCardProps
 
 function LevelPanel({
     level,
+    dppId,
     publicCode,
     token,
     documents,
     loading,
 }: {
     level: DppAccessLevel;
+    dppId: string;
     publicCode: string;
     token: string | null;
     documents: DppFormDocument[];
@@ -112,7 +115,7 @@ function LevelPanel({
                         variant="outline"
                         size="sm"
                         className="w-full"
-                        onClick={() => window.open(`/print/passport/${publicCode}`, '_blank')}
+                        onClick={() => window.open(`/print/passport/${dppId}`, '_blank')}
                     >
                         <Download className="mr-1.5 h-3.5 w-3.5" />
                         Télécharger le PDF
