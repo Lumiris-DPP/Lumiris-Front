@@ -7,6 +7,7 @@ import { toast } from '@lumiris/ui/components/sonner';
 import { useCurrentArtisan } from './current-artisan';
 import { useDraftStore } from './draft-store';
 import { dppToDraftFields } from './passport-adapter';
+import { useSubscriptionGate } from './use-subscription-gate';
 
 /**
  * Loads a backend DRAFT into a fresh local wizard draft (tagged with its backendId)
@@ -19,8 +20,13 @@ export function useEditDraft() {
     const createDraft = useDraftStore((s) => s.createDraft);
     const setDraft = useDraftStore((s) => s.setDraft);
     const [loadingId, setLoadingId] = useState<string | null>(null);
+    const { blocked, notifyBlocked } = useSubscriptionGate();
 
     const editDraft = async (dppId: string) => {
+        if (blocked) {
+            notifyBlocked();
+            return;
+        }
         setLoadingId(dppId);
         try {
             const dpp = await client.dpp.get(dppId);

@@ -6,6 +6,7 @@ import { Check, Circle } from 'lucide-react';
 import type { Artisan } from '@lumiris/types';
 import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent } from '@lumiris/ui/components/card';
+import { CreatePassportCta } from '@/features/quota-upsell/create-passport-cta';
 import type { OnboardingItem } from './derive';
 
 interface EmptyStateProps {
@@ -68,16 +69,18 @@ export function EmptyState({ artisan, items }: EmptyStateProps) {
                                     <p className="text-sm font-medium text-foreground">{item.label}</p>
                                     <p className="mt-1 text-xs text-muted-foreground">{HELPERS[item.key]}</p>
                                 </div>
-                                <Button
-                                    asChild
-                                    size="sm"
-                                    variant={isPrimary ? 'default' : 'outline'}
-                                    className={
-                                        isPrimary ? 'bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90' : undefined
-                                    }
-                                >
-                                    <Link href={item.href}>{CTAS[item.key]}</Link>
-                                </Button>
+                                {isPrimary ? (
+                                    <CreatePassportCta
+                                        size="sm"
+                                        className="bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90"
+                                    >
+                                        {CTAS[item.key]}
+                                    </CreatePassportCta>
+                                ) : (
+                                    <Button asChild size="sm" variant="outline">
+                                        <Link href={item.href}>{CTAS[item.key]}</Link>
+                                    </Button>
+                                )}
                             </li>
                         );
                     })}
