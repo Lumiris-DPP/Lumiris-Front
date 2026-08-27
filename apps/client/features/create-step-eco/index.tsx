@@ -85,6 +85,7 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
         gtin: d.traceability.gtin ?? null,
         sku: d.traceability.sku ?? null,
         reachCompliant: d.traceability.reachCompliant,
+        weightGrams: d.garment.dimensions?.weightG ?? null,
         recycledPct: form.recycledPct ?? null,
         warrantyDescription: form.warrantyDescription ?? null,
         warrantyMonths: form.warrantyMonths ?? null,
