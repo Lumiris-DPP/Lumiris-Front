@@ -28,7 +28,7 @@ export function EventFormCard({ passportId }: { passportId: string }) {
         const country = COUNTRIES.find((c) => c.code === locationCountryCode);
         createEvent.mutate(
             {
-                occurredAt: new Date(occurredAt).toISOString(),
+                occurredAt: new Date(`${occurredAt}T00:00`).toISOString(),
                 description: description.trim(),
                 actorType: actorType as DppEventActorType,
                 locationCity: locationCity.trim() || null,
@@ -63,9 +63,9 @@ export function EventFormCard({ passportId }: { passportId: string }) {
                             </label>
                             <Input
                                 id="event-occurred-at"
-                                type="datetime-local"
+                                type="date"
                                 value={occurredAt}
-                                max={new Date().toISOString().slice(0, 16)}
+                                max={new Date().toLocaleDateString('sv-SE')}
                                 onChange={(e) => setOccurredAt(e.target.value)}
                             />
                         </div>
