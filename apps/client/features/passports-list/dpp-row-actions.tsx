@@ -1,9 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Eye, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { Copy, Eye, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import type { DppFormSummaryDto } from '@lumiris/api-client';
-import { useDeleteDppForm } from '@lumiris/api-client/react';
+import { useDeleteDppForm, useDuplicateDppForm } from '@lumiris/api-client/react';
 import { Button } from '@lumiris/ui/components/button';
 import {
     DropdownMenu,
@@ -19,8 +19,21 @@ export function useDppActions() {
     const router = useRouter();
     const { editDraft, loadingId } = useEditDraft();
     const deleteDpp = useDeleteDppForm();
+    const duplicateDpp = useDuplicateDppForm();
 
     const open = (dpp: DppFormSummaryDto) => router.push(`/passports/${dpp.id}`);
+
+    const duplicate = (dpp: DppFormSummaryDto) => {
+        duplicateDpp.mutate(dpp.id, {
+            onSuccess: (created) => {
+                toast.success('Passeport dupliqué.');
+                router.push(`/passports/${created.id}`);
+            },
+            onError: (e) => {
+                toast.error('La duplication a échoué', { description: e.message });
+            },
+        });
+    };
 
     const remove = async (dpp: DppFormSummaryDto) => {
         if (
@@ -37,7 +50,15 @@ export function useDppActions() {
         }
     };
 
-    return { open, remove, editDraft, loadingId };
+    return {
+        open,
+        duplicate,
+        remove,
+        editDraft,
+        loadingId,
+        isDuplicating: duplicateDpp.isPending,
+        duplicatingId: duplicateDpp.isPending ? duplicateDpp.variables : undefined,
+    };
 }
 
 interface DppRowActionsProps {
@@ -64,6 +85,9 @@ export function DppRowActions({ dpp, actions, className }: DppRowActionsProps) {
             <DropdownMenuContent align="end" className="w-44">
                 <DropdownMenuItem onClick={() => actions.open(dpp)}>
                     <Eye className="h-3.5 w-3.5" /> Voir détail
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => actions.duplicate(dpp)} disabled={actions.isDuplicating}>
+                    <Copy className="h-3.5 w-3.5" /> Dupliquer
                 </DropdownMenuItem>
                 {isDraft && (
                     <>

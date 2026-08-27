@@ -153,6 +153,7 @@ export function PassportDetail({ passportId }: { passportId: string }) {
                                         documents={apiDpp.documents ?? []}
                                     />
                                 )}
+                                <DuplicateDppButton dppId={passportId} label="Dupliquer ce passeport" />
                             </div>
                         )}
                     </aside>
@@ -249,27 +250,7 @@ function DeleteDraftCard({ dppId }: { dppId: string }) {
 }
 
 function DraftAside({ dppId }: { dppId: string }) {
-    const router = useRouter();
     const { editDraft, loadingId } = useEditDraft();
-    const duplicateDpp = useDuplicateDppForm();
-
-    const onDuplicate = () => {
-        duplicateDpp.mutate(dppId, {
-            onSuccess: (created) => {
-                toast.success('Brouillon dupliqué.');
-                router.push(`/passports/${created.id}`);
-            },
-            onError: (e) => {
-                if (isApiError(e) && e.status === 409) {
-                    toast.error('Duplication impossible', {
-                        description: e.message || 'Seul un brouillon peut être dupliqué.',
-                    });
-                    return;
-                }
-                toast.error('La duplication a échoué', { description: e.message });
-            },
-        });
-    };
 
     return (
         <Card>
@@ -288,20 +269,32 @@ function DraftAside({ dppId }: { dppId: string }) {
                 >
                     <Pencil className="h-4 w-4" /> Modifier le brouillon
                 </Button>
-                <Button
-                    variant="outline"
-                    onClick={onDuplicate}
-                    disabled={duplicateDpp.isPending}
-                    className="w-full gap-2"
-                >
-                    {duplicateDpp.isPending ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                        <Copy className="h-4 w-4" />
-                    )}
-                    Dupliquer le brouillon
-                </Button>
+                <DuplicateDppButton dppId={dppId} label="Dupliquer le brouillon" />
             </CardContent>
         </Card>
+    );
+}
+
+function DuplicateDppButton({ dppId, label }: { dppId: string; label: string }) {
+    const router = useRouter();
+    const duplicateDpp = useDuplicateDppForm();
+
+    const onDuplicate = () => {
+        duplicateDpp.mutate(dppId, {
+            onSuccess: (created) => {
+                toast.success('Passeport dupliqué.');
+                router.push(`/passports/${created.id}`);
+            },
+            onError: (e) => {
+                toast.error('La duplication a échoué', { description: e.message });
+            },
+        });
+    };
+
+    return (
+        <Button variant="outline" onClick={onDuplicate} disabled={duplicateDpp.isPending} className="w-full gap-2">
+            {duplicateDpp.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Copy className="h-4 w-4" />}
+            {label}
+        </Button>
     );
 }
