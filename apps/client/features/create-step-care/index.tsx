@@ -22,13 +22,14 @@ export function CreateStepCare({ draftId }: { draftId: string }) {
     const [care, setLocalCare] = useState<CareInstructionCode[]>(draft?.careInstructions ?? []);
     const [careNotes, setLocalCareNotes] = useState<string>(draft?.careNotes ?? '');
 
+    const persistedMaterials = draft?.materials;
+    const persistedCare = draft?.careInstructions;
+    const persistedCareNotes = draft?.careNotes;
     useEffect(() => {
-        if (draft) {
-            setLocalMaterials(draft.materials);
-            setLocalCare(draft.careInstructions);
-            setLocalCareNotes(draft.careNotes);
-        }
-    }, [draft]);
+        if (persistedMaterials) setLocalMaterials(persistedMaterials);
+        if (persistedCare) setLocalCare(persistedCare);
+        if (persistedCareNotes !== undefined) setLocalCareNotes(persistedCareNotes);
+    }, [persistedMaterials, persistedCare, persistedCareNotes]);
 
     const validation = useMemo(
         () => validateStep(draftToValidationInput(draft, { materials, careInstructions: care })),

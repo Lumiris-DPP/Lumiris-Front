@@ -37,9 +37,10 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
         () => draft?.files?.['CREATION_PASSPORT'] ?? null,
     );
 
+    const persistedGarment = draft?.garment;
     useEffect(() => {
-        if (draft) setForm(draft.garment);
-    }, [draft]);
+        if (persistedGarment) setForm(persistedGarment);
+    }, [persistedGarment]);
 
     const validation = useMemo(() => validateStep(draftToValidationInput(draft, { garment: form })), [form, draft]);
 

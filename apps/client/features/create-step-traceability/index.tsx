@@ -41,9 +41,10 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
         () => draft?.files?.['ORIGIN_CERTIFICATES'] ?? null,
     );
 
+    const persistedTraceability = draft?.traceability;
     useEffect(() => {
-        if (draft) setForm(draft.traceability);
-    }, [draft]);
+        if (persistedTraceability) setForm(persistedTraceability);
+    }, [persistedTraceability]);
 
     const validation = useMemo(
         () => validateStep(draftToValidationInput(draft, { traceability: form })),

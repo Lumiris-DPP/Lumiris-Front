@@ -48,9 +48,10 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
     const [careGuideFile, setCareGuideFile] = useState<File | null>(() => draft?.files?.['CARE_GUIDE'] ?? null);
     const [endOfLifeFile, setEndOfLifeFile] = useState<File | null>(() => draft?.files?.['END_OF_LIFE_GUIDE'] ?? null);
 
+    const persistedEco = draft?.eco;
     useEffect(() => {
-        if (draft) setForm(draft.eco);
-    }, [draft]);
+        if (persistedEco) setForm(persistedEco);
+    }, [persistedEco]);
 
     const handlePrev = () => {
         setEco(draftId, form);
