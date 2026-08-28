@@ -39,7 +39,7 @@ export function OrderConfirmation({ routeId }: { routeId: string }) {
 }
 
 function OrderConfirmationInner({ routeId }: { routeId: string }) {
-    const { isAuthenticated } = useUser();
+    const { user, isAuthenticated } = useUser();
     const searchParams = useSearchParams();
     const [startedAt] = useState(() => Date.now());
     const [pollExpired, setPollExpired] = useState(false);
@@ -84,7 +84,7 @@ function OrderConfirmationInner({ routeId }: { routeId: string }) {
             return POLL_INTERVAL_MS;
         },
     });
-    const { data: wardrobe = [] } = useWardrobe({ enabled: isAuthenticated });
+    const { data: wardrobe = [] } = useWardrobe(user?.id ?? null, { enabled: isAuthenticated });
 
     const settling = !group || group.status === 'PENDING';
     // Une commande remboursée ou annulée n'est plus une commande confirmée : sans ce cas, l'écran

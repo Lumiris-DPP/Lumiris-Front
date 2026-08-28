@@ -32,7 +32,7 @@ import { cn } from '@lumiris/ui/lib/cn';
 import { useUser } from '@/lib/auth/use-user';
 import { routes } from '@/lib/routes';
 import { scorePassport } from '@/lib/passport-score';
-import { useWardrobe, type WardrobeItem, type WardrobeSector } from '@/lib/wardrobe-storage';
+import { hydrateWardrobeFromApi, useWardrobe, type WardrobeItem, type WardrobeSector } from '@/lib/wardrobe-storage';
 import { getGradeDistribution, getOverallScore } from '@/lib/iris/wardrobe-stats';
 import { COMPARE_MAX, clearCompare, setCompare, toggleCompare, useCompare } from '@/lib/iris/compare-store';
 import { toast } from '@/lib/toast';
@@ -215,9 +215,13 @@ function buildPurchasedRow(item: WardrobeItemDto): PurchasedVaultRow {
 export function Vault() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { isAuthenticated } = useUser();
+    const { user, isAuthenticated } = useUser();
     const items = useWardrobe();
-    const { data: purchased = [] } = useBackendWardrobe({ enabled: isAuthenticated });
+    const wardrobeQuery = useBackendWardrobe(user?.id ?? null, { enabled: isAuthenticated });
+    const purchased = useMemo(
+        () => (isAuthenticated ? (wardrobeQuery.data ?? []).filter((item) => item.origin === 'purchase') : []),
+        [isAuthenticated, wardrobeQuery.data],
+    );
     const compareIds = useCompare();
     const [now] = useState(() => new Date());
     const [compareMode, setCompareMode] = useState(false);
@@ -226,6 +230,10 @@ export function Vault() {
     const [filtersOpen, setFiltersOpen] = useState(false);
     const [filters, setFilters] = useState<VaultFilters>(VAULT_DEFAULT_FILTERS);
     const [actionsTarget, setActionsTarget] = useState<Exclude<VaultRow, PurchasedVaultRow> | null>(null);
+
+    useEffect(() => {
+        if (user && wardrobeQuery.data) hydrateWardrobeFromApi(user.id, wardrobeQuery.data);
+    }, [user, wardrobeQuery.data]);
 
     // Une seule grille : les achats marketplace (backend) rejoignent l'inventaire local. Chaque
     // carte porte un badge de provenance — Acheté / Passeport / Sans DPP.
@@ -611,7 +619,7 @@ function WardrobeHealth({ grade, percentage, scoredCount }: WardrobeHealthProps)
             </div>
 
             <div className="flex-1">
-                <h3 className="text-sm font-bold text-foreground">Inventory Health</h3>
+                <h3 className="text-sm font-bold text-foreground">Qualité de votre garde robe</h3>
                 <p className="mt-0.5 text-xs font-semibold" style={{ color: stroke }}>
                     {GRADE_LABEL[grade]}
                 </p>

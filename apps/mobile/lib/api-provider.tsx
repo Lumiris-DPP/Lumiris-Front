@@ -4,6 +4,7 @@ import { ApiProvider } from '@lumiris/api-client/react';
 import { env } from '@/env';
 import { readToken, readRefreshToken, updateTokens } from '@/lib/auth/storage';
 import { clearUser } from '@/lib/auth';
+import { WardrobeSyncBridge } from '@/lib/wardrobe-sync-bridge';
 
 export function ClientApiProvider({ children }: { children: React.ReactNode }) {
     return (
@@ -14,6 +15,7 @@ export function ClientApiProvider({ children }: { children: React.ReactNode }) {
             onTokensRefreshed={({ token, refreshToken }) => updateTokens(token, refreshToken)}
             onUnauthorized={clearUser}
         >
+            <WardrobeSyncBridge />
             {children}
         </ApiProvider>
     );

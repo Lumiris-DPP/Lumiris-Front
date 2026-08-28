@@ -116,7 +116,7 @@ export function MyDocuments() {
                 </div>
             </motion.header>
 
-            <PurchaseDocuments enabled={Boolean(userId)} />
+            <PurchaseDocuments userId={userId} />
 
             <KindFilter filter={filter} counts={counts} total={total} onChange={setFilter} />
 

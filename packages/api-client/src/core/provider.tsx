@@ -1,7 +1,13 @@
 'use client';
 
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import { QueryClient, QueryClientProvider, MutationCache, type DefaultOptions } from '@tanstack/react-query';
+import {
+    QueryClient,
+    QueryClientProvider,
+    MutationCache,
+    useQueryClient,
+    type DefaultOptions,
+} from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import { isApiError, type ApiError } from './errors';
@@ -21,6 +27,10 @@ export function useApiClient(): LumirisClient {
         );
     }
     return client;
+}
+
+export function useApiQueryClient(): QueryClient {
+    return useQueryClient();
 }
 
 export interface QueryProviderProps {
