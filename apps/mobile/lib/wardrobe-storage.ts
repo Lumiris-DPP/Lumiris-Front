@@ -261,7 +261,7 @@ function read(): WardrobeItem[] {
     return readScope(readUser()?.id ?? null);
 }
 
-export interface PendingWardrobeChanges {
+interface PendingWardrobeChanges {
     upserts: WardrobeItem[];
     deletedKeys: string[];
 }
@@ -362,7 +362,7 @@ export function readPendingWardrobeChanges(userId: string): PendingWardrobeChang
     return readPending(userId);
 }
 
-export function hasPendingWardrobeChanges(userId: string): boolean {
+function hasPendingWardrobeChanges(userId: string): boolean {
     const pending = readPending(userId);
     return pending.upserts.length > 0 || pending.deletedKeys.length > 0;
 }
