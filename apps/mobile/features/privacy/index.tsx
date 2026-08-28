@@ -19,9 +19,8 @@ import {
 import { useDeleteAccount } from '@lumiris/api-client/react';
 import { useUser } from '@/lib/auth';
 import { wipeAllUserData } from '@/lib/auth/wipe';
-import { useWardrobe } from '@/lib/wardrobe-storage';
+import { clearWardrobe, useWardrobe } from '@/lib/wardrobe-storage';
 import { useSettings } from '@/lib/settings';
-import { USER_KEYS, userScopedKey } from '@/lib/storage-keys';
 import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
 import { SectionLabel } from '@/lib/section';
 import { toast } from '@/lib/toast';
@@ -189,9 +188,7 @@ function RightsSection() {
     }
 
     function handleClearWardrobe() {
-        if (typeof window === 'undefined') return;
-        window.localStorage.removeItem(userScopedKey(user?.id ?? null, USER_KEYS.wardrobe));
-        window.dispatchEvent(new CustomEvent('lumiris:wardrobe-changed'));
+        clearWardrobe();
     }
 
     async function handleDeleteAccount() {

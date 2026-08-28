@@ -4,6 +4,7 @@ export {
     QueryProvider,
     type QueryProviderProps,
     useApiClient,
+    useApiQueryClient,
 } from './core/provider';
 export { useListQuery, useDetailQuery, useStaticQuery, useRealtimeQuery } from './core/query';
 export { createSubResourceMutations, type EntityApi, type SubResourceKeys, type IdField } from './core/mutation';

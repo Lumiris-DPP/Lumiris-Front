@@ -19,9 +19,10 @@ interface PurchaseDocument {
  * serveur, pas dans le coffre chiffré local : sans cette section, l'écran de confirmation
  * annonçait des justificatifs rattachés que « Mes documents » ne montrait nulle part.
  */
-export function PurchaseDocuments({ enabled }: { enabled: boolean }) {
+export function PurchaseDocuments({ userId }: { userId: string | null }) {
+    const enabled = userId !== null;
     const { data: orders = [] } = useMyOrders({ enabled });
-    const { data: wardrobe = [] } = useWardrobe({ enabled });
+    const { data: wardrobe = [] } = useWardrobe(userId, { enabled });
 
     const invoices: PurchaseDocument[] = orders
         .filter((order) => order.invoiceNumber && order.paymentIntentId)

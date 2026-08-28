@@ -3,6 +3,7 @@
 // Inventaire local scopé par user (v2). Migration v1 → v2 dans `migrateLegacyKeys()`.
 
 import { useSyncExternalStore } from 'react';
+import type { WardrobeItemDto, WardrobeSyncUpsert } from '@lumiris/api-client';
 import { readUser } from './auth/storage';
 import { USER_KEYS, userScopedKey } from './storage-keys';
 
@@ -95,13 +96,18 @@ export interface ManualWardrobeItem {
 
 export type WardrobeItem = LumirisPassportItem | ExternalDppItem | PublicDppItem | ManualWardrobeItem;
 
-const EVENT = 'lumiris:wardrobe-changed';
+export const WARDROBE_CHANGED_EVENT = 'lumiris:wardrobe-changed';
+const EVENT = WARDROBE_CHANGED_EVENT;
 const USER_CHANGED = 'lumiris:user-changed';
 
 const subscribers = new Set<() => void>();
 
-function currentKey(): string {
-    return userScopedKey(readUser()?.id ?? null, USER_KEYS.wardrobe);
+function scopeKey(userId: string | null): string {
+    return userScopedKey(userId, USER_KEYS.wardrobe);
+}
+
+function syncKey(userId: string | null): string {
+    return userScopedKey(userId, USER_KEYS.wardrobeSync);
 }
 
 function notify() {
@@ -234,10 +240,10 @@ function legacyToItem(entry: LegacyEntry): LumirisPassportItem {
     };
 }
 
-function read(): WardrobeItem[] {
+function readScope(userId: string | null): WardrobeItem[] {
     if (typeof window === 'undefined') return [];
     try {
-        const raw = window.localStorage.getItem(currentKey());
+        const raw = window.localStorage.getItem(scopeKey(userId));
         if (!raw) return [];
         const parsed: unknown = JSON.parse(raw);
         if (!Array.isArray(parsed)) return [];
@@ -251,9 +257,87 @@ function read(): WardrobeItem[] {
     }
 }
 
+function read(): WardrobeItem[] {
+    return readScope(readUser()?.id ?? null);
+}
+
+interface PendingWardrobeChanges {
+    upserts: WardrobeItem[];
+    deletedKeys: string[];
+}
+
+const EMPTY_PENDING: PendingWardrobeChanges = { upserts: [], deletedKeys: [] };
+
+// Lecture des elements de la garde robe à ajouter / delete de la DB wardrobe items
+function readPending(userId: string | null): PendingWardrobeChanges {
+    if (typeof window === 'undefined') return EMPTY_PENDING;
+    try {
+        const raw = window.localStorage.getItem(syncKey(userId));
+
+        if (!raw) {
+            const legacyItems = userId ? readScope(userId) : [];
+            return legacyItems.length > 0 ? { upserts: legacyItems, deletedKeys: [] } : EMPTY_PENDING;
+        }
+
+        const parsed = JSON.parse(raw) as Partial<PendingWardrobeChanges>;
+        const upserts = Array.isArray(parsed.upserts) ? parsed.upserts.filter(isWardrobeItem).map(withDocuments) : [];
+        const deletedKeys = Array.isArray(parsed.deletedKeys)
+            ? parsed.deletedKeys.filter((key): key is string => typeof key === 'string')
+            : [];
+
+        return { upserts, deletedKeys };
+    } catch {
+        return EMPTY_PENDING;
+    }
+}
+
+function writePending(userId: string | null, pending: PendingWardrobeChanges): void {
+    if (typeof window === 'undefined') return;
+    if (pending.upserts.length === 0 && pending.deletedKeys.length === 0) {
+        if (userId) window.localStorage.setItem(syncKey(userId), JSON.stringify(EMPTY_PENDING));
+        else window.localStorage.removeItem(syncKey(userId));
+        return;
+    }
+    window.localStorage.setItem(syncKey(userId), JSON.stringify(pending));
+}
+
+function recordPendingDiff(
+    userId: string | null,
+    before: readonly WardrobeItem[],
+    after: readonly WardrobeItem[],
+): void {
+    const pending = readPending(userId);
+    const upserts = new Map(pending.upserts.map((item) => [itemKey(item), item]));
+    const deletedKeys = new Set(pending.deletedKeys);
+    const beforeByKey = new Map(before.map((item) => [itemKey(item), item]));
+    const afterByKey = new Map(after.map((item) => [itemKey(item), item]));
+
+    for (const [key, item] of afterByKey) {
+        const previous = beforeByKey.get(key);
+        if (!previous || JSON.stringify(previous) !== JSON.stringify(item)) {
+            upserts.set(key, item);
+            deletedKeys.delete(key);
+        }
+    }
+    for (const key of beforeByKey.keys()) {
+        if (!afterByKey.has(key)) {
+            upserts.delete(key);
+            deletedKeys.add(key);
+        }
+    }
+    writePending(userId, { upserts: [...upserts.values()], deletedKeys: [...deletedKeys] });
+}
+
+function writeScope(userId: string | null, items: readonly WardrobeItem[], trackChanges: boolean): void {
+    if (typeof window === 'undefined') return;
+    if (trackChanges) recordPendingDiff(userId, readScope(userId), items);
+    window.localStorage.setItem(scopeKey(userId), JSON.stringify(items));
+}
+
 function write(items: readonly WardrobeItem[]): void {
     if (typeof window === 'undefined') return;
-    window.localStorage.setItem(currentKey(), JSON.stringify(items));
+    const userId = readUser()?.id ?? null;
+    writeScope(userId, items, true);
     notify();
 }
 
@@ -268,6 +352,112 @@ export function itemKey(item: WardrobeItem): string {
         case 'manual':
             return `manual:${item.id}`;
     }
+}
+
+export function readWardrobeForScope(userId: string | null): readonly WardrobeItem[] {
+    return readScope(userId);
+}
+
+export function readPendingWardrobeChanges(userId: string): PendingWardrobeChanges {
+    return readPending(userId);
+}
+
+function hasPendingWardrobeChanges(userId: string): boolean {
+    const pending = readPending(userId);
+    return pending.upserts.length > 0 || pending.deletedKeys.length > 0;
+}
+
+export function toWardrobeSyncUpsert(item: WardrobeItem): WardrobeSyncUpsert {
+    const payload: Record<string, unknown> = (() => {
+        switch (item.kind) {
+            case 'lumiris-passport':
+                return { passportId: item.passportId, careLog: item.careLog };
+            case 'external-dpp':
+                return { gtin: item.gtin };
+            case 'public-dpp':
+                return {
+                    publicCode: item.publicCode,
+                    productName: item.productName,
+                    ...(item.grade ? { grade: item.grade } : {}),
+                };
+            case 'manual':
+                return {
+                    id: item.id,
+                    sector: item.sector,
+                    productName: item.productName,
+                    ...(item.brand ? { brand: item.brand } : {}),
+                    ...(item.acquiredAt ? { acquiredAt: item.acquiredAt } : {}),
+                    ...(item.notes ? { notes: item.notes } : {}),
+                };
+        }
+    })();
+    return { clientKey: itemKey(item), kind: item.kind, addedAt: item.addedAt, payload };
+}
+
+function fromApiItem(dto: WardrobeItemDto, existing?: WardrobeItem): WardrobeItem | null {
+    if (dto.origin !== 'user' || !dto.kind || !dto.payload) return null;
+    const payload = dto.payload;
+    const addedAt = dto.acquiredAt ?? new Date().toISOString();
+    const documents = existing?.documents ?? [];
+    const candidate: unknown = (() => {
+        switch (dto.kind) {
+            case 'lumiris-passport':
+                return {
+                    kind: dto.kind,
+                    passportId: payload['passportId'],
+                    addedAt,
+                    careLog: Array.isArray(payload['careLog']) ? payload['careLog'] : [],
+                    documents,
+                };
+            case 'external-dpp':
+                return { kind: dto.kind, gtin: payload['gtin'], addedAt, documents };
+            case 'public-dpp':
+                return {
+                    kind: dto.kind,
+                    publicCode: payload['publicCode'],
+                    productName: payload['productName'],
+                    ...(typeof payload['grade'] === 'string' ? { grade: payload['grade'] } : {}),
+                    addedAt,
+                    documents,
+                };
+            case 'manual':
+                return {
+                    kind: dto.kind,
+                    id: payload['id'],
+                    sector: payload['sector'],
+                    productName: payload['productName'],
+                    ...(typeof payload['brand'] === 'string' ? { brand: payload['brand'] } : {}),
+                    ...(typeof payload['acquiredAt'] === 'string' ? { acquiredAt: payload['acquiredAt'] } : {}),
+                    ...(typeof payload['notes'] === 'string' ? { notes: payload['notes'] } : {}),
+                    addedAt,
+                    documents,
+                };
+        }
+    })();
+    return isWardrobeItem(candidate) ? withDocuments(candidate) : null;
+}
+
+function replaceUserItemsFromApi(userId: string, response: readonly WardrobeItemDto[]): void {
+    const existing = new Map(readScope(userId).map((item) => [itemKey(item), item]));
+    const items = response
+        .map((dto) => fromApiItem(dto, dto.clientKey ? existing.get(dto.clientKey) : undefined))
+        .filter((item): item is WardrobeItem => item !== null);
+    writeScope(userId, items, false);
+    writePending(userId, EMPTY_PENDING);
+    notify();
+}
+
+export function applyWardrobeSyncResult(userId: string, response: readonly WardrobeItemDto[]): void {
+    replaceUserItemsFromApi(userId, response);
+    if (typeof window !== 'undefined') {
+        window.localStorage.removeItem(scopeKey(null));
+        window.localStorage.removeItem(syncKey(null));
+    }
+}
+
+export function hydrateWardrobeFromApi(userId: string, response: readonly WardrobeItemDto[]): void {
+    if (hasPendingWardrobeChanges(userId)) return;
+    replaceUserItemsFromApi(userId, response);
 }
 
 function addLumirisPassport(passportId: string): void {
@@ -378,6 +568,10 @@ export function removeFromWardrobe(key: string): void {
 
 export function removeLumirisPassport(passportId: string): void {
     removeFromWardrobe(`lumiris:${passportId}`);
+}
+
+export function clearWardrobe(): void {
+    write([]);
 }
 
 // Snapshot stable — `useSyncExternalStore` ne re-render que si la référence change.

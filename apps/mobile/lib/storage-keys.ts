@@ -12,6 +12,7 @@ export const DEVICE_KEYS = {
 /** Suffixes à combiner avec `userScopedKey(userId, suffix)` — jamais utilisés bruts. */
 export const USER_KEYS = {
     wardrobe: 'wardrobe.v2',
+    wardrobeSync: 'wardrobe-sync.v1',
     scanCounter: 'scans.v1',
     compare: 'compare.v1',
     settings: 'settings.v1',
