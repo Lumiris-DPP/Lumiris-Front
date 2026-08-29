@@ -13,8 +13,16 @@ export function PassportView({ code, accessToken }: { code: string; accessToken?
     const api = useApiClient();
     const { mutate: trackEvent } = useTrackEvent();
     const tracked = useRef(false);
+    // Limite le fetch à un par instance de composant (re-renders) — pas une garantie absolue
+    // (StrictMode remonte, un lien peut être ouvert deux fois), donc la déduplication qui compte
+    // pour la notification au propriétaire vit côté back (voir DppForm.lastScanNotifiedAt).
+    const fetchedFor = useRef<string | null>(null);
 
     useEffect(() => {
+        const key = `${code}:${accessToken ?? ''}`;
+        if (fetchedFor.current === key) return;
+        fetchedFor.current = key;
+
         api.dpp
             .getPublic(code, accessToken)
             .then(setData)
