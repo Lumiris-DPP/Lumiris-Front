@@ -12,6 +12,7 @@ export * from './iris';
 export * from './atelier-stats';
 export * from './orders';
 export * from './notifications';
+export * from './notification-preferences';
 export * from './order-labels';
 export * from './seller-labels';
 export * from './dashboard';

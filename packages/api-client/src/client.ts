@@ -13,6 +13,7 @@ import { sellerApi } from './modules/seller';
 import { wardrobeApi } from './modules/wardrobe';
 import { ordersApi, sellerOrdersApi } from './modules/orders';
 import { notificationsApi } from './modules/notifications';
+import { notificationPreferencesApi } from './modules/notification-preferences';
 import { disputesApi } from './modules/disputes';
 import { irisApi } from './modules/iris';
 import { atelierStatsApi, eventsApi } from './modules/atelier-stats';
@@ -38,6 +39,7 @@ export function createClient(opts: ClientOptions) {
         orders: ordersApi(http),
         sellerOrders: sellerOrdersApi(http),
         notifications: notificationsApi(http),
+        notificationPreferences: notificationPreferencesApi(http),
         disputes: disputesApi(http),
         iris: irisApi(http),
         atelierStats: atelierStatsApi(http),

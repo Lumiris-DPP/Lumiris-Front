@@ -9,6 +9,8 @@ import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { Switch } from '@lumiris/ui/components/switch';
 import { Tabs, TabsList, TabsTrigger } from '@lumiris/ui/components/tabs';
+import type { NotificationCategory } from '@lumiris/api-client';
+import { useNotificationPreferences, useUpdateNotificationPreference } from '@lumiris/api-client/react';
 import { useUser } from '@/lib/auth';
 import { SectionLabel } from '@/lib/section';
 import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
@@ -33,7 +35,7 @@ export function ProfileSettings() {
             <motion.div className="flex flex-col gap-5 px-4" variants={slideUpFade} initial="initial" animate="animate">
                 <AccountSection displayName={user.displayName} email={user.email} city={user.city ?? ''} />
                 <AppearanceSection settings={settings} />
-                <NotificationsSection settings={settings} />
+                <NotificationsSection />
                 <PrivacyLink />
             </motion.div>
 
@@ -225,31 +227,60 @@ function AppearanceSection({ settings }: { settings: Settings }) {
     );
 }
 
-const NOTIFS: ReadonlyArray<{ key: keyof Settings; label: string }> = [
-    { key: 'notifNewArticles', label: 'Nouveaux articles Journal' },
-    { key: 'notifNewArtisans', label: 'Nouveaux passeports d’artisans suivis' },
-    { key: 'notifReminders', label: 'Rappels d’entretien Garde-Robe' },
+// Ordre d'affichage pensé pour un acheteur : ce qui touche à son argent et ses achats d'abord,
+// l'entretien et les favoris ensuite. Les libellés couvrent l'email — le push suivra le même
+// découpage par catégorie une fois le canal branché.
+const CATEGORY_ORDER: readonly NotificationCategory[] = [
+    'ORDERS',
+    'PAYMENTS',
+    'RETURNS_DISPUTES',
+    'PASSPORT',
+    'ATELIER',
+    'WARDROBE',
+    'FAVORITES',
 ];
 
-function NotificationsSection({ settings }: { settings: Settings }) {
+const CATEGORY_LABELS: Record<NotificationCategory, string> = {
+    ORDERS: 'Commandes',
+    PAYMENTS: 'Paiements',
+    RETURNS_DISPUTES: 'Retours & litiges',
+    PASSPORT: 'Passeports produits',
+    ATELIER: 'Atelier (retouches)',
+    WARDROBE: 'Garde-Robe (entretien, garantie, certificats)',
+    FAVORITES: 'Favoris (stock, prix)',
+};
+
+function NotificationsSection() {
+    const { data: preferences = [], isLoading } = useNotificationPreferences();
+    const updatePreference = useUpdateNotificationPreference();
+    const byCategory = new Map(preferences.map((pref) => [pref.category, pref]));
+
     return (
         <Section title="Notifications">
-            {NOTIFS.map(({ key, label }, i) => {
-                const value = settings[key] as boolean;
-                const id = `notif-${key}`;
-                return (
-                    <Row key={key} last={i === NOTIFS.length - 1}>
-                        <Label htmlFor={id} className="text-sm font-normal text-foreground">
-                            {label}
-                        </Label>
-                        <Switch
-                            id={id}
-                            checked={value}
-                            onCheckedChange={(v) => updateSettings({ [key]: v } as Partial<Settings>)}
-                        />
-                    </Row>
-                );
-            })}
+            {isLoading ? (
+                <div className="px-4 py-3 text-xs text-muted-foreground">Chargement…</div>
+            ) : (
+                CATEGORY_ORDER.map((category, i) => {
+                    const pref = byCategory.get(category);
+                    const emailEnabled = pref?.emailEnabled ?? true;
+                    const pushEnabled = pref?.pushEnabled ?? true;
+                    const id = `notif-${category}`;
+                    return (
+                        <Row key={category} last={i === CATEGORY_ORDER.length - 1}>
+                            <Label htmlFor={id} className="text-sm font-normal text-foreground">
+                                {CATEGORY_LABELS[category]}
+                            </Label>
+                            <Switch
+                                id={id}
+                                checked={emailEnabled}
+                                onCheckedChange={(v) =>
+                                    updatePreference.mutate({ category, emailEnabled: v, pushEnabled })
+                                }
+                            />
+                        </Row>
+                    );
+                })
+            )}
         </Section>
     );
 }
