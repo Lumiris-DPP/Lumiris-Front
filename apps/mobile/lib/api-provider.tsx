@@ -5,6 +5,7 @@ import { env } from '@/env';
 import { readToken, readRefreshToken, updateTokens } from '@/lib/auth/storage';
 import { clearUser } from '@/lib/auth';
 import { WardrobeSyncBridge } from '@/lib/wardrobe-sync-bridge';
+import { PushRegistrationBridge } from '@/lib/push-registration-bridge';
 
 export function ClientApiProvider({ children }: { children: React.ReactNode }) {
     return (
@@ -16,6 +17,7 @@ export function ClientApiProvider({ children }: { children: React.ReactNode }) {
             onUnauthorized={clearUser}
         >
             <WardrobeSyncBridge />
+            <PushRegistrationBridge />
             {children}
         </ApiProvider>
     );

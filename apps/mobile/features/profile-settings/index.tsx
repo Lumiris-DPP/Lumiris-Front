@@ -15,6 +15,7 @@ import { useUser } from '@/lib/auth';
 import { SectionLabel } from '@/lib/section';
 import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
 import { updateSettings, useSettings, type Settings, type ThemePref } from '@/lib/settings';
+import { usePushOptIn } from './use-push-optin';
 
 const APP_VERSION = '0.1.0';
 
@@ -36,6 +37,7 @@ export function ProfileSettings() {
                 <AccountSection displayName={user.displayName} email={user.email} city={user.city ?? ''} />
                 <AppearanceSection settings={settings} />
                 <NotificationsSection />
+                <PushSection />
                 <PrivacyLink />
             </motion.div>
 
@@ -281,6 +283,43 @@ function NotificationsSection() {
                     );
                 })
             )}
+        </Section>
+    );
+}
+
+// Le toggle par catégorie ci-dessus ne couvre que l'email pour l'instant (voir NotificationsSection) —
+// celui-ci est le seul endroit qui active/désactive le canal push lui-même (opt-in navigateur +
+// abonnement côté back), séparément du choix par catégorie.
+function PushSection() {
+    const { status, pending, toggle } = usePushOptIn();
+
+    if (status === 'unsupported') {
+        return null;
+    }
+
+    return (
+        <Section title="Notifications push">
+            <Row last>
+                <div className="flex flex-col gap-0.5">
+                    <Label htmlFor="push-optin" className="text-sm font-normal text-foreground">
+                        Recevoir des notifications push
+                    </Label>
+                    {status === 'unavailable' ? (
+                        <span className="text-[11px] text-muted-foreground">Indisponible pour le moment.</span>
+                    ) : null}
+                    {status === 'denied' ? (
+                        <span className="text-[11px] text-muted-foreground">
+                            Bloquées au niveau du navigateur — à réactiver dans ses réglages.
+                        </span>
+                    ) : null}
+                </div>
+                <Switch
+                    id="push-optin"
+                    checked={status === 'on'}
+                    disabled={status === 'unavailable' || status === 'denied' || pending}
+                    onCheckedChange={toggle}
+                />
+            </Row>
         </Section>
     );
 }

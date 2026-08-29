@@ -13,6 +13,7 @@ export * from './atelier-stats';
 export * from './orders';
 export * from './notifications';
 export * from './notification-preferences';
+export * from './push';
 export * from './order-labels';
 export * from './seller-labels';
 export * from './dashboard';
