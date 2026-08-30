@@ -238,7 +238,6 @@ const CATEGORY_ORDER: readonly NotificationCategory[] = [
     'PAYMENTS',
     'RETURNS_DISPUTES',
     'PASSPORT',
-    'ATELIER',
     'WARDROBE',
     'FAVORITES',
 ];
@@ -248,8 +247,7 @@ const CATEGORY_LABELS: Record<NotificationCategory, string> = {
     PAYMENTS: 'Paiements',
     RETURNS_DISPUTES: 'Retours & litiges',
     PASSPORT: 'Passeports produits',
-    ATELIER: 'Atelier (retouches)',
-    WARDROBE: 'Garde-Robe (entretien, garantie, certificats)',
+    WARDROBE: 'Garde-Robe (entretien, garantie)',
     FAVORITES: 'Favoris (stock, prix)',
 };
 
