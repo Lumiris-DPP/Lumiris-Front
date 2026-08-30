@@ -5,7 +5,7 @@ import { useVapidPublicKey, usePushSubscribe, usePushUnsubscribe } from '@lumiri
 import type { PushSubscriptionPayload } from '@lumiris/api-client';
 import { getExistingPushSubscription, isPushSupported, subscribeToPush } from '@/lib/push';
 
-export type PushOptInStatus = 'unsupported' | 'unavailable' | 'denied' | 'off' | 'on';
+type PushOptInStatus = 'unsupported' | 'unavailable' | 'denied' | 'off' | 'on';
 
 // unsupported: navigateur sans Service Worker/Push API (ex. Safari iOS < 16.4, ou Tauri webview).
 // unavailable: VAPID non configuré côté back — rien à quoi s'abonner.
