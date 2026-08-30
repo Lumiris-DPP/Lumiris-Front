@@ -34,6 +34,10 @@ export const dppFormPayloadSchema = z.object({
     isRepairable: z.boolean().nullish(),
     endOfLifeInstructions: z.string().nullish(),
     quantity: z.number().int().min(1).nullish(),
+    // Rattache un certificat déjà présent dans la bibliothèque de l'artisan (id certificate_library)
+    // au lieu d'un nouvel upload pour ce champ — voir CertUploadField / /certifications.
+    transactionCertLibraryId: z.string().nullish(),
+    originCertLibraryId: z.string().nullish(),
 });
 export type DppFormPayload = z.infer<typeof dppFormPayloadSchema>;
 

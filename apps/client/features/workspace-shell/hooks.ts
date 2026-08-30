@@ -5,7 +5,6 @@ import type { Artisan, ArtisanTier } from '@lumiris/types';
 import { useNotifications, useSellerOrders } from '@lumiris/api-client/react';
 import { useAuthStore } from '@/lib/auth-store';
 import { useBilling } from '@/lib/billing-store';
-import { useCertificatesForArtisan } from '@/lib/certificates-store';
 import { usePassports } from '@/lib/passports-source';
 import { buildNotifications, toAtelierNotifications, type AtelierNotification } from '@/lib/notifications';
 
@@ -40,7 +39,6 @@ export function usePendingOrderCount(): number {
 // commandes. Les secondes passent devant : une commande à expédier prime sur un rappel.
 export function useWorkspaceNotifications(artisan: Artisan): readonly AtelierNotification[] {
     const passports = usePassports(artisan.id);
-    const certificates = useCertificatesForArtisan(artisan.id);
     const token = useAuthStore((s) => s.token);
     const { data: serverNotifications = [] } = useNotifications({ enabled: Boolean(token) });
 
@@ -50,10 +48,9 @@ export function useWorkspaceNotifications(artisan: Artisan): readonly AtelierNot
             ...buildNotifications({
                 artisan,
                 passports,
-                certificates,
                 hasServerNotifications: serverNotifications.length > 0,
             }),
         ],
-        [serverNotifications, artisan, passports, certificates],
+        [serverNotifications, artisan, passports],
     );
 }

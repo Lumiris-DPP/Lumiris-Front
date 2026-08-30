@@ -7,6 +7,7 @@ import { dppApi } from './modules/dpp';
 import { artisansApi } from './modules/artisans';
 import { adminArtisansApi } from './modules/admin-artisans';
 import { adminEmailsApi } from './modules/admin-emails';
+import { certificateLibraryApi } from './modules/certificate-library';
 import { favoritesApi } from './modules/favorites';
 import { marketplaceApi } from './modules/marketplace';
 import { trackApi } from './modules/track';
@@ -34,6 +35,7 @@ export function createClient(opts: ClientOptions) {
         artisans: artisansApi(http),
         adminArtisans: adminArtisansApi(http),
         adminEmails: adminEmailsApi(http),
+        certificateLibrary: certificateLibraryApi(http),
         marketplace: marketplaceApi(http),
         favorites: favoritesApi(http),
         track: trackApi(http),

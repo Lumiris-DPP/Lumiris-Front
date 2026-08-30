@@ -42,6 +42,11 @@ export interface DraftPassport {
     traceability: TraceabilityInfo;
     eco: EcoInfo;
     files: Partial<Record<string, File>>;
+    // Certificat choisi dans la bibliothèque (id certificate_library) au lieu d'un nouvel upload,
+    // indexé par DocumentType. Contrairement à `files`, une string est sérialisable — survit à un
+    // refresh sans le mécanisme filesDropped. Mutuellement exclusif avec `files` pour le même
+    // DocumentType (voir setFile/setLibraryCertRef).
+    libraryCertRefs?: Partial<Record<string, string>>;
     // Documents déjà stockés côté backend, indexés par DocumentType (PRODUCT_PHOTO inclus).
     // Un `File` n'est ni sérialisable ni reconstructible : c'est ce descripteur qui permet aux
     // champs d'upload d'afficher « déjà envoyé » à la reprise d'un brouillon. Un nouveau fichier
@@ -66,6 +71,7 @@ interface DraftStoreState {
     setTraceability: (id: string, traceability: TraceabilityInfo) => void;
     setEco: (id: string, eco: EcoInfo) => void;
     setFile: (id: string, docType: string, file: File | null) => void;
+    setLibraryCertRef: (id: string, docType: string, libraryId: string | null) => void;
     setLastStep: (id: string, step: WizardStep) => void;
     clearFilesDropped: (id: string) => void;
     deleteDraft: (id: string) => void;
@@ -126,6 +132,7 @@ export const useDraftStore = create<DraftStoreState>()(
                     traceability: emptyTraceability(),
                     eco: {},
                     files: {},
+                    libraryCertRefs: {},
                 };
                 set((s) => ({ ...s, drafts: { ...s.drafts, [draftId]: draft } }));
                 return draftId;
@@ -148,13 +155,42 @@ export const useDraftStore = create<DraftStoreState>()(
                     const files = { ...draft.files };
                     if (file === null) delete files[docType];
                     else files[docType] = file;
+                    // Un nouvel upload prime sur une référence bibliothèque du même DocumentType —
+                    // les deux ne doivent jamais coexister (voir setLibraryCertRef, symétrique).
+                    const libraryCertRefs = { ...draft.libraryCertRefs };
+                    if (file !== null) delete libraryCertRefs[docType];
                     // Selecting a file resolves the "re-upload needed" prompt for this draft.
                     const filesDropped = file !== null ? false : draft.filesDropped;
                     return {
                         ...s,
                         drafts: {
                             ...s.drafts,
-                            [id]: { ...draft, files, filesDropped, updatedAt: new Date().toISOString() },
+                            [id]: {
+                                ...draft,
+                                files,
+                                libraryCertRefs,
+                                filesDropped,
+                                updatedAt: new Date().toISOString(),
+                            },
+                        },
+                    };
+                }),
+            setLibraryCertRef: (id, docType, libraryId) =>
+                set((s) => {
+                    const draft = s.drafts[id];
+                    if (!draft) return s;
+                    const libraryCertRefs = { ...draft.libraryCertRefs };
+                    if (libraryId === null) delete libraryCertRefs[docType];
+                    else libraryCertRefs[docType] = libraryId;
+                    // Choisir un certificat de la bibliothèque efface tout fichier brut du même
+                    // DocumentType — exclusion mutuelle symétrique à setFile.
+                    const files = { ...draft.files };
+                    if (libraryId !== null) delete files[docType];
+                    return {
+                        ...s,
+                        drafts: {
+                            ...s.drafts,
+                            [id]: { ...draft, files, libraryCertRefs, updatedAt: new Date().toISOString() },
                         },
                     };
                 }),

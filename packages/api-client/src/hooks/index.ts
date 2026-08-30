@@ -6,6 +6,7 @@ export * from './telemetry';
 export * from './artisans';
 export * from './admin-artisans';
 export * from './admin-emails';
+export * from './certificate-library';
 export * from './marketplace';
 export * from './track';
 export * from './seller';
