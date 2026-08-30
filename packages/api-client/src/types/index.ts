@@ -5,6 +5,7 @@ export * from './storage';
 export * from './telemetry';
 export * from './artisans';
 export * from './admin-artisans';
+export * from './admin-emails';
 export * from './marketplace';
 export * from './seller';
 export * from './wardrobe';
