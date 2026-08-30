@@ -9,16 +9,20 @@ import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { Switch } from '@lumiris/ui/components/switch';
 import { Tabs, TabsList, TabsTrigger } from '@lumiris/ui/components/tabs';
+import type { NotificationCategory } from '@lumiris/api-client';
+import { useNotificationPreferences, useUpdateNotificationPreference } from '@lumiris/api-client/react';
 import { useUser } from '@/lib/auth';
 import { SectionLabel } from '@/lib/section';
 import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
 import { updateSettings, useSettings, type Settings, type ThemePref } from '@/lib/settings';
+import { usePushOptIn } from './use-push-optin';
 
 const APP_VERSION = '0.1.0';
 
 export function ProfileSettings() {
     const { user, isAuthenticated } = useUser();
     const settings = useSettings();
+    const pushOptIn = usePushOptIn();
 
     if (!isAuthenticated || user === null) {
         return <NotConnectedNotice />;
@@ -33,7 +37,8 @@ export function ProfileSettings() {
             <motion.div className="flex flex-col gap-5 px-4" variants={slideUpFade} initial="initial" animate="animate">
                 <AccountSection displayName={user.displayName} email={user.email} city={user.city ?? ''} />
                 <AppearanceSection settings={settings} />
-                <NotificationsSection settings={settings} />
+                <NotificationsSection pushOptIn={pushOptIn} />
+                <PushSection pushOptIn={pushOptIn} />
                 <PrivacyLink />
             </motion.div>
 
@@ -225,31 +230,125 @@ function AppearanceSection({ settings }: { settings: Settings }) {
     );
 }
 
-const NOTIFS: ReadonlyArray<{ key: keyof Settings; label: string }> = [
-    { key: 'notifNewArticles', label: 'Nouveaux articles Journal' },
-    { key: 'notifNewArtisans', label: 'Nouveaux passeports d’artisans suivis' },
-    { key: 'notifReminders', label: 'Rappels d’entretien Garde-Robe' },
+// Ordre d'affichage pensé pour un acheteur : ce qui touche à son argent et ses achats d'abord,
+// l'entretien et les favoris ensuite. Les libellés couvrent l'email — le push suivra le même
+// découpage par catégorie une fois le canal branché.
+const CATEGORY_ORDER: readonly NotificationCategory[] = [
+    'ORDERS',
+    'PAYMENTS',
+    'RETURNS_DISPUTES',
+    'PASSPORT',
+    'WARDROBE',
+    'FAVORITES',
 ];
 
-function NotificationsSection({ settings }: { settings: Settings }) {
+const CATEGORY_LABELS: Record<NotificationCategory, string> = {
+    ORDERS: 'Commandes',
+    PAYMENTS: 'Paiements',
+    RETURNS_DISPUTES: 'Retours & litiges',
+    PASSPORT: 'Passeports produits',
+    WARDROBE: 'Garde-Robe (entretien, garantie)',
+    FAVORITES: 'Favoris (stock, prix)',
+};
+
+function NotificationsSection({ pushOptIn }: { pushOptIn: ReturnType<typeof usePushOptIn> }) {
+    const { data: preferences = [], isLoading } = useNotificationPreferences();
+    const updatePreference = useUpdateNotificationPreference();
+    const byCategory = new Map(preferences.map((pref) => [pref.category, pref]));
+    const pushGloballyOn = pushOptIn.status === 'on';
+
     return (
         <Section title="Notifications">
-            {NOTIFS.map(({ key, label }, i) => {
-                const value = settings[key] as boolean;
-                const id = `notif-${key}`;
-                return (
-                    <Row key={key} last={i === NOTIFS.length - 1}>
-                        <Label htmlFor={id} className="text-sm font-normal text-foreground">
-                            {label}
-                        </Label>
-                        <Switch
-                            id={id}
-                            checked={value}
-                            onCheckedChange={(v) => updateSettings({ [key]: v } as Partial<Settings>)}
-                        />
-                    </Row>
-                );
-            })}
+            {isLoading ? (
+                <div className="px-4 py-3 text-xs text-muted-foreground">Chargement…</div>
+            ) : (
+                <>
+                    {!pushGloballyOn ? (
+                        <div className="border-b border-border/40 px-4 py-2 text-[11px] text-muted-foreground">
+                            Active les notifications push ci-dessous pour choisir par catégorie.
+                        </div>
+                    ) : null}
+                    {CATEGORY_ORDER.map((category, i) => {
+                        const pref = byCategory.get(category);
+                        const emailEnabled = pref?.emailEnabled ?? true;
+                        const pushEnabled = pref?.pushEnabled ?? true;
+                        const emailId = `notif-email-${category}`;
+                        const pushId = `notif-push-${category}`;
+                        return (
+                            <div
+                                key={category}
+                                className={`flex flex-col gap-2 px-4 py-3 ${i === CATEGORY_ORDER.length - 1 ? '' : 'border-b border-border/40'}`}
+                            >
+                                <span className="text-sm font-normal text-foreground">{CATEGORY_LABELS[category]}</span>
+                                <div className="flex items-center gap-5">
+                                    <div className="flex items-center gap-2">
+                                        <Label htmlFor={emailId} className="text-xs font-normal text-muted-foreground">
+                                            Email
+                                        </Label>
+                                        <Switch
+                                            id={emailId}
+                                            checked={emailEnabled}
+                                            onCheckedChange={(v) =>
+                                                updatePreference.mutate({ category, emailEnabled: v, pushEnabled })
+                                            }
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Label htmlFor={pushId} className="text-xs font-normal text-muted-foreground">
+                                            Push
+                                        </Label>
+                                        <Switch
+                                            id={pushId}
+                                            checked={pushGloballyOn && pushEnabled}
+                                            disabled={!pushGloballyOn}
+                                            onCheckedChange={(v) =>
+                                                updatePreference.mutate({ category, emailEnabled, pushEnabled: v })
+                                            }
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </>
+            )}
+        </Section>
+    );
+}
+
+// Le toggle push global ci-dessous active/désactive le canal push lui-même (opt-in navigateur +
+// abonnement côté back) ; les switches "Push" par catégorie dans NotificationsSection n'ont
+// d'effet que si ce canal est actif — d'où leur désactivation tant qu'il ne l'est pas.
+function PushSection({ pushOptIn }: { pushOptIn: ReturnType<typeof usePushOptIn> }) {
+    const { status, pending, toggle } = pushOptIn;
+
+    if (status === 'unsupported') {
+        return null;
+    }
+
+    return (
+        <Section title="Notifications push">
+            <Row last>
+                <div className="flex flex-col gap-0.5">
+                    <Label htmlFor="push-optin" className="text-sm font-normal text-foreground">
+                        Recevoir des notifications push
+                    </Label>
+                    {status === 'unavailable' ? (
+                        <span className="text-[11px] text-muted-foreground">Indisponible pour le moment.</span>
+                    ) : null}
+                    {status === 'denied' ? (
+                        <span className="text-[11px] text-muted-foreground">
+                            Bloquées au niveau du navigateur — à réactiver dans ses réglages.
+                        </span>
+                    ) : null}
+                </div>
+                <Switch
+                    id="push-optin"
+                    checked={status === 'on'}
+                    disabled={status === 'unavailable' || status === 'denied' || pending}
+                    onCheckedChange={toggle}
+                />
+            </Row>
         </Section>
     );
 }

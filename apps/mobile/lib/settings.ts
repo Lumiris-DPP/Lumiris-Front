@@ -9,17 +9,11 @@ export type ThemePref = 'system' | 'light' | 'dark';
 export interface Settings {
     theme: ThemePref;
     reduceMotion: boolean;
-    notifNewArticles: boolean;
-    notifNewArtisans: boolean;
-    notifReminders: boolean;
 }
 
 const DEFAULT_SETTINGS: Settings = {
     theme: 'system',
     reduceMotion: false,
-    notifNewArticles: true,
-    notifNewArtisans: true,
-    notifReminders: false,
 };
 
 const EVENT = 'lumiris:settings-changed';
@@ -49,9 +43,6 @@ function pickSettings(value: unknown): Partial<Settings> {
     const out: Partial<Settings> = {};
     if (isThemePref(v.theme)) out.theme = v.theme;
     if (typeof v.reduceMotion === 'boolean') out.reduceMotion = v.reduceMotion;
-    if (typeof v.notifNewArticles === 'boolean') out.notifNewArticles = v.notifNewArticles;
-    if (typeof v.notifNewArtisans === 'boolean') out.notifNewArtisans = v.notifNewArtisans;
-    if (typeof v.notifReminders === 'boolean') out.notifReminders = v.notifReminders;
     return out;
 }
 

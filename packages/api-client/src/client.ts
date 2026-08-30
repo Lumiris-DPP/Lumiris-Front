@@ -6,6 +6,7 @@ import { subscriptionApi } from './modules/subscription';
 import { dppApi } from './modules/dpp';
 import { artisansApi } from './modules/artisans';
 import { adminArtisansApi } from './modules/admin-artisans';
+import { adminEmailsApi } from './modules/admin-emails';
 import { favoritesApi } from './modules/favorites';
 import { marketplaceApi } from './modules/marketplace';
 import { trackApi } from './modules/track';
@@ -13,6 +14,8 @@ import { sellerApi } from './modules/seller';
 import { wardrobeApi } from './modules/wardrobe';
 import { ordersApi, sellerOrdersApi } from './modules/orders';
 import { notificationsApi } from './modules/notifications';
+import { notificationPreferencesApi } from './modules/notification-preferences';
+import { pushApi } from './modules/push';
 import { disputesApi } from './modules/disputes';
 import { irisApi } from './modules/iris';
 import { atelierStatsApi, eventsApi } from './modules/atelier-stats';
@@ -30,6 +33,7 @@ export function createClient(opts: ClientOptions) {
         dpp: dppApi(http),
         artisans: artisansApi(http),
         adminArtisans: adminArtisansApi(http),
+        adminEmails: adminEmailsApi(http),
         marketplace: marketplaceApi(http),
         favorites: favoritesApi(http),
         track: trackApi(http),
@@ -38,6 +42,8 @@ export function createClient(opts: ClientOptions) {
         orders: ordersApi(http),
         sellerOrders: sellerOrdersApi(http),
         notifications: notificationsApi(http),
+        notificationPreferences: notificationPreferencesApi(http),
+        push: pushApi(http),
         disputes: disputesApi(http),
         iris: irisApi(http),
         atelierStats: atelierStatsApi(http),
