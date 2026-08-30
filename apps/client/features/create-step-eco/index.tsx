@@ -91,6 +91,8 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
         warrantyMonths: form.warrantyMonths ?? null,
         isRepairable: form.isRepairable ?? false,
         endOfLifeInstructions: form.endOfLifeInstructions ?? null,
+        transactionCertLibraryId: d.libraryCertRefs?.['TRANSACTION_CERTIFICATES'] ?? null,
+        originCertLibraryId: d.libraryCertRefs?.['ORIGIN_CERTIFICATES'] ?? null,
     });
 
     // Draft files are keyed by backend DocumentType; the endpoints expect part names.

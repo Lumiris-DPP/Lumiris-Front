@@ -8,6 +8,7 @@ import { Checkbox } from '@lumiris/ui/components/checkbox';
 import { WizardStepFrame } from '@/features/wizard-shell/step-frame';
 import { useStepNavigation } from '@/features/wizard-shell/use-step-navigation';
 import { DocUploadField } from '@/features/wizard-shell/doc-upload-field';
+import { CertUploadField } from '@/features/wizard-shell/cert-upload-field';
 import { useDraftStore } from '@/lib/draft-store';
 import { draftToValidationInput } from '@/features/wizard-shell/validation-input';
 import { validateStep } from './schema';
@@ -16,6 +17,7 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
     const draft = useDraftStore((s) => s.drafts[draftId]);
     const setTraceability = useDraftStore((s) => s.setTraceability);
     const setFile = useDraftStore((s) => s.setFile);
+    const setLibraryCertRef = useDraftStore((s) => s.setLibraryCertRef);
     const { goNext, goTo } = useStepNavigation(draftId);
 
     const [form, setForm] = useState<TraceabilityInfo>(
@@ -36,6 +38,12 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
     const [originCertsFile, setOriginCertsFile] = useState<File | null>(
         () => draft?.files?.['ORIGIN_CERTIFICATES'] ?? null,
     );
+    const [transactionCertLibraryId, setTransactionCertLibraryId] = useState<string | null>(
+        () => draft?.libraryCertRefs?.['TRANSACTION_CERTIFICATES'] ?? null,
+    );
+    const [originCertLibraryId, setOriginCertLibraryId] = useState<string | null>(
+        () => draft?.libraryCertRefs?.['ORIGIN_CERTIFICATES'] ?? null,
+    );
 
     const persistedTraceability = draft?.traceability;
     useEffect(() => {
@@ -53,6 +61,8 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
         setFile(draftId, 'TEST_REPORTS', testReportsFile);
         setFile(draftId, 'TRANSACTION_CERTIFICATES', transactionCertsFile);
         setFile(draftId, 'ORIGIN_CERTIFICATES', originCertsFile);
+        setLibraryCertRef(draftId, 'TRANSACTION_CERTIFICATES', transactionCertLibraryId);
+        setLibraryCertRef(draftId, 'ORIGIN_CERTIFICATES', originCertLibraryId);
     };
 
     const handleNext = () => {
@@ -209,24 +219,40 @@ export function CreateStepTraceability({ draftId }: { draftId: string }) {
                     existing={draft?.existingDocs?.['TEST_REPORTS']}
                 />
 
-                <DocUploadField
+                <CertUploadField
                     label="Certificats de Transaction (TC)"
                     description="Délivrés par des organismes comme GOTS ou RWS. Ils prouvent l'origine de la fibre depuis la ferme jusqu'à votre atelier."
-                    value={transactionCertsFile}
-                    onChange={(file) => {
+                    certType="TRANSACTION"
+                    file={transactionCertsFile}
+                    onFileChange={(file) => {
                         setTransactionCertsFile(file);
                         setFile(draftId, 'TRANSACTION_CERTIFICATES', file);
+                        if (file) setTransactionCertLibraryId(null);
+                    }}
+                    libraryId={transactionCertLibraryId}
+                    onLibrarySelect={(id) => {
+                        setTransactionCertLibraryId(id);
+                        setLibraryCertRef(draftId, 'TRANSACTION_CERTIFICATES', id);
+                        if (id) setTransactionCertsFile(null);
                     }}
                     existing={draft?.existingDocs?.['TRANSACTION_CERTIFICATES']}
                 />
 
-                <DocUploadField
+                <CertUploadField
                     label="Certificats d'Origine Géographique"
                     description="Pour la haute couture ou l'artisanat : labels officiels comme l'Indication Géographique Protégée (ex : Dentelle de Calais-Caudry) ou Appellation d'Origine."
-                    value={originCertsFile}
-                    onChange={(file) => {
+                    certType="ORIGIN"
+                    file={originCertsFile}
+                    onFileChange={(file) => {
                         setOriginCertsFile(file);
                         setFile(draftId, 'ORIGIN_CERTIFICATES', file);
+                        if (file) setOriginCertLibraryId(null);
+                    }}
+                    libraryId={originCertLibraryId}
+                    onLibrarySelect={(id) => {
+                        setOriginCertLibraryId(id);
+                        setLibraryCertRef(draftId, 'ORIGIN_CERTIFICATES', id);
+                        if (id) setOriginCertsFile(null);
                     }}
                     existing={draft?.existingDocs?.['ORIGIN_CERTIFICATES']}
                 />

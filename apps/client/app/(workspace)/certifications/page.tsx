@@ -1,11 +1,11 @@
 import { WorkspaceHeader } from '@/features/workspace-header';
-import { CertificationsList } from '@/features/certifications-list';
+import { CertificateLibrary } from '@/features/certificate-library';
 
 export default function CertificationsPage() {
     return (
         <>
-            <WorkspaceHeader title="Certifications" description="Vos labels et échéances." />
-            <CertificationsList />
+            <WorkspaceHeader title="Certifications" description="Vos certificats réutilisables sur vos passeports." />
+            <CertificateLibrary />
         </>
     );
 }
