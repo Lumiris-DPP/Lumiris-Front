@@ -19,3 +19,5 @@ export * from './push';
 export * from './order-labels';
 export * from './seller-labels';
 export * from './dashboard';
+export * from './repairers';
+export * from './kyb';

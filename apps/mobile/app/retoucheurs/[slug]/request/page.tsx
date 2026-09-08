@@ -1,11 +1,7 @@
-import { mockRepairers, mockRepairerById } from '@lumiris/mock-data';
+import { notFound } from 'next/navigation';
 import { MobileScreen } from '@/components/mobile-screen';
-import { NotFound } from '@/components/not-found';
+import { fetchPublicRepairer } from '@/lib/public-repairer-api';
 import { PrefilledRepairRequest } from './prefilled-repair-request';
-
-export function generateStaticParams() {
-    return mockRepairers.map((r) => ({ slug: r.id }));
-}
 
 interface RouteProps {
     params: Promise<{ slug: string }>;
@@ -13,10 +9,12 @@ interface RouteProps {
 
 export default async function RepairRequestRoute({ params }: RouteProps) {
     const { slug } = await params;
-    const repairer = mockRepairerById(slug);
 
-    if (!repairer) {
-        return <NotFound />;
+    let repairer;
+    try {
+        repairer = await fetchPublicRepairer(slug);
+    } catch {
+        notFound();
     }
 
     return (

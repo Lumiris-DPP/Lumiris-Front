@@ -16,6 +16,11 @@ export function useAdminArtisansList() {
     return useListQuery<ArtisanProfileResponse[]>(adminArtisanKeys.list(), () => client.adminArtisans.listPending());
 }
 
+export function useAdminArtisansAll() {
+    const client = useApiClient();
+    return useListQuery<ArtisanProfileResponse[]>(adminArtisanKeys.custom('all'), () => client.adminArtisans.listAll());
+}
+
 export function useVerifyArtisan(
     options?: Omit<UseMutationOptions<ArtisanProfileResponse, Error, string>, 'mutationFn'>,
 ) {
@@ -38,6 +43,36 @@ export function useRejectArtisan(
     const queryClient = useQueryClient();
     return useMutation<ArtisanProfileResponse, Error, { id: string; reason?: string }>({
         mutationFn: ({ id, reason }) => client.adminArtisans.reject(id, { reason } as RejectArtisanRequest),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.invalidateQueries({ queryKey: adminArtisanKeys.all });
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+export function useMarkArtisanKybOngoing(
+    options?: Omit<UseMutationOptions<ArtisanProfileResponse, Error, string>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<ArtisanProfileResponse, Error, string>({
+        mutationFn: (id) => client.adminArtisans.markOngoing(id),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.invalidateQueries({ queryKey: adminArtisanKeys.all });
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+export function useMarkArtisanKybIncomplete(
+    options?: Omit<UseMutationOptions<ArtisanProfileResponse, Error, { id: string; reason?: string }>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<ArtisanProfileResponse, Error, { id: string; reason?: string }>({
+        mutationFn: ({ id, reason }) => client.adminArtisans.markIncomplete(id, { reason } as RejectArtisanRequest),
         ...options,
         onSuccess: (...args) => {
             queryClient.invalidateQueries({ queryKey: adminArtisanKeys.all });

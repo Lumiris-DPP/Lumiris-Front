@@ -9,6 +9,7 @@ import { adminArtisansApi } from './modules/admin-artisans';
 import { adminEmailsApi } from './modules/admin-emails';
 import { certificateLibraryApi } from './modules/certificate-library';
 import { favoritesApi } from './modules/favorites';
+import { adminRepairersApi } from './modules/admin-repairers';
 import { marketplaceApi } from './modules/marketplace';
 import { trackApi } from './modules/track';
 import { sellerApi } from './modules/seller';
@@ -21,6 +22,7 @@ import { disputesApi } from './modules/disputes';
 import { irisApi } from './modules/iris';
 import { atelierStatsApi, eventsApi } from './modules/atelier-stats';
 import { dashboardApi } from './modules/dashboard';
+import { repairersApi, repairRequestsApi } from './modules/repairers';
 
 export type ClientOptions = HttpOptions;
 
@@ -36,6 +38,7 @@ export function createClient(opts: ClientOptions) {
         adminArtisans: adminArtisansApi(http),
         adminEmails: adminEmailsApi(http),
         certificateLibrary: certificateLibraryApi(http),
+        adminRepairers: adminRepairersApi(http),
         marketplace: marketplaceApi(http),
         favorites: favoritesApi(http),
         track: trackApi(http),
@@ -51,6 +54,8 @@ export function createClient(opts: ClientOptions) {
         atelierStats: atelierStatsApi(http),
         events: eventsApi(http),
         dashboard: dashboardApi(http),
+        repairers: repairersApi(http),
+        repairRequests: repairRequestsApi(http),
     };
 }
 

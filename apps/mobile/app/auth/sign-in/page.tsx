@@ -69,6 +69,12 @@ function SignInForm() {
                       role: 'consumer',
                   })
                 : await loginMutation.mutateAsync({ email: trimmedEmail, password });
+            // VISION est réservé aux comptes consommateur — un artisan/réparateur/admin doit
+            // utiliser ATELIER ou la console admin, même si ses identifiants sont valides ici.
+            if (user.role !== 'consumer') {
+                setError('Ce compte n’est pas un compte consommateur. Utilisez ATELIER ou la console admin.');
+                return;
+            }
             signIn(user, token, refreshToken);
             // Un `returnTo` interne (ex. depuis le paiement) est prioritaire sur la destination
             // par défaut, pour ramener l'utilisateur exactement là où il s'était arrêté.
@@ -89,7 +95,7 @@ function SignInForm() {
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div className="flex flex-col gap-2">
-                <Label htmlFor="email" className="text-xs font-semibold text-foreground/80">
+                <Label htmlFor="email" className="text-foreground/80 text-xs font-semibold">
                     E-mail
                 </Label>
                 <Input
@@ -106,7 +112,7 @@ function SignInForm() {
             </div>
             {isSignup ? (
                 <div className="flex flex-col gap-2">
-                    <Label htmlFor="displayName" className="text-xs font-semibold text-foreground/80">
+                    <Label htmlFor="displayName" className="text-foreground/80 text-xs font-semibold">
                         Prénom
                     </Label>
                     <Input
@@ -122,7 +128,7 @@ function SignInForm() {
                 </div>
             ) : null}
             <div className="flex flex-col gap-2">
-                <Label htmlFor="password" className="text-xs font-semibold text-foreground/80">
+                <Label htmlFor="password" className="text-foreground/80 text-xs font-semibold">
                     Mot de passe
                 </Label>
                 <Input
@@ -142,14 +148,14 @@ function SignInForm() {
                         type="button"
                         onClick={() => setShowReset((v) => !v)}
                         aria-expanded={showReset}
-                        className="text-[11px] text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                        className="text-muted-foreground hover:text-foreground text-[11px] underline-offset-4 hover:underline"
                     >
                         Mot de passe oublié ?
                     </button>
                     {showReset ? (
                         <p
                             role="note"
-                            className="mt-2 rounded-xl border border-border/60 bg-card/60 p-3 text-[11px] leading-relaxed text-muted-foreground"
+                            className="border-border/60 bg-card/60 text-muted-foreground mt-2 rounded-xl border p-3 text-[11px] leading-relaxed"
                         >
                             La réinitialisation du mot de passe par e-mail arrive bientôt. En attendant, écris-nous à{' '}
                             <a
@@ -164,19 +170,19 @@ function SignInForm() {
                 </div>
             ) : null}
             {error ? (
-                <p className="text-xs text-destructive" role="alert">
+                <p className="text-destructive text-xs" role="alert">
                     {error}
                 </p>
             ) : null}
             <Button
                 type="submit"
                 disabled={isPending}
-                className="h-11 w-full rounded-full bg-foreground text-sm font-semibold text-background hover:bg-foreground/90"
+                className="bg-foreground text-background hover:bg-foreground/90 h-11 w-full rounded-full text-sm font-semibold"
             >
                 {isPending ? 'Un instant…' : 'Continuer'}
             </Button>
             {isSignup ? (
-                <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
+                <p className="text-muted-foreground text-center text-[11px] leading-relaxed">
                     En continuant, tu acceptes les{' '}
                     <Link href="/about#cgu" className="text-foreground underline-offset-4 hover:underline">
                         CGV
@@ -188,7 +194,7 @@ function SignInForm() {
                     .
                 </p>
             ) : (
-                <p className="text-center text-[11px] text-muted-foreground">Connecte-toi à ton compte LUMIRIS.</p>
+                <p className="text-muted-foreground text-center text-[11px]">Connecte-toi à ton compte LUMIRIS.</p>
             )}
         </form>
     );
@@ -196,12 +202,12 @@ function SignInForm() {
 
 export default function SignInPage() {
     return (
-        <div className="relative flex h-full flex-col px-6 pt-12 pb-10">
+        <div className="relative flex h-full flex-col px-6 pb-10 pt-12">
             <IridescentBackground intensity="subtle" />
 
             <Link
                 href="/auth"
-                className="inline-flex w-fit items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-1 text-xs"
             >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 Retour
@@ -214,9 +220,9 @@ export default function SignInPage() {
                 animate="animate"
             >
                 <GlassCard className="w-full max-w-sm p-7">
-                    <h1 className="text-xl font-bold tracking-tight text-foreground">Bienvenue</h1>
+                    <h1 className="text-foreground text-xl font-bold tracking-tight">Bienvenue</h1>
                     <div className="mt-6">
-                        <Suspense fallback={<p className="text-xs text-muted-foreground">Chargement…</p>}>
+                        <Suspense fallback={<p className="text-muted-foreground text-xs">Chargement…</p>}>
                             <SignInForm />
                         </Suspense>
                     </div>

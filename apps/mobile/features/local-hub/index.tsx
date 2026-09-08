@@ -4,8 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
 import { MapPin, SlidersHorizontal } from 'lucide-react';
-import type { ArtisanWithSlug } from '@lumiris/mock-data';
-import type { Repairer } from '@lumiris/types';
+import { useArtisansDirectory, useRepairerSearch } from '@lumiris/api-client/react';
 import { cn } from '@lumiris/ui/lib/cn';
 import { useUserCoords } from '@/lib/geolocation/use-user-coords';
 import { hasSeenGeolocPrompt, markGeolocPromptSeen } from '@/lib/geolocation/permission-storage';
@@ -21,12 +20,12 @@ import { PermissionPrompt } from './permission-prompt';
 import type { LocalPoint } from './types';
 import { ViewToggle, type LocalView } from './view-toggle';
 
-export interface LocalHubProps {
-    artisans: readonly ArtisanWithSlug[];
-    repairers: readonly Repairer[];
-}
+// Paris, used as the repairer search origin until the user shares (or denies) their location —
+// the backend geo-search needs a lat/lng to query, unlike the artisan directory (no geo-search
+// backend yet, so it's a flat list regardless of position).
+const DEFAULT_COORDS = { lat: 48.8566, lng: 2.3522 };
 
-export function LocalHub({ artisans, repairers }: LocalHubProps) {
+export function LocalHub() {
     const online = useOnlineStatus();
     const { coords, status, request } = useUserCoords();
     const searchParams = useSearchParams();
@@ -39,17 +38,19 @@ export function LocalHub({ artisans, repairers }: LocalHubProps) {
     const [filterSheetOpen, setFilterSheetOpen] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [showGeolocPrompt, setShowGeolocPrompt] = useState(false);
-    const [loading, setLoading] = useState(true);
 
-    // Skeletons à l'entrée : simule le chargement de l'annuaire partenaires.
-    useEffect(() => {
-        const timer = setTimeout(() => setLoading(false), 450);
-        return () => clearTimeout(timer);
-    }, []);
+    const searchOrigin = coords ?? DEFAULT_COORDS;
+    const artisansQuery = useArtisansDirectory();
+    const repairersQuery = useRepairerSearch({
+        lat: searchOrigin.lat,
+        lng: searchOrigin.lng,
+        radiusKm: DISTANCE_MAX_KM,
+    });
+    const loading = artisansQuery.isLoading || repairersQuery.isLoading;
 
     const points = useMemo(
-        () => toLocalPoints(artisans, repairers, { userCoords: coords ?? undefined }),
-        [artisans, repairers, coords],
+        () => toLocalPoints(artisansQuery.data ?? [], repairersQuery.data ?? []),
+        [artisansQuery.data, repairersQuery.data],
     );
 
     const specialtyOptions = useMemo(() => {
@@ -118,16 +119,16 @@ export function LocalHub({ artisans, repairers }: LocalHubProps) {
     const filterCount = activeFilterCount(filters);
 
     return (
-        <div className="relative flex h-full flex-col bg-background">
-            <header className="flex shrink-0 items-start justify-between gap-3 px-5 pt-12 pb-3">
+        <div className="bg-background relative flex h-full flex-col">
+            <header className="flex shrink-0 items-start justify-between gap-3 px-5 pb-3 pt-12">
                 <div className="min-w-0">
-                    <h1 className="text-xl font-bold text-foreground">Local</h1>
-                    <p className="text-sm text-muted-foreground">Ateliers et retoucheurs partenaires près de toi</p>
+                    <h1 className="text-foreground text-xl font-bold">Local</h1>
+                    <p className="text-muted-foreground text-sm">Ateliers et retoucheurs partenaires près de toi</p>
                 </div>
                 <ViewToggle value={view} onChange={handleViewChange} />
             </header>
 
-            <div className="sticky top-0 z-20 flex shrink-0 items-center gap-2 bg-background/85 px-5 pt-1 pb-3 backdrop-blur-xl">
+            <div className="bg-background/85 sticky top-0 z-20 flex shrink-0 items-center gap-2 px-5 pb-3 pt-1 backdrop-blur-xl">
                 <div className="min-w-0 flex-1 overflow-x-auto">
                     <FilterPills value={kind} onChange={setKind} counts={counts} />
                 </div>
@@ -137,7 +138,7 @@ export function LocalHub({ artisans, repairers }: LocalHubProps) {
                     aria-label={`Filtres${filterCount > 0 ? `, ${filterCount} actif${filterCount > 1 ? 's' : ''}` : ''}`}
                     className={cn(
                         'relative inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-colors',
-                        'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:outline-none',
+                        'focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
                         filterCount > 0
                             ? 'border-primary bg-primary/10 text-primary'
                             : 'border-border/60 bg-card text-muted-foreground hover:text-foreground',
@@ -146,7 +147,7 @@ export function LocalHub({ artisans, repairers }: LocalHubProps) {
                     <SlidersHorizontal className="h-4 w-4" strokeWidth={1.5} aria-hidden />
                     Filtres
                     {filterCount > 0 ? (
-                        <span className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 font-mono text-[10px] font-bold text-primary-foreground tabular-nums">
+                        <span className="bg-primary text-primary-foreground inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 font-mono text-[10px] font-bold tabular-nums">
                             {filterCount}
                         </span>
                     ) : null}
@@ -154,15 +155,15 @@ export function LocalHub({ artisans, repairers }: LocalHubProps) {
             </div>
 
             {showDeniedBanner ? (
-                <div className="mx-5 mb-3 flex shrink-0 items-center justify-between gap-2 rounded-2xl border border-border/40 bg-card/80 px-3 py-2 text-xs backdrop-blur-md">
-                    <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                <div className="border-border/40 bg-card/80 mx-5 mb-3 flex shrink-0 items-center justify-between gap-2 rounded-2xl border px-3 py-2 text-xs backdrop-blur-md">
+                    <span className="text-muted-foreground inline-flex items-center gap-1.5">
                         <MapPin className="h-3.5 w-3.5" aria-hidden />
-                        Position non partagée, tri par note.
+                        Position non partagée, résultats centrés sur Paris.
                     </span>
                     <button
                         type="button"
                         onClick={() => setShowGeolocPrompt(true)}
-                        className="font-semibold text-foreground underline-offset-2 hover:underline"
+                        className="text-foreground font-semibold underline-offset-2 hover:underline"
                     >
                         Réactiver
                     </button>
@@ -184,7 +185,7 @@ export function LocalHub({ artisans, repairers }: LocalHubProps) {
                         />
                         <AnimatePresence>
                             {selected ? (
-                                <div key="mini-card" className="pointer-events-none absolute inset-x-3 bottom-3 z-1000">
+                                <div key="mini-card" className="z-1000 pointer-events-none absolute inset-x-3 bottom-3">
                                     <div className="pointer-events-auto">
                                         <MiniPointCard point={selected} onClose={() => setSelectedId(null)} />
                                     </div>

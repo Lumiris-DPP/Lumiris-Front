@@ -1,3 +1,5 @@
+import type { KybDetailsResponse } from './kyb';
+
 export type ArtisanStatus = 'PENDING' | 'VERIFIED' | 'REJECTED';
 
 export interface ArtisanProfileResponse {
@@ -28,6 +30,7 @@ export interface ArtisanProfileResponse {
     websiteUrl?: string;
     links?: Record<string, string>;
     photos: ArtisanPhotoResponse[];
+    kyb?: KybDetailsResponse;
 }
 
 // Mise en congés de l'atelier : les pièces restent achetables, le délai d'expédition annoncé est

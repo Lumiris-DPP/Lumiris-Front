@@ -1,14 +1,8 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { mockRepairers, mockRepairerById } from '@lumiris/mock-data';
 import { MobileScreen } from '@/components/mobile-screen';
+import { fetchPublicRepairer, fetchRepairerReviews } from '@/lib/public-repairer-api';
 import { RepairerProfile } from '@/features/repairers/profile';
-
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-    return mockRepairers.map((r) => ({ slug: r.id }));
-}
 
 interface RouteProps {
     params: Promise<{ slug: string }>;
@@ -16,14 +10,19 @@ interface RouteProps {
 
 export default async function RepairerRoute({ params }: RouteProps) {
     const { slug } = await params;
-    const repairer = mockRepairerById(slug);
 
-    if (!repairer) notFound();
+    let repairer;
+    try {
+        repairer = await fetchPublicRepairer(slug);
+    } catch {
+        notFound();
+    }
+    const reviews = await fetchRepairerReviews(slug).catch(() => []);
 
     return (
         <MobileScreen>
             <Suspense fallback={null}>
-                <RepairerProfile repairer={repairer} />
+                <RepairerProfile repairer={repairer} reviews={reviews} />
             </Suspense>
         </MobileScreen>
     );
