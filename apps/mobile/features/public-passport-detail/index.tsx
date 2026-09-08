@@ -21,7 +21,7 @@ import type { IrisGrade } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
 import { fiberLabel } from '@lumiris/scoring-ui';
 import type { OriginMapOriginPoint, OriginMapStepPoint } from '@lumiris/scoring-ui/components/origin-map';
-import { formatCents } from '@/lib/marketplace';
+import { formatCents, recordSuggestionOrigin } from '@/lib/marketplace';
 import { routes } from '@/lib/routes';
 import type { DppAccessLevel, DppEventDto, DppEventActorType, DppFormDto, IrisScoreDto } from '@lumiris/api-client';
 import { addPublicDpp, removePublicDpp, useWardrobe } from '@/lib/wardrobe-storage';
@@ -296,7 +296,9 @@ export function PublicPassportDetail({
                         <Link
                             href={routes.product(buyProduct.id)}
                             onClick={() => {
-                                if (publicCode) trackEvent({ publicCode, type: 'SUGGESTION_CLICK' });
+                                if (!publicCode) return;
+                                trackEvent({ publicCode, type: 'SUGGESTION_CLICK' });
+                                recordSuggestionOrigin(buyProduct.id, publicCode);
                             }}
                             className="bg-primary text-primary-foreground flex items-center justify-between gap-3 rounded-2xl px-4 py-3.5 text-sm font-semibold shadow-sm transition-opacity active:opacity-90"
                         >

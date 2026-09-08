@@ -6,13 +6,14 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Loader2, Lock, LogIn, UserPlus } from 'lucide-react';
 import { Elements } from '@stripe/react-stripe-js';
-import { useApiClient } from '@lumiris/api-client/react';
+import { useApiClient, useTrackEvent } from '@lumiris/api-client/react';
 import type { PaymentIntentResponse } from '@lumiris/api-client';
 import { routes } from '@/lib/routes';
 import { useUser } from '@/lib/auth/use-user';
 import {
     clearCart,
     readShippingAddress,
+    takeConversionOrigins,
     useCartDetails,
     type CartShipment,
     type ShippingAddress,
@@ -47,6 +48,7 @@ export function Checkout() {
     const router = useRouter();
     const { user, isAuthenticated } = useUser();
     const client = useApiClient();
+    const { mutate: trackEvent } = useTrackEvent();
     const { items, shipments, subtotalCents, shippingCents, totalCents, isLoading } = useCartDetails();
 
     const [step, setStep] = useState<Step>('address');
@@ -121,7 +123,7 @@ export function Checkout() {
     }
 
     return (
-        <div className="flex h-full flex-col overflow-y-auto bg-background pb-44 md:pb-20">
+        <div className="bg-background flex h-full flex-col overflow-y-auto pb-44 md:pb-20">
             <CheckoutHeader step={step} onBack={() => (step === 'payment' ? setStep('address') : router.back())} />
 
             <div className="mx-auto w-full max-w-md px-4 md:max-w-4xl md:px-6">
@@ -139,7 +141,7 @@ export function Checkout() {
                         }}
                     />
                 ) : !intent || !address ? (
-                    <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
+                    <div className="text-muted-foreground flex items-center justify-center gap-2 py-16 text-sm">
                         <Loader2 className="h-4 w-4 animate-spin" /> Préparation du paiement sécurisé…
                     </div>
                 ) : (
@@ -152,6 +154,11 @@ export function Checkout() {
                             amountTotalCents={intent.amountTotalCents}
                             onEditAddress={() => setStep('address')}
                             onPaid={(paymentIntentId) => {
+                                // Rattache la conversion au passeport d'origine (clic suggestion) avant de
+                                // vider le panier — après, l'info productId → publicCode n'a plus de sens.
+                                for (const publicCode of takeConversionOrigins(items.map((it) => it.product.id))) {
+                                    trackEvent({ publicCode, type: 'CONVERSION' });
+                                }
                                 intentCache.clear();
                                 clearCart();
                                 router.replace(routes.order(paymentIntentId));
@@ -204,7 +211,7 @@ function AddressForm({
 function CheckoutHeader({ step, onBack }: { step: Step; onBack: () => void }) {
     return (
         <motion.header
-            className="mx-auto flex w-full max-w-md items-center gap-3 px-4 pt-12 pb-3 md:max-w-4xl md:px-6"
+            className="mx-auto flex w-full max-w-md items-center gap-3 px-4 pb-3 pt-12 md:max-w-4xl md:px-6"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
         >
@@ -212,13 +219,13 @@ function CheckoutHeader({ step, onBack }: { step: Step; onBack: () => void }) {
                 type="button"
                 onClick={onBack}
                 aria-label="Retour"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground"
+                className="border-border bg-card text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full border"
             >
                 <ArrowLeft className="h-4 w-4" />
             </button>
             <div className="min-w-0 flex-1">
-                <h1 className="text-base font-bold text-foreground">{step === 'address' ? 'Livraison' : 'Paiement'}</h1>
-                <p className="text-xs text-muted-foreground">Étape {step === 'address' ? 1 : 2} sur 2</p>
+                <h1 className="text-foreground text-base font-bold">{step === 'address' ? 'Livraison' : 'Paiement'}</h1>
+                <p className="text-muted-foreground text-xs">Étape {step === 'address' ? 1 : 2} sur 2</p>
             </div>
             <StepDots active={step === 'address' ? 0 : 1} />
         </motion.header>
@@ -232,7 +239,7 @@ function StepDots({ active }: { active: number }) {
                 <span
                     key={index}
                     className={`h-1.5 rounded-full transition-all ${
-                        index === active ? 'w-5 bg-foreground' : 'w-1.5 bg-border'
+                        index === active ? 'bg-foreground w-5' : 'bg-border w-1.5'
                     }`}
                 />
             ))}
@@ -242,27 +249,27 @@ function StepDots({ active }: { active: number }) {
 
 function SignInGate({ onBack }: { onBack: () => void }) {
     return (
-        <div className="flex h-full flex-col items-center justify-center gap-5 bg-background px-8 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-3xl border border-border/60 bg-card">
-                <Lock className="h-6 w-6 text-muted-foreground" />
+        <div className="bg-background flex h-full flex-col items-center justify-center gap-5 px-8 text-center">
+            <div className="border-border/60 bg-card flex h-16 w-16 items-center justify-center rounded-3xl border">
+                <Lock className="text-muted-foreground h-6 w-6" />
             </div>
             <div>
-                <h1 className="text-lg font-bold text-foreground">Connecte-toi pour finaliser</h1>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <h1 className="text-foreground text-lg font-bold">Connecte-toi pour finaliser</h1>
+                <p className="text-muted-foreground mt-1 text-sm">
                     Crée un compte ou connecte-toi pour régler en toute sécurité. Ton panier est conservé.
                 </p>
             </div>
             <div className="flex w-full max-w-xs flex-col gap-2">
                 <Link
                     href={`/auth/sign-in?returnTo=${CHECKOUT_RETURN}`}
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-semibold text-primary-foreground"
+                    className="bg-foreground text-primary-foreground inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold"
                 >
                     <LogIn className="h-4 w-4" />
                     Se connecter
                 </Link>
                 <Link
                     href={`/auth/sign-in?mode=signup&returnTo=${CHECKOUT_RETURN}`}
-                    className="inline-flex items-center justify-center gap-2 rounded-full border border-border px-5 py-3 text-sm font-semibold text-foreground"
+                    className="border-border text-foreground inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-semibold"
                 >
                     <UserPlus className="h-4 w-4" />
                     Créer un compte
@@ -271,7 +278,7 @@ function SignInGate({ onBack }: { onBack: () => void }) {
             <button
                 type="button"
                 onClick={onBack}
-                className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                className="text-muted-foreground hover:text-foreground text-xs underline-offset-4 hover:underline"
             >
                 Revenir au panier
             </button>
@@ -289,13 +296,13 @@ function CheckoutMessage({
     action: { label: string; onClick: () => void };
 }) {
     return (
-        <div className="flex h-full flex-col items-center justify-center gap-4 bg-background px-8 text-center">
-            <p className="text-base font-semibold text-foreground">{title}</p>
-            {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
+        <div className="bg-background flex h-full flex-col items-center justify-center gap-4 px-8 text-center">
+            <p className="text-foreground text-base font-semibold">{title}</p>
+            {description ? <p className="text-muted-foreground text-sm">{description}</p> : null}
             <button
                 type="button"
                 onClick={action.onClick}
-                className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+                className="bg-foreground text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
             >
                 {action.label}
             </button>
