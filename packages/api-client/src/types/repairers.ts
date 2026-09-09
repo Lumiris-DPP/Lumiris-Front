@@ -8,6 +8,9 @@ export interface RepairerProfileResponse {
     id: string;
     userEmail?: string;
     status: RepairerStatus;
+    source?: RepairerSource;
+    importedAt?: string;
+    claimedAt?: string;
     siret?: string;
     companyName?: string;
     displayName?: string;
