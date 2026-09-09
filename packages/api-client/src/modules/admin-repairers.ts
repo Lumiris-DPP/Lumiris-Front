@@ -1,5 +1,10 @@
 import type { Http } from '../core/http';
-import type { RepairerProfileResponse } from '../types/repairers';
+import type {
+    RepairerDirectoryImportReport,
+    RepairerDirectoryImportRequest,
+    RepairerInviteRequest,
+    RepairerProfileResponse,
+} from '../types/repairers';
 import type { RejectArtisanRequest } from '../types/admin-artisans';
 
 export function adminRepairersApi(http: Http) {
@@ -9,6 +14,21 @@ export function adminRepairersApi(http: Http) {
         },
         listAll(): Promise<RepairerProfileResponse[]> {
             return http.request<RepairerProfileResponse[]>('/api/admin/repairers/all', { method: 'GET' });
+        },
+        // Import annuaire (SIRENE…). Les fiches arrivent en UNCLAIMED.
+        importDirectory(req: RepairerDirectoryImportRequest): Promise<RepairerDirectoryImportReport> {
+            return http.request<RepairerDirectoryImportReport>('/api/admin/repairers/import', {
+                method: 'POST',
+                body: req,
+            });
+        },
+        // (Re)génère un jeton de réclamation pour une fiche sans compte.
+        issueClaimToken(id: string): Promise<{ claimToken: string }> {
+            return http.request<{ claimToken: string }>(`/api/admin/repairers/${id}/claim-token`, { method: 'POST' });
+        },
+        // Envoie l'e-mail de prospection à une fiche annuaire.
+        invite(id: string, req: RepairerInviteRequest): Promise<void> {
+            return http.request<void>(`/api/admin/repairers/${id}/invite`, { method: 'POST', body: req });
         },
         verify(id: string): Promise<RepairerProfileResponse> {
             return http.request<RepairerProfileResponse>(`/api/admin/repairers/${id}/verify`, { method: 'PATCH' });

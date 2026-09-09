@@ -3,7 +3,11 @@
 import { useMutation, useQueryClient, type UseMutationOptions } from '@tanstack/react-query';
 
 import { createKeys } from '../core/keys';
-import type { RepairerProfileResponse } from '../types/repairers';
+import type {
+    RepairerDirectoryImportReport,
+    RepairerDirectoryImportRequest,
+    RepairerProfileResponse,
+} from '../types/repairers';
 import type { RejectArtisanRequest } from '../types/admin-artisans';
 
 import { useApiClient } from '../core/provider';
@@ -80,5 +84,45 @@ export function useMarkRepairerKybIncomplete(
             queryClient.invalidateQueries({ queryKey: adminRepairerKeys.all });
             return options?.onSuccess?.(...args);
         },
+    });
+}
+
+// --- Réseau : import annuaire + prospection ---
+
+export function useImportRepairerDirectory(
+    options?: Omit<
+        UseMutationOptions<RepairerDirectoryImportReport, Error, RepairerDirectoryImportRequest>,
+        'mutationFn'
+    >,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<RepairerDirectoryImportReport, Error, RepairerDirectoryImportRequest>({
+        mutationFn: (req) => client.adminRepairers.importDirectory(req),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.invalidateQueries({ queryKey: adminRepairerKeys.all });
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+export function useIssueRepairerClaimToken(
+    options?: Omit<UseMutationOptions<{ claimToken: string }, Error, string>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    return useMutation<{ claimToken: string }, Error, string>({
+        mutationFn: (id) => client.adminRepairers.issueClaimToken(id),
+        ...options,
+    });
+}
+
+export function useInviteRepairer(
+    options?: Omit<UseMutationOptions<void, Error, { id: string; email: string }>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    return useMutation<void, Error, { id: string; email: string }>({
+        mutationFn: ({ id, email }) => client.adminRepairers.invite(id, { email }),
+        ...options,
     });
 }

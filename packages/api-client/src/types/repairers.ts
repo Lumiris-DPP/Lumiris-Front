@@ -1,6 +1,8 @@
 import type { KybDetailsResponse } from './kyb';
 
-export type RepairerStatus = 'PENDING' | 'VERIFIED' | 'REJECTED';
+export type RepairerStatus = 'PENDING' | 'VERIFIED' | 'REJECTED' | 'UNCLAIMED' | 'SUSPENDED';
+
+export type RepairerSource = 'SELF' | 'SIRENE' | 'CMA' | 'OSM' | 'MANUAL';
 
 export interface RepairerProfileResponse {
     id: string;
@@ -23,6 +25,43 @@ export interface RepairerProfileResponse {
 
 export interface RepairerRegisterRequest {
     siret: string;
+}
+
+// --- Réclamation d'une fiche annuaire ---
+
+export interface RepairerClaimPreview {
+    displayName?: string;
+    companyName?: string;
+    siret?: string;
+    address?: string;
+    city?: string;
+    region?: string;
+    specialties?: string[];
+}
+
+export interface RepairerClaimRequest {
+    token: string;
+}
+
+// --- Import annuaire (admin) ---
+
+export interface RepairerDirectoryImportRequest {
+    source: RepairerSource;
+    departments?: string[];
+    nafCodes?: string[];
+    maxPages?: number;
+}
+
+export interface RepairerDirectoryImportReport {
+    source: RepairerSource;
+    fetched: number;
+    created: number;
+    updated: number;
+    skipped: number;
+}
+
+export interface RepairerInviteRequest {
+    email: string;
 }
 
 export interface RepairerProfileUpdateRequest {

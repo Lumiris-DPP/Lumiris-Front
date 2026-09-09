@@ -1,6 +1,8 @@
 import type { Http } from '../core/http';
 import type {
     RepairAppointmentRequest,
+    RepairerClaimPreview,
+    RepairerClaimRequest,
     RepairerProfileResponse,
     RepairerProfileUpdateRequest,
     RepairerPublicProfileResponse,
@@ -24,6 +26,14 @@ export function repairersApi(http: Http) {
         },
         register(req: RepairerRegisterRequest): Promise<RepairerProfileResponse> {
             return http.request<RepairerProfileResponse>('/api/repairers/register', { method: 'POST', body: req });
+        },
+        // Prévisualise une fiche annuaire à réclamer (données pré-remplies pour l'onboarding).
+        claimPreview(token: string): Promise<RepairerClaimPreview> {
+            return http.request<RepairerClaimPreview>(`/v1/repairers/claim/${token}`);
+        },
+        // Rattache la fiche annuaire (jeton reçu par e-mail) au compte retoucheur courant.
+        claim(req: RepairerClaimRequest): Promise<RepairerProfileResponse> {
+            return http.request<RepairerProfileResponse>('/api/repairers/claim', { method: 'POST', body: req });
         },
         updateProfile(req: RepairerProfileUpdateRequest): Promise<RepairerProfileResponse> {
             return http.request<RepairerProfileResponse>('/api/repairers/me/profile', { method: 'PUT', body: req });

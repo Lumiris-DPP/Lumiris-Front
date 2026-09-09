@@ -11,6 +11,8 @@ import {
 import { createKeys } from '../core/keys';
 import type {
     RepairAppointmentRequest,
+    RepairerClaimPreview,
+    RepairerClaimRequest,
     RepairerProfileResponse,
     RepairerProfileUpdateRequest,
     RepairerPublicProfileResponse,
@@ -51,6 +53,36 @@ export function useRegisterRepairer(
     const queryClient = useQueryClient();
     return useMutation<RepairerProfileResponse, Error, RepairerRegisterRequest>({
         mutationFn: (req) => client.repairers.register(req),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.setQueryData(repairerKeys.custom('me'), args[0]);
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+// Prévisualisation d'une fiche annuaire à réclamer (page d'onboarding, lien ?token=).
+export function useRepairerClaimPreview(
+    token: string | undefined,
+    options?: Omit<UseQueryOptions<RepairerClaimPreview, Error>, 'queryKey' | 'queryFn'>,
+) {
+    const client = useApiClient();
+    return useQuery<RepairerClaimPreview, Error>({
+        queryKey: repairerKeys.custom(`claim-preview:${token ?? ''}`),
+        queryFn: () => client.repairers.claimPreview(token as string),
+        enabled: Boolean(token),
+        retry: false,
+        ...options,
+    });
+}
+
+export function useClaimRepairer(
+    options?: Omit<UseMutationOptions<RepairerProfileResponse, Error, RepairerClaimRequest>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<RepairerProfileResponse, Error, RepairerClaimRequest>({
+        mutationFn: (req) => client.repairers.claim(req),
         ...options,
         onSuccess: (...args) => {
             queryClient.setQueryData(repairerKeys.custom('me'), args[0]);
