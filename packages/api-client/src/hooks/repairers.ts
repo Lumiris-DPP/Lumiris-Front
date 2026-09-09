@@ -27,6 +27,8 @@ import type {
     RepairRequestCreateRequest,
     RepairRequestResponse,
     RepairRequestReviewRequest,
+    RepairPayRequest,
+    RepairPaymentIntentResponse,
 } from '../types/repairers';
 import type { KybDetailsRequest, KybDocumentLabel, KybDocumentUploadOptions } from '../types/kyb';
 
@@ -372,6 +374,20 @@ export function useCancelRepairRequest(
             queryClient.invalidateQueries({ queryKey: repairRequestKeys.custom('mine') });
             return options?.onSuccess?.(...args);
         },
+    });
+}
+
+// Règlement du devis : renvoie le client secret pour le Payment Element.
+export function usePayQuote(
+    options?: Omit<
+        UseMutationOptions<RepairPaymentIntentResponse, Error, { requestId: string; req?: RepairPayRequest }>,
+        'mutationFn'
+    >,
+) {
+    const client = useApiClient();
+    return useMutation<RepairPaymentIntentResponse, Error, { requestId: string; req?: RepairPayRequest }>({
+        mutationFn: ({ requestId, req }) => client.repairRequests.payQuote(requestId, req),
+        ...options,
     });
 }
 

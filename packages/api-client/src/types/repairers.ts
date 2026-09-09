@@ -157,6 +157,18 @@ export interface RepairAppointmentRequest {
     appointmentAt: string;
 }
 
+// Règlement du devis (le paiement vaut acceptation). appointmentAt optionnel.
+export interface RepairPayRequest {
+    appointmentAt?: string;
+}
+
+export interface RepairPaymentIntentResponse {
+    clientSecret: string;
+    publishableKey: string;
+    amountCents: number;
+    currency: string;
+}
+
 export interface RepairRequestResponse {
     id: string;
     repairerProfileId: string;
@@ -171,6 +183,7 @@ export interface RepairRequestResponse {
     quoteDescription?: string;
     quoteSubmittedAt?: string;
     appointmentAt?: string;
+    paidAt?: string;
     createdAt: string;
 }
 

@@ -17,6 +17,8 @@ import type {
     RepairRequestCreateRequest,
     RepairRequestResponse,
     RepairRequestReviewRequest,
+    RepairPayRequest,
+    RepairPaymentIntentResponse,
 } from '../types/repairers';
 import type { KybDetailsRequest, KybDocumentLabel, KybDocumentUploadOptions } from '../types/kyb';
 
@@ -118,6 +120,13 @@ export function repairRequestsApi(http: Http) {
             return http.request<RepairRequestResponse>(`/api/repair-requests/${requestId}/accept-quote`, {
                 method: 'POST',
                 body: req,
+            });
+        },
+        // Règle le devis (Payment Element embarqué) — le paiement vaut acceptation.
+        payQuote(requestId: string, req?: RepairPayRequest): Promise<RepairPaymentIntentResponse> {
+            return http.request<RepairPaymentIntentResponse>(`/api/repair-requests/${requestId}/pay`, {
+                method: 'POST',
+                body: req ?? {},
             });
         },
         refuseQuote(requestId: string): Promise<RepairRequestResponse> {
