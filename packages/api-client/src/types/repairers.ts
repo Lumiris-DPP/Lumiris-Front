@@ -122,6 +122,8 @@ export interface RepairerSearchResult {
     reviewCount?: number;
     // Délai médian demande -> devis, en heures.
     medianResponseHours?: number;
+    // false = fiche annuaire sans compte : CTA doux au lieu d'une prise de RDV.
+    claimed?: boolean;
 }
 
 export type RepairerSearchSort = 'distance' | 'rating' | 'responsiveness';

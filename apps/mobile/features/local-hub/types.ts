@@ -12,5 +12,7 @@ export interface LocalPoint {
     photoUrl?: string;
     rating?: number;
     reviewCount?: number;
+    // Retoucheur uniquement : false = fiche annuaire sans compte (CTA doux, pas de RDV direct).
+    claimed?: boolean;
     specialties?: readonly string[];
 }

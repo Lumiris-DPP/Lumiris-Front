@@ -34,6 +34,9 @@ export function toLocalPoints(
             region: r.region ?? '',
             coords: { lat: r.lat, lng: r.lng },
             distanceKm: r.distanceKm,
+            rating: r.averageRating,
+            reviewCount: r.reviewCount,
+            claimed: r.claimed ?? true,
             specialties: r.specialties ?? [],
         });
     }

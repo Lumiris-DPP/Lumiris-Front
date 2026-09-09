@@ -34,13 +34,17 @@ const PLACEHOLDER_ROWS: AtelierStatsPassportBreakdown[] = [
 ];
 
 export function StatsByPassport({ rows, locked }: Props) {
-    const displayRows = locked ? PLACEHOLDER_ROWS : rows;
+    const ranked = locked
+        ? PLACEHOLDER_ROWS
+        : [...rows].sort((a, b) => b.scans - a.scans || b.conversions - a.conversions).slice(0, 20);
 
     return (
         <section className="space-y-4">
             <header>
-                <h2 className="text-lg font-semibold tracking-tight text-foreground">Détail par passeport</h2>
-                <p className="text-xs text-muted-foreground">Réservé aux abonnés ATELIER+.</p>
+                <h2 className="text-lg font-semibold tracking-tight text-foreground">Top passeports</h2>
+                <p className="text-xs text-muted-foreground">
+                    Performance passeport par passeport, du plus scanné au moins scanné. Réservé aux abonnés ATELIER+.
+                </p>
             </header>
 
             <div className="relative">
@@ -60,7 +64,7 @@ export function StatsByPassport({ rows, locked }: Props) {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {displayRows.length === 0 && (
+                                {ranked.length === 0 && (
                                     <TableRow>
                                         <TableCell
                                             colSpan={5}
@@ -70,7 +74,7 @@ export function StatsByPassport({ rows, locked }: Props) {
                                         </TableCell>
                                     </TableRow>
                                 )}
-                                {displayRows.map((row) => (
+                                {ranked.map((row) => (
                                     <TableRow key={row.dppFormId}>
                                         <TableCell>
                                             <span className="font-medium text-foreground">
