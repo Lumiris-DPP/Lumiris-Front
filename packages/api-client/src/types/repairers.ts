@@ -89,6 +89,10 @@ export interface RepairerPublicProfileResponse {
     region?: string;
     averageRating?: number;
     reviewCount: number;
+    // Délai médian demande -> devis, en heures (null si aucun devis encore).
+    medianResponseHours?: number;
+    // Interventions terminées avec devis.
+    completedJobs?: number;
 }
 
 export interface RepairerSearchResult {
@@ -124,7 +128,16 @@ export interface RepairerReviewResponse {
     rating: number;
     comment?: string;
     reviewerName?: string;
+    // true si l'avis est rattaché à une intervention terminée (toujours renvoyé par l'API ;
+    // optionnel ici pour les jeux de données locaux).
+    verified?: boolean;
     createdAt: string;
+}
+
+// Avis vérifié : posté par le client d'une demande de réparation terminée.
+export interface RepairRequestReviewRequest {
+    rating: number;
+    comment?: string;
 }
 
 export type RepairRequestStatus = 'PENDING' | 'DRAFT' | 'ACCEPTED' | 'REFUSED' | 'IN_PROGRESS' | 'COMPLETED';

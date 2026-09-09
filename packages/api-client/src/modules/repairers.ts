@@ -16,6 +16,7 @@ import type {
     RepairQuoteRequest,
     RepairRequestCreateRequest,
     RepairRequestResponse,
+    RepairRequestReviewRequest,
 } from '../types/repairers';
 import type { KybDetailsRequest, KybDocumentLabel, KybDocumentUploadOptions } from '../types/kyb';
 
@@ -127,6 +128,13 @@ export function repairRequestsApi(http: Http) {
         cancel(requestId: string): Promise<RepairRequestResponse> {
             return http.request<RepairRequestResponse>(`/api/repair-requests/${requestId}/cancel`, {
                 method: 'POST',
+            });
+        },
+        // Avis vérifié : uniquement sur une demande TERMINÉE qui vous appartient, un seul par demande.
+        submitReview(requestId: string, req: RepairRequestReviewRequest): Promise<RepairerReviewResponse> {
+            return http.request<RepairerReviewResponse>(`/api/repair-requests/${requestId}/review`, {
+                method: 'POST',
+                body: req,
             });
         },
         messages(requestId: string): Promise<RepairMessageResponse[]> {

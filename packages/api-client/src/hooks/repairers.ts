@@ -26,6 +26,7 @@ import type {
     RepairQuoteRequest,
     RepairRequestCreateRequest,
     RepairRequestResponse,
+    RepairRequestReviewRequest,
 } from '../types/repairers';
 import type { KybDetailsRequest, KybDocumentLabel, KybDocumentUploadOptions } from '../types/kyb';
 
@@ -369,6 +370,26 @@ export function useCancelRepairRequest(
         ...options,
         onSuccess: (...args) => {
             queryClient.invalidateQueries({ queryKey: repairRequestKeys.custom('mine') });
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+// Avis vérifié sur une intervention terminée.
+export function useSubmitRepairRequestReview(
+    options?: Omit<
+        UseMutationOptions<RepairerReviewResponse, Error, { requestId: string; req: RepairRequestReviewRequest }>,
+        'mutationFn'
+    >,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<RepairerReviewResponse, Error, { requestId: string; req: RepairRequestReviewRequest }>({
+        mutationFn: ({ requestId, req }) => client.repairRequests.submitReview(requestId, req),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.invalidateQueries({ queryKey: repairRequestKeys.custom('mine') });
+            queryClient.invalidateQueries({ queryKey: repairerKeys.custom('reviews') });
             return options?.onSuccess?.(...args);
         },
     });
