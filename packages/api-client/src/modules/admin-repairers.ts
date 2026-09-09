@@ -1,5 +1,6 @@
 import type { Http } from '../core/http';
 import type {
+    CoverageGapResponse,
     RepairerDirectoryImportReport,
     RepairerDirectoryImportRequest,
     RepairerInviteRequest,
@@ -29,6 +30,12 @@ export function adminRepairersApi(http: Http) {
         // Envoie l'e-mail de prospection à une fiche annuaire.
         invite(id: string, req: RepairerInviteRequest): Promise<void> {
             return http.request<void>(`/api/admin/repairers/${id}/invite`, { method: 'POST', body: req });
+        },
+        // Zones de demande non satisfaite (recherches consommateur à 0 résultat).
+        coverageGaps(days = 30): Promise<CoverageGapResponse[]> {
+            return http.request<CoverageGapResponse[]>('/api/admin/repairers/coverage-gaps', {
+                query: { days },
+            });
         },
         verify(id: string): Promise<RepairerProfileResponse> {
             return http.request<RepairerProfileResponse>(`/api/admin/repairers/${id}/verify`, { method: 'PATCH' });

@@ -1,9 +1,16 @@
 'use client';
 
-import { useMutation, useQueryClient, type UseMutationOptions } from '@tanstack/react-query';
+import {
+    useMutation,
+    useQuery,
+    useQueryClient,
+    type UseMutationOptions,
+    type UseQueryOptions,
+} from '@tanstack/react-query';
 
 import { createKeys } from '../core/keys';
 import type {
+    CoverageGapResponse,
     RepairerDirectoryImportReport,
     RepairerDirectoryImportRequest,
     RepairerProfileResponse,
@@ -123,6 +130,19 @@ export function useInviteRepairer(
     const client = useApiClient();
     return useMutation<void, Error, { id: string; email: string }>({
         mutationFn: ({ id, email }) => client.adminRepairers.invite(id, { email }),
+        ...options,
+    });
+}
+
+export function useRepairerCoverageGaps(
+    days = 30,
+    options?: Omit<UseQueryOptions<CoverageGapResponse[], Error>, 'queryKey' | 'queryFn'>,
+) {
+    const client = useApiClient();
+    return useQuery<CoverageGapResponse[], Error>({
+        queryKey: adminRepairerKeys.custom('coverage-gaps', days),
+        queryFn: () => client.adminRepairers.coverageGaps(days),
+        staleTime: 5 * 60 * 1000,
         ...options,
     });
 }

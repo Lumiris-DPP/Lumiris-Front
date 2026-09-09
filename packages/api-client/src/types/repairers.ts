@@ -91,8 +91,18 @@ export interface RepairerPublicProfileResponse {
     reviewCount: number;
     // Délai médian demande -> devis, en heures (null si aucun devis encore).
     medianResponseHours?: number;
+    // Part de devis acceptés parmi les devis tranchés (0..1), null si aucune décision.
+    acceptanceRate?: number;
     // Interventions terminées avec devis.
     completedJobs?: number;
+}
+
+// Zone où des consommateurs cherchent un retoucheur sans en trouver.
+export interface CoverageGapResponse {
+    lat: number;
+    lng: number;
+    missCount: number;
+    lastSeen: string;
 }
 
 export interface RepairerSearchResult {
