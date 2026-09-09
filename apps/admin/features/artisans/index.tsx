@@ -12,6 +12,7 @@ import { ArtisanDrawer } from './artisan-drawer';
 import { ArtisanTable } from './artisan-table';
 import { useDeepLinkId } from '../_shared/use-deep-link-id';
 import { RealArtisanAccounts } from './real-accounts';
+import { RealRepairerAccounts } from './real-repairer-accounts';
 import { HEALTH_OPTIONS, type HealthFilter } from './tier-status';
 import { FIXTURE_NOW } from '@/lib/fixture-clock';
 
@@ -94,6 +95,17 @@ function ArtisansInner() {
                             </p>
                         </div>
                         <RealArtisanAccounts />
+                    </div>
+
+                    <div className="space-y-3">
+                        <div>
+                            <h2 className="text-foreground text-sm font-semibold">Réparateurs (ATELIER)</h2>
+                            <p className="text-muted-foreground text-xs">
+                                Comptes réparateur inscrits sur le vrai backend. Cliquez sur un compte pour consulter
+                                son dossier KYB.
+                            </p>
+                        </div>
+                        <RealRepairerAccounts />
                     </div>
                 </div>
             </FeatureLayout>
