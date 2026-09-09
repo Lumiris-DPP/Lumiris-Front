@@ -62,7 +62,15 @@ export function repairersApi(http: Http) {
         },
         search(query: RepairerSearchQuery): Promise<RepairerSearchResult[]> {
             return http.request<RepairerSearchResult[]>('/v1/repairers/search', {
-                query: { lat: query.lat, lng: query.lng, specialty: query.specialty, radiusKm: query.radiusKm },
+                query: {
+                    lat: query.lat,
+                    lng: query.lng,
+                    specialty: query.specialty,
+                    radiusKm: query.radiusKm,
+                    sort: query.sort,
+                    page: query.page,
+                    size: query.size,
+                },
             });
         },
         getReviews(repairerId: string): Promise<RepairerReviewResponse[]> {

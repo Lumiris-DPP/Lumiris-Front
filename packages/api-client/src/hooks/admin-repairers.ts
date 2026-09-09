@@ -10,6 +10,7 @@ import {
 
 import { createKeys } from '../core/keys';
 import type {
+    AdminAuditEntry,
     CoverageGapResponse,
     RepairerDirectoryImportReport,
     RepairerDirectoryImportRequest,
@@ -143,6 +144,19 @@ export function useRepairerCoverageGaps(
         queryKey: adminRepairerKeys.custom('coverage-gaps', days),
         queryFn: () => client.adminRepairers.coverageGaps(days),
         staleTime: 5 * 60 * 1000,
+        ...options,
+    });
+}
+
+export function useRepairerAuditLog(
+    { page = 0, size = 50 }: { page?: number; size?: number } = {},
+    options?: Omit<UseQueryOptions<AdminAuditEntry[], Error>, 'queryKey' | 'queryFn'>,
+) {
+    const client = useApiClient();
+    return useQuery<AdminAuditEntry[], Error>({
+        queryKey: adminRepairerKeys.custom('audit-log', page, size),
+        queryFn: () => client.adminRepairers.auditLog(page, size),
+        staleTime: 30 * 1000,
         ...options,
     });
 }

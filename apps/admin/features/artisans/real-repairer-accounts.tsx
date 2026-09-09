@@ -10,6 +10,7 @@ import {
     useMarkRepairerKybIncomplete,
     useMarkRepairerKybOngoing,
     useRejectRepairer,
+    useRepairerAuditLog,
     useVerifyRepairer,
 } from '@lumiris/api-client/react';
 import type { RepairerProfileResponse, RepairerStatus } from '@lumiris/api-client';
@@ -321,6 +322,8 @@ export function RealRepairerAccounts() {
                 </div>
             )}
 
+            <AuditLogPanel />
+
             <KybComparisonDrawer
                 open={selected != null}
                 onClose={() => setSelected(null)}
@@ -340,5 +343,56 @@ export function RealRepairerAccounts() {
                 canReject={canReject}
             />
         </div>
+    );
+}
+
+const AUDIT_ACTION_LABEL: Record<string, string> = {
+    'repairer.import': 'Import annuaire',
+    'repairer.invite': 'Invitation',
+    'repairer.verify': 'Fiche validée',
+    'repairer.reject': 'Fiche rejetée',
+};
+
+function AuditLogPanel() {
+    const [open, setOpen] = useState(false);
+    const { data: entries = [] } = useRepairerAuditLog({ size: 30 }, { enabled: open });
+
+    return (
+        <details
+            open={open}
+            onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}
+            className="rounded-xl border border-border bg-card"
+        >
+            <summary className="cursor-pointer px-4 py-2.5 text-sm font-medium text-foreground">
+                Journal d&apos;audit
+            </summary>
+            <div className="max-h-72 overflow-y-auto border-t border-border">
+                {entries.length === 0 ? (
+                    <p className="px-4 py-3 text-xs text-muted-foreground">Aucune action enregistrée.</p>
+                ) : (
+                    <ul className="divide-y divide-border text-xs">
+                        {entries.map((e) => (
+                            <li key={e.id} className="flex items-start justify-between gap-3 px-4 py-2">
+                                <div className="min-w-0">
+                                    <span className="font-medium text-foreground">
+                                        {AUDIT_ACTION_LABEL[e.action] ?? e.action}
+                                    </span>
+                                    {e.detail ? <span className="text-muted-foreground"> — {e.detail}</span> : null}
+                                    <p className="text-[11px] text-muted-foreground">{e.actorEmail}</p>
+                                </div>
+                                <time className="shrink-0 text-[11px] text-muted-foreground">
+                                    {new Date(e.occurredAt).toLocaleString('fr-FR', {
+                                        day: '2-digit',
+                                        month: 'short',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                    })}
+                                </time>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+        </details>
     );
 }

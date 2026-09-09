@@ -1,5 +1,6 @@
 import type { Http } from '../core/http';
 import type {
+    AdminAuditEntry,
     CoverageGapResponse,
     RepairerDirectoryImportReport,
     RepairerDirectoryImportRequest,
@@ -35,6 +36,12 @@ export function adminRepairersApi(http: Http) {
         coverageGaps(days = 30): Promise<CoverageGapResponse[]> {
             return http.request<CoverageGapResponse[]>('/api/admin/repairers/coverage-gaps', {
                 query: { days },
+            });
+        },
+        // Journal d'audit des actions réseau retoucheurs (import / invite / verify / reject).
+        auditLog(page = 0, size = 50): Promise<AdminAuditEntry[]> {
+            return http.request<AdminAuditEntry[]>('/api/admin/repairers/audit-log', {
+                query: { page, size },
             });
         },
         verify(id: string): Promise<RepairerProfileResponse> {

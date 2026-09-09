@@ -118,13 +118,32 @@ export interface RepairerSearchResult {
     distanceKm: number;
     lat: number;
     lng: number;
+    averageRating?: number;
+    reviewCount?: number;
+    // Délai médian demande -> devis, en heures.
+    medianResponseHours?: number;
 }
+
+export type RepairerSearchSort = 'distance' | 'rating' | 'responsiveness';
 
 export interface RepairerSearchQuery {
     lat: number;
     lng: number;
     specialty?: string;
     radiusKm?: number;
+    sort?: RepairerSearchSort;
+    page?: number;
+    size?: number;
+}
+
+export interface AdminAuditEntry {
+    id: string;
+    actorEmail: string;
+    action: string;
+    targetType: string;
+    targetId?: string;
+    detail?: string;
+    occurredAt: string;
 }
 
 export interface RepairerReviewRequest {
