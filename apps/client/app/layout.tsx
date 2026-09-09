@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Geist_Mono } from 'next/font/google';
 import { Toaster } from '@lumiris/ui/components/sonner';
 import { ThemeProvider } from '@lumiris/ui/theme-provider';
+import { ConsentBanner } from '@lumiris/ui/components/consent-banner';
 
 import { ClientApiProvider } from '@/lib/api-provider';
 import { WebVitals } from './web-vitals';
@@ -49,6 +50,7 @@ export default function RootLayout({
                         <WebVitals />
                         {children}
                         <Toaster position="bottom-right" closeButton />
+                        <ConsentBanner />
                     </ThemeProvider>
                 </ClientApiProvider>
             </body>

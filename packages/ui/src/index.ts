@@ -1,5 +1,10 @@
 export { cn } from './lib/cn';
 export { ThemeProvider } from './components/theme-provider';
+
+export { ConsentBanner, ConsentSettingsLink, useConsent, openConsentSettings } from './components/ui/consent-banner';
+export type { ConsentBannerProps, ConsentState } from './components/ui/consent-banner';
+
+export { PrivacyPolicy, LegalNotice } from './components/ui/legal';
 export { useIsMobile } from './hooks/use-mobile';
 export { useToast, toast } from './hooks/use-toast';
 
