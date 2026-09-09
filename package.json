@@ -75,5 +75,8 @@
         "*.{json,md,yaml,yml}": [
             "prettier --write"
         ]
+    },
+    "overrides": {
+        "next": "16.3.4"
     }
 }
