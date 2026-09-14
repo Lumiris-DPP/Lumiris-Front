@@ -12,6 +12,9 @@ export interface PublicRepairerDto {
     region: string | null;
     averageRating: number | null;
     reviewCount: number;
+    // false = fiche annuaire sans compte (import SIRENE) : bandeau "pas encore dans le réseau".
+    claimed: boolean;
+    interestCount: number;
 }
 
 export interface RepairerReviewDto {
@@ -32,4 +35,10 @@ export async function fetchRepairerReviews(id: string): Promise<RepairerReviewDt
     const res = await fetch(`${BASE}/v1/repairers/${id}/reviews`);
     if (!res.ok) throw new Error(`GET /v1/repairers/${id}/reviews → ${res.status}`);
     return res.json() as Promise<RepairerReviewDto[]>;
+}
+
+// Signal d'intérêt anonyme sur une fiche pas encore réclamée — pas de compte requis.
+export async function signalRepairerInterest(id: string): Promise<void> {
+    const res = await fetch(`${BASE}/v1/repairers/${id}/interest`, { method: 'POST' });
+    if (!res.ok) throw new Error(`POST /v1/repairers/${id}/interest → ${res.status}`);
 }
