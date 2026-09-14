@@ -39,12 +39,14 @@ function formatDate(iso: string) {
 
 function itemName(item: PendingItem): string {
     return item.type === 'artisan'
-        ? (item.data.companyName ?? item.data.userName)
+        ? (item.data.companyName ?? item.data.userName ?? 'Atelier')
         : (item.data.companyName ?? item.data.displayName ?? item.data.userEmail ?? 'Retoucheur');
 }
 
 function itemSubtitle(item: PendingItem): string {
-    return item.type === 'artisan' ? `${item.data.userName} · ${item.data.userEmail}` : (item.data.userEmail ?? '—');
+    return item.type === 'artisan'
+        ? `${item.data.userName ?? '—'} · ${item.data.userEmail ?? '—'}`
+        : (item.data.userEmail ?? '—');
 }
 
 export function ValidationQueue() {
@@ -174,7 +176,7 @@ export function ValidationQueue() {
                     icon={ClipboardCheck}
                 />
             ) : (
-                <div className="border-border bg-card overflow-hidden rounded-xl border">
+                <div className="overflow-hidden rounded-xl border border-border bg-card">
                     <div className="overflow-x-auto">
                         <Table>
                             <TableHeader stickyHeader>
@@ -202,8 +204,8 @@ export function ValidationQueue() {
                                         </TableCell>
                                         <TableCell>
                                             <div>
-                                                <p className="text-foreground text-sm font-medium">{itemName(item)}</p>
-                                                <p className="text-muted-foreground text-[11px]">
+                                                <p className="text-sm font-medium text-foreground">{itemName(item)}</p>
+                                                <p className="text-[11px] text-muted-foreground">
                                                     {itemSubtitle(item)}
                                                 </p>
                                             </div>
@@ -212,14 +214,14 @@ export function ValidationQueue() {
                                             <span className="font-mono text-xs">{formatSiret(item.data.siret)}</span>
                                         </TableCell>
                                         <TableCell>
-                                            <span className="text-muted-foreground text-xs">
+                                            <span className="text-xs text-muted-foreground">
                                                 {formatDate(item.data.createdAt)}
                                             </span>
                                         </TableCell>
                                         <TableCell>
                                             <Badge
                                                 variant="outline"
-                                                className="border-lumiris-amber/40 bg-lumiris-amber/10 text-lumiris-amber font-mono text-[10px]"
+                                                className="border-lumiris-amber/40 bg-lumiris-amber/10 font-mono text-[10px] text-lumiris-amber"
                                             >
                                                 En attente
                                             </Badge>
@@ -243,7 +245,7 @@ export function ValidationQueue() {
                                                             : !canRejectRepairer) || rejecting
                                                     }
                                                     onClick={() => reject(item)}
-                                                    className="bg-lumiris-rose hover:bg-lumiris-rose/90 h-8 gap-1.5 text-white disabled:opacity-40"
+                                                    className="h-8 gap-1.5 bg-lumiris-rose text-white hover:bg-lumiris-rose/90 disabled:opacity-40"
                                                 >
                                                     <XCircle className="h-3.5 w-3.5" />
                                                     Rejeter
@@ -256,7 +258,7 @@ export function ValidationQueue() {
                                                             : !canVerifyRepairer) || approving
                                                     }
                                                     onClick={() => approve(item)}
-                                                    className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 h-8 gap-1.5 text-white disabled:opacity-40"
+                                                    className="h-8 gap-1.5 bg-lumiris-emerald text-white hover:bg-lumiris-emerald/90 disabled:opacity-40"
                                                 >
                                                     <CheckCircle2 className="h-3.5 w-3.5" />
                                                     Approuver

@@ -3,7 +3,11 @@
 import { useMutation, useQueryClient, type UseMutationOptions } from '@tanstack/react-query';
 
 import { createKeys } from '../core/keys';
-import type { ArtisanProfileResponse } from '../types/artisans';
+import type {
+    ArtisanDirectoryImportReport,
+    ArtisanDirectoryImportRequest,
+    ArtisanProfileResponse,
+} from '../types/artisans';
 import type { RejectArtisanRequest } from '../types/admin-artisans';
 
 import { useApiClient } from '../core/provider';
@@ -19,6 +23,24 @@ export function useAdminArtisansList() {
 export function useAdminArtisansAll() {
     const client = useApiClient();
     return useListQuery<ArtisanProfileResponse[]>(adminArtisanKeys.custom('all'), () => client.adminArtisans.listAll());
+}
+
+export function useImportArtisanDirectory(
+    options?: Omit<
+        UseMutationOptions<ArtisanDirectoryImportReport, Error, ArtisanDirectoryImportRequest>,
+        'mutationFn'
+    >,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<ArtisanDirectoryImportReport, Error, ArtisanDirectoryImportRequest>({
+        mutationFn: (req) => client.adminArtisans.importDirectory(req),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.invalidateQueries({ queryKey: adminArtisanKeys.all });
+            return options?.onSuccess?.(...args);
+        },
+    });
 }
 
 export function useVerifyArtisan(
