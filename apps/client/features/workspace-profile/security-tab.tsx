@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Mail } from 'lucide-react';
 import { Button } from '@lumiris/ui/components/button';
+import { Card, CardContent } from '@lumiris/ui/components/card';
 import {
     Dialog,
     DialogContent,
@@ -29,75 +30,77 @@ export function SecurityTab() {
     const [emailOpen, setEmailOpen] = useState(false);
 
     return (
-        <div className="max-w-2xl space-y-4">
-            <Section
-                title="Mot de passe"
-                description="Modifiable à tout moment. La nouvelle valeur prend effet immédiatement."
-                action={
-                    <Button variant="outline" size="sm" onClick={() => setPasswordOpen(true)}>
-                        Changer
-                    </Button>
-                }
-            />
+        <Card>
+            <CardContent className="max-w-2xl space-y-4">
+                <Section
+                    title="Mot de passe"
+                    description="Modifiable à tout moment. La nouvelle valeur prend effet immédiatement."
+                    action={
+                        <Button variant="outline" size="sm" onClick={() => setPasswordOpen(true)}>
+                            Changer
+                        </Button>
+                    }
+                />
 
-            <Separator />
+                <Separator />
 
-            <Section
-                title="Authentification à deux facteurs (2FA)"
-                description={
-                    twoFA
-                        ? 'Active — méthode : application authenticator'
-                        : 'Inactive — recommandé pour les ateliers Studio et Maison.'
-                }
-                action={
-                    <div className="flex items-center gap-2">
-                        {twoFA && (
-                            <Button variant="outline" size="sm" onClick={() => toast.info('Reconfiguration 2FA')}>
-                                Reconfigurer
-                            </Button>
-                        )}
-                        <Switch
-                            checked={twoFA}
-                            onCheckedChange={(v) => {
-                                setTwoFA(v);
-                                toast.success(v ? '2FA activée' : '2FA désactivée');
-                            }}
-                            aria-label="Activer la 2FA"
-                        />
-                    </div>
-                }
-            />
+                <Section
+                    title="Authentification à deux facteurs (2FA)"
+                    description={
+                        twoFA
+                            ? 'Active — méthode : application authenticator'
+                            : 'Inactive — recommandé pour les ateliers Studio et Maison.'
+                    }
+                    action={
+                        <div className="flex items-center gap-2">
+                            {twoFA && (
+                                <Button variant="outline" size="sm" onClick={() => toast.info('Reconfiguration 2FA')}>
+                                    Reconfigurer
+                                </Button>
+                            )}
+                            <Switch
+                                checked={twoFA}
+                                onCheckedChange={(v) => {
+                                    setTwoFA(v);
+                                    toast.success(v ? '2FA activée' : '2FA désactivée');
+                                }}
+                                aria-label="Activer la 2FA"
+                            />
+                        </div>
+                    }
+                />
 
-            <Separator />
+                <Separator />
 
-            <Section
-                title="Email de récupération"
-                description={
-                    <span className="inline-flex items-center gap-1.5 font-mono text-xs text-foreground">
-                        <Mail className="h-3.5 w-3.5 text-muted-foreground" />
-                        {recoveryEmail}
-                    </span>
-                }
-                action={
-                    <Button variant="outline" size="sm" onClick={() => setEmailOpen(true)}>
-                        Modifier
-                    </Button>
-                }
-            />
+                <Section
+                    title="Email de récupération"
+                    description={
+                        <span className="inline-flex items-center gap-1.5 font-mono text-xs text-foreground">
+                            <Mail className="h-3.5 w-3.5 text-muted-foreground" />
+                            {recoveryEmail}
+                        </span>
+                    }
+                    action={
+                        <Button variant="outline" size="sm" onClick={() => setEmailOpen(true)}>
+                            Modifier
+                        </Button>
+                    }
+                />
 
-            <PasswordDialog open={passwordOpen} onOpenChange={setPasswordOpen} />
-            <RecoveryEmailDialog
-                open={emailOpen}
-                onOpenChange={setEmailOpen}
-                current={recoveryEmail}
-                onSave={(v) => {
-                    setRecoveryEmail(v);
-                    toast.success('Email de récupération mis à jour', {
-                        description: 'Un code de vérification a été envoyé.',
-                    });
-                }}
-            />
-        </div>
+                <PasswordDialog open={passwordOpen} onOpenChange={setPasswordOpen} />
+                <RecoveryEmailDialog
+                    open={emailOpen}
+                    onOpenChange={setEmailOpen}
+                    current={recoveryEmail}
+                    onSave={(v) => {
+                        setRecoveryEmail(v);
+                        toast.success('Email de récupération mis à jour', {
+                            description: 'Un code de vérification a été envoyé.',
+                        });
+                    }}
+                />
+            </CardContent>
+        </Card>
     );
 }
 
