@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, type SyntheticEvent } from 'react';
+import { useEffect, useMemo, useState, type SyntheticEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -213,8 +213,13 @@ function RequestDetailOverlay({ request, onClose }: { request: RepairRequestResp
     const [paying, setPaying] = useState(false);
     const [paidNotice, setPaidNotice] = useState(false);
 
+    // Une action (payer, refuser…) peut échouer parce que le statut a bougé entre-temps (ex:
+    // webhook Stripe arrivé pendant la saisie) — une fois la demande rafraîchie avec le nouveau
+    // statut, l'erreur de conflit affichée n'a plus lieu d'être.
+    useEffect(() => setError(null), [request.status]);
+
     const canCancel = request.status !== 'COMPLETED';
-    const canRespondToQuote = request.status === 'DRAFT';
+    const canRespondToQuote = request.status === 'DRAFT' && !request.paidAt;
     // Une intervention réellement effectuée (acceptée ou payée), pas un devis refusé.
     const canReview = request.status === 'COMPLETED' && Boolean(request.appointmentAt || request.paidAt);
 
