@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef } from 'react';
-import { CircleMarker, MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
+import { CircleMarker, MapContainer, Marker, TileLayer, useMap, useMapEvent } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { LocalPoint } from './types';
@@ -55,6 +55,14 @@ function CenterOnUser({ userCoords }: { userCoords: UserCoords | null }) {
     return null;
 }
 
+function ReportMoveEnd({ onMoveEnd }: { onMoveEnd: (center: { lat: number; lng: number }) => void }) {
+    useMapEvent('moveend', (event) => {
+        const center = event.target.getCenter();
+        onMoveEnd({ lat: center.lat, lng: center.lng });
+    });
+    return null;
+}
+
 function DeselectOnMapClick({ onSelect }: { onSelect: (id: string | null) => void }) {
     const map = useMap();
     useEffect(() => {
@@ -72,9 +80,10 @@ interface MapClientProps {
     userCoords: UserCoords | null;
     selectedId: string | null;
     onSelect: (id: string | null) => void;
+    onMoveEnd: (center: { lat: number; lng: number }) => void;
 }
 
-export function MapClient({ points, userCoords, selectedId, onSelect }: MapClientProps) {
+export function MapClient({ points, userCoords, selectedId, onSelect, onMoveEnd }: MapClientProps) {
     const visiblePoints = useMemo(() => points.filter((p) => p.coords !== undefined).slice(0, MAX_MARKERS), [points]);
 
     const totalWithCoords = useMemo(() => points.filter((p) => p.coords !== undefined).length, [points]);
@@ -107,6 +116,7 @@ export function MapClient({ points, userCoords, selectedId, onSelect }: MapClien
                 <ResizeOnMount />
                 <CenterOnUser userCoords={userCoords} />
                 <DeselectOnMapClick onSelect={onSelect} />
+                <ReportMoveEnd onMoveEnd={onMoveEnd} />
 
                 {userCoords ? (
                     <CircleMarker

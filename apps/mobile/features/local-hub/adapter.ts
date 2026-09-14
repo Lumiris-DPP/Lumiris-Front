@@ -1,13 +1,28 @@
 import type { ArtisanPublicProfileResponse, RepairerSearchResult } from '@lumiris/api-client';
 import type { LocalPoint } from './types';
 
+const EARTH_RADIUS_KM = 6371;
+
+// ponytail: haversine, good enough at map zoom levels — no need for a geo library for one distance calc.
+function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+    const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+    const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+    const sinLat = Math.sin(dLat / 2);
+    const sinLng = Math.sin(dLng / 2);
+    const h = sinLat * sinLat + Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * sinLng * sinLng;
+    return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(h));
+}
+
 export function toLocalPoints(
     artisans: readonly ArtisanPublicProfileResponse[],
     repairers: readonly RepairerSearchResult[],
+    // Ateliers SELF (pas d'adresse SIRENE géocodée) restent sans coords : liste uniquement.
+    origin: { lat: number; lng: number },
 ): LocalPoint[] {
     const points: LocalPoint[] = [];
 
     for (const a of artisans) {
+        const coords = a.lat !== undefined && a.lng !== undefined ? { lat: a.lat, lng: a.lng } : undefined;
         points.push({
             kind: 'artisan',
             id: a.slug,
@@ -15,12 +30,11 @@ export function toLocalPoints(
             name: a.atelierName ?? a.displayName ?? 'Atelier',
             city: a.city ?? '',
             region: a.region ?? '',
-            // Artisans have no stored coordinates on the backend yet, so they can't be placed
-            // on the map or geo-sorted — they still show up in the list view.
-            coords: undefined,
-            distanceKm: undefined,
+            coords,
+            distanceKm: coords ? haversineKm(origin, coords) : undefined,
             photoUrl: a.photoUrls[0],
             specialties: a.specialties ?? [],
+            claimed: a.claimed ?? true,
         });
     }
 

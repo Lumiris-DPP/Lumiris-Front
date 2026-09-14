@@ -80,7 +80,7 @@ export function PointCard({ point, index }: PointCardProps) {
                         </ul>
                     ) : null}
 
-                    {!isArtisan && point.claimed === false ? (
+                    {point.claimed === false ? (
                         <p className="text-[11px] text-muted-foreground italic">
                             Pas encore sur Lumiris — on le contacte pour vous
                         </p>
