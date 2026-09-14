@@ -196,7 +196,7 @@ export function PublicPassportDetail({
     );
 
     return (
-        <div className="bg-background flex h-full w-full flex-col overflow-y-auto pb-28">
+        <div className="flex h-full w-full flex-col overflow-y-auto bg-background pb-28">
             {/* Hero score */}
             <header className="relative flex h-56 shrink-0 items-center justify-center overflow-hidden">
                 {grade && (
@@ -214,7 +214,7 @@ export function PublicPassportDetail({
                     type="button"
                     onClick={() => router.back()}
                     aria-label="Retour"
-                    className="bg-card/70 absolute left-4 top-12 inline-flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md"
+                    className="absolute top-12 left-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-card/70 backdrop-blur-md"
                 >
                     <ArrowLeft className="h-4 w-4" aria-hidden />
                 </button>
@@ -227,7 +227,7 @@ export function PublicPassportDetail({
                         aria-label={isSaved ? 'Retirer de ma garde-robe' : 'Ajouter à ma garde-robe'}
                         aria-pressed={isSaved}
                         className={cn(
-                            'absolute right-4 top-12 inline-flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md transition-colors',
+                            'absolute top-12 right-4 inline-flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md transition-colors',
                             isSaved ? 'bg-lumiris-rose/15 text-lumiris-rose' : 'bg-card/70 text-foreground',
                         )}
                     >
@@ -239,7 +239,7 @@ export function PublicPassportDetail({
                     {grade ? (
                         <motion.div
                             className={cn(
-                                'flex h-24 w-24 items-center justify-center rounded-full border-2 font-mono text-[56px] font-bold leading-none',
+                                'flex h-24 w-24 items-center justify-center rounded-full border-2 font-mono text-[56px] leading-none font-bold',
                                 GRADE_BORDER[grade],
                                 GRADE_TEXT[grade],
                                 GRADE_BG_SOFT[grade],
@@ -252,8 +252,8 @@ export function PublicPassportDetail({
                             {grade}
                         </motion.div>
                     ) : (
-                        <div className="bg-muted flex h-24 w-24 items-center justify-center rounded-full">
-                            <span className="text-muted-foreground text-[10px]">—</span>
+                        <div className="flex h-24 w-24 items-center justify-center rounded-full bg-muted">
+                            <span className="text-[10px] text-muted-foreground">—</span>
                         </div>
                     )}
 
@@ -268,8 +268,8 @@ export function PublicPassportDetail({
                                 {irisScore.total.toFixed(1)} / 100
                             </p>
                         )}
-                        <p className="text-foreground text-sm font-semibold">{dpp.productName ?? 'Produit sans nom'}</p>
-                        {dpp.sku && <p className="text-muted-foreground text-xs">Réf. {dpp.sku}</p>}
+                        <p className="text-sm font-semibold text-foreground">{dpp.productName ?? 'Produit sans nom'}</p>
+                        {dpp.sku && <p className="text-xs text-muted-foreground">Réf. {dpp.sku}</p>}
                     </motion.div>
                 </div>
             </header>
@@ -281,7 +281,7 @@ export function PublicPassportDetail({
                         <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
                         <div className="min-w-0">
                             <p className="text-[13px] font-semibold">{banner.title}</p>
-                            <p className="text-foreground/70 text-[11px] leading-relaxed">{banner.body}</p>
+                            <p className="text-[11px] leading-relaxed text-foreground/70">{banner.body}</p>
                         </div>
                     </div>
                 )}
@@ -300,7 +300,7 @@ export function PublicPassportDetail({
                                 trackEvent({ publicCode, type: 'SUGGESTION_CLICK' });
                                 recordSuggestionOrigin(buyProduct.id, publicCode);
                             }}
-                            className="bg-primary text-primary-foreground flex items-center justify-between gap-3 rounded-2xl px-4 py-3.5 text-sm font-semibold shadow-sm transition-opacity active:opacity-90"
+                            className="flex items-center justify-between gap-3 rounded-2xl bg-primary px-4 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition-opacity active:opacity-90"
                         >
                             <span className="inline-flex items-center gap-2">
                                 <ShoppingBag className="h-4 w-4" strokeWidth={1.75} aria-hidden />
@@ -314,7 +314,7 @@ export function PublicPassportDetail({
                 {/* Produit */}
                 <Section delay={LAYER_DELAY * 1} title="Le Produit">
                     {dpp.mainPhotoUrl && (
-                        <div className="border-border mx-auto w-1/2 overflow-hidden rounded-xl border">
+                        <div className="mx-auto w-1/2 overflow-hidden rounded-xl border border-border">
                             <Image
                                 src={dpp.mainPhotoUrl}
                                 alt={dpp.productName ?? 'Photo produit'}
@@ -341,7 +341,7 @@ export function PublicPassportDetail({
                                         {(dpp.availableSizes ?? []).map((s) => (
                                             <span
                                                 key={s}
-                                                className="bg-secondary text-secondary-foreground rounded px-1.5 py-0.5 text-xs"
+                                                className="rounded bg-secondary px-1.5 py-0.5 text-xs text-secondary-foreground"
                                             >
                                                 {s}
                                             </span>
@@ -358,7 +358,7 @@ export function PublicPassportDetail({
                                         {(dpp.colors ?? []).map((c) => (
                                             <span
                                                 key={c}
-                                                className="border-border rounded border px-1.5 py-0.5 text-xs"
+                                                className="rounded border border-border px-1.5 py-0.5 text-xs"
                                             >
                                                 {c}
                                             </span>
@@ -374,10 +374,10 @@ export function PublicPassportDetail({
                 {artisanSlug && (
                     <Link
                         href={routes.artisan(artisanSlug)}
-                        className="border-border bg-card hover:bg-muted/40 flex items-center justify-between rounded-2xl border p-4 transition-colors"
+                        className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-muted/40"
                     >
-                        <span className="text-foreground text-sm font-semibold">Voir la vitrine de l&apos;artisan</span>
-                        <ExternalLink className="text-muted-foreground h-4 w-4" />
+                        <span className="text-sm font-semibold text-foreground">Voir la vitrine de l&apos;artisan</span>
+                        <ExternalLink className="h-4 w-4 text-muted-foreground" />
                     </Link>
                 )}
 
@@ -388,7 +388,7 @@ export function PublicPassportDetail({
                             <div className="space-y-1">
                                 <Label>Matières</Label>
                                 {(dpp.materials ?? []).map((m, i) => (
-                                    <p key={i} className="text-foreground text-sm">
+                                    <p key={i} className="text-sm text-foreground">
                                         <span className="font-mono">{m.percentage}%</span> {fiberLabel(m.fiber)}
                                         {m.originCountry && (
                                             <span className="text-muted-foreground"> · {m.originCountry}</span>
@@ -405,7 +405,7 @@ export function PublicPassportDetail({
                                         (s) => (
                                             <div
                                                 key={s.code}
-                                                className="border-border flex items-center gap-2 rounded-lg border px-2.5 py-2"
+                                                className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2"
                                             >
                                                 <Image
                                                     src={s.svgPath}
@@ -415,7 +415,7 @@ export function PublicPassportDetail({
                                                     height={20}
                                                     className="h-5 w-5 shrink-0"
                                                 />
-                                                <span className="text-foreground truncate text-xs">{s.label}</span>
+                                                <span className="truncate text-xs text-foreground">{s.label}</span>
                                             </div>
                                         ),
                                     )}
@@ -425,7 +425,7 @@ export function PublicPassportDetail({
                         {dpp.careNotes && (
                             <div>
                                 <Label>Notes</Label>
-                                <p className="text-foreground whitespace-pre-wrap text-sm">{dpp.careNotes}</p>
+                                <p className="text-sm whitespace-pre-wrap text-foreground">{dpp.careNotes}</p>
                             </div>
                         )}
                     </Section>
@@ -462,19 +462,19 @@ export function PublicPassportDetail({
                 {/* Documents, groupés par niveau d'accès */}
                 {docGroups.map((group, groupIndex) => (
                     <Section key={group.visibility} delay={LAYER_DELAY * (5 + groupIndex)} title={group.title}>
-                        <p className="text-muted-foreground mb-2 text-[11px]">{group.audience}</p>
+                        <p className="mb-2 text-[11px] text-muted-foreground">{group.audience}</p>
                         <div className="space-y-1.5">
                             {group.documents.map((doc) => (
                                 <div
                                     key={doc.fileId}
-                                    className="border-border flex items-center gap-2.5 rounded-xl border px-3 py-2.5"
+                                    className="flex items-center gap-2.5 rounded-xl border border-border px-3 py-2.5"
                                 >
-                                    <FileText className="text-muted-foreground h-4 w-4 shrink-0" />
+                                    <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
                                     <div className="min-w-0 flex-1">
-                                        <p className="text-foreground truncate text-sm font-medium">
+                                        <p className="truncate text-sm font-medium text-foreground">
                                             {doc.filename ?? 'Document'}
                                         </p>
-                                        <p className="text-muted-foreground truncate text-[11px]">
+                                        <p className="truncate text-[11px] text-muted-foreground">
                                             {DOC_TYPE_LABELS[doc.documentType ?? ''] ?? doc.documentType}
                                         </p>
                                     </div>
@@ -484,7 +484,7 @@ export function PublicPassportDetail({
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         aria-label={`Télécharger ${doc.filename ?? 'le document'}`}
-                                        className="border-border bg-card text-foreground hover:bg-muted/40 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-colors active:scale-95"
+                                        className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted/40 active:scale-95"
                                     >
                                         <Download className="h-3.5 w-3.5" aria-hidden />
                                     </a>
@@ -500,19 +500,19 @@ export function PublicPassportDetail({
                             {events.map((event, i) => (
                                 <li key={event.id} className="relative flex gap-3 pb-4 last:pb-0">
                                     <div className="flex flex-col items-center">
-                                        <span className="bg-foreground/70 mt-1.5 h-2 w-2 shrink-0 rounded-full" />
-                                        {i < events.length - 1 && <span className="bg-border w-px flex-1" />}
+                                        <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-foreground/70" />
+                                        {i < events.length - 1 && <span className="w-px flex-1 bg-border" />}
                                     </div>
                                     <div className="min-w-0 flex-1">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-muted-foreground text-[11px] uppercase tracking-wider">
+                                            <span className="text-[11px] tracking-wider text-muted-foreground uppercase">
                                                 {new Date(event.occurredAt).toLocaleDateString('fr-FR')}
                                             </span>
-                                            <span className="bg-secondary text-secondary-foreground rounded px-1.5 py-0.5 text-[10px]">
+                                            <span className="rounded bg-secondary px-1.5 py-0.5 text-[10px] text-secondary-foreground">
                                                 {ACTOR_LABELS[event.actorType]}
                                             </span>
                                         </div>
-                                        <p className="text-foreground text-sm">{event.description}</p>
+                                        <p className="text-sm text-foreground">{event.description}</p>
                                     </div>
                                 </li>
                             ))}
@@ -528,7 +528,7 @@ export function PublicPassportDetail({
                     </Section>
                 )}
 
-                <p className="text-muted-foreground mt-2 border-t pt-4 font-mono text-[10px] leading-relaxed">
+                <p className="mt-2 border-t pt-4 font-mono text-[10px] leading-relaxed text-muted-foreground">
                     {publicCode !== null && `Code : ${publicCode} / `}
                     {new Date(dpp.createdAt).toLocaleDateString('fr-FR')}
                 </p>
@@ -540,19 +540,19 @@ export function PublicPassportDetail({
 function Section({ delay, title, children }: { delay: number; title: string; children: ReactNode }) {
     return (
         <motion.section
-            className="border-border bg-card space-y-3 rounded-2xl border p-4"
+            className="space-y-3 rounded-2xl border border-border bg-card p-4"
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay, ease: [0.22, 1, 0.36, 1] }}
         >
-            <h2 className="text-foreground text-xs font-semibold uppercase tracking-[0.18em]">{title}</h2>
+            <h2 className="text-xs font-semibold tracking-[0.18em] text-foreground uppercase">{title}</h2>
             {children}
         </motion.section>
     );
 }
 
 function Label({ children }: { children: ReactNode }) {
-    return <p className="text-muted-foreground text-[11px] uppercase tracking-wider">{children}</p>;
+    return <p className="text-[11px] tracking-wider text-muted-foreground uppercase">{children}</p>;
 }
 
 function InfoRow({ label, value, fullWidth }: { label: string; value: ReactNode; fullWidth?: boolean }) {
@@ -560,18 +560,18 @@ function InfoRow({ label, value, fullWidth }: { label: string; value: ReactNode;
     return (
         <div className={cn('flex flex-col gap-0.5', fullWidth && 'col-span-full')}>
             <Label>{label}</Label>
-            <span className="text-foreground text-sm">{value}</span>
+            <span className="text-sm text-foreground">{value}</span>
         </div>
     );
 }
 
 function BooleanField({ value }: { value: boolean }) {
     return value ? (
-        <span className="text-lumiris-emerald flex items-center gap-1 text-sm">
+        <span className="flex items-center gap-1 text-sm text-lumiris-emerald">
             <CheckCircle className="h-3.5 w-3.5" /> Oui
         </span>
     ) : (
-        <span className="text-lumiris-rose flex items-center gap-1 text-sm">
+        <span className="flex items-center gap-1 text-sm text-lumiris-rose">
             <XCircle className="h-3.5 w-3.5" /> Non
         </span>
     );

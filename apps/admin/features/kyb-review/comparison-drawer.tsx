@@ -69,11 +69,11 @@ function isExpired(dateIso?: string): boolean {
 function ConsistencyBadge({ consistent }: { consistent: boolean | null }) {
     if (consistent === null) return null;
     return consistent ? (
-        <Badge className="bg-lumiris-emerald/10 text-lumiris-emerald border-lumiris-emerald/30 gap-1">
+        <Badge className="gap-1 border-lumiris-emerald/30 bg-lumiris-emerald/10 text-lumiris-emerald">
             <CheckCircle2 className="h-3 w-3" /> Cohérent avec SIRENE
         </Badge>
     ) : (
-        <Badge className="bg-lumiris-amber/10 text-lumiris-amber border-lumiris-amber/30 gap-1">
+        <Badge className="gap-1 border-lumiris-amber/30 bg-lumiris-amber/10 text-lumiris-amber">
             <AlertTriangle className="h-3 w-3" /> À vérifier — différent de SIRENE
         </Badge>
     );
@@ -99,11 +99,11 @@ function DocRow({
                 <span className="text-foreground">{label}</span>
                 <div className="flex items-center gap-2">
                     {uploaded ? (
-                        <span className="text-lumiris-emerald inline-flex items-center gap-1 text-xs font-medium">
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-lumiris-emerald">
                             <CheckCircle2 className="h-3.5 w-3.5" /> Reçu
                         </span>
                     ) : (
-                        <span className="text-destructive inline-flex items-center gap-1 text-xs font-medium">
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-destructive">
                             <XCircle className="h-3.5 w-3.5" /> Manquant
                         </span>
                     )}
@@ -112,7 +112,7 @@ function DocRow({
                             href={url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-lumiris-cyan inline-flex items-center gap-1 text-xs underline underline-offset-2"
+                            className="inline-flex items-center gap-1 text-xs text-lumiris-cyan underline underline-offset-2"
                         >
                             Voir <ExternalLink className="h-3 w-3" />
                         </a>
@@ -120,18 +120,18 @@ function DocRow({
                 </div>
             </div>
             {uploaded && expiresAt ? (
-                <p className={`text-[11px] ${expired ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>
+                <p className={`text-[11px] ${expired ? 'font-medium text-destructive' : 'text-muted-foreground'}`}>
                     {expired ? 'Expiré le' : 'Expire le'} {new Date(expiresAt).toLocaleDateString('fr-FR')}
                     {expired ? ' — à renouveler' : ''}
                 </p>
             ) : null}
             {nameMatch !== undefined ? (
                 nameMatch ? (
-                    <span className="text-lumiris-emerald inline-flex w-fit items-center gap-1 text-[11px]">
+                    <span className="inline-flex w-fit items-center gap-1 text-[11px] text-lumiris-emerald">
                         <CheckCircle2 className="h-3 w-3" /> Nom du représentant détecté sur le document (OCR)
                     </span>
                 ) : (
-                    <span className="text-lumiris-amber inline-flex w-fit items-center gap-1 text-[11px]">
+                    <span className="inline-flex w-fit items-center gap-1 text-[11px] text-lumiris-amber">
                         <FileWarning className="h-3 w-3" /> Nom du représentant non détecté sur le document (OCR)
                     </span>
                 )
@@ -143,8 +143,8 @@ function DocRow({
 function Field({ label, value }: { label: string; value: string }) {
     return (
         <div>
-            <p className="text-muted-foreground text-[11px] uppercase tracking-wide">{label}</p>
-            <p className="text-foreground text-sm">{value || '—'}</p>
+            <p className="text-[11px] tracking-wide text-muted-foreground uppercase">{label}</p>
+            <p className="text-sm text-foreground">{value || '—'}</p>
         </div>
     );
 }
@@ -208,7 +208,7 @@ export function KybComparisonDrawer({
             <div className="flex flex-col gap-6">
                 {kyb ? (
                     <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground text-[11px] uppercase tracking-wide">
+                        <span className="text-[11px] tracking-wide text-muted-foreground uppercase">
                             Statut du dossier
                         </span>
                         <Badge variant="outline" className={`font-mono text-[10px] ${KYB_STATUS_TONE[kyb.kybStatus]}`}>
@@ -217,14 +217,14 @@ export function KybComparisonDrawer({
                     </div>
                 ) : null}
                 {kyb?.kybReviewNote ? (
-                    <p className="border-border/60 bg-background rounded-lg border p-3 text-xs">
+                    <p className="rounded-lg border border-border/60 bg-background p-3 text-xs">
                         <span className="text-muted-foreground">Note admin : </span>
                         {kyb.kybReviewNote}
                     </p>
                 ) : null}
 
                 <section className="flex flex-col gap-3">
-                    <h3 className="text-foreground text-sm font-semibold">Entité juridique déclarée</h3>
+                    <h3 className="text-sm font-semibold text-foreground">Entité juridique déclarée</h3>
                     <div className="grid grid-cols-2 gap-3">
                         <Field
                             label="Catégorie"
@@ -238,19 +238,19 @@ export function KybComparisonDrawer({
                     <ConsistencyBadge consistent={addressConsistent} />
                 </section>
 
-                <section className="border-border/60 flex flex-col gap-2 rounded-lg border p-3">
-                    <h3 className="text-foreground text-sm font-semibold">Données SIRENE (référence)</h3>
+                <section className="flex flex-col gap-2 rounded-lg border border-border/60 p-3">
+                    <h3 className="text-sm font-semibold text-foreground">Données SIRENE (référence)</h3>
                     <Field label="SIREN" value={kyb?.sireneSiren ?? ''} />
                     <Field label="Adresse du siège" value={kyb?.sireneSiegeAddress ?? ''} />
                     <Field label="Code nature juridique (INSEE)" value={kyb?.sireneNatureJuridique ?? ''} />
                     {dirigeants.length > 0 ? (
                         <div>
-                            <p className="text-muted-foreground text-[11px] uppercase tracking-wide">
+                            <p className="text-[11px] tracking-wide text-muted-foreground uppercase">
                                 Dirigeants déclarés à l&apos;INSEE
                             </p>
                             <ul className="mt-1 flex flex-col gap-1">
                                 {dirigeants.map((d, i) => (
-                                    <li key={i} className="text-foreground text-xs">
+                                    <li key={i} className="text-xs text-foreground">
                                         {d.denomination ?? [d.prenoms, d.nom].filter(Boolean).join(' ')}
                                         {d.qualite ? (
                                             <span className="text-muted-foreground"> — {d.qualite}</span>
@@ -263,7 +263,7 @@ export function KybComparisonDrawer({
                 </section>
 
                 <section className="flex flex-col gap-3">
-                    <h3 className="text-foreground text-sm font-semibold">Représentant légal déclaré</h3>
+                    <h3 className="text-sm font-semibold text-foreground">Représentant légal déclaré</h3>
                     <div className="grid grid-cols-2 gap-3">
                         <Field label="Nom" value={repFullName} />
                         <Field label="Date de naissance" value={kyb?.repBirthDate ?? ''} />
@@ -289,18 +289,18 @@ export function KybComparisonDrawer({
                     {dirigeants.some(
                         (d) => kyb?.repLastName && d.nom?.toUpperCase().includes(kyb.repLastName.toUpperCase()),
                     ) ? (
-                        <Badge className="bg-lumiris-emerald/10 text-lumiris-emerald border-lumiris-emerald/30 w-fit gap-1">
+                        <Badge className="w-fit gap-1 border-lumiris-emerald/30 bg-lumiris-emerald/10 text-lumiris-emerald">
                             <CheckCircle2 className="h-3 w-3" /> Nom retrouvé parmi les dirigeants SIRENE
                         </Badge>
                     ) : (
-                        <Badge className="bg-lumiris-amber/10 text-lumiris-amber border-lumiris-amber/30 w-fit gap-1">
+                        <Badge className="w-fit gap-1 border-lumiris-amber/30 bg-lumiris-amber/10 text-lumiris-amber">
                             <AlertTriangle className="h-3 w-3" /> Nom non retrouvé parmi les dirigeants SIRENE
                         </Badge>
                     )}
                 </section>
 
                 <section className="flex flex-col gap-3">
-                    <h3 className="text-foreground text-sm font-semibold">Documents</h3>
+                    <h3 className="text-sm font-semibold text-foreground">Documents</h3>
                     <DocRow
                         label="Pièce d'identité du représentant"
                         uploaded={Boolean(kyb?.idDocUploaded)}
@@ -338,7 +338,7 @@ export function KybComparisonDrawer({
                         variant="outline"
                         disabled={!canReject || pending}
                         onClick={onMarkIncomplete}
-                        className="border-lumiris-amber/40 text-lumiris-amber hover:bg-lumiris-amber/10 h-8 gap-1.5"
+                        className="h-8 gap-1.5 border-lumiris-amber/40 text-lumiris-amber hover:bg-lumiris-amber/10"
                     >
                         <FileWarning className="h-3.5 w-3.5" />
                         Incomplet
@@ -347,7 +347,7 @@ export function KybComparisonDrawer({
                         size="sm"
                         disabled={!canReject || pending}
                         onClick={onReject}
-                        className="bg-lumiris-rose hover:bg-lumiris-rose/90 h-8 gap-1.5 text-white disabled:opacity-40"
+                        className="h-8 gap-1.5 bg-lumiris-rose text-white hover:bg-lumiris-rose/90 disabled:opacity-40"
                     >
                         <XCircle className="h-3.5 w-3.5" />
                         Rejeter
@@ -356,7 +356,7 @@ export function KybComparisonDrawer({
                         size="sm"
                         disabled={!canApprove || pending}
                         onClick={onApprove}
-                        className="bg-lumiris-emerald hover:bg-lumiris-emerald/90 h-8 gap-1.5 text-white disabled:opacity-40"
+                        className="h-8 gap-1.5 bg-lumiris-emerald text-white hover:bg-lumiris-emerald/90 disabled:opacity-40"
                     >
                         <CheckCircle2 className="h-3.5 w-3.5" />
                         Valider

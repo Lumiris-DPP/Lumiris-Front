@@ -67,21 +67,21 @@ export function OnboardingProfile() {
     const remaining = MAX_STYLE_PREFS - stylePrefs.length;
 
     return (
-        <div className="relative flex h-full flex-col px-6 pb-10 pt-[max(env(safe-area-inset-top),3rem)]">
+        <div className="relative flex h-full flex-col px-6 pt-[max(env(safe-area-inset-top),3rem)] pb-10">
             <IridescentBackground intensity="subtle" />
 
             <header className="flex items-center justify-between">
                 <button
                     type="button"
                     onClick={handleLogout}
-                    className="text-muted-foreground hover:text-foreground rounded-full px-3 py-1 text-xs font-medium transition-colors"
+                    className="rounded-full px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
                 >
                     Se déconnecter
                 </button>
                 <button
                     type="button"
                     onClick={handleSkip}
-                    className="text-muted-foreground hover:text-foreground rounded-full px-3 py-1 text-xs font-medium transition-colors"
+                    className="rounded-full px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
                 >
                     Passer
                 </button>
@@ -95,20 +95,20 @@ export function OnboardingProfile() {
             >
                 <GlassCard className="w-full max-w-sm p-7">
                     <header className="text-center">
-                        <p className="text-muted-foreground text-[10px] font-semibold uppercase tracking-[0.28em]">
+                        <p className="text-[10px] font-semibold tracking-[0.28em] text-muted-foreground uppercase">
                             Profil
                         </p>
-                        <h1 className="text-foreground mt-2 text-xl font-bold tracking-tight">
+                        <h1 className="mt-2 text-xl font-bold tracking-tight text-foreground">
                             Aide-nous à personnaliser
                         </h1>
-                        <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                             Ta ville sert à proposer les bons retoucheurs. Le style affine les suggestions.
                         </p>
                     </header>
 
                     <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-5">
                         <div className="flex flex-col gap-2">
-                            <Label htmlFor={cityId} className="text-foreground/80 text-xs font-semibold">
+                            <Label htmlFor={cityId} className="text-xs font-semibold text-foreground/80">
                                 Ville
                             </Label>
                             <Input
@@ -130,9 +130,9 @@ export function OnboardingProfile() {
                         </div>
 
                         <fieldset className="flex flex-col gap-2">
-                            <legend className="text-foreground/80 text-xs font-semibold">
+                            <legend className="text-xs font-semibold text-foreground/80">
                                 Style préféré
-                                <span className="text-muted-foreground ml-2 font-normal">
+                                <span className="ml-2 font-normal text-muted-foreground">
                                     ({remaining > 0 ? `${remaining} restant${remaining > 1 ? 's' : ''}` : 'max atteint'}
                                     )
                                 </span>
@@ -163,7 +163,7 @@ export function OnboardingProfile() {
 
                         <Button
                             type="submit"
-                            className="bg-foreground text-background hover:bg-foreground/90 mt-2 h-11 w-full rounded-full text-sm font-semibold"
+                            className="mt-2 h-11 w-full rounded-full bg-foreground text-sm font-semibold text-background hover:bg-foreground/90"
                         >
                             Terminer
                         </Button>

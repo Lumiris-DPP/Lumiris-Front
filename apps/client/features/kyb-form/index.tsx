@@ -286,7 +286,7 @@ export function RepresentativeFields({ draft, onChange }: DraftFieldsProps) {
                     onCheckedChange={(v) => onChange({ repIsUbo: v === true })}
                     className="mt-0.5"
                 />
-                <Label htmlFor="kyb-rep-ubo" className="cursor-pointer text-sm font-normal leading-snug">
+                <Label htmlFor="kyb-rep-ubo" className="cursor-pointer text-sm leading-snug font-normal">
                     Le représentant détient plus de 25&nbsp;% du capital (bénéficiaire effectif)
                 </Label>
             </div>
@@ -352,12 +352,12 @@ export function DocumentsSection({ initialKyb, onUploadDocument, uploadingLabel 
                 return (
                     <li
                         key={doc.key}
-                        className="border-border/60 bg-background flex flex-col gap-2 rounded-lg border p-3"
+                        className="flex flex-col gap-2 rounded-lg border border-border/60 bg-background p-3"
                     >
                         <div className="flex items-center justify-between gap-3">
                             <div className="min-w-0">
-                                <p className="text-foreground text-sm font-medium">{doc.title}</p>
-                                <p className="text-muted-foreground text-xs">{doc.hint}</p>
+                                <p className="text-sm font-medium text-foreground">{doc.title}</p>
+                                <p className="text-xs text-muted-foreground">{doc.hint}</p>
                             </div>
                             <div className="flex shrink-0 items-center gap-2">
                                 {info.uploaded && info.url ? (
@@ -365,7 +365,7 @@ export function DocumentsSection({ initialKyb, onUploadDocument, uploadingLabel 
                                         href={info.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs underline underline-offset-2"
+                                        className="inline-flex items-center gap-1 text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
                                     >
                                         Voir <ExternalLink className="h-3 w-3" />
                                     </a>
@@ -402,7 +402,7 @@ export function DocumentsSection({ initialKyb, onUploadDocument, uploadingLabel 
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
-                            <Label htmlFor={`kyb-doc-expiry-${doc.key}`} className="text-muted-foreground text-[11px]">
+                            <Label htmlFor={`kyb-doc-expiry-${doc.key}`} className="text-[11px] text-muted-foreground">
                                 Date d&apos;expiration (optionnel)
                             </Label>
                             <Input
@@ -423,7 +423,7 @@ export function DocumentsSection({ initialKyb, onUploadDocument, uploadingLabel 
 export function DocumentsCard(props: DocumentsSectionProps) {
     return (
         <Card className="flex flex-col gap-3 p-5">
-            <h2 className="text-foreground text-sm font-semibold">Documents justificatifs</h2>
+            <h2 className="text-sm font-semibold text-foreground">Documents justificatifs</h2>
             <DocumentsSection {...props} />
         </Card>
     );

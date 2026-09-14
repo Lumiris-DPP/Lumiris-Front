@@ -88,8 +88,8 @@ function ArtisansInner() {
 
                     <div className="space-y-3">
                         <div>
-                            <h2 className="text-foreground text-sm font-semibold">Comptes réels (ATELIER)</h2>
-                            <p className="text-muted-foreground text-xs">
+                            <h2 className="text-sm font-semibold text-foreground">Comptes réels (ATELIER)</h2>
+                            <p className="text-xs text-muted-foreground">
                                 Comptes artisan inscrits sur le vrai backend — distinct du jeu de données de démo
                                 ci-dessus. Cliquez sur un compte pour consulter son dossier KYB.
                             </p>
@@ -99,8 +99,8 @@ function ArtisansInner() {
 
                     <div className="space-y-3">
                         <div>
-                            <h2 className="text-foreground text-sm font-semibold">Réparateurs (ATELIER)</h2>
-                            <p className="text-muted-foreground text-xs">
+                            <h2 className="text-sm font-semibold text-foreground">Réparateurs (ATELIER)</h2>
+                            <p className="text-xs text-muted-foreground">
                                 Comptes réparateur inscrits sur le vrai backend. Cliquez sur un compte pour consulter
                                 son dossier KYB.
                             </p>
