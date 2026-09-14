@@ -15,6 +15,7 @@ import {
     DropdownMenuTrigger,
 } from '@lumiris/ui/components/dropdown-menu';
 import { signOut } from '@/lib/auth-store';
+import { useAuthRole } from '@/lib/use-auth';
 
 interface UserMenuProps {
     artisan: Artisan;
@@ -22,6 +23,7 @@ interface UserMenuProps {
 
 export function UserMenu({ artisan }: UserMenuProps) {
     const router = useRouter();
+    const isRepairer = useAuthRole() === 'repairer';
     const initials =
         artisan.displayName
             .split(' ')
@@ -58,17 +60,19 @@ export function UserMenu({ artisan }: UserMenuProps) {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                    <Link href="/profile">
+                    <Link href={isRepairer ? '/repairer-profile' : '/profile'}>
                         <UserIcon className="h-4 w-4" />
                         Mon profil
                     </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                    <Link href="/subscription">
-                        <Wallet className="h-4 w-4" />
-                        Mon abonnement
-                    </Link>
-                </DropdownMenuItem>
+                {!isRepairer && (
+                    <DropdownMenuItem asChild>
+                        <Link href="/subscription">
+                            <Wallet className="h-4 w-4" />
+                            Mon abonnement
+                        </Link>
+                    </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem variant="destructive" onSelect={handleSignOut}>
                     <LogOut className="h-4 w-4" />

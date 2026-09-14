@@ -19,6 +19,7 @@ import type {
     RepairRequestReviewRequest,
     RepairPayRequest,
     RepairPaymentIntentResponse,
+    RepairPayoutSchedule,
 } from '../types/repairers';
 import type { KybDetailsRequest, KybDocumentLabel, KybDocumentUploadOptions } from '../types/kyb';
 
@@ -86,6 +87,9 @@ export function repairersApi(http: Http) {
         // Repairer side (authenticated)
         myRequests(): Promise<RepairRequestResponse[]> {
             return http.request<RepairRequestResponse[]>('/api/repairers/me/requests');
+        },
+        myPayouts(): Promise<RepairPayoutSchedule> {
+            return http.request<RepairPayoutSchedule>('/api/repairers/me/payouts');
         },
         submitQuote(requestId: string, req: RepairQuoteRequest): Promise<RepairRequestResponse> {
             return http.request<RepairRequestResponse>(`/api/repairers/me/requests/${requestId}/quote`, {

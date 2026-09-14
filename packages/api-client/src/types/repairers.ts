@@ -229,3 +229,26 @@ export interface RepairMessageResponse {
     body: string;
     createdAt: string;
 }
+
+// --- Trésorerie / versements (Stripe Connect, même mécanique que le vendeur artisan) ---
+
+export type RepairPayoutExpectation = 'SCHEDULED' | 'IMMINENT' | 'ON_HOLD';
+
+export interface RepairPayoutEntry {
+    requestId: string;
+    productName?: string;
+    consumerName?: string;
+    netCents: number;
+    currency?: string;
+    expectedAt?: string;
+    expectation: RepairPayoutExpectation;
+    status: RepairRequestStatus;
+}
+
+export interface RepairPayoutSchedule {
+    scheduledCents: number;
+    releasedCents: number;
+    onHoldCents: number;
+    currency?: string;
+    entries: RepairPayoutEntry[];
+}

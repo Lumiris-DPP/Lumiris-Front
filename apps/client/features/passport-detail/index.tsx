@@ -24,6 +24,7 @@ import { IrisScoreCard } from '@lumiris/scoring-ui';
 import { useDeleteDppForm, useDppForm, useDuplicateDppForm } from '@lumiris/api-client/react';
 import { isApiError, type DppFormDto } from '@lumiris/api-client';
 import { useAuthStore } from '@/lib/auth-store';
+import { useAuthRole } from '@/lib/use-auth';
 import { useCurrentArtisan } from '@/lib/current-artisan';
 import { useEditDraft } from '@/lib/use-edit-draft';
 import { draftToPassport, useDraftStore } from '@/lib/draft-store';
@@ -39,11 +40,14 @@ import {
 import { DocumentsCard } from './documents-card';
 import { EventFormCard } from './event-form-card';
 import { EventHistoryCard } from './event-history-card';
+import { RepairerRequestCard } from './repairer-request-card';
 import { AccessQrCard } from './access-qr-card';
 import { buildDetailView } from './view-model';
 
 export function PassportDetail({ passportId }: { passportId: string }) {
     const artisan = useCurrentArtisan();
+    const role = useAuthRole();
+    const isRepairerViewer = role === 'repairer';
     const token = useAuthStore((s) => s.token);
     const drafts = useDraftStore((s) => s.drafts);
     const draft = drafts[passportId];
@@ -110,11 +114,13 @@ export function PassportDetail({ passportId }: { passportId: string }) {
                 <div className="space-y-6">
                     <div className="flex items-center gap-3">
                         <Button asChild variant="ghost" size="sm">
-                            <Link href="/passports">
+                            <Link href={isRepairerViewer ? '/repairer-passports' : '/passports'}>
                                 <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Liste
                             </Link>
                         </Button>
                     </div>
+
+                    {isRepairerViewer && <RepairerRequestCard passportId={passportId} />}
 
                     <IdentityCard view={view} />
                     <CompositionCard view={view} />
@@ -128,7 +134,10 @@ export function PassportDetail({ passportId }: { passportId: string }) {
                             {/* Events and Iris score only exist once a DPP is published. */}
                             {!isDraft && (
                                 <>
-                                    <EventFormCard passportId={passportId} />
+                                    <EventFormCard
+                                        passportId={passportId}
+                                        defaultActorType={isRepairerViewer ? 'REPAIRER' : 'MANUFACTURER'}
+                                    />
                                     <EventHistoryCard passportId={passportId} />
                                 </>
                             )}

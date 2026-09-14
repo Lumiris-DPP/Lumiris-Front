@@ -29,6 +29,7 @@ import type {
     RepairRequestReviewRequest,
     RepairPayRequest,
     RepairPaymentIntentResponse,
+    RepairPayoutSchedule,
 } from '../types/repairers';
 import type { KybDetailsRequest, KybDocumentLabel, KybDocumentUploadOptions } from '../types/kyb';
 
@@ -226,6 +227,18 @@ export function useRepairerRequests(
     });
 }
 
+export function useRepairerPayouts(
+    options?: Omit<UseQueryOptions<RepairPayoutSchedule, Error>, 'queryKey' | 'queryFn'>,
+) {
+    const client = useApiClient();
+    return useQuery<RepairPayoutSchedule, Error>({
+        queryKey: repairerKeys.custom('payouts'),
+        queryFn: () => client.repairers.myPayouts(),
+        staleTime: 15 * 1000,
+        ...options,
+    });
+}
+
 export function useSubmitQuote(
     options?: Omit<
         UseMutationOptions<RepairRequestResponse, Error, { requestId: string; req: RepairQuoteRequest }>,
@@ -327,6 +340,10 @@ export function useMyRepairRequests(
         queryKey: repairRequestKeys.custom('mine'),
         queryFn: () => client.repairRequests.mine(),
         staleTime: 15 * 1000,
+        // Le statut peut bouger côté serveur (webhook Stripe, action du retoucheur) pendant que
+        // cet écran reste ouvert sans remount ni changement de focus — on repolle pour ne pas
+        // laisser un devis déjà payé/traité affiché comme actionnable.
+        refetchInterval: 15 * 1000,
         ...options,
     });
 }
