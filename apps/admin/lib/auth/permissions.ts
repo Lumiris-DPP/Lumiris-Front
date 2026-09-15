@@ -86,7 +86,7 @@ const ROLE_PERMISSIONS: Record<AdminUserRole, ReadonlySet<AdminAction>> = {
     ]),
 };
 
-export function can(role: AdminUserRole, action: AdminAction): boolean {
+function can(role: AdminUserRole, action: AdminAction): boolean {
     return ROLE_PERMISSIONS[role].has(action);
 }
 

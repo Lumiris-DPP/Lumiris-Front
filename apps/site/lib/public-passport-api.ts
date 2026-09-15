@@ -32,7 +32,7 @@ export interface PassportNote {
     body: string;
 }
 
-export interface PublicPassport {
+interface PublicPassport {
     view: PassportPublicView;
     artisanSlug: string;
     notes: readonly PassportNote[];
@@ -92,7 +92,7 @@ export async function fetchArtisanPieces(slug: string): Promise<readonly Artisan
     return catalogArtisanPieces(slug);
 }
 
-export function catalogArtisanPieces(slug: string): readonly ArtisanPiece[] {
+function catalogArtisanPieces(slug: string): readonly ArtisanPiece[] {
     const artisan = mockArtisanBySlug(slug);
     if (!artisan) return [];
 
