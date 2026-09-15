@@ -83,7 +83,7 @@ export default async function Image({ params }: OgProps) {
                 ) : null}
             </div>
 
-            <div style={{ display: 'flex', fontSize: 20, color: '#94a3b8' }}>lumiris.fr/passeport</div>
+            <div style={{ display: 'flex', fontSize: 20, color: '#94a3b8' }}>lumiris.eu/passeport</div>
         </div>,
         size,
     );

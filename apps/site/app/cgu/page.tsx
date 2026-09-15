@@ -4,7 +4,7 @@ import { Scale } from 'lucide-react';
 export const metadata: Metadata = {
     title: 'Conditions générales d’utilisation — LUMIRIS',
     description:
-        'Règles d’usage du site lumiris.fr et conditions générales de vente des abonnements ATELIER et LOCAL. Version provisoire — à finaliser avant la mise en production publique.',
+        'Règles d’usage du site lumiris.eu et conditions générales de vente des abonnements ATELIER et LOCAL. Version provisoire — à finaliser avant la mise en production publique.',
     alternates: { canonical: '/cgu' },
 };
 
@@ -37,7 +37,7 @@ export default function CguPage() {
                 <div>
                     <h2 className="text-base font-semibold text-foreground">Objet</h2>
                     <p className="mt-2 text-muted-foreground">
-                        Les présentes conditions encadrent l&apos;usage du site lumiris.fr et la souscription aux offres
+                        Les présentes conditions encadrent l&apos;usage du site lumiris.eu et la souscription aux offres
                         LUMIRIS — ATELIER (abonnements artisans), ATELIER+ (add-on), LOCAL (retoucheurs) et l&apos;API
                         Enterprise pour les marques. Le détail tarifaire et les modalités d&apos;engagement seront
                         publiés ici avant l&apos;ouverture commerciale.
@@ -60,7 +60,7 @@ export default function CguPage() {
                 <div>
                     <h2 className="text-base font-semibold text-foreground">Responsabilité</h2>
                     <p className="mt-2 text-muted-foreground">
-                        Les passeports DPP affichés sur lumiris.fr sont publiés sous la responsabilité de l&apos;artisan
+                        Les passeports DPP affichés sur lumiris.eu sont publiés sous la responsabilité de l&apos;artisan
                         émetteur. LUMIRIS contrôle la cohérence algorithmique du score Iris mais ne se substitue pas à
                         l&apos;artisan dans la véracité des données déclaratives (origine, certifications, composition).
                     </p>

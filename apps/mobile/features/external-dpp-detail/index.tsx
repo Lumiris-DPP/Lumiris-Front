@@ -13,6 +13,7 @@ import { toast } from '@/lib/toast';
 import { SectionHeading } from '@/lib/section';
 import { ScoreHero } from '@/features/passport-detail/score-hero';
 import { ScoreSheet } from '@/features/passport-detail/score-sheet';
+import { WEB_URL } from '@/lib/web-url';
 
 const SECTOR_LABEL_FR: Record<ExternalDpp['sector'], string> = {
     electronics: 'Électronique',
@@ -59,7 +60,7 @@ export function ExternalDppDetail({ dpp }: ExternalDppDetailProps) {
     );
 
     const onShare = useCallback(async () => {
-        const url = typeof window !== 'undefined' ? window.location.href : `https://lumiris.fr/dpp/${dpp.gtin}`;
+        const url = typeof window !== 'undefined' ? window.location.href : `${WEB_URL}/dpp/${dpp.gtin}`;
         const title = `${dpp.brand} · ${dpp.productName}`;
         if (typeof navigator !== 'undefined' && 'share' in navigator) {
             try {

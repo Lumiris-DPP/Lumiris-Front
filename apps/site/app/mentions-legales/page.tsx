@@ -4,7 +4,7 @@ import { FileText } from 'lucide-react';
 export const metadata: Metadata = {
     title: 'Mentions légales — LUMIRIS',
     description:
-        'Éditeur, hébergeur et contact responsable de la publication du site lumiris.fr. Version provisoire — à compléter avant la mise en production publique.',
+        'Éditeur, hébergeur et contact responsable de la publication du site lumiris.eu. Version provisoire — à compléter avant la mise en production publique.',
     alternates: { canonical: '/mentions-legales' },
 };
 

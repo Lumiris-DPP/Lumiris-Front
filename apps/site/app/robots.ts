@@ -1,6 +1,5 @@
 import type { MetadataRoute } from 'next';
-
-const SITE_URL = 'https://lumiris.fr';
+import { SITE_URL } from '@/lib/urls';
 
 export default function robots(): MetadataRoute.Robots {
     return {

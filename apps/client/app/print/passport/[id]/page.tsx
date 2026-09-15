@@ -384,7 +384,7 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
                         <div className="min-w-0 flex-1 space-y-1">
                             <p className="text-[10px] text-neutral-600 italic">
                                 Passeport numérique de produit — format anticipant le DPP textile ESPR. Vérifiable sur
-                                lumiris.fr.
+                                lumiris.eu.
                             </p>
                             <p className="font-mono text-[9px] text-neutral-700">{dppUrl}</p>
                             <p className="font-mono text-[10px] font-semibold text-neutral-800">

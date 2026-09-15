@@ -8,6 +8,7 @@ import { Footer } from '@/features/footer';
 import { MotionProvider } from '@/features/motion-provider';
 import { WebVitals } from './web-vitals';
 import './globals.css';
+import { SITE_URL } from '@/lib/urls';
 
 // Force recompile
 
@@ -21,7 +22,6 @@ const geistMono = Geist_Mono({
     variable: '--font-geist-mono',
 });
 
-const SITE_URL = 'https://lumiris.fr';
 const TITLE_DEFAULT = 'LUMIRIS — Le passeport numérique de la consommation européenne';
 const DESCRIPTION =
     "LUMIRIS aide les artisans textile français à créer leurs passeports DPP et permet à tout client de scanner n'importe quel DPP européen (textile, tech, électroménager, mobilier). Garde-Robe globale, score Iris, aucun acteur ne paye son score.";

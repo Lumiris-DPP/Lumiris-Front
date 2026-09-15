@@ -5,7 +5,7 @@ import { ConsentSettingsLink } from '@lumiris/ui/components/consent-banner';
 export const metadata: Metadata = {
     title: 'Politique de confidentialité — LUMIRIS',
     description:
-        'Données collectées, finalités, durée de conservation et droits RGPD pour les utilisateurs du site lumiris.fr. Version provisoire — à finaliser avant la mise en production publique.',
+        'Données collectées, finalités, durée de conservation et droits RGPD pour les utilisateurs du site lumiris.eu. Version provisoire — à finaliser avant la mise en production publique.',
     alternates: { canonical: '/confidentialite' },
 };
 

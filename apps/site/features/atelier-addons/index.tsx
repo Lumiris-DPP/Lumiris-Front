@@ -2,8 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Sparkles, Wrench, Check, ArrowRight } from 'lucide-react';
-
-const SIGNUP_URL = 'https://client.lumiris.fr';
+import { SIGNUP_URL } from '@/lib/urls';
 
 // Hardcoded canonical addon prices: 19 EUR/month or 190 EUR/year each
 const ADDONS = [

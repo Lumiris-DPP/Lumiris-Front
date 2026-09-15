@@ -22,9 +22,15 @@ RUN --mount=type=cache,target=/root/.bun/install/cache \
     bun install --frozen-lockfile
 
 # Public env inlined into the bundle at build time (Next.js bakes NEXT_PUBLIC_*).
+# NEXT_PUBLIC_WEB_URL is this site's own origin: it signs the canonicals, the sitemap,
+# robots.txt and the JSON-LD, so an image built without it advertises another domain.
 ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+ARG NEXT_PUBLIC_WEB_URL=https://lumiris.eu
+ARG NEXT_PUBLIC_CLIENT_URL=https://app.lumiris.eu
 ARG NEXT_PUBLIC_SENTRY_DSN=
 ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+ENV NEXT_PUBLIC_WEB_URL=${NEXT_PUBLIC_WEB_URL}
+ENV NEXT_PUBLIC_CLIENT_URL=${NEXT_PUBLIC_CLIENT_URL}
 ENV NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN}
 RUN NODE_ENV=production bun run --filter @lumiris/site build
 
