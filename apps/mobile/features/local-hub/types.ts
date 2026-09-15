@@ -1,5 +1,3 @@
-import type { FrenchRegion, IrisGrade, RepairerSector } from '@lumiris/types';
-
 export type LocalPointKind = 'artisan' | 'repairer';
 
 export interface LocalPoint {
@@ -8,16 +6,13 @@ export interface LocalPoint {
     slug: string;
     name: string;
     city: string;
-    region: FrenchRegion;
+    region: string;
     coords?: { lat: number; lng: number };
     distanceKm?: number;
     photoUrl?: string;
-    averageGrade?: IrisGrade;
-    publishedPassports?: number;
     rating?: number;
     reviewCount?: number;
-    avgDelayDays?: number;
-    priceRange?: { min: number; max: number };
+    // Retoucheur uniquement : false = fiche annuaire sans compte (CTA doux, pas de RDV direct).
+    claimed?: boolean;
     specialties?: readonly string[];
-    sector?: RepairerSector;
 }

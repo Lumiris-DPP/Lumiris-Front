@@ -14,11 +14,15 @@ interface MapViewProps {
     userCoords: UserCoords | null;
     selectedId: string | null;
     onSelect: (id: string | null) => void;
+    onMoveEnd: (center: { lat: number; lng: number }) => void;
 }
 
 export function MapView(props: MapViewProps) {
     return (
-        <div className="absolute inset-0">
+        // ponytail: isolate contains Leaflet's internal panes (z-index up to 700), which would
+        // otherwise leak into the parent stacking context and paint over siblings like the z-40
+        // PermissionPrompt regardless of DOM order.
+        <div className="absolute inset-0 isolate z-0">
             <MapClient {...props} />
         </div>
     );

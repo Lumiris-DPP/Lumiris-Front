@@ -18,6 +18,8 @@ const STATUS_MAP: Record<ArtisanProfileResponse['status'], VerificationStatus> =
     PENDING: 'pending',
     VERIFIED: 'verified',
     REJECTED: 'rejected',
+    // Fiche annuaire (import SIRENE) : jamais renvoyé pour le profil de l'artisan connecté.
+    UNCLAIMED: 'unregistered',
 };
 
 interface VerificationState {

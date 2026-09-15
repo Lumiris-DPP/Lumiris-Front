@@ -1,70 +1,71 @@
 'use client';
 
-import Image from 'next/image';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type SyntheticEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, CheckCircle2, Clock3, ScrollText, Wrench, X, XCircle } from 'lucide-react';
-import { mockPassportById, mockRepairerById } from '@lumiris/mock-data';
-import type { Passport, Repairer, RepairerSpecialty } from '@lumiris/types';
 import {
-    type RepairRequest,
-    type RepairRequestStatus,
-    updateRepairRequest,
-    useRepairRequests,
-} from '@/lib/repairs/storage';
-
-const SPECIALITY_LABEL: Record<RepairerSpecialty, string> = {
-    alteration: 'Retouche',
-    embroidery: 'Broderie',
-    'shoe-repair': 'Cordonnerie',
-    leather: 'Cuir',
-    lining: 'Doublure',
-    'electronics-repair': 'Électronique',
-    'phone-repair': 'Téléphonie',
-    'computer-repair': 'Informatique',
-    cabinetmaking: 'Ébénisterie',
-    upholstery: 'Tapisserie',
-    'appliance-repair': 'Électroménager',
-};
+    ArrowLeft,
+    CheckCircle2,
+    Clock3,
+    MessageCircle,
+    ScrollText,
+    Send,
+    Star,
+    Wrench,
+    X,
+    XCircle,
+} from 'lucide-react';
+import {
+    isApiError,
+    repairRequestKeys,
+    useApiQueryClient,
+    useCancelRepairRequest,
+    useMyRepairRequests,
+    useRefuseQuote,
+    useRepairMessages,
+    useSendMessage,
+    useSubmitRepairRequestReview,
+} from '@lumiris/api-client/react';
+import type { RepairRequestResponse, RepairRequestStatus } from '@lumiris/api-client';
+import { RepairPaymentPanel } from './payment-panel';
 
 const STATUS_LABEL: Record<RepairRequestStatus, string> = {
-    pending: 'En attente',
-    cancelled: 'Annulée',
-    completed: 'Terminée',
+    PENDING: 'En attente de devis',
+    DRAFT: 'Devis reçu',
+    ACCEPTED: 'Rendez-vous confirmé',
+    REFUSED: 'Devis refusé',
+    IN_PROGRESS: 'En cours',
+    COMPLETED: 'Terminée',
 };
 
-const STATUS_ORDER: readonly RepairRequestStatus[] = ['pending', 'completed', 'cancelled'];
-
-interface ResolvedRequest {
-    request: RepairRequest;
-    repairer: Repairer | undefined;
-    passport: Passport | undefined;
-}
+const STATUS_ORDER: readonly RepairRequestStatus[] = ['PENDING', 'DRAFT', 'ACCEPTED', 'IN_PROGRESS', 'COMPLETED'];
 
 export function MyRepairs() {
     const router = useRouter();
-    const requests = useRepairRequests();
-    const [detail, setDetail] = useState<RepairRequest | null>(null);
+    const { data: requests, isLoading } = useMyRepairRequests();
+    const [detailId, setDetailId] = useState<string | null>(null);
 
     const grouped = useMemo(() => {
-        const buckets: Record<RepairRequestStatus, ResolvedRequest[]> = {
-            pending: [],
-            cancelled: [],
-            completed: [],
+        const buckets: Record<RepairRequestStatus, RepairRequestResponse[]> = {
+            PENDING: [],
+            DRAFT: [],
+            ACCEPTED: [],
+            REFUSED: [],
+            IN_PROGRESS: [],
+            COMPLETED: [],
         };
-        for (const request of [...requests].sort((a, b) => b.createdAt.localeCompare(a.createdAt))) {
-            buckets[request.status].push({
-                request,
-                repairer: mockRepairerById(request.repairerId),
-                passport: request.passportId ? mockPassportById(request.passportId) : undefined,
-            });
+        for (const request of [...(requests ?? [])].sort((a, b) => b.createdAt.localeCompare(a.createdAt))) {
+            buckets[request.status]?.push(request);
         }
+        // REFUSED requests auto-transition to COMPLETED server-side; fold defensively just in case.
+        buckets.COMPLETED = [...(buckets.COMPLETED ?? []), ...(buckets.REFUSED ?? [])];
+        buckets.REFUSED = [];
         return buckets;
     }, [requests]);
 
-    const total = requests.length;
+    const total = requests?.length ?? 0;
+    const detail = requests?.find((r) => r.id === detailId) ?? null;
 
     return (
         <div className="flex h-full flex-col overflow-y-auto bg-background pb-24">
@@ -89,11 +90,11 @@ export function MyRepairs() {
                 </div>
             </motion.header>
 
-            {total === 0 ? <Empty /> : null}
+            {!isLoading && total === 0 ? <Empty /> : null}
 
             <div className="flex flex-col gap-5 px-4">
                 {STATUS_ORDER.map((status) => {
-                    const items = grouped[status];
+                    const items = grouped[status] ?? [];
                     if (items.length === 0) return null;
                     return (
                         <section key={status} className="flex flex-col gap-2">
@@ -101,15 +102,9 @@ export function MyRepairs() {
                                 {STATUS_LABEL[status]} ({items.length})
                             </h2>
                             <ul className="flex flex-col gap-2">
-                                {items.map((entry) => (
-                                    <li key={entry.request.id}>
-                                        <RequestCard
-                                            entry={entry}
-                                            onView={() => setDetail(entry.request)}
-                                            onCancel={() =>
-                                                updateRepairRequest(entry.request.id, { status: 'cancelled' })
-                                            }
-                                        />
+                                {items.map((request) => (
+                                    <li key={request.id}>
+                                        <RequestCard request={request} onView={() => setDetailId(request.id)} />
                                     </li>
                                 ))}
                             </ul>
@@ -119,14 +114,7 @@ export function MyRepairs() {
             </div>
 
             <AnimatePresence>
-                {detail ? (
-                    <RequestDetailOverlay
-                        request={detail}
-                        repairer={mockRepairerById(detail.repairerId)}
-                        passport={detail.passportId ? mockPassportById(detail.passportId) : undefined}
-                        onClose={() => setDetail(null)}
-                    />
-                ) : null}
+                {detail ? <RequestDetailOverlay request={detail} onClose={() => setDetailId(null)} /> : null}
             </AnimatePresence>
         </div>
     );
@@ -160,29 +148,19 @@ function Empty() {
 }
 
 function StatusIcon({ status }: { status: RepairRequestStatus }) {
-    if (status === 'completed') return <CheckCircle2 className="h-3.5 w-3.5 text-lumiris-emerald" />;
-    if (status === 'cancelled') return <XCircle className="h-3.5 w-3.5 text-muted-foreground" />;
+    if (status === 'COMPLETED') return <CheckCircle2 className="h-3.5 w-3.5 text-lumiris-emerald" />;
+    if (status === 'REFUSED') return <XCircle className="h-3.5 w-3.5 text-muted-foreground" />;
     return <Clock3 className="h-3.5 w-3.5 text-lumiris-cyan" />;
 }
 
-function RequestCard({
-    entry,
-    onView,
-    onCancel,
-}: {
-    entry: ResolvedRequest;
-    onView: () => void;
-    onCancel: () => void;
-}) {
-    const { request, repairer, passport } = entry;
-    const repairerName = repairer?.atelierName ?? repairer?.displayName ?? 'Retoucheur supprimé';
-    const reference = passport?.garment.reference ?? 'Pièce non précisée';
+function RequestCard({ request, onView }: { request: RepairRequestResponse; onView: () => void }) {
+    const repairerName = request.repairerDisplayName ?? 'Retoucheur';
+    const reference = request.dppProductName ?? 'Pièce non précisée';
     const date = new Date(request.createdAt).toLocaleDateString('fr-FR', {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
     });
-    const canCancel = request.status === 'pending';
 
     return (
         <article className="flex flex-col gap-2 rounded-2xl border border-border/60 bg-card p-4">
@@ -198,22 +176,13 @@ function RequestCard({
             </div>
 
             <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                <span>
-                    {SPECIALITY_LABEL[request.specialty]} · {date}
-                </span>
-                <span className="font-mono">#{request.id}</span>
+                <span>{date}</span>
+                {request.quoteAmountCents != null ? (
+                    <span className="font-mono text-foreground">{(request.quoteAmountCents / 100).toFixed(2)} €</span>
+                ) : null}
             </div>
 
             <div className="mt-1 flex items-center justify-end gap-2">
-                {canCancel ? (
-                    <button
-                        type="button"
-                        onClick={onCancel}
-                        className="inline-flex items-center gap-1 rounded-full border border-lumiris-rose/30 px-3 py-1 text-[11px] font-medium text-lumiris-rose"
-                    >
-                        Annuler
-                    </button>
-                ) : null}
                 <button
                     type="button"
                     onClick={onView}
@@ -227,17 +196,97 @@ function RequestCard({
     );
 }
 
-function RequestDetailOverlay({
-    request,
-    repairer,
-    passport,
-    onClose,
-}: {
-    request: RepairRequest;
-    repairer: Repairer | undefined;
-    passport: Passport | undefined;
-    onClose: () => void;
-}) {
+function RequestDetailOverlay({ request, onClose }: { request: RepairRequestResponse; onClose: () => void }) {
+    const queryClient = useApiQueryClient();
+    const { data: messages } = useRepairMessages(request.id);
+    const refuseQuote = useRefuseQuote();
+    const cancelRequest = useCancelRepairRequest();
+    const sendMessage = useSendMessage(request.id);
+    const submitReview = useSubmitRepairRequestReview();
+
+    const [appointmentAt, setAppointmentAt] = useState('');
+    const [messageBody, setMessageBody] = useState('');
+    const [error, setError] = useState<string | null>(null);
+    const [reviewRating, setReviewRating] = useState(5);
+    const [reviewComment, setReviewComment] = useState('');
+    const [reviewDone, setReviewDone] = useState(false);
+    const [paying, setPaying] = useState(false);
+    const [paidNotice, setPaidNotice] = useState(false);
+
+    // Une action (payer, refuser…) peut échouer parce que le statut a bougé entre-temps (ex:
+    // webhook Stripe arrivé pendant la saisie) — une fois la demande rafraîchie avec le nouveau
+    // statut, l'erreur de conflit affichée n'a plus lieu d'être.
+    useEffect(() => setError(null), [request.status]);
+
+    const canCancel = request.status !== 'COMPLETED';
+    const canRespondToQuote = request.status === 'DRAFT' && !request.paidAt;
+    // Une intervention réellement effectuée (acceptée ou payée), pas un devis refusé.
+    const canReview = request.status === 'COMPLETED' && Boolean(request.appointmentAt || request.paidAt);
+
+    function onSubmitReview(event: SyntheticEvent<HTMLFormElement>): void {
+        event.preventDefault();
+        setError(null);
+        submitReview.mutate(
+            { requestId: request.id, req: { rating: reviewRating, comment: reviewComment.trim() || undefined } },
+            {
+                onSuccess: () => setReviewDone(true),
+                onError: (err) => {
+                    if (isApiError(err) && err.status === 409) {
+                        setReviewDone(true);
+                    } else {
+                        setError(isApiError(err) ? err.message : "Impossible d'envoyer l'avis.");
+                    }
+                },
+            },
+        );
+    }
+
+    function onStartPayment(event: SyntheticEvent<HTMLFormElement>): void {
+        event.preventDefault();
+        if (!appointmentAt) {
+            setError('Choisis une date de rendez-vous.');
+            return;
+        }
+        setError(null);
+        setPaying(true);
+    }
+
+    function onPaid(): void {
+        setPaying(false);
+        setPaidNotice(true);
+        // Le webhook Stripe (async) fait passer la demande en ACCEPTED — pas immédiat au clic.
+        // Un deuxième rafraîchissement un peu plus tard augmente les chances de l'avoir capté.
+        queryClient.invalidateQueries({ queryKey: repairRequestKeys.custom('mine') });
+        setTimeout(() => queryClient.invalidateQueries({ queryKey: repairRequestKeys.custom('mine') }), 2500);
+    }
+
+    function onRefuse(): void {
+        setError(null);
+        refuseQuote.mutate(request.id, {
+            onError: (err) => setError(isApiError(err) ? err.message : 'Impossible de refuser le devis.'),
+        });
+    }
+
+    function onCancel(): void {
+        setError(null);
+        cancelRequest.mutate(request.id, {
+            onError: (err) => setError(isApiError(err) ? err.message : "Impossible d'annuler la demande."),
+        });
+    }
+
+    function onSendMessage(event: SyntheticEvent<HTMLFormElement>): void {
+        event.preventDefault();
+        const body = messageBody.trim();
+        if (!body) return;
+        sendMessage.mutate(
+            { body },
+            {
+                onSuccess: () => setMessageBody(''),
+                onError: (err) => setError(isApiError(err) ? err.message : "Impossible d'envoyer le message."),
+            },
+        );
+    }
+
     return (
         <motion.div
             className="fixed inset-0 z-50 flex items-end justify-center"
@@ -249,7 +298,7 @@ function RequestDetailOverlay({
             <motion.div
                 role="dialog"
                 aria-label={`Détail demande ${request.id}`}
-                className="relative mx-4 mb-8 w-full max-w-sm rounded-3xl border border-border bg-card p-5 shadow-2xl"
+                className="relative mx-4 mb-8 flex max-h-[85vh] w-full max-w-sm flex-col overflow-y-auto rounded-3xl border border-border bg-card p-5 shadow-2xl"
                 initial={{ y: 60 }}
                 animate={{ y: 0 }}
                 exit={{ y: 60 }}
@@ -265,32 +314,192 @@ function RequestDetailOverlay({
                 </button>
 
                 <h2 className="text-base font-semibold text-foreground">
-                    {repairer?.atelierName ?? repairer?.displayName ?? 'Retoucheur'}
+                    {request.repairerDisplayName ?? 'Retoucheur'}
                 </h2>
-                <p className="text-xs text-muted-foreground">
-                    {SPECIALITY_LABEL[request.specialty]}
-                    {passport ? ` · ${passport.garment.reference}` : ''}
-                </p>
+                <p className="text-xs text-muted-foreground">{request.dppProductName ?? 'Pièce non précisée'}</p>
 
-                <p className="mt-3 text-sm leading-relaxed whitespace-pre-line text-foreground">
-                    {request.description}
-                </p>
+                {request.message ? (
+                    <p className="mt-3 text-sm leading-relaxed whitespace-pre-line text-foreground">
+                        {request.message}
+                    </p>
+                ) : null}
 
-                {request.photos.length > 0 ? (
-                    <ul className="mt-3 flex flex-wrap gap-2">
-                        {request.photos.map((src, idx) => (
-                            <li key={`${idx}-${src.length}`} className="h-16 w-16">
-                                <Image
-                                    src={src}
-                                    alt={`Pièce jointe ${idx + 1}`}
-                                    width={64}
-                                    height={64}
-                                    className="h-full w-full rounded-lg border border-border object-cover"
-                                />
+                {request.quoteAmountCents != null ? (
+                    <div className="mt-3 flex flex-col gap-1 rounded-2xl border border-border/60 bg-background p-3">
+                        <p className="text-sm font-semibold text-foreground">
+                            Devis : {(request.quoteAmountCents / 100).toFixed(2)} €
+                        </p>
+                        {request.quoteDescription ? (
+                            <p className="text-xs text-muted-foreground">{request.quoteDescription}</p>
+                        ) : null}
+                    </div>
+                ) : null}
+
+                {request.appointmentAt ? (
+                    <p className="mt-3 text-xs text-muted-foreground">
+                        Rendez-vous le{' '}
+                        {new Date(request.appointmentAt).toLocaleString('fr-FR', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                        })}
+                    </p>
+                ) : null}
+
+                {canRespondToQuote && paying ? (
+                    <RepairPaymentPanel
+                        requestId={request.id}
+                        appointmentAt={new Date(appointmentAt).toISOString()}
+                        onPaid={onPaid}
+                        onCancel={() => setPaying(false)}
+                    />
+                ) : canRespondToQuote && paidNotice ? (
+                    <p className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-lumiris-emerald">
+                        <CheckCircle2 className="h-3.5 w-3.5" /> Paiement effectué — rendez-vous en cours de
+                        confirmation.
+                    </p>
+                ) : canRespondToQuote ? (
+                    <form onSubmit={onStartPayment} className="mt-4 flex flex-col gap-2">
+                        <label
+                            htmlFor="appointment-at"
+                            className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
+                        >
+                            Rendez-vous souhaité
+                        </label>
+                        <input
+                            id="appointment-at"
+                            type="datetime-local"
+                            value={appointmentAt}
+                            onChange={(e) => setAppointmentAt(e.target.value)}
+                            aria-label="Rendez-vous souhaité"
+                            className="rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground"
+                        />
+                        <div className="mt-1 flex gap-2">
+                            <button
+                                type="submit"
+                                className="flex-1 rounded-full bg-foreground px-4 py-2 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+                            >
+                                Payer le devis
+                            </button>
+                            <button
+                                type="button"
+                                onClick={onRefuse}
+                                disabled={refuseQuote.isPending}
+                                className="rounded-full border border-lumiris-rose/30 px-4 py-2 text-xs font-medium text-lumiris-rose disabled:opacity-50"
+                            >
+                                Refuser
+                            </button>
+                        </div>
+                    </form>
+                ) : null}
+
+                {canCancel ? (
+                    <button
+                        type="button"
+                        onClick={onCancel}
+                        disabled={cancelRequest.isPending}
+                        className="mt-3 self-start rounded-full border border-border px-3 py-1 text-[11px] font-medium text-muted-foreground disabled:opacity-50"
+                    >
+                        Annuler la demande
+                    </button>
+                ) : null}
+
+                {canReview ? (
+                    reviewDone ? (
+                        <p className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-lumiris-emerald">
+                            <CheckCircle2 className="h-3.5 w-3.5" /> Merci pour votre avis.
+                        </p>
+                    ) : (
+                        <form onSubmit={onSubmitReview} className="mt-4 flex flex-col gap-2">
+                            <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+                                Noter cette intervention
+                            </span>
+                            <div className="flex gap-1">
+                                {[1, 2, 3, 4, 5].map((n) => (
+                                    <button
+                                        key={n}
+                                        type="button"
+                                        onClick={() => setReviewRating(n)}
+                                        aria-label={`${n} étoile${n > 1 ? 's' : ''}`}
+                                        className="p-0.5"
+                                    >
+                                        <Star
+                                            className={`h-5 w-5 ${
+                                                n <= reviewRating
+                                                    ? 'fill-lumiris-amber text-lumiris-amber'
+                                                    : 'text-muted-foreground/40'
+                                            }`}
+                                        />
+                                    </button>
+                                ))}
+                            </div>
+                            <textarea
+                                value={reviewComment}
+                                onChange={(e) => setReviewComment(e.target.value)}
+                                placeholder="Un mot sur le travail réalisé (optionnel)"
+                                rows={2}
+                                className="rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground outline-none placeholder:text-muted-foreground/60"
+                                aria-label="Commentaire"
+                            />
+                            <button
+                                type="submit"
+                                disabled={submitReview.isPending}
+                                className="self-start rounded-full bg-foreground px-4 py-2 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+                            >
+                                {submitReview.isPending ? 'Envoi…' : 'Publier mon avis'}
+                            </button>
+                        </form>
+                    )
+                ) : null}
+
+                {error ? (
+                    <p className="mt-2 text-xs text-destructive" role="alert">
+                        {error}
+                    </p>
+                ) : null}
+
+                <div className="mt-4 flex flex-col gap-2">
+                    <h3 className="inline-flex items-center gap-1 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+                        <MessageCircle className="h-3 w-3" /> Messages
+                    </h3>
+                    <ul className="flex flex-col gap-1.5">
+                        {(messages ?? []).map((m) => (
+                            <li
+                                key={m.id}
+                                className={`max-w-[85%] rounded-2xl px-3 py-1.5 text-xs ${
+                                    m.fromRepairer
+                                        ? 'self-start bg-secondary/40 text-foreground'
+                                        : 'self-end bg-foreground text-primary-foreground'
+                                }`}
+                            >
+                                {m.body}
                             </li>
                         ))}
+                        {(messages ?? []).length === 0 ? (
+                            <p className="text-[11px] text-muted-foreground/70 italic">Aucun message pour l’instant.</p>
+                        ) : null}
                     </ul>
-                ) : null}
+                    <form onSubmit={onSendMessage} className="mt-1 flex items-center gap-2">
+                        <input
+                            type="text"
+                            value={messageBody}
+                            onChange={(e) => setMessageBody(e.target.value)}
+                            placeholder="Écrire un message…"
+                            className="flex-1 rounded-full border border-border bg-background px-3 py-2 text-xs text-foreground outline-none placeholder:text-muted-foreground/60"
+                            aria-label="Écrire un message"
+                        />
+                        <button
+                            type="submit"
+                            disabled={sendMessage.isPending || messageBody.trim().length === 0}
+                            aria-label="Envoyer"
+                            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-primary-foreground disabled:opacity-50"
+                        >
+                            <Send className="h-3.5 w-3.5" />
+                        </button>
+                    </form>
+                </div>
 
                 <p className="mt-4 text-[11px] text-muted-foreground/80">
                     Créée le{' '}

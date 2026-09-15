@@ -6,13 +6,14 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Loader2, Lock, LogIn, UserPlus } from 'lucide-react';
 import { Elements } from '@stripe/react-stripe-js';
-import { useApiClient } from '@lumiris/api-client/react';
+import { useApiClient, useTrackEvent } from '@lumiris/api-client/react';
 import type { PaymentIntentResponse } from '@lumiris/api-client';
 import { routes } from '@/lib/routes';
 import { useUser } from '@/lib/auth/use-user';
 import {
     clearCart,
     readShippingAddress,
+    takeConversionOrigins,
     useCartDetails,
     type CartShipment,
     type ShippingAddress,
@@ -47,6 +48,7 @@ export function Checkout() {
     const router = useRouter();
     const { user, isAuthenticated } = useUser();
     const client = useApiClient();
+    const { mutate: trackEvent } = useTrackEvent();
     const { items, shipments, subtotalCents, shippingCents, totalCents, isLoading } = useCartDetails();
 
     const [step, setStep] = useState<Step>('address');
@@ -152,6 +154,11 @@ export function Checkout() {
                             amountTotalCents={intent.amountTotalCents}
                             onEditAddress={() => setStep('address')}
                             onPaid={(paymentIntentId) => {
+                                // Rattache la conversion au passeport d'origine (clic suggestion) avant de
+                                // vider le panier — après, l'info productId → publicCode n'a plus de sens.
+                                for (const publicCode of takeConversionOrigins(items.map((it) => it.product.id))) {
+                                    trackEvent({ publicCode, type: 'CONVERSION' });
+                                }
                                 intentCache.clear();
                                 clearCart();
                                 router.replace(routes.order(paymentIntentId));

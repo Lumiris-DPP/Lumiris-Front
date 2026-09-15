@@ -6,6 +6,7 @@ import { MoreVertical, Trash2, UserPlus, Users } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@lumiris/ui/components/avatar';
 import { Badge } from '@lumiris/ui/components/badge';
 import { Button } from '@lumiris/ui/components/button';
+import { Card, CardContent } from '@lumiris/ui/components/card';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -46,104 +47,106 @@ export function TeamTab() {
 
     return (
         <>
-            <div className="space-y-4">
-                <div className="flex items-end justify-between gap-4">
-                    <div>
-                        <h3 className="text-base font-medium">
-                            Membres ({used} / {Number.isFinite(seats) ? seats : '∞'})
-                        </h3>
-                        <p className="text-xs text-muted-foreground">Palier {billing.tier}</p>
+            <Card>
+                <CardContent className="space-y-4">
+                    <div className="flex items-end justify-between gap-4">
+                        <div>
+                            <h3 className="text-base font-medium">
+                                Membres ({used} / {Number.isFinite(seats) ? seats : '∞'})
+                            </h3>
+                            <p className="text-xs text-muted-foreground">Palier {billing.tier}</p>
+                        </div>
+                        <Button
+                            size="sm"
+                            onClick={() => setInviteOpen(true)}
+                            disabled={atSeatLimit}
+                            title={atSeatLimit ? 'Limite de sièges atteinte — voir Abonnement' : undefined}
+                        >
+                            <UserPlus className="mr-1.5 h-3.5 w-3.5" />
+                            Inviter
+                        </Button>
                     </div>
-                    <Button
-                        size="sm"
-                        onClick={() => setInviteOpen(true)}
-                        disabled={atSeatLimit}
-                        title={atSeatLimit ? 'Limite de sièges atteinte — voir Abonnement' : undefined}
-                    >
-                        <UserPlus className="mr-1.5 h-3.5 w-3.5" />
-                        Inviter
-                    </Button>
-                </div>
 
-                <div className="overflow-hidden rounded-lg border border-border">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Membre</TableHead>
-                                <TableHead>Rôle</TableHead>
-                                <TableHead className="hidden md:table-cell">Dernière activité</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {team.map((member) => (
-                                <TableRow key={member.id}>
-                                    <TableCell>
-                                        <div className="flex items-center gap-3">
-                                            <Avatar className="h-8 w-8">
-                                                <AvatarFallback className="text-[10px]">
-                                                    {initials(member.name)}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div className="min-w-0">
-                                                <p className="truncate text-sm font-medium">{member.name}</p>
-                                                <p className="truncate font-mono text-xs text-muted-foreground">
-                                                    {member.email}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <RoleCell
-                                            member={member}
-                                            onChange={(role) => {
-                                                changeRole(artisan.id, member.id, role);
-                                                toast.success(`Rôle modifié — ${role}`);
-                                            }}
-                                        />
-                                    </TableCell>
-                                    <TableCell className="hidden text-xs text-muted-foreground md:table-cell">
-                                        <span
-                                            className={cn(
-                                                'inline-flex items-center rounded-md px-2 py-0.5 font-mono text-[10px] uppercase',
-                                                member.status === 'active'
-                                                    ? 'bg-lumiris-emerald/10 text-lumiris-emerald'
-                                                    : 'bg-lumiris-amber/10 text-lumiris-amber',
-                                            )}
-                                        >
-                                            {member.status}
-                                        </span>
-                                        <span className="ml-2">{formatDateFr(member.joinedAt)}</span>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    aria-label={`Actions pour ${member.name}`}
-                                                    disabled={member.role === 'owner'}
-                                                >
-                                                    <MoreVertical className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem
-                                                    onSelect={() => setConfirmRemove(member)}
-                                                    className="text-destructive focus:text-destructive"
-                                                >
-                                                    <Trash2 className="mr-2 h-3.5 w-3.5" />
-                                                    Supprimer
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
+                    <div className="overflow-hidden rounded-lg border border-border">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Membre</TableHead>
+                                    <TableHead>Rôle</TableHead>
+                                    <TableHead className="hidden md:table-cell">Dernière activité</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </div>
-            </div>
+                            </TableHeader>
+                            <TableBody>
+                                {team.map((member) => (
+                                    <TableRow key={member.id}>
+                                        <TableCell>
+                                            <div className="flex items-center gap-3">
+                                                <Avatar className="h-8 w-8">
+                                                    <AvatarFallback className="text-[10px]">
+                                                        {initials(member.name)}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                                <div className="min-w-0">
+                                                    <p className="truncate text-sm font-medium">{member.name}</p>
+                                                    <p className="truncate font-mono text-xs text-muted-foreground">
+                                                        {member.email}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <RoleCell
+                                                member={member}
+                                                onChange={(role) => {
+                                                    changeRole(artisan.id, member.id, role);
+                                                    toast.success(`Rôle modifié — ${role}`);
+                                                }}
+                                            />
+                                        </TableCell>
+                                        <TableCell className="hidden text-xs text-muted-foreground md:table-cell">
+                                            <span
+                                                className={cn(
+                                                    'inline-flex items-center rounded-md px-2 py-0.5 font-mono text-[10px] uppercase',
+                                                    member.status === 'active'
+                                                        ? 'bg-lumiris-emerald/10 text-lumiris-emerald'
+                                                        : 'bg-lumiris-amber/10 text-lumiris-amber',
+                                                )}
+                                            >
+                                                {member.status}
+                                            </span>
+                                            <span className="ml-2">{formatDateFr(member.joinedAt)}</span>
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        aria-label={`Actions pour ${member.name}`}
+                                                        disabled={member.role === 'owner'}
+                                                    >
+                                                        <MoreVertical className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem
+                                                        onSelect={() => setConfirmRemove(member)}
+                                                        className="text-destructive focus:text-destructive"
+                                                    >
+                                                        <Trash2 className="mr-2 h-3.5 w-3.5" />
+                                                        Supprimer
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </CardContent>
+            </Card>
 
             <InviteDialog artisanId={artisan.id} open={inviteOpen} onOpenChange={setInviteOpen} />
             <DeleteMemberDialog artisanId={artisan.id} member={confirmRemove} onClose={() => setConfirmRemove(null)} />

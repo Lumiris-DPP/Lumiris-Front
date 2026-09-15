@@ -16,6 +16,9 @@ export const routes = {
     publicPassport: (code: string, accessToken?: string | null): string =>
         withParams('/p', { c: code, k: accessToken }),
     artisan: (slug: string): string => withParams('/artisans', { slug }),
+    repairer: (slug: string, forCode?: string | null): string => withParams('/retoucheurs', { slug, for: forCode }),
+    repairerRequest: (slug: string, forCode?: string | null): string =>
+        withParams('/retoucheurs/request', { slug, for: forCode }),
     product: (id: string): string => withParams('/boutique/produit', { id }),
     order: (paymentIntentId: string): string => withParams('/commande', { pi: paymentIntentId }),
     orderTracking: (orderId: string): string => withParams('/commande/suivi', { id: orderId }),

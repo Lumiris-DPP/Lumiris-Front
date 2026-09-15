@@ -1,70 +1,57 @@
-import { CITY_COORDS, distanceKm, mockPassportsByArtisan, type ArtisanWithSlug } from '@lumiris/mock-data';
-import type { IrisGrade, Repairer, RepairerSpecialty } from '@lumiris/types';
-import { SPECIALTY_TO_SECTOR } from '@lumiris/types';
-import { scorePassport } from '@/lib/passport-score';
+import type { ArtisanPublicProfileResponse, RepairerSearchResult } from '@lumiris/api-client';
 import type { LocalPoint } from './types';
 
-const REPAIRER_SPECIALTY_LABEL: Record<RepairerSpecialty, string> = {
-    alteration: 'Retouches',
-    embroidery: 'Broderie',
-    'shoe-repair': 'Cordonnerie',
-    leather: 'Cuir',
-    lining: 'Doublures',
-    'electronics-repair': 'Électronique',
-    'phone-repair': 'Téléphonie',
-    'computer-repair': 'Informatique',
-    cabinetmaking: 'Ébénisterie',
-    upholstery: 'Tapisserie',
-    'appliance-repair': 'Électroménager',
-};
+const EARTH_RADIUS_KM = 6371;
+
+// ponytail: haversine, good enough at map zoom levels — no need for a geo library for one distance calc.
+function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+    const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+    const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+    const sinLat = Math.sin(dLat / 2);
+    const sinLng = Math.sin(dLng / 2);
+    const h = sinLat * sinLat + Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * sinLng * sinLng;
+    return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(h));
+}
 
 export function toLocalPoints(
-    artisans: readonly ArtisanWithSlug[],
-    repairers: readonly Repairer[],
-    options: { userCoords?: { lat: number; lng: number }; now?: Date } = {},
+    artisans: readonly ArtisanPublicProfileResponse[],
+    repairers: readonly RepairerSearchResult[],
+    // Ateliers SELF (pas d'adresse SIRENE géocodée) restent sans coords : liste uniquement.
+    origin: { lat: number; lng: number },
 ): LocalPoint[] {
-    const now = options.now ?? new Date();
     const points: LocalPoint[] = [];
 
     for (const a of artisans) {
-        const coords = CITY_COORDS[a.city];
-        const passports = mockPassportsByArtisan(a.id).filter((p) => p.status === 'Published');
-        const grades = passports.map((p) => scorePassport(p, now).grade);
-        const [firstGrade, ...restGrades] = grades;
+        const coords = a.lat !== undefined && a.lng !== undefined ? { lat: a.lat, lng: a.lng } : undefined;
         points.push({
             kind: 'artisan',
-            id: a.id,
+            id: a.slug,
             slug: a.slug,
-            name: a.atelierName,
-            city: a.city,
-            region: a.region,
+            name: a.atelierName ?? a.displayName ?? 'Atelier',
+            city: a.city ?? '',
+            region: a.region ?? '',
             coords,
-            distanceKm: coords && options.userCoords ? distanceKm(options.userCoords, coords) : undefined,
-            photoUrl: a.photoUrl,
-            averageGrade: firstGrade ? mostFrequent(firstGrade, restGrades) : undefined,
-            publishedPassports: passports.length,
-            specialties: a.specialities,
+            distanceKm: coords ? haversineKm(origin, coords) : undefined,
+            photoUrl: a.photoUrls[0],
+            specialties: a.specialties ?? [],
+            claimed: a.claimed ?? true,
         });
     }
 
     for (const r of repairers) {
-        const coords = CITY_COORDS[r.city];
-        const [firstSpecialty] = r.specialities;
         points.push({
             kind: 'repairer',
             id: r.id,
             slug: r.id,
-            name: r.displayName,
-            city: r.city,
-            region: r.region,
-            coords,
-            distanceKm: coords && options.userCoords ? distanceKm(options.userCoords, coords) : undefined,
-            rating: r.avgRating,
+            name: r.displayName ?? r.companyName ?? 'Retoucheur',
+            city: r.city ?? '',
+            region: r.region ?? '',
+            coords: { lat: r.lat, lng: r.lng },
+            distanceKm: r.distanceKm,
+            rating: r.averageRating,
             reviewCount: r.reviewCount,
-            avgDelayDays: r.avgDelayDays,
-            priceRange: { min: r.priceRange.min, max: r.priceRange.max },
-            specialties: r.specialities.map((s) => REPAIRER_SPECIALTY_LABEL[s]),
-            sector: firstSpecialty ? SPECIALTY_TO_SECTOR[firstSpecialty] : undefined,
+            claimed: r.claimed ?? true,
+            specialties: r.specialties ?? [],
         });
     }
 
@@ -81,18 +68,4 @@ function sortPoints(points: LocalPoint[]): LocalPoint[] {
         if (a.kind !== b.kind) return a.kind === 'artisan' ? -1 : 1;
         return a.name.localeCompare(b.name, 'fr');
     });
-}
-
-function mostFrequent(first: IrisGrade, rest: readonly IrisGrade[]): IrisGrade {
-    const counts = new Map<IrisGrade, number>([[first, 1]]);
-    for (const item of rest) counts.set(item, (counts.get(item) ?? 0) + 1);
-    let best: IrisGrade = first;
-    let bestCount = counts.get(first) ?? 1;
-    for (const [grade, count] of counts) {
-        if (count > bestCount) {
-            best = grade;
-            bestCount = count;
-        }
-    }
-    return best;
 }

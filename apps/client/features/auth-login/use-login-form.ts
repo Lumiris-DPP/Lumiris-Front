@@ -48,6 +48,14 @@ export function useLoginForm() {
                 email: normalizedEmail,
                 password: parsed.data.password,
             });
+            // ATELIER est réservé aux comptes artisan et réparateur — un consommateur ou un
+            // admin doit utiliser VISION ou la console admin, même avec des identifiants valides.
+            if (user.role !== 'artisan' && user.role !== 'repairer') {
+                toast.error('Ce compte n’a pas accès à ATELIER', {
+                    description: 'Utilisez VISION (consommateur) ou la console admin.',
+                });
+                return;
+            }
             signInWithToken(user.id, user.artisanId ?? null, user.role, token, refreshToken, user.name ?? null);
             const firstName = user.name?.split(' ')[0] ?? 'vous';
             toast.success(`Bienvenue ${firstName}`);

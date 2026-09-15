@@ -15,7 +15,7 @@ const MAX_STYLE_PREFS = 3;
 
 export function OnboardingProfile() {
     const router = useRouter();
-    const { user, isAuthenticated, updateUser } = useUser();
+    const { user, isAuthenticated, updateUser, signOut } = useUser();
     const hydrated = useAuthHydrated();
     const cityId = useId();
     const datalistId = useId();
@@ -55,6 +55,11 @@ export function OnboardingProfile() {
         router.push('/');
     }
 
+    function handleLogout(): void {
+        signOut();
+        router.replace('/auth');
+    }
+
     if (!isAuthenticated) {
         return null;
     }
@@ -65,7 +70,14 @@ export function OnboardingProfile() {
         <div className="relative flex h-full flex-col px-6 pt-[max(env(safe-area-inset-top),3rem)] pb-10">
             <IridescentBackground intensity="subtle" />
 
-            <header className="flex items-center justify-end">
+            <header className="flex items-center justify-between">
+                <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="rounded-full px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                    Se déconnecter
+                </button>
                 <button
                     type="button"
                     onClick={handleSkip}

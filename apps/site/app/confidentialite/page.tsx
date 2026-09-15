@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { ShieldCheck } from 'lucide-react';
+import { ConsentSettingsLink } from '@lumiris/ui/components/consent-banner';
 
 export const metadata: Metadata = {
     title: 'Politique de confidentialité — LUMIRIS',
@@ -69,11 +70,13 @@ export default function ConfidentialitePage() {
                 </div>
 
                 <div>
-                    <h2 className="text-base font-semibold text-foreground">Cookies</h2>
+                    <h2 className="text-base font-semibold text-foreground">Cookies et mesure d&apos;audience</h2>
                     <p className="mt-2 text-muted-foreground">
-                        Le site n&apos;utilise aucun cookie traceur, marketing ou analytique tiers. Si un dispositif de
-                        mesure d&apos;audience est ajouté ultérieurement, un bandeau de consentement conforme aux
-                        recommandations CNIL sera mis en place.
+                        Le site n&apos;utilise aucun cookie traceur ou publicitaire tiers. La mesure d&apos;audience et
+                        de performance (Web Vitals) est anonyme et n&apos;est activée qu&apos;après votre consentement,
+                        recueilli via un bandeau au premier accès. Vous pouvez revenir sur ce choix à tout moment&nbsp;:{' '}
+                        <ConsentSettingsLink className="text-foreground underline underline-offset-4 hover:no-underline" />
+                        .
                     </p>
                 </div>
             </section>

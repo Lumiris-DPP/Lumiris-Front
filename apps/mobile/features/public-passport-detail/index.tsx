@@ -16,12 +16,12 @@ import {
     ShieldCheck,
     ShoppingBag,
 } from 'lucide-react';
-import { useMarketplaceProductByDpp } from '@lumiris/api-client/react';
+import { useMarketplaceProductByDpp, useTrackEvent } from '@lumiris/api-client/react';
 import type { IrisGrade } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
 import { fiberLabel } from '@lumiris/scoring-ui';
 import type { OriginMapOriginPoint, OriginMapStepPoint } from '@lumiris/scoring-ui/components/origin-map';
-import { formatCents } from '@/lib/marketplace';
+import { formatCents, recordSuggestionOrigin } from '@/lib/marketplace';
 import { routes } from '@/lib/routes';
 import type { DppAccessLevel, DppEventDto, DppEventActorType, DppFormDto, IrisScoreDto } from '@lumiris/api-client';
 import { addPublicDpp, removePublicDpp, useWardrobe } from '@/lib/wardrobe-storage';
@@ -140,6 +140,7 @@ export function PublicPassportDetail({
     // formId), on propose de l'acheter en direct. Un 404 (aucune annonce) laisse `buyProduct`
     // indéfini → le CTA reste masqué.
     const { data: buyProduct } = useMarketplaceProductByDpp(dpp.id);
+    const { mutate: trackEvent } = useTrackEvent();
 
     const onToggleSaved = () => {
         if (publicCode === null) return;
@@ -294,6 +295,11 @@ export function PublicPassportDetail({
                     >
                         <Link
                             href={routes.product(buyProduct.id)}
+                            onClick={() => {
+                                if (!publicCode) return;
+                                trackEvent({ publicCode, type: 'SUGGESTION_CLICK' });
+                                recordSuggestionOrigin(buyProduct.id, publicCode);
+                            }}
                             className="flex items-center justify-between gap-3 rounded-2xl bg-primary px-4 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition-opacity active:opacity-90"
                         >
                             <span className="inline-flex items-center gap-2">

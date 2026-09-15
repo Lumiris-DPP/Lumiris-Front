@@ -11,12 +11,20 @@ import { Textarea } from '@lumiris/ui/components/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@lumiris/ui/components/select';
 import { ACTOR_LABELS } from './event-history-card';
 
-export function EventFormCard({ passportId }: { passportId: string }) {
+// `defaultActorType` : présélectionne l'acteur le plus probable pour l'utilisateur connecté (ex.
+// Réparateur pour un retoucheur) sans empêcher de le changer — le champ reste éditable.
+export function EventFormCard({
+    passportId,
+    defaultActorType,
+}: {
+    passportId: string;
+    defaultActorType?: DppEventActorType;
+}) {
     const createEvent = useCreateDppEvent(passportId);
 
-    const [occurredAt, setOccurredAt] = useState('');
+    const [occurredAt, setOccurredAt] = useState(() => new Date().toLocaleDateString('sv-SE'));
     const [description, setDescription] = useState('');
-    const [actorType, setActorType] = useState<DppEventActorType | ''>('');
+    const [actorType, setActorType] = useState<DppEventActorType | ''>(defaultActorType ?? '');
     const [locationCity, setLocationCity] = useState('');
     const [locationCountryCode, setLocationCountryCode] = useState('');
 
@@ -36,9 +44,9 @@ export function EventFormCard({ passportId }: { passportId: string }) {
             },
             {
                 onSuccess: () => {
-                    setOccurredAt('');
+                    setOccurredAt(new Date().toLocaleDateString('sv-SE'));
                     setDescription('');
-                    setActorType('');
+                    setActorType(defaultActorType ?? '');
                     setLocationCity('');
                     setLocationCountryCode('');
                 },

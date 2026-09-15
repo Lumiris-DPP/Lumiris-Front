@@ -1,14 +1,30 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, CalendarClock, ExternalLink, MapPin } from 'lucide-react';
+import { ArrowLeft, CalendarClock, ExternalLink, Handshake, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
-import type { ArtisanPublicProfileDto } from '@/lib/public-artisan-api';
+import { Button } from '@lumiris/ui/components/button';
+import { signalArtisanInterest, type ArtisanPublicProfileDto } from '@/lib/public-artisan-api';
+import { toast } from '@/lib/toast';
 
 export function ArtisanPublicProfile({ artisan }: { artisan: ArtisanPublicProfileDto }) {
     const router = useRouter();
     const title = artisan.atelierName ?? artisan.displayName ?? 'Atelier';
+    const [interestSent, setInterestSent] = useState(false);
+    const [sendingInterest, setSendingInterest] = useState(false);
+
+    function handleSignalInterest() {
+        setSendingInterest(true);
+        signalArtisanInterest(artisan.slug)
+            .then(() => {
+                setInterestSent(true);
+                toast.success('Merci ! On les préviendra que vous les cherchez.');
+            })
+            .catch(() => toast.error('Un souci est survenu, réessaie plus tard.'))
+            .finally(() => setSendingInterest(false));
+    }
 
     return (
         <div className="flex h-full flex-col overflow-y-auto bg-background pb-24">
@@ -36,6 +52,28 @@ export function ArtisanPublicProfile({ artisan }: { artisan: ArtisanPublicProfil
                     ) : null}
                 </div>
             </motion.header>
+
+            {!artisan.claimed ? (
+                <section className="mx-4 mb-2 flex flex-col items-center gap-2 rounded-3xl border border-lumiris-amber/30 bg-lumiris-amber/5 p-5 text-center">
+                    <Handshake className="h-6 w-6 text-lumiris-amber" aria-hidden />
+                    <p className="text-sm font-semibold text-foreground">
+                        Cet atelier ne fait pas encore partie du réseau Lumiris
+                    </p>
+                    <p className="text-xs leading-relaxed text-muted-foreground">
+                        Ses passeports ne sont pas encore disponibles ici. Signale-nous que tu le cherches, on
+                        l&apos;invitera à nous rejoindre.
+                    </p>
+                    <Button
+                        type="button"
+                        size="sm"
+                        disabled={interestSent || sendingInterest}
+                        onClick={handleSignalInterest}
+                        className="mt-1 bg-lumiris-amber text-white hover:bg-lumiris-amber/90"
+                    >
+                        {interestSent ? 'Merci, on s’en occupe !' : 'Inviter dans le réseau'}
+                    </Button>
+                </section>
+            ) : null}
 
             {artisan.pausedUntil ? (
                 <div className="mx-4 mb-2 flex items-start gap-2 rounded-2xl border border-lumiris-cyan/30 bg-lumiris-cyan/10 p-3">

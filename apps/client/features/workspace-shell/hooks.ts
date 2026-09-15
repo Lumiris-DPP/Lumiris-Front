@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import type { Artisan, ArtisanTier } from '@lumiris/types';
 import { useNotifications, useSellerOrders } from '@lumiris/api-client/react';
 import { useAuthStore } from '@/lib/auth-store';
+import { useAuthRole } from '@/lib/use-auth';
 import { useBilling } from '@/lib/billing-store';
 import { usePassports } from '@/lib/passports-source';
 import { buildNotifications, toAtelierNotifications, type AtelierNotification } from '@/lib/notifications';
@@ -27,7 +28,10 @@ export function useHasAtelierPlus(artisanId: string): boolean {
 // réceptionner, litige ouvert. Alimente le compteur de la navigation.
 export function usePendingOrderCount(): number {
     const token = useAuthStore((s) => s.token);
-    const { data: orders = [] } = useSellerOrders({ enabled: Boolean(token) });
+    const role = useAuthRole();
+    // Endpoint réservé aux artisans (tableau de bord vendeur) — un retoucheur connecté ne doit
+    // jamais le déclencher (403 "ROLE_NOT_ALLOWED" sinon).
+    const { data: orders = [] } = useSellerOrders({ enabled: Boolean(token) && role === 'artisan' });
     return orders.filter(
         (order) =>
             order.canShip || order.canDecideReturn || order.canMarkReturnReceived || order.disputeStatus === 'OPEN',

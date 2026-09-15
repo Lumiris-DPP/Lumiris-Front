@@ -69,6 +69,12 @@ function SignInForm() {
                       role: 'consumer',
                   })
                 : await loginMutation.mutateAsync({ email: trimmedEmail, password });
+            // VISION est réservé aux comptes consommateur — un artisan/réparateur/admin doit
+            // utiliser ATELIER ou la console admin, même si ses identifiants sont valides ici.
+            if (user.role !== 'consumer') {
+                setError('Ce compte n’est pas un compte consommateur. Utilisez ATELIER ou la console admin.');
+                return;
+            }
             signIn(user, token, refreshToken);
             // Un `returnTo` interne (ex. depuis le paiement) est prioritaire sur la destination
             // par défaut, pour ramener l'utilisateur exactement là où il s'était arrêté.

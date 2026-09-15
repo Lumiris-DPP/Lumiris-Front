@@ -48,6 +48,13 @@ jobs:
             - name: Install dependencies
               run: bun install --frozen-lockfile
 
+            # Blocks the merge on any CRITICAL advisory. High/moderate are surfaced (non-blocking)
+            # in the step log so they stay visible without wedging every PR on transitive noise.
+            - name: Audit dependencies — report
+              run: bun audit --audit-level=low || true
+            - name: Audit dependencies — gate on CRITICAL
+              run: bun audit --audit-level=critical
+
             - name: Lint (JS/TS)
               run: bun run lint
 

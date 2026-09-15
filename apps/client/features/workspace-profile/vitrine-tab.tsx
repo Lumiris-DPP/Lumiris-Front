@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Eye, ExternalLink, ImagePlus, Loader2, Trash2, X } from 'lucide-react';
 import { Badge } from '@lumiris/ui/components/badge';
 import { Button } from '@lumiris/ui/components/button';
+import { Card, CardContent } from '@lumiris/ui/components/card';
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { Separator } from '@lumiris/ui/components/separator';
@@ -125,214 +126,220 @@ export function VitrineTab() {
     };
 
     return (
-        <div className="space-y-6">
-            {!isVerified ? (
-                <p className="rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
-                    Votre profil doit être vérifié (KYB) avant de pouvoir publier votre vitrine publique. Vous pouvez
-                    déjà préparer son contenu.
-                </p>
-            ) : null}
+        <Card>
+            <CardContent className="space-y-6">
+                {!isVerified ? (
+                    <p className="rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+                        Votre profil doit être vérifié (KYB) avant de pouvoir publier votre vitrine publique. Vous
+                        pouvez déjà préparer son contenu.
+                    </p>
+                ) : null}
 
-            {profile.published && profile.slug ? (
-                <p className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
-                    <ExternalLink className="h-3 w-3" />
-                    Vitrine publique :{' '}
-                    <span className="font-mono text-xs text-foreground">/artisans/{profile.slug}</span>
-                </p>
-            ) : null}
+                {profile.published && profile.slug ? (
+                    <p className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                        <ExternalLink className="h-3 w-3" />
+                        Vitrine publique :{' '}
+                        <span className="font-mono text-xs text-foreground">/artisans/{profile.slug}</span>
+                    </p>
+                ) : null}
 
-            <div className="space-y-2">
-                <Label>Photos d&apos;atelier</Label>
-                <div className="flex flex-wrap gap-3">
-                    {profile.photos.map((photo) => (
-                        <div key={photo.id} className="group relative h-24 w-24 overflow-hidden rounded-lg">
-                            <Image src={photo.url} alt="" fill sizes="96px" className="object-cover" />
-                            <button
-                                type="button"
-                                onClick={() => removePhotoMutation.mutate(photo.id)}
-                                disabled={removePhotoMutation.isPending}
-                                aria-label="Supprimer la photo"
-                                className="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
-                            >
-                                <Trash2 className="h-3 w-3" />
-                            </button>
-                        </div>
-                    ))}
-                    <label className="relative flex h-24 w-24 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted/40 hover:bg-muted">
-                        {addPhotoMutation.isPending ? (
-                            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                        ) : (
-                            <ImagePlus className="h-5 w-5 text-muted-foreground" />
-                        )}
-                        <input
-                            type="file"
-                            accept="image/*"
-                            aria-label="Ajouter une photo"
-                            className="absolute inset-0 cursor-pointer opacity-0"
-                            onChange={(e) => handlePhotoUpload(e.target.files?.[0])}
-                            disabled={addPhotoMutation.isPending}
+                <div className="space-y-2">
+                    <Label>Photos d&apos;atelier</Label>
+                    <div className="flex flex-wrap gap-3">
+                        {profile.photos.map((photo) => (
+                            <div key={photo.id} className="group relative h-24 w-24 overflow-hidden rounded-lg">
+                                <Image src={photo.url} alt="" fill sizes="96px" className="object-cover" />
+                                <button
+                                    type="button"
+                                    onClick={() => removePhotoMutation.mutate(photo.id)}
+                                    disabled={removePhotoMutation.isPending}
+                                    aria-label="Supprimer la photo"
+                                    className="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                                >
+                                    <Trash2 className="h-3 w-3" />
+                                </button>
+                            </div>
+                        ))}
+                        <label className="relative flex h-24 w-24 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted/40 hover:bg-muted">
+                            {addPhotoMutation.isPending ? (
+                                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                            ) : (
+                                <ImagePlus className="h-5 w-5 text-muted-foreground" />
+                            )}
+                            <input
+                                type="file"
+                                accept="image/*"
+                                aria-label="Ajouter une photo"
+                                className="absolute inset-0 cursor-pointer opacity-0"
+                                onChange={(e) => handlePhotoUpload(e.target.files?.[0])}
+                                disabled={addPhotoMutation.isPending}
+                            />
+                        </label>
+                    </div>
+                </div>
+
+                <Separator />
+
+                <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-1.5">
+                        <Label htmlFor="atelierName">Nom de l&apos;atelier</Label>
+                        <Input
+                            id="atelierName"
+                            value={draft.atelierName}
+                            onChange={(e) => setDraft((d) => ({ ...d, atelierName: e.target.value }))}
                         />
-                    </label>
+                    </div>
+                    <div className="space-y-1.5">
+                        <Label htmlFor="city">Ville</Label>
+                        <Input
+                            id="city"
+                            value={draft.city}
+                            onChange={(e) => setDraft((d) => ({ ...d, city: e.target.value }))}
+                        />
+                    </div>
+                    <div className="space-y-1.5">
+                        <Label htmlFor="region">Région</Label>
+                        <Input
+                            id="region"
+                            value={draft.region}
+                            onChange={(e) => setDraft((d) => ({ ...d, region: e.target.value }))}
+                        />
+                    </div>
+                    <div className="space-y-1.5">
+                        <Label htmlFor="websiteUrl">Site web</Label>
+                        <Input
+                            id="websiteUrl"
+                            type="url"
+                            placeholder="https://…"
+                            value={draft.websiteUrl}
+                            onChange={(e) => setDraft((d) => ({ ...d, websiteUrl: e.target.value }))}
+                        />
+                    </div>
                 </div>
-            </div>
 
-            <Separator />
-
-            <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-1.5">
-                    <Label htmlFor="atelierName">Nom de l&apos;atelier</Label>
-                    <Input
-                        id="atelierName"
-                        value={draft.atelierName}
-                        onChange={(e) => setDraft((d) => ({ ...d, atelierName: e.target.value }))}
+                    <div className="flex items-center justify-between">
+                        <Label htmlFor="story">Histoire de l&apos;atelier</Label>
+                        <span className="text-xs text-muted-foreground tabular-nums">
+                            {draft.story.length} / {STORY_MAX}
+                        </span>
+                    </div>
+                    <Textarea
+                        id="story"
+                        rows={5}
+                        maxLength={STORY_MAX}
+                        value={draft.story}
+                        onChange={(e) => setDraft((d) => ({ ...d, story: e.target.value }))}
                     />
                 </div>
+
                 <div className="space-y-1.5">
-                    <Label htmlFor="city">Ville</Label>
-                    <Input
-                        id="city"
-                        value={draft.city}
-                        onChange={(e) => setDraft((d) => ({ ...d, city: e.target.value }))}
+                    <Label htmlFor="method">Méthode</Label>
+                    <Textarea
+                        id="method"
+                        rows={4}
+                        value={draft.method}
+                        onChange={(e) => setDraft((d) => ({ ...d, method: e.target.value }))}
+                        placeholder="Techniques, savoir-faire, matières travaillées…"
                     />
                 </div>
+
                 <div className="space-y-1.5">
-                    <Label htmlFor="region">Région</Label>
-                    <Input
-                        id="region"
-                        value={draft.region}
-                        onChange={(e) => setDraft((d) => ({ ...d, region: e.target.value }))}
+                    <Label htmlFor="journey">Parcours</Label>
+                    <Textarea
+                        id="journey"
+                        rows={4}
+                        value={draft.journey}
+                        onChange={(e) => setDraft((d) => ({ ...d, journey: e.target.value }))}
+                        placeholder="Formation, expériences, création de l’atelier…"
                     />
                 </div>
-                <div className="space-y-1.5">
-                    <Label htmlFor="websiteUrl">Site web</Label>
-                    <Input
-                        id="websiteUrl"
-                        type="url"
-                        placeholder="https://…"
-                        value={draft.websiteUrl}
-                        onChange={(e) => setDraft((d) => ({ ...d, websiteUrl: e.target.value }))}
-                    />
+
+                <div className="space-y-2">
+                    <Label>Spécialités</Label>
+                    <div className="flex flex-wrap gap-1.5">
+                        {draft.specialties.length === 0 && (
+                            <p className="text-xs text-muted-foreground">Aucune spécialité renseignée.</p>
+                        )}
+                        {draft.specialties.map((t) => (
+                            <Badge key={t} variant="secondary" className="gap-1">
+                                {t}
+                                <button type="button" onClick={() => removeTag(t)} aria-label={`Retirer ${t}`}>
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        ))}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Input
+                            value={tagInput}
+                            onChange={(e) => setTagInput(e.target.value)}
+                            placeholder="Ex. tissage main"
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    addTag();
+                                }
+                            }}
+                        />
+                        <Button variant="outline" type="button" onClick={addTag}>
+                            Ajouter
+                        </Button>
+                    </div>
                 </div>
-            </div>
 
-            <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                    <Label htmlFor="story">Histoire de l&apos;atelier</Label>
-                    <span className="text-xs text-muted-foreground tabular-nums">
-                        {draft.story.length} / {STORY_MAX}
-                    </span>
+                <div className="space-y-2">
+                    <Label>Liens</Label>
+                    <div className="flex flex-col gap-1.5">
+                        {Object.entries(draft.links).map(([label, url]) => (
+                            <div key={label} className="flex items-center justify-between gap-2 text-sm">
+                                <span>
+                                    <span className="font-medium">{label}</span>{' '}
+                                    <span className="text-muted-foreground">{url}</span>
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={() => removeLink(label)}
+                                    aria-label={`Retirer ${label}`}
+                                    className="text-muted-foreground hover:text-destructive"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Input
+                            value={linkLabel}
+                            onChange={(e) => setLinkLabel(e.target.value)}
+                            placeholder="Instagram"
+                        />
+                        <Input value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} placeholder="https://…" />
+                        <Button variant="outline" type="button" onClick={addLink}>
+                            Ajouter
+                        </Button>
+                    </div>
                 </div>
-                <Textarea
-                    id="story"
-                    rows={5}
-                    maxLength={STORY_MAX}
-                    value={draft.story}
-                    onChange={(e) => setDraft((d) => ({ ...d, story: e.target.value }))}
-                />
-            </div>
 
-            <div className="space-y-1.5">
-                <Label htmlFor="method">Méthode</Label>
-                <Textarea
-                    id="method"
-                    rows={4}
-                    value={draft.method}
-                    onChange={(e) => setDraft((d) => ({ ...d, method: e.target.value }))}
-                    placeholder="Techniques, savoir-faire, matières travaillées…"
-                />
-            </div>
-
-            <div className="space-y-1.5">
-                <Label htmlFor="journey">Parcours</Label>
-                <Textarea
-                    id="journey"
-                    rows={4}
-                    value={draft.journey}
-                    onChange={(e) => setDraft((d) => ({ ...d, journey: e.target.value }))}
-                    placeholder="Formation, expériences, création de l’atelier…"
-                />
-            </div>
-
-            <div className="space-y-2">
-                <Label>Spécialités</Label>
-                <div className="flex flex-wrap gap-1.5">
-                    {draft.specialties.length === 0 && (
-                        <p className="text-xs text-muted-foreground">Aucune spécialité renseignée.</p>
-                    )}
-                    {draft.specialties.map((t) => (
-                        <Badge key={t} variant="secondary" className="gap-1">
-                            {t}
-                            <button type="button" onClick={() => removeTag(t)} aria-label={`Retirer ${t}`}>
-                                <X className="h-3 w-3" />
-                            </button>
-                        </Badge>
-                    ))}
-                </div>
-                <div className="flex items-center gap-2">
-                    <Input
-                        value={tagInput}
-                        onChange={(e) => setTagInput(e.target.value)}
-                        placeholder="Ex. tissage main"
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                addTag();
-                            }
-                        }}
-                    />
-                    <Button variant="outline" type="button" onClick={addTag}>
-                        Ajouter
+                <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
+                    <Button asChild type="button" variant="ghost">
+                        <Link href="/preview/vitrine" target="_blank" rel="noopener noreferrer">
+                            <Eye className="mr-1.5 h-3.5 w-3.5" /> Aperçu
+                        </Link>
+                    </Button>
+                    <Button type="button" onClick={handleSave} disabled={updateMutation.isPending}>
+                        {updateMutation.isPending ? 'Enregistrement…' : 'Enregistrer'}
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handlePublish}
+                        disabled={!isVerified || publishMutation.isPending || profile.published}
+                    >
+                        {profile.published ? 'Déjà publiée' : publishMutation.isPending ? 'Publication…' : 'Publier'}
                     </Button>
                 </div>
-            </div>
-
-            <div className="space-y-2">
-                <Label>Liens</Label>
-                <div className="flex flex-col gap-1.5">
-                    {Object.entries(draft.links).map(([label, url]) => (
-                        <div key={label} className="flex items-center justify-between gap-2 text-sm">
-                            <span>
-                                <span className="font-medium">{label}</span>{' '}
-                                <span className="text-muted-foreground">{url}</span>
-                            </span>
-                            <button
-                                type="button"
-                                onClick={() => removeLink(label)}
-                                aria-label={`Retirer ${label}`}
-                                className="text-muted-foreground hover:text-destructive"
-                            >
-                                <X className="h-3 w-3" />
-                            </button>
-                        </div>
-                    ))}
-                </div>
-                <div className="flex items-center gap-2">
-                    <Input value={linkLabel} onChange={(e) => setLinkLabel(e.target.value)} placeholder="Instagram" />
-                    <Input value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} placeholder="https://…" />
-                    <Button variant="outline" type="button" onClick={addLink}>
-                        Ajouter
-                    </Button>
-                </div>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
-                <Button asChild type="button" variant="ghost">
-                    <Link href="/preview/vitrine" target="_blank" rel="noopener noreferrer">
-                        <Eye className="mr-1.5 h-3.5 w-3.5" /> Aperçu
-                    </Link>
-                </Button>
-                <Button type="button" onClick={handleSave} disabled={updateMutation.isPending}>
-                    {updateMutation.isPending ? 'Enregistrement…' : 'Enregistrer'}
-                </Button>
-                <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handlePublish}
-                    disabled={!isVerified || publishMutation.isPending || profile.published}
-                >
-                    {profile.published ? 'Déjà publiée' : publishMutation.isPending ? 'Publication…' : 'Publier'}
-                </Button>
-            </div>
-        </div>
+            </CardContent>
+        </Card>
     );
 }

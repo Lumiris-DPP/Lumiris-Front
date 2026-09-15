@@ -3,7 +3,11 @@
 import { useMutation, useQueryClient, type UseMutationOptions } from '@tanstack/react-query';
 
 import { createKeys } from '../core/keys';
-import type { ArtisanProfileResponse } from '../types/artisans';
+import type {
+    ArtisanDirectoryImportReport,
+    ArtisanDirectoryImportRequest,
+    ArtisanProfileResponse,
+} from '../types/artisans';
 import type { RejectArtisanRequest } from '../types/admin-artisans';
 
 import { useApiClient } from '../core/provider';
@@ -14,6 +18,29 @@ export const adminArtisanKeys = createKeys('admin-artisans');
 export function useAdminArtisansList() {
     const client = useApiClient();
     return useListQuery<ArtisanProfileResponse[]>(adminArtisanKeys.list(), () => client.adminArtisans.listPending());
+}
+
+export function useAdminArtisansAll() {
+    const client = useApiClient();
+    return useListQuery<ArtisanProfileResponse[]>(adminArtisanKeys.custom('all'), () => client.adminArtisans.listAll());
+}
+
+export function useImportArtisanDirectory(
+    options?: Omit<
+        UseMutationOptions<ArtisanDirectoryImportReport, Error, ArtisanDirectoryImportRequest>,
+        'mutationFn'
+    >,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<ArtisanDirectoryImportReport, Error, ArtisanDirectoryImportRequest>({
+        mutationFn: (req) => client.adminArtisans.importDirectory(req),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.invalidateQueries({ queryKey: adminArtisanKeys.all });
+            return options?.onSuccess?.(...args);
+        },
+    });
 }
 
 export function useVerifyArtisan(
@@ -38,6 +65,36 @@ export function useRejectArtisan(
     const queryClient = useQueryClient();
     return useMutation<ArtisanProfileResponse, Error, { id: string; reason?: string }>({
         mutationFn: ({ id, reason }) => client.adminArtisans.reject(id, { reason } as RejectArtisanRequest),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.invalidateQueries({ queryKey: adminArtisanKeys.all });
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+export function useMarkArtisanKybOngoing(
+    options?: Omit<UseMutationOptions<ArtisanProfileResponse, Error, string>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<ArtisanProfileResponse, Error, string>({
+        mutationFn: (id) => client.adminArtisans.markOngoing(id),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.invalidateQueries({ queryKey: adminArtisanKeys.all });
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
+export function useMarkArtisanKybIncomplete(
+    options?: Omit<UseMutationOptions<ArtisanProfileResponse, Error, { id: string; reason?: string }>, 'mutationFn'>,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<ArtisanProfileResponse, Error, { id: string; reason?: string }>({
+        mutationFn: ({ id, reason }) => client.adminArtisans.markIncomplete(id, { reason } as RejectArtisanRequest),
         ...options,
         onSuccess: (...args) => {
             queryClient.invalidateQueries({ queryKey: adminArtisanKeys.all });

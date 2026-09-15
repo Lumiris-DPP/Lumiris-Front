@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import type { Metadata, Viewport } from 'next';
 import { Toaster } from '@lumiris/ui/components/sonner';
+import { ConsentBanner } from '@lumiris/ui/components/consent-banner';
 
 // Polices auto-hébergées (@fontsource) plutôt que next/font/google : le bundle Tauri doit
 // rester utilisable hors ligne et le build ne doit dépendre d'aucun CDN.
@@ -54,6 +55,7 @@ export default function RootLayout({
                     <AppShell>
                         <Suspense fallback={null}>{children}</Suspense>
                     </AppShell>
+                    <ConsentBanner />
                 </ClientApiProvider>
             </body>
         </html>
