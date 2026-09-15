@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -116,6 +116,25 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
         migrateLegacyKeys();
     }, []);
 
+    // Publie la hauteur réelle de la barre d'onglets : tout ce qui se fixe en bas de l'écran
+    // (bandeau de consentement…) s'appuie dessus pour ne pas la recouvrir.
+    const [tabBarHeight, setTabBarHeight] = useState(0);
+    useEffect(() => {
+        document.documentElement.style.setProperty('--app-bottom-inset', `${tabBarHeight}px`);
+    }, [tabBarHeight]);
+    const measureTabBar = useCallback((node: HTMLElement | null) => {
+        if (!node) {
+            setTabBarHeight(0);
+            return;
+        }
+        // Hauteur de bordure, pas de contenu : la barre porte l'essentiel de sa hauteur
+        // dans son padding bas (encoche de l'appareil).
+        const observer = new ResizeObserver(() => setTabBarHeight(node.getBoundingClientRect().height));
+        observer.observe(node);
+        setTabBarHeight(node.getBoundingClientRect().height);
+        return () => observer.disconnect();
+    }, []);
+
     return (
         <div
             className={`relative mx-auto flex h-dvh flex-col overflow-hidden bg-background print:h-auto print:overflow-visible ${shellMaxWidth(pathname)}`}
@@ -140,6 +159,7 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
                 {tabBarHidden ? null : (
                     <motion.nav
                         key="tab-bar"
+                        ref={measureTabBar}
                         aria-label="Navigation principale"
                         className="absolute inset-x-0 bottom-0 z-nav border-t border-border/40 bg-background/85 px-4 pt-2 pb-[max(env(safe-area-inset-bottom),1.75rem)] backdrop-blur-xl"
                         initial={{ y: 80 }}
@@ -154,7 +174,10 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
                                     <Link
                                         key={id}
                                         href={href}
-                                        prefetch
+                                        // Export statique : le préchargement RSC de Next 16 laisse une entrée
+                                        // annulée dans le cache du routeur, et la navigation suivante est
+                                        // abandonnée sans erreur. Ne pas remettre `prefetch`.
+                                        prefetch={false}
                                         aria-current={active ? 'page' : undefined}
                                         className={`relative flex flex-col items-center gap-0.5 px-2 py-1.5 transition-colors ${
                                             active ? 'text-lumiris-cyan' : 'text-muted-foreground'
