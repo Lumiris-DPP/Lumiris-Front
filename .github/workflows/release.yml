@@ -97,10 +97,12 @@ jobs:
                   push: true
                   platforms: linux/amd64
                   # NEXT_PUBLIC_* is inlined into the bundle at build time, so the
-                  # published image is bound to this API origin.
+                  # published image is bound to this API origin. The client also bakes the
+                  # mobile origin: it is the URL every printed passport QR code resolves to.
                   build-args: |
                       NEXT_PUBLIC_API_BASE_URL=https://api.${{ vars.PROD_DOMAIN || 'lumiris.eu' }}
                       NEXT_PUBLIC_SENTRY_DSN=${{ secrets.SENTRY_DSN_FRONT }}
+                      ${{ matrix.app == 'client' && format('NEXT_PUBLIC_MOBILE_URL=https://mobile.{0}', vars.PROD_DOMAIN || 'lumiris.eu') || '' }}
                   tags: |
                       ${{ env.REGISTRY }}/${{ needs.version.outputs.namespace }}/${{ matrix.image }}:${{ needs.version.outputs.version }}
                       ${{ env.REGISTRY }}/${{ needs.version.outputs.namespace }}/${{ matrix.image }}:${{ needs.version.outputs.sha_short }}

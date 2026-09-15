@@ -18,9 +18,13 @@ RUN --mount=type=cache,target=/root/.bun/install/cache \
     bun install --frozen-lockfile
 
 # Public env inlined into the bundle at build time (Next.js bakes NEXT_PUBLIC_*).
+# NEXT_PUBLIC_MOBILE_URL is the origin printed into every passport QR code: an image
+# built without it ships tags pointing at localhost, on physical garment labels.
 ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+ARG NEXT_PUBLIC_MOBILE_URL=http://localhost:3002
 ARG NEXT_PUBLIC_SENTRY_DSN=
 ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+ENV NEXT_PUBLIC_MOBILE_URL=${NEXT_PUBLIC_MOBILE_URL}
 ENV NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN}
 RUN NODE_ENV=production bun run --filter @lumiris/client build
 
