@@ -5,7 +5,7 @@
     "description": "LUMIRIS Web - public marketing site, journal, and consumer transparency portal.",
     "scripts": {
         "dev": "next dev --port 3000",
-        "build": "next build",
+        "build": "node ./node_modules/.bin/next build",
         "start": "next start --port 3000",
         "lint": "eslint .",
         "typecheck": "tsc --noEmit",

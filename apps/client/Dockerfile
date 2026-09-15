@@ -9,9 +9,13 @@ ARG BUN_VERSION=1.3.14
 ARG NODE_VERSION=22
 
 # ── build ── install (dev deps inclus) + compile Next (standalone) ───────────
-FROM oven/bun:${BUN_VERSION}-alpine AS build
+# Node is the base image because the apps' build script runs Next under node: Bun
+# segfaults (SIGILL) compiling Next 16 in a container, on alpine as on debian.
+FROM node:${NODE_VERSION}-bookworm-slim AS build
 WORKDIR /repo
 ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN npm install --global bun@${BUN_VERSION}
 
 COPY . .
 RUN --mount=type=cache,target=/root/.bun/install/cache \

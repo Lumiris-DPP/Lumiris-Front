@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "next dev --port 3002",
         "dev:tauri": "next dev --port 1420",
-        "build": "next build",
+        "build": "node ./node_modules/.bin/next build",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "typecheck": "tsc --noEmit",
