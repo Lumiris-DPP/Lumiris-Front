@@ -102,6 +102,8 @@ jobs:
                   build-args: |
                       NEXT_PUBLIC_API_BASE_URL=https://api.${{ vars.PROD_DOMAIN || 'lumiris.eu' }}
                       NEXT_PUBLIC_SENTRY_DSN=${{ secrets.SENTRY_DSN_FRONT }}
+                      ${{ (matrix.app == 'site' || matrix.app == 'mobile') && format('NEXT_PUBLIC_WEB_URL=https://{0}', vars.PROD_DOMAIN || 'lumiris.eu') || '' }}
+                      ${{ matrix.app == 'site' && format('NEXT_PUBLIC_CLIENT_URL=https://app.{0}', vars.PROD_DOMAIN || 'lumiris.eu') || '' }}
                       ${{ matrix.app == 'client' && format('NEXT_PUBLIC_MOBILE_URL=https://mobile.{0}', vars.PROD_DOMAIN || 'lumiris.eu') || '' }}
                   tags: |
                       ${{ env.REGISTRY }}/${{ needs.version.outputs.namespace }}/${{ matrix.image }}:${{ needs.version.outputs.version }}

@@ -14,8 +14,8 @@ import { CategoryChips, type CategoryFilter } from './category-chips';
 import { HeroCard } from './hero-card';
 import { CategoryRow } from './category-row';
 import { ArticleCard } from './article-card';
+import { WEB_URL } from '@/lib/web-url';
 
-const WEB_BASE_URL = 'https://lumiris.fr';
 const COMPACT_SCROLL_THRESHOLD = 60;
 
 export interface DiscoverProps {
@@ -164,12 +164,12 @@ function FooterCta() {
     return (
         <div className="mt-10 flex items-center justify-center pb-2">
             <a
-                href={`${WEB_BASE_URL}/journal`}
+                href={`${WEB_URL}/journal`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
             >
-                Plus d&apos;histoires sur lumiris.fr/journal
+                Plus d&apos;histoires sur lumiris.eu/journal
             </a>
         </div>
     );

@@ -4,6 +4,7 @@ import { ArtisanPublicView } from '@/features/artisan-public-view';
 import { JsonLd } from '@/features/json-ld';
 import { fetchPublicArtisanProfile } from '@/lib/public-artisan-api';
 import { fetchArtisanPieces } from '@/lib/public-passport-api';
+import { SITE_URL } from '@/lib/urls';
 
 interface RouteProps {
     params: Promise<{ slug: string }>;
@@ -46,10 +47,10 @@ export default async function ArtisanPage({ params }: RouteProps) {
     const localBusinessJsonLd = {
         '@context': 'https://schema.org',
         '@type': 'LocalBusiness',
-        '@id': `https://lumiris.fr/artisans/${artisan.slug}`,
+        '@id': `${SITE_URL}/artisans/${artisan.slug}`,
         name,
         description: artisan.story ?? undefined,
-        url: `https://lumiris.fr/artisans/${artisan.slug}`,
+        url: `${SITE_URL}/artisans/${artisan.slug}`,
         sameAs: artisan.websiteUrl ? [artisan.websiteUrl] : undefined,
         image: artisan.photoUrls[0] || undefined,
         address: artisan.city

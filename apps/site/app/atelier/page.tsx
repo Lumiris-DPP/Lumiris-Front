@@ -5,6 +5,7 @@ import { AtelierSteps } from '@/features/atelier-steps';
 import { AtelierPricing } from '@/features/atelier-pricing';
 import { AtelierAddons } from '@/features/atelier-addons';
 import { AtelierFaq } from '@/features/atelier-faq';
+import { SIGNUP_URL } from '@/lib/urls';
 
 export const metadata: Metadata = {
     title: 'ATELIER — Publiez vos passeports DPP en minutes | LUMIRIS',
@@ -12,8 +13,6 @@ export const metadata: Metadata = {
         "L'offre ATELIER permet aux artisans textile français de créer leurs passeports DPP et d'anticiper la conformité ESPR. Trois paliers Solo / Studio / Maison.",
     alternates: { canonical: '/atelier' },
 };
-
-const SIGNUP_URL = 'https://client.lumiris.fr';
 
 export default function AtelierPage() {
     return (

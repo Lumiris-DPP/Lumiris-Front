@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { JournalArticleView } from '@/features/journal-article';
 import { JsonLd } from '@/features/json-ld';
 import { getAllArticles, getArticleBySlug, getRelatedArticles } from '@/lib/journal';
+import { SITE_URL } from '@/lib/urls';
 
 export const dynamicParams = false;
 
@@ -63,9 +64,9 @@ export default async function JournalArticlePage({ params }: RouteProps) {
         publisher: {
             '@type': 'Organization',
             name: 'LUMIRIS',
-            logo: { '@type': 'ImageObject', url: 'https://lumiris.fr/icon.svg' },
+            logo: { '@type': 'ImageObject', url: `${SITE_URL}/icon.svg` },
         },
-        mainEntityOfPage: { '@type': 'WebPage', '@id': `https://lumiris.fr/journal/${article.slug}` },
+        mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/journal/${article.slug}` },
     };
 
     return (

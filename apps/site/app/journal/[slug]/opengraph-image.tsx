@@ -58,7 +58,7 @@ export default async function Image({ params }: OgProps) {
             </div>
 
             <div style={{ display: 'flex', fontSize: 22, color: '#94a3b8' }}>
-                Aucun acteur n’achète son score · lumiris.fr
+                Aucun acteur n’achète son score · lumiris.eu
             </div>
         </div>,
         size,

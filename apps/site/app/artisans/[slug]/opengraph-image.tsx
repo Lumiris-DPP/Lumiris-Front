@@ -74,7 +74,7 @@ export default async function Image({ params }: OgProps) {
                 <div style={{ display: 'flex', fontSize: 30, color: '#64748b', marginTop: 24 }}>{sub}</div>
             </div>
 
-            <div style={{ display: 'flex', fontSize: 22, color: '#94a3b8' }}>lumiris.fr/artisans</div>
+            <div style={{ display: 'flex', fontSize: 22, color: '#94a3b8' }}>lumiris.eu/artisans</div>
         </div>,
         size,
     );

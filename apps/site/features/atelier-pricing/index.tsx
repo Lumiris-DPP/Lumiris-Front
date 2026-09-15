@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, ArrowRight, Sparkles } from 'lucide-react';
-
-const SIGNUP_URL = 'https://client.lumiris.fr';
+import { SIGNUP_URL } from '@/lib/urls';
 
 // Hardcoded canonical prices as per user requirement
 const PLANS = [

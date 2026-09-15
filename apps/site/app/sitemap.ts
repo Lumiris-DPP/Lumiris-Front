@@ -2,8 +2,7 @@ import type { MetadataRoute } from 'next';
 import { fetchPublicArtisans } from '@/lib/public-artisan-api';
 import { getAllArticles } from '@/lib/journal';
 import { getAllRegulations } from '@/lib/reglementation';
-
-const SITE_URL = 'https://lumiris.fr';
+import { SITE_URL } from '@/lib/urls';
 
 const STATIC_PATHS: ReadonlyArray<{ path: string; priority: number; changeFrequency: 'weekly' | 'monthly' }> = [
     { path: '/', priority: 1, changeFrequency: 'weekly' },

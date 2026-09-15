@@ -11,6 +11,7 @@ import { addToWardrobe, removeLumirisPassport, type WardrobeDocument } from '@/l
 import { toast } from '@/lib/toast';
 import { BuySheet } from './buy-sheet';
 import { DocumentsSheet } from './documents-sheet';
+import { WEB_URL } from '@/lib/web-url';
 
 interface ActionBarProps {
     passport: Passport;
@@ -25,8 +26,7 @@ export function ActionBar({ passport, artisan, isSaved, documents }: ActionBarPr
     const [docsOpen, setDocsOpen] = useState(false);
 
     const onShare = useCallback(async () => {
-        const url =
-            typeof window !== 'undefined' ? window.location.href : `https://lumiris.fr/passeport/${passport.id}`;
+        const url = typeof window !== 'undefined' ? window.location.href : `${WEB_URL}/passeport/${passport.id}`;
         const title = passport.garment.reference;
         if (typeof navigator !== 'undefined' && 'share' in navigator) {
             try {

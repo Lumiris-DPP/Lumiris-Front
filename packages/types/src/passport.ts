@@ -190,13 +190,13 @@ export interface EcoInfo {
 // ──────────────────────────────────────────────────────────────────────────────
 
 export function buildGS1DigitalLink(gtin: string, serial: string): GS1DigitalLink {
-    return `https://id.lumiris.fr/01/${gtin}/21/${serial}`;
+    return `https://id.lumiris.eu/01/${gtin}/21/${serial}`;
 }
 
 export function buildGS1Identifier(gtin: string, serial: string, slug: string = serial): GS1Identifier {
     return {
         gtin,
         serial,
-        verificationUrl: `https://lumiris.fr/passeport/${slug}`,
+        verificationUrl: `https://lumiris.eu/passeport/${slug}`,
     };
 }

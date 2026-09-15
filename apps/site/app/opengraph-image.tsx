@@ -43,7 +43,7 @@ export default function Image() {
                 </div>
             </div>
 
-            <div style={{ display: 'flex', fontSize: 22, color: '#94a3b8' }}>lumiris.fr</div>
+            <div style={{ display: 'flex', fontSize: 22, color: '#94a3b8' }}>lumiris.eu</div>
         </div>,
         size,
     );
