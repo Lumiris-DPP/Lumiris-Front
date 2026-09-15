@@ -139,7 +139,7 @@ export interface MockTeamActivityEntry {
 export const mockAdmins: readonly AdminProfile[] = [
     {
         id: 'usr-fdr-juba',
-        email: 'juba@lumiris.fr',
+        email: 'juba@lumiris.eu',
         role: 'admin',
         name: 'Juba Aït-Adda',
         avatar: 'https://placehold.co/128x128/png?text=Juba',
@@ -148,7 +148,7 @@ export const mockAdmins: readonly AdminProfile[] = [
     },
     {
         id: 'usr-adm-ops',
-        email: 'ops@lumiris.fr',
+        email: 'ops@lumiris.eu',
         role: 'admin',
         name: 'Camille - DevOps',
         avatar: 'https://placehold.co/128x128/png?text=Ops',
@@ -157,7 +157,7 @@ export const mockAdmins: readonly AdminProfile[] = [
     },
     {
         id: 'usr-cm-elise',
-        email: 'elise@lumiris.fr',
+        email: 'elise@lumiris.eu',
         role: 'admin',
         name: 'Élise Garnier',
         avatar: 'https://placehold.co/128x128/png?text=Elise',

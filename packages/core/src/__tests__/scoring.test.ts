@@ -87,7 +87,7 @@ function makePassport(overrides: Partial<Passport> = {}): Passport {
         gs1: {
             gtin: '03000000000001',
             serial: 'SN-001',
-            verificationUrl: 'https://lumiris.fr/passeport/SN-001',
+            verificationUrl: 'https://lumiris.eu/passeport/SN-001',
         },
         status: 'Published',
         createdAt: '2026-01-01T00:00:00Z',

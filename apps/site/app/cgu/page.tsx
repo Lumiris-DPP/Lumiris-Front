@@ -71,10 +71,10 @@ export default function CguPage() {
                     <p className="mt-2 text-muted-foreground">
                         Pour toute question relative aux CGU / CGV&nbsp;:{' '}
                         <a
-                            href="mailto:legal@lumiris.fr"
+                            href="mailto:legal@lumiris.eu"
                             className="text-foreground underline-offset-4 hover:underline"
                         >
-                            legal@lumiris.fr
+                            legal@lumiris.eu
                         </a>
                         .
                     </p>
