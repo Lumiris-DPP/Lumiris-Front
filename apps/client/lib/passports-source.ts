@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { mockPassports } from '@lumiris/mock-data';
 import type { DppFormDto } from '@lumiris/api-client';
 import { useApiClient, useDppForms } from '@lumiris/api-client/react';
 import type { Passport } from '@lumiris/types';
@@ -19,10 +18,9 @@ interface UsePassportsOptions {
 }
 
 /**
- * Passports for the given artisan.
- *  - Demo mode (no token): local wizard drafts + mock passports.
- *  - Real mode (JWT): local wizard drafts + live DPPs from GET /api/dpp-forms,
- *    optionally enriched with each DPP's full detail for accurate scoring.
+ * Passports for the given artisan: local wizard drafts + live DPPs from
+ * GET /api/dpp-forms, optionally enriched with each DPP's full detail for
+ * accurate scoring. Without a session only the local drafts remain.
  */
 export function usePassports(artisanId: string, options?: UsePassportsOptions): readonly Passport[] {
     const detailed = options?.detailed ?? false;
@@ -68,17 +66,13 @@ export function usePassports(artisanId: string, options?: UsePassportsOptions): 
             .filter((d) => d.artisanId === artisanId)
             .map(draftToPassport);
 
-        if (isRealMode) {
-            const real = (summaries ?? []).map((summary) => {
-                const detail = details[summary.id];
-                const base = detail ? dppToPassport(detail, artisanId) : dppSummaryToPassport(summary, artisanId);
-                // The summary status is the authoritative lifecycle state (VALID/DRAFT/INVALID).
-                return { ...base, status: passportStatusFromDpp(summary.status) };
-            });
-            return [...draftPassports, ...real];
-        }
+        const real = (summaries ?? []).map((summary) => {
+            const detail = details[summary.id];
+            const base = detail ? dppToPassport(detail, artisanId) : dppSummaryToPassport(summary, artisanId);
+            // The summary status is the authoritative lifecycle state (VALID/DRAFT/INVALID).
+            return { ...base, status: passportStatusFromDpp(summary.status) };
+        });
 
-        const fixed = mockPassports.filter((p) => p.artisanId === artisanId);
-        return [...draftPassports, ...fixed];
-    }, [drafts, artisanId, isRealMode, summaries, details]);
+        return [...draftPassports, ...real];
+    }, [drafts, artisanId, summaries, details]);
 }

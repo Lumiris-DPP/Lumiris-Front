@@ -11,7 +11,7 @@ import type { DraftPassport, ExistingDoc } from './draft-store';
 
 /** Maps a backend product category onto the local garment taxonomy. */
 const CATEGORY_TO_KIND: Record<string, GarmentKind> = {
-    top: 'sweater',
+    top: 'other',
     bottom: 'trouser',
     dress: 'other',
     outerwear: 'jacket',

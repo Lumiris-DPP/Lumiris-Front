@@ -23,8 +23,8 @@ export function OriginMap({ materials, steps }: OriginMapProps) {
                     id: `${m.fiber}-${i}`,
                     label: m.fiber,
                     country: country?.name ?? m.originCountry,
-                    latitude: country?.lat,
-                    longitude: country?.lng,
+                    latitude: m.coordinates?.lat ?? country?.lat,
+                    longitude: m.coordinates?.lng ?? country?.lng,
                 };
             }),
         [materials],

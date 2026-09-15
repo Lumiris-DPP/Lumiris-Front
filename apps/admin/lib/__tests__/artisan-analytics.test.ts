@@ -7,7 +7,7 @@ import {
     computeCohortMetrics,
     listCohortMonths,
 } from '../artisan-analytics';
-import { makeArtisan, makePassport, makeSubscription, makeAuditEntry } from '@/test/factories';
+import { makeArtisan, makePassport, makeSubscription } from '@/test/factories';
 
 const NOW = new Date('2026-04-30T08:00:00Z');
 
@@ -30,7 +30,7 @@ describe('buildArtisanRow', () => {
     });
 
     it("publishedCount = 0 quand l'artisan n'a pas de passeport publié", () => {
-        const row = buildArtisanRow(artisan, [], [], [], NOW);
+        const row = buildArtisanRow(artisan, [], [], NOW);
         expect(row.publishedCount).toBe(0);
         expect(row.avgGrade).toBe('-');
         expect(row.avgScore).toBe(0);
@@ -42,13 +42,13 @@ describe('buildArtisanRow', () => {
             makePassport({ artisanId: 'ART-A', status: 'Draft' }),
             makePassport({ artisanId: 'ART-B', status: 'Published' }),
         ];
-        const row = buildArtisanRow(artisan, passports, [], [], NOW);
+        const row = buildArtisanRow(artisan, passports, [], NOW);
         expect(row.publishedCount).toBe(1);
     });
 
     it('mrr = tier + ATELIER+ quand plus=true', () => {
         const studio = makeArtisan({ id: 'ART-S', tier: 'Studio', plus: true });
-        const row = buildArtisanRow(studio, [], [], [], NOW);
+        const row = buildArtisanRow(studio, [], [], NOW);
         expect(row.mrr).toBe(TIER_MRR.Studio + PLUS_ADDON);
     });
 
@@ -60,50 +60,29 @@ describe('buildArtisanRow', () => {
             makePassport({ artisanId: 'ART-A', status: 'Published' }),
             makePassport({ artisanId: 'ART-A', status: 'Published' }),
         ];
-        const row = buildArtisanRow(artisan, passports, [], [], NOW);
+        const row = buildArtisanRow(artisan, passports, [], NOW);
         expect(row.upgradeHint).toBe('Studio');
     });
 
     it('upgradeHint = null pour Maison (pas de tier supérieur)', () => {
         const maison = makeArtisan({ id: 'ART-M', tier: 'Maison', passportLimit: Number.POSITIVE_INFINITY });
-        const row = buildArtisanRow(maison, [], [], [], NOW);
+        const row = buildArtisanRow(maison, [], [], NOW);
         expect(row.upgradeHint).toBeNull();
     });
 
     it('cohortMonth = YYYY-MM du joinedAt', () => {
-        const row = buildArtisanRow(artisan, [], [], [], NOW);
+        const row = buildArtisanRow(artisan, [], [], NOW);
         expect(row.cohortMonth).toBe('2025-10');
     });
 
     it('cohortOffset négatif quand joinedAt est antérieur à now', () => {
-        const row = buildArtisanRow(artisan, [], [], [], NOW);
+        const row = buildArtisanRow(artisan, [], [], NOW);
         expect(row.cohortOffset).toBeLessThan(0);
         expect(row.cohortOffset).toBe(-6);
     });
 
-    it('compte les overrides 90j via audit log + payload.artisanId', () => {
-        const auditLog = [
-            makeAuditEntry({
-                action: 'passport.override',
-                targetType: 'artisan',
-                targetId: 'ART-A',
-                payload: { artisanId: 'ART-A', from: 'C', to: 'B' },
-                ts: '2026-04-01T00:00:00Z',
-            }),
-            makeAuditEntry({
-                action: 'passport.override',
-                targetType: 'artisan',
-                targetId: 'ART-A',
-                payload: { artisanId: 'ART-A' },
-                ts: '2025-10-01T00:00:00Z',
-            }),
-        ];
-        const row = buildArtisanRow(artisan, [], [], auditLog, NOW);
-        expect(row.overrideCount90d).toBe(1);
-    });
-
     it('health.total reste borné 0-100', () => {
-        const row = buildArtisanRow(artisan, [], [], [], NOW);
+        const row = buildArtisanRow(artisan, [], [], NOW);
         expect(row.health.total).toBeGreaterThanOrEqual(0);
         expect(row.health.total).toBeLessThanOrEqual(100);
     });
@@ -112,12 +91,12 @@ describe('buildArtisanRow', () => {
 describe('buildArtisanRows', () => {
     it('renvoie une row par artisan dans le même ordre', () => {
         const artisans = [makeArtisan({ id: 'A1' }), makeArtisan({ id: 'A2' }), makeArtisan({ id: 'A3' })];
-        const rows = buildArtisanRows(artisans, [], [], [], NOW);
+        const rows = buildArtisanRows(artisans, [], [], NOW);
         expect(rows.map((r) => r.artisan.id)).toEqual(['A1', 'A2', 'A3']);
     });
 
     it('renvoie un tableau vide pour une liste vide', () => {
-        expect(buildArtisanRows([], [], [], [], NOW)).toEqual([]);
+        expect(buildArtisanRows([], [], [], NOW)).toEqual([]);
     });
 });
 

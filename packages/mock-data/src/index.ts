@@ -32,7 +32,6 @@ export {
 export { mockSuppliers, type SupplierRef } from './suppliers';
 export { mockProducts, mockProductById, sampleProduct, type MockProduct, type ProductCategory } from './products';
 export { mockAdminUsers } from './admin-users';
-export { mockAdminAuditLog } from './admin-audit-log';
 export { mockJournalArticles, mockJournalArticleById } from './journal';
 export { mockJournalPublic, journalArticleBySlug, type JournalArticlePublic } from './journal-public';
 export {

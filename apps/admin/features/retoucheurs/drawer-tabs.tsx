@@ -122,13 +122,12 @@ export function ProfileTab({ retoucheur }: { retoucheur: Repairer }) {
 interface KycTabProps {
     retoucheur: Repairer;
     overlay: RetoucheurOverlay | undefined;
-    canVerify: boolean;
     onOpenVerify: () => void;
     onOpenReject: () => void;
     onResolveOverdue: () => void;
 }
 
-export function KycTab({ retoucheur, overlay, canVerify, onOpenVerify, onOpenReject, onResolveOverdue }: KycTabProps) {
+export function KycTab({ retoucheur, overlay, onOpenVerify, onOpenReject, onResolveOverdue }: KycTabProps) {
     const subscription = deriveSubscription(retoucheur, overlay);
     const planLabel =
         subscription.plan === 'monthly'
@@ -182,7 +181,6 @@ export function KycTab({ retoucheur, overlay, canVerify, onOpenVerify, onOpenRej
                         size="sm"
                         variant="outline"
                         onClick={onResolveOverdue}
-                        disabled={!canVerify}
                         className="mt-1 gap-1.5 border-lumiris-emerald/40 text-lumiris-emerald hover:bg-lumiris-emerald/10"
                     >
                         <CheckCircle2 className="h-3.5 w-3.5" /> Marquer impayé résolu
@@ -201,7 +199,6 @@ export function KycTab({ retoucheur, overlay, canVerify, onOpenVerify, onOpenRej
                 <Button
                     size="sm"
                     onClick={onOpenVerify}
-                    disabled={!canVerify}
                     className="gap-1.5 bg-lumiris-emerald hover:bg-lumiris-emerald/90"
                 >
                     <ShieldCheck className="h-3.5 w-3.5" /> Vérifier KYC
@@ -210,7 +207,6 @@ export function KycTab({ retoucheur, overlay, canVerify, onOpenVerify, onOpenRej
                     size="sm"
                     variant="outline"
                     onClick={onOpenReject}
-                    disabled={!canVerify}
                     className="gap-1.5 border-lumiris-rose/40 text-lumiris-rose hover:bg-lumiris-rose/10"
                 >
                     <ShieldX className="h-3.5 w-3.5" /> Rejeter

@@ -14,8 +14,8 @@ export function useSubscription() {
         subscription: query.data?.subscription ?? null,
         quota: query.data?.quota ?? null,
         hasActiveSubscription: query.data?.hasActiveSubscription ?? false,
+        hasLiveSubscription: query.data?.hasLiveSubscription ?? false,
         // ATELIER+ add-on actif (2ᵉ article Stripe) — imbriqué dans `subscription` côté backend.
         atelierPlus: query.data?.subscription?.atelierPlus ?? false,
-        isRealMode: Boolean(token),
     };
 }

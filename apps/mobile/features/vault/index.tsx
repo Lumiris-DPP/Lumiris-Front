@@ -524,11 +524,9 @@ export function Vault() {
                 target={actionsTarget}
             />
 
-            <AnimatePresence>
-                {showComparison && compareItems.length === COMPARE_MAX ? (
-                    <ComparisonOverlay items={compareItems} onClose={exitCompare} />
-                ) : null}
-            </AnimatePresence>
+            {showComparison && compareItems.length === COMPARE_MAX ? (
+                <ComparisonOverlay items={compareItems} onClose={exitCompare} />
+            ) : null}
         </div>
     );
 }

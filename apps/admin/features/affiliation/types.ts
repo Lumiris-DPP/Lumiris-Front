@@ -1,5 +1,5 @@
-import type { AffiliationEvent, Payout } from '@lumiris/types';
-import { NOW_REF, type SuspiciousFlag } from '@/lib/affiliation-fraud';
+import type { Payout } from '@lumiris/types';
+import { NOW_REF } from '@/lib/affiliation-fraud';
 
 export type BankStatus = 'awaiting' | 'wire_sent' | 'reconciled' | 'failed';
 
@@ -38,32 +38,4 @@ export interface RateHistoryEntry {
     newValue: string;
     reason: string;
     at: string;
-}
-
-export type FraudPattern = 'burst' | 'self_booking' | 'geo' | 'manual';
-
-export interface FraudCase {
-    event: AffiliationEvent;
-    flag: SuspiciousFlag;
-    pattern: FraudPattern;
-}
-
-export type FraudCaseStatus = 'open' | 'resolved' | 'anonymised';
-
-export const FRAUD_PATTERN_LABEL: Record<FraudPattern, string> = {
-    burst: 'Pic d’activité',
-    self_booking: 'Auto-réservation',
-    geo: 'Géo incohérente',
-    manual: 'Flag manuel',
-};
-
-export interface AntiConflictAlert {
-    id: string;
-    severity: 'warn' | 'info';
-    title: string;
-    detail: string;
-    partnerId: string;
-    partnerName: string;
-    occurredAt: string;
-    eventIds: readonly string[];
 }

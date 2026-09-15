@@ -1,6 +1,6 @@
 import type { AdminAction, AdminAuditLogEntry, AdminUserRole } from '@lumiris/types';
 
-export interface AnomalyAlert {
+interface AnomalyAlert {
     id: string;
     severity: 'warn' | 'error';
     rule: AnomalyRule;

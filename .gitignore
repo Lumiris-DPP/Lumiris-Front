@@ -61,8 +61,10 @@ CLAUDE.md
 context/
 
 # Tauri (apps/mobile/src-tauri)
+# gen/android is tracked — the camera permission in its manifest is a source.
+# Gradle output stays out via the .gitignore files Tauri generates inside it.
 **/src-tauri/target
-**/src-tauri/gen
+**/src-tauri/gen/schemas
 **/src-tauri/.cargo
 **/src-tauri/WixTools
 

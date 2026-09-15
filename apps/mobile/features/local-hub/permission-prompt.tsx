@@ -15,7 +15,7 @@ export function PermissionPrompt({ onAccept, onDismiss }: PermissionPromptProps)
             role="dialog"
             aria-labelledby="geoloc-prompt-title"
             aria-describedby="geoloc-prompt-desc"
-            className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-background/80 px-8 backdrop-blur-md"
+            className="absolute inset-0 z-overlay flex flex-col items-center justify-center bg-background/80 px-8 backdrop-blur-md"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.2 }}

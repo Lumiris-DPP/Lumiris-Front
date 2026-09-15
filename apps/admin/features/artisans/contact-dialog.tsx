@@ -16,7 +16,6 @@ import { Label } from '@lumiris/ui/components/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@lumiris/ui/components/select';
 import { Textarea } from '@lumiris/ui/components/textarea';
 import { useToast } from '@lumiris/ui/hooks/use-toast';
-import { useLogAction, usePermission } from '@/lib/auth';
 
 type ContactTemplateId = 'health-below-50' | 'capacity-upgrade' | 'capped-d-espr';
 
@@ -59,8 +58,6 @@ interface ContactDialogProps {
 }
 
 export function ContactDialog({ artisan, open, onOpenChange, upgradeHint = null }: ContactDialogProps) {
-    const log = useLogAction();
-    const canContact = usePermission('artisan.contact');
     const { toast } = useToast();
 
     const defaultTemplateId: ContactTemplateId = upgradeHint ? 'capacity-upgrade' : 'health-below-50';
@@ -82,17 +79,10 @@ export function ContactDialog({ artisan, open, onOpenChange, upgradeHint = null 
     }, [selectedTemplate, artisan, upgradeHint]);
 
     const handleSend = () => {
-        const trimmed = body.trim();
-        if (trimmed.length === 0) return;
-        log({
-            action: 'artisan.contact',
-            targetType: 'artisan',
-            targetId: artisan.id,
-            payload: { template: selectedTemplate.id, body: trimmed },
-        });
+        if (body.trim().length === 0) return;
         toast({
             title: `Message envoyé à ${artisan.displayName}`,
-            description: `Modèle « ${selectedTemplate.label} » — entrée audit log écrite.`,
+            description: `Modèle « ${selectedTemplate.label} ».`,
         });
         onOpenChange(false);
     };
@@ -149,7 +139,7 @@ export function ContactDialog({ artisan, open, onOpenChange, upgradeHint = null 
                     <Button variant="ghost" onClick={() => onOpenChange(false)}>
                         Annuler
                     </Button>
-                    <Button onClick={handleSend} disabled={!canContact || body.trim().length === 0} className="gap-1.5">
+                    <Button onClick={handleSend} disabled={body.trim().length === 0} className="gap-1.5">
                         <Send className="h-3.5 w-3.5" aria-hidden /> Envoyer
                     </Button>
                 </DialogFooter>

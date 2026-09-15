@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Loader2, X } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@lumiris/ui/components/sheet';
 import { AttachmentPicker, type PickedFile } from './attachment-picker';
 
 // Une seule feuille pour toutes les actions qui n'exigent qu'un texte : demander un retour,
@@ -42,33 +42,23 @@ export function ReasonSheet({
         }
     }, [open]);
 
-    if (!open) return null;
-
     const valid = reason.trim().length >= 5;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm">
-            <button type="button" aria-label="Fermer" className="absolute inset-0" onClick={onClose} />
-            <motion.div
-                className="relative mx-auto w-full max-w-md rounded-t-3xl border-t border-border bg-background px-5 pt-5 pb-8"
-                initial={{ y: 200 }}
-                animate={{ y: 0 }}
-                transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+        <Sheet
+            open={open}
+            onOpenChange={(next) => {
+                if (!next) onClose();
+            }}
+        >
+            <SheetContent
+                side="bottom"
+                className="mx-auto max-h-[85dvh] max-w-md overflow-y-auto rounded-t-3xl px-5 pt-5 pb-8"
             >
-                <div className="flex items-start gap-3">
-                    <div className="min-w-0 flex-1">
-                        <h2 className="text-base font-bold text-foreground">{title}</h2>
-                        <p className="mt-1 text-xs text-muted-foreground">{description}</p>
-                    </div>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        aria-label="Fermer"
-                        className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground"
-                    >
-                        <X className="h-4 w-4" />
-                    </button>
-                </div>
+                <SheetHeader className="p-0 pr-10">
+                    <SheetTitle className="text-base font-bold">{title}</SheetTitle>
+                    <SheetDescription className="text-xs">{description}</SheetDescription>
+                </SheetHeader>
 
                 {suggestions?.length ? (
                     <div className="mt-4 flex flex-wrap gap-2">
@@ -116,7 +106,7 @@ export function ReasonSheet({
                     {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                     {submitLabel}
                 </button>
-            </motion.div>
-        </div>
+            </SheetContent>
+        </Sheet>
     );
 }

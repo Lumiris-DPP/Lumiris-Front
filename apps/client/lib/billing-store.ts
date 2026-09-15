@@ -70,7 +70,7 @@ function defaultBilling(artisanId: string): BillingState {
     };
 }
 
-export const useBillingStore = create<BillingStoreState>()(
+const useBillingStore = create<BillingStoreState>()(
     persist(
         (set) => ({
             byArtisan: {},

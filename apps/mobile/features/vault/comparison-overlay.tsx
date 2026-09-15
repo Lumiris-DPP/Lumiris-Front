@@ -1,9 +1,8 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { X } from 'lucide-react';
 import type { Passport, ScoreResult } from '@lumiris/types';
 import { GRADE_LABEL, IrisGrade as IrisGradeBadge } from '@lumiris/scoring-ui';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@lumiris/ui/components/sheet';
 
 export interface VaultItem {
     passport: Passport;
@@ -21,62 +20,59 @@ export function ComparisonOverlay({ items, onClose }: ComparisonOverlayProps) {
     if (!a || !b) return null;
 
     return (
-        <motion.div
-            className="absolute inset-0 z-50 flex flex-col bg-background"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 40 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        <Sheet
+            open
+            onOpenChange={(next) => {
+                if (!next) onClose();
+            }}
         >
-            <div className="flex items-center justify-between px-6 pt-12 pb-4">
-                <h2 className="text-lg font-bold text-foreground">Comparer</h2>
-                <button
-                    type="button"
-                    onClick={onClose}
-                    aria-label="Fermer la comparaison"
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-foreground"
-                >
-                    <X className="h-4 w-4" />
-                </button>
-            </div>
+            <SheetContent side="bottom" className="flex h-[92dvh] flex-col rounded-t-3xl p-0">
+                <SheetHeader className="px-6 pt-6 pb-4">
+                    <SheetTitle className="text-lg font-bold">Comparer</SheetTitle>
+                </SheetHeader>
 
-            <div className="flex-1 overflow-y-auto px-5 pb-8">
-                <div className="mb-6 flex gap-3">
-                    {[a, b].map((item) => (
-                        <ComparisonHeaderCard key={item.passport.id} item={item} />
-                    ))}
+                <div className="flex-1 overflow-y-auto overscroll-contain px-5 pb-8">
+                    <div className="mb-6 flex gap-3">
+                        {[a, b].map((item) => (
+                            <ComparisonHeaderCard key={item.passport.id} item={item} />
+                        ))}
+                    </div>
+
+                    <ComparisonRow
+                        label="Prix"
+                        valueA={`${a.passport.garment.retailPrice} €`}
+                        valueB={`${b.passport.garment.retailPrice} €`}
+                    />
+                    <ComparisonRow
+                        label="Value"
+                        valueA={GRADE_LABEL[a.score.grade]}
+                        valueB={GRADE_LABEL[b.score.grade]}
+                    />
+                    <ComparisonRow
+                        label="CO₂"
+                        valueA={fmtNum(a.passport.carbonKg, 'kg')}
+                        valueB={fmtNum(b.passport.carbonKg, 'kg')}
+                    />
+                    <ComparisonRow
+                        label="Eau"
+                        valueA={fmtNum(a.passport.waterLiters, 'L')}
+                        valueB={fmtNum(b.passport.waterLiters, 'L')}
+                    />
+                    {/* Pas de champ énergie sur Passport - on garde le row pour la spec, valeur '-'. */}
+                    <ComparisonRow label="Énergie" valueA="- kWh" valueB="- kWh" />
+                    <ComparisonRow
+                        label="Certifs"
+                        valueA={`${a.passport.certifications.length}`}
+                        valueB={`${b.passport.certifications.length}`}
+                    />
+                    <ComparisonRow
+                        label="Étapes"
+                        valueA={`${a.passport.steps.length}`}
+                        valueB={`${b.passport.steps.length}`}
+                    />
                 </div>
-
-                <ComparisonRow
-                    label="Prix"
-                    valueA={`${a.passport.garment.retailPrice} €`}
-                    valueB={`${b.passport.garment.retailPrice} €`}
-                />
-                <ComparisonRow label="Value" valueA={GRADE_LABEL[a.score.grade]} valueB={GRADE_LABEL[b.score.grade]} />
-                <ComparisonRow
-                    label="CO₂"
-                    valueA={fmtNum(a.passport.carbonKg, 'kg')}
-                    valueB={fmtNum(b.passport.carbonKg, 'kg')}
-                />
-                <ComparisonRow
-                    label="Eau"
-                    valueA={fmtNum(a.passport.waterLiters, 'L')}
-                    valueB={fmtNum(b.passport.waterLiters, 'L')}
-                />
-                {/* Pas de champ énergie sur Passport - on garde le row pour la spec, valeur '-'. */}
-                <ComparisonRow label="Énergie" valueA="- kWh" valueB="- kWh" />
-                <ComparisonRow
-                    label="Certifs"
-                    valueA={`${a.passport.certifications.length}`}
-                    valueB={`${b.passport.certifications.length}`}
-                />
-                <ComparisonRow
-                    label="Étapes"
-                    valueA={`${a.passport.steps.length}`}
-                    valueB={`${b.passport.steps.length}`}
-                />
-            </div>
-        </motion.div>
+            </SheetContent>
+        </Sheet>
     );
 }
 

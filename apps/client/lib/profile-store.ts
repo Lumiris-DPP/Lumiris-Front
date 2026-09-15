@@ -3,8 +3,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { safeJSONStorage } from './persist-storage';
-import { mockArtisanById } from '@lumiris/mock-data';
-import type { Artisan } from '@lumiris/types';
 
 interface ProfileOverride {
     epvLabeled?: boolean;
@@ -48,19 +46,10 @@ export const useProfileStore = create<ProfileStoreState>()(
     ),
 );
 
-function baselineFromArtisan(artisan: Artisan): ProfileSnapshot {
-    return {
-        epvLabeled: artisan.epvLabeled,
-        ofgLabeled: artisan.ofgLabeled,
-    };
-}
-
-function fallbackProfile(): ProfileSnapshot {
-    return {
-        epvLabeled: false,
-        ofgLabeled: false,
-    };
-}
+const UNLABELLED: ProfileSnapshot = {
+    epvLabeled: false,
+    ofgLabeled: false,
+};
 
 function applyOverride(base: ProfileSnapshot, override: ProfileOverride | undefined): ProfileSnapshot {
     if (!override) return base;
@@ -72,7 +61,5 @@ function applyOverride(base: ProfileSnapshot, override: ProfileOverride | undefi
 
 export function useProfile(artisanId: string): ProfileSnapshot {
     const override = useProfileStore((s) => s.byArtisan[artisanId]);
-    const artisan = mockArtisanById(artisanId);
-    if (!artisan) return fallbackProfile();
-    return applyOverride(baselineFromArtisan(artisan), override);
+    return applyOverride(UNLABELLED, override);
 }

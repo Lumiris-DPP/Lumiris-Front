@@ -4,15 +4,16 @@ import { use, useEffect, useMemo, useState } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { CheckCircle, XCircle } from 'lucide-react';
 import Image from 'next/image';
-import { mockPassportById } from '@lumiris/mock-data';
 import type { IrisGrade, ScoreResult } from '@lumiris/types';
 import { useApiClient } from '@lumiris/api-client/react';
 import { useAuthHydrated } from '@/lib/use-auth';
 import type { DppFormDto } from '@lumiris/api-client';
 import { fiberLabel } from '@lumiris/scoring-ui';
 import { LumirisLogo } from '@lumiris/ui/components/logo';
+import { PrintButton } from '@/features/print-button';
 import { PrintMessage } from '@/features/print-message';
 import { draftToPassport, useDraftStore } from '@/lib/draft-store';
+import { useAutoPrint } from '@/lib/use-auto-print';
 import { publicPassportUrl } from '@/features/passport-detail/access-levels';
 
 interface PageProps {
@@ -61,21 +62,19 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
     const api = useApiClient();
     const hydrated = useAuthHydrated();
     const draft = useDraftStore((s) => s.drafts[id]);
-    const fixed = useMemo(() => mockPassportById(id), [id]);
 
     const [dpp, setDpp] = useState<DppFormDto | null>(null);
     const [score, setScore] = useState<ScoreResult | null>(null);
     const [notFound, setNotFound] = useState(false);
 
-    const mockPassport = useMemo(() => (draft ? draftToPassport(draft) : fixed), [draft, fixed]);
-    const isMockOrDraft = Boolean(mockPassport);
+    const draftPassport = useMemo(() => (draft ? draftToPassport(draft) : null), [draft]);
 
     // La fiche s'imprime depuis l'atelier, sur un identifiant de passeport — pas sur un code
     // public. `/public/dpp_forms/{code}` répondait donc 404 sur des passeports pourtant valides.
     // La requête part APRÈS l'hydratation du store d'auth : sans en-tête Authorization, l'API
     // répond 401 et la page conclut à tort à une fiche introuvable.
     useEffect(() => {
-        if (isMockOrDraft || !hydrated) return;
+        if (draftPassport || !hydrated) return;
         let cancelled = false;
         Promise.all([api.dpp.get(id), api.dpp.getIrisScore(id).catch(() => null)])
             .then(([fetchedDpp, irisScore]) => {
@@ -89,13 +88,9 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
         return () => {
             cancelled = true;
         };
-    }, [id, isMockOrDraft, api, hydrated]);
+    }, [id, draftPassport, api, hydrated]);
 
-    useEffect(() => {
-        if (!isMockOrDraft && !dpp) return;
-        const t = window.setTimeout(() => window.print(), 400);
-        return () => window.clearTimeout(t);
-    }, [isMockOrDraft, dpp]);
+    useAutoPrint(Boolean(draftPassport ?? dpp), 400);
 
     if (notFound) {
         return (
@@ -107,8 +102,8 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
         );
     }
 
-    if (mockPassport) {
-        return <MockPrintSheet productName={mockPassport.garment.name ?? mockPassport.garment.reference} />;
+    if (draftPassport) {
+        return <DraftPrintSheet productName={draftPassport.garment.name ?? draftPassport.garment.reference} />;
     }
 
     if (!dpp) {
@@ -144,6 +139,7 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
             `}</style>
 
             <div className="flex min-h-screen items-start justify-center bg-neutral-100 print:bg-white">
+                <PrintButton />
                 <article
                     className="lumiris-sheet relative box-border flex min-h-[297mm] w-[210mm] flex-col gap-6 bg-white p-12 text-neutral-900 shadow-md print:m-0 print:p-12 print:shadow-none"
                     style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}
@@ -405,9 +401,10 @@ export default function PrintPassportSheetPage({ params }: PageProps) {
     );
 }
 
-function MockPrintSheet({ productName }: { productName: string }) {
+function DraftPrintSheet({ productName }: { productName: string }) {
     return (
         <div className="flex min-h-screen items-center justify-center bg-white p-12">
+            <PrintButton />
             <div className="space-y-3 text-center">
                 <p className="font-mono text-sm text-neutral-700">{productName}</p>
                 <p className="text-xs text-neutral-500">Aperçu disponible uniquement pour les passeports publiés.</p>

@@ -11,15 +11,13 @@ import { Chip } from '@/components/chip';
 import {
     MARKETPLACE_SORT_LABEL,
     MARKETPLACE_SORT_ORDER,
+    capitalize,
+    marketplaceCategoryLabel,
     type MarketplaceItem,
     type MarketplaceSort,
 } from '@/lib/marketplace';
 
 const GRADE_OPTIONS: readonly IrisGrade[] = ['A', 'B', 'C', 'D', 'E'];
-
-function titleCase(value: string): string {
-    return value.charAt(0).toUpperCase() + value.slice(1);
-}
 
 interface PriceBounds {
     min: number;
@@ -197,7 +195,7 @@ function BoutiqueFilterSheet({
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent
                 side="bottom"
-                className="mx-auto max-h-[88vh] max-w-md overflow-y-auto rounded-t-3xl px-6 pt-6 pb-[max(env(safe-area-inset-bottom),1.5rem)]"
+                className="mx-auto max-h-[88dvh] max-w-md overflow-y-auto rounded-t-3xl px-6 pt-6 pb-[max(env(safe-area-inset-bottom),1.5rem)]"
             >
                 <SheetHeader className="px-0 text-left">
                     <SheetTitle className="flex items-center gap-2 text-base">
@@ -218,7 +216,7 @@ function BoutiqueFilterSheet({
                                     selected={state.categories.includes(cat)}
                                     onClick={() => onChange({ ...state, categories: toggle(state.categories, cat) })}
                                 >
-                                    {titleCase(cat)}
+                                    {marketplaceCategoryLabel(cat)}
                                 </Chip>
                             ))}
                         </FilterGroup>
@@ -244,7 +242,7 @@ function BoutiqueFilterSheet({
                                     selected={state.materials.includes(material)}
                                     onClick={() => onChange({ ...state, materials: toggle(state.materials, material) })}
                                 >
-                                    {titleCase(material)}
+                                    {capitalize(material)}
                                 </Chip>
                             ))}
                         </FilterGroup>

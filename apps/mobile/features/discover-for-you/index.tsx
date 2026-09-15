@@ -100,7 +100,7 @@ export function DiscoverForYou() {
                     <motion.div
                         role="status"
                         aria-live="polite"
-                        className="pointer-events-auto fixed top-24 left-1/2 z-50 flex w-fit max-w-[20rem] -translate-x-1/2 items-center gap-2 rounded-2xl border border-border/60 bg-card/95 px-4 py-2 text-xs text-foreground shadow-xl backdrop-blur-md"
+                        className="pointer-events-auto fixed top-24 left-1/2 z-nav flex w-fit max-w-[20rem] -translate-x-1/2 items-center gap-2 rounded-2xl border border-border/60 bg-card/95 px-4 py-2 text-xs text-foreground shadow-xl backdrop-blur-md"
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}

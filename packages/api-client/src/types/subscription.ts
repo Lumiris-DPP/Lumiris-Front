@@ -36,6 +36,7 @@ export const subscriptionStateDtoSchema = z.object({
     subscription: subscriptionDtoSchema.nullable(),
     quota: quotaDtoSchema,
     hasActiveSubscription: z.boolean(),
+    hasLiveSubscription: z.boolean(),
     publishableKey: z.string().nullable(),
 });
 export type SubscriptionStateDto = z.infer<typeof subscriptionStateDtoSchema>;

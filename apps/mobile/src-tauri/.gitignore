@@ -1,6 +1,6 @@
 # Tauri build output
 /target
-/gen
+/gen/schemas
 /.cargo
 /WixTools
 

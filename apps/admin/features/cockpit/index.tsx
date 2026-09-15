@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useMemo } from 'react';
-import { mockAdminAuditLog, mockArtisans, mockPassports, mockSubscriptions } from '@lumiris/mock-data';
+import { mockArtisans, mockPassports, mockSubscriptions } from '@lumiris/mock-data';
 import { FeatureLayout } from '@lumiris/ui/components/feature-layout';
 import { IRIS_AVERAGE_TARGET } from '@/lib/business-targets';
 import { buildArtisanKpi, buildCurationKpi, buildIrisKpi, buildMrrKpi, buildTrajectory } from '@/lib/cockpit-metrics';
@@ -11,7 +11,7 @@ import { TrajectoryChart } from './trajectory-chart';
 const COCKPIT_NOW = new Date('2026-05-17T08:00:00Z');
 
 function CockpitComponent() {
-    const artisanKpi = useMemo(() => buildArtisanKpi(mockArtisans, mockAdminAuditLog, COCKPIT_NOW), []);
+    const artisanKpi = useMemo(() => buildArtisanKpi(mockArtisans), []);
     const curationKpi = useMemo(() => buildCurationKpi(mockPassports), []);
     const irisKpi = useMemo(() => buildIrisKpi(mockPassports, mockArtisans, COCKPIT_NOW, IRIS_AVERAGE_TARGET), []);
     const mrrKpi = useMemo(() => buildMrrKpi(mockSubscriptions), []);

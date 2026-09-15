@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { AlertTriangle, ArrowLeft, Copy, Loader2, Pencil, Trash2 } from 'lucide-react';
 import { computeScore } from '@lumiris/core/scoring';
-import { mockCertificates, mockPassportById } from '@lumiris/mock-data';
+import { mockCertificates } from '@lumiris/mock-data';
 import type { Passport } from '@lumiris/types';
 import {
     AlertDialog,
@@ -52,11 +52,8 @@ export function PassportDetail({ passportId }: { passportId: string }) {
     const drafts = useDraftStore((s) => s.drafts);
     const draft = drafts[passportId];
 
-    // Les passeports « fixes » proviennent des mocks : réservés au mode démo (aucun token).
-    const fixed = useMemo(() => (token ? null : mockPassportById(passportId)), [passportId, token]);
-
-    // Fetched only when this isn't a draft or mock passport.
-    const dppQuery = useDppForm(passportId, { enabled: !draft && !fixed && Boolean(token) });
+    // Fetched only when this isn't a local draft.
+    const dppQuery = useDppForm(passportId, { enabled: !draft && Boolean(token) });
     const apiDpp: DppFormDto | null = dppQuery.data ?? null;
     const loading = dppQuery.isLoading;
     const notFound = dppQuery.isError;
@@ -66,16 +63,15 @@ export function PassportDetail({ passportId }: { passportId: string }) {
         [apiDpp, artisan.id],
     );
 
-    const passport = useMemo<Passport | null>(() => {
-        if (draft) return draftToPassport(draft);
-        if (fixed) return fixed;
-        return apiPassport;
-    }, [draft, fixed, apiPassport]);
+    const passport = useMemo<Passport | null>(
+        () => (draft ? draftToPassport(draft) : apiPassport),
+        [draft, apiPassport],
+    );
 
     const now = useMemo(() => new Date(), []);
-    // Le score client (calculé à partir de certificats mock) ne sert qu'à l'aperçu démo / brouillon
-    // local. Un DPP publié via l'API expose son vrai score Iris (IrisScoreCard) : aucun calcul mock
-    // en mode réel.
+    // Le score client ne sert qu'au brouillon local. Un DPP enregistré expose son vrai score Iris
+    // (IrisScoreCard), calculé par le backend.
+    // TODO(fiche-07): les certificats du brouillon viennent encore des fixtures.
     const score = useMemo(
         () => (passport && !apiDpp ? computeScore(passport, { artisan, certificates: mockCertificates, now }) : null),
         [artisan, passport, apiDpp, now],

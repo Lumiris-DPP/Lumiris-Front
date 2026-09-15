@@ -1,4 +1,5 @@
 import { ImageResponse } from 'next/og';
+import { deslugify, joinNonEmpty } from '@lumiris/utils';
 import { fetchPublicArtisanProfile, fetchPublicArtisans } from '@/lib/public-artisan-api';
 import { OG_LOGO_DATA_URI } from '@/lib/og-logo';
 
@@ -14,13 +15,27 @@ interface OgProps {
     params: Promise<{ slug: string }>;
 }
 
+interface Headline {
+    title: string;
+    sub: string;
+}
+
+async function artisanHeadline(slug: string): Promise<Headline> {
+    try {
+        const artisan = await fetchPublicArtisanProfile(slug);
+        return {
+            title: artisan?.atelierName ?? artisan?.displayName ?? 'Atelier LUMIRIS',
+            sub: joinNonEmpty([artisan?.displayName, joinNonEmpty([artisan?.city, artisan?.region], ', ')]),
+        };
+    } catch (error) {
+        console.error(`GET /v1/artisans/${slug} injoignable`, error);
+        return { title: deslugify(slug), sub: '' };
+    }
+}
+
 export default async function Image({ params }: OgProps) {
     const { slug } = await params;
-    const artisan = await fetchPublicArtisanProfile(slug);
-    const title = artisan?.atelierName ?? artisan?.displayName ?? 'Atelier LUMIRIS';
-    const sub = [artisan?.displayName, [artisan?.city, artisan?.region].filter(Boolean).join(', ')]
-        .filter(Boolean)
-        .join(' · ');
+    const { title, sub } = await artisanHeadline(slug);
 
     return new ImageResponse(
         <div

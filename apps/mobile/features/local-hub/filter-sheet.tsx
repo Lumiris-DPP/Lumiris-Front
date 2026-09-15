@@ -51,7 +51,7 @@ export function FilterSheet({
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent
                 side="bottom"
-                className="mx-auto max-h-[85vh] max-w-md overflow-y-auto rounded-t-3xl px-6 pt-6 pb-[max(env(safe-area-inset-bottom),1.5rem)]"
+                className="mx-auto max-h-[85dvh] max-w-md overflow-y-auto rounded-t-3xl px-6 pt-6 pb-[max(env(safe-area-inset-bottom),1.5rem)]"
             >
                 <SheetHeader className="px-0 text-left">
                     <SheetTitle className="flex items-center gap-2 text-base">

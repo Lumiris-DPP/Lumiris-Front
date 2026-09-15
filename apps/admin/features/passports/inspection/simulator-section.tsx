@@ -12,7 +12,6 @@ import { Switch } from '@lumiris/ui/components/switch';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@lumiris/ui/components/tooltip';
 import { useToast } from '@lumiris/ui/hooks/use-toast';
 import { cn } from '@lumiris/ui/lib/cn';
-import { useLogAction } from '@/lib/auth';
 import { applySimulatorChanges, type SimulatorChanges } from '@/lib/iris-simulator';
 import { scorePassport } from './scoring';
 import { AXIS_LABEL } from './types';
@@ -64,7 +63,6 @@ const TOGGLES: readonly ToggleSpec[] = [
 ];
 
 export function SimulatorSection({ passport, baseScore }: SimulatorSectionProps) {
-    const log = useLogAction();
     const { toast } = useToast();
     const [changes, setChanges] = useState<SimulatorChanges>({});
     const [debouncedChanges, setDebouncedChanges] = useState<SimulatorChanges>({});
@@ -85,21 +83,6 @@ export function SimulatorSection({ passport, baseScore }: SimulatorSectionProps)
     const artisan = mockArtisans.find((a) => a.id === passport.artisanId);
 
     const handleApply = () => {
-        const finalPassport = applySimulatorChanges(passport, changes);
-        const finalScore = scorePassport(finalPassport);
-        log({
-            action: 'artisan.contact',
-            targetType: 'artisan',
-            targetId: passport.artisanId,
-            payload: {
-                kind: 'workbench_suggestion',
-                passportId: passport.id,
-                changes,
-                deltaTotal: +(finalScore.total - baseScore.total).toFixed(1),
-                fromGrade: baseScore.grade,
-                toGrade: finalScore.grade,
-            },
-        });
         toast({
             title: 'Simulation transmise',
             description: `Suggestion envoyée à l'artisan ${passport.artisanId}.`,

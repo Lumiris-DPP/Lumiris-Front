@@ -4,7 +4,6 @@ import { memo, Suspense, useCallback, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FeatureLayout } from '@lumiris/ui/components/feature-layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@lumiris/ui/components/tabs';
-import { PermissionGate } from '../_shared/permission-gate';
 import { Retoucheurs } from '../retoucheurs';
 import { VisionUsers } from '../vision-users';
 
@@ -50,14 +49,10 @@ function ReseauInner() {
                 }
             >
                 <TabsContent value="retoucheurs" className="mt-0 outline-none">
-                    <PermissionGate requires="retoucheur.read">
-                        <Retoucheurs />
-                    </PermissionGate>
+                    <Retoucheurs />
                 </TabsContent>
                 <TabsContent value="users" className="mt-0 outline-none">
-                    <PermissionGate requires="vision_user.read">
-                        <VisionUsers />
-                    </PermissionGate>
+                    <VisionUsers />
                 </TabsContent>
             </FeatureLayout>
         </Tabs>

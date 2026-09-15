@@ -11,7 +11,6 @@ import { PaymentsTab } from '@/features/billing/payments-tab';
 import { PayoutsTab } from '@/features/affiliation/payouts-tab';
 import { RatesTab } from '@/features/affiliation/rates-tab';
 import { inferBankStatus, type BankStatus } from '@/features/affiliation/types';
-import { PermissionGate } from '../_shared/permission-gate';
 
 type TabValue = 'subscriptions' | 'payments' | 'affiliation';
 
@@ -73,52 +72,46 @@ function RevenusInner() {
                 }
             >
                 <TabsContent value="subscriptions" className="mt-0 outline-none">
-                    <PermissionGate requires="billing.read">
-                        <SubscriptionsTab />
-                    </PermissionGate>
+                    <SubscriptionsTab />
                 </TabsContent>
                 <TabsContent value="payments" className="mt-0 outline-none">
-                    <PermissionGate requires="billing.read">
-                        <PaymentsTab />
-                    </PermissionGate>
+                    <PaymentsTab />
                 </TabsContent>
                 <TabsContent value="affiliation" className="mt-0 space-y-10 outline-none">
-                    <PermissionGate requires="affiliation.read">
-                        <PayoutsTab
-                            payouts={mockPayouts}
-                            events={events}
-                            suspicions={suspicions}
-                            bankStatuses={bankStatuses}
-                            comments={comments}
-                            onUpdateBankStatus={(id, status) =>
-                                setBankStatuses((prev) => {
-                                    const next = new Map(prev);
-                                    next.set(id, status);
-                                    return next;
-                                })
-                            }
-                            onUpdateComment={(id, value) =>
-                                setComments((prev) => {
-                                    const next = new Map(prev);
-                                    next.set(id, value);
-                                    return next;
-                                })
-                            }
-                            onPreparePayout={(eventIds) =>
-                                setPaidEventIds((prev) => {
-                                    const next = new Set(prev);
-                                    for (const id of eventIds) next.add(id);
-                                    return next;
-                                })
-                            }
-                        />
-                        <section className="space-y-3">
-                            <header>
-                                <h2 className="text-base font-semibold text-foreground">Tarifs</h2>
-                            </header>
-                            <RatesTab />
-                        </section>
-                    </PermissionGate>
+                    <PayoutsTab
+                        payouts={mockPayouts}
+                        events={events}
+                        suspicions={suspicions}
+                        bankStatuses={bankStatuses}
+                        comments={comments}
+                        onUpdateBankStatus={(id, status) =>
+                            setBankStatuses((prev) => {
+                                const next = new Map(prev);
+                                next.set(id, status);
+                                return next;
+                            })
+                        }
+                        onUpdateComment={(id, value) =>
+                            setComments((prev) => {
+                                const next = new Map(prev);
+                                next.set(id, value);
+                                return next;
+                            })
+                        }
+                        onPreparePayout={(eventIds) =>
+                            setPaidEventIds((prev) => {
+                                const next = new Set(prev);
+                                for (const id of eventIds) next.add(id);
+                                return next;
+                            })
+                        }
+                    />
+                    <section className="space-y-3">
+                        <header>
+                            <h2 className="text-base font-semibold text-foreground">Tarifs</h2>
+                        </header>
+                        <RatesTab />
+                    </section>
                 </TabsContent>
             </FeatureLayout>
         </Tabs>

@@ -8,22 +8,20 @@ describe('computeHealthScore — smoke', () => {
             publishedCount: 8,
             passportLimit: 10,
             avgIrisScore: 85,
-            overrideCount90d: 0,
         });
         expect(h.total).toBeGreaterThanOrEqual(75);
         expect(h.capacityUtilization).toBe(80);
     });
 
-    it('edge : Maison sans passeport publié → total dominé par axe overrides (~25)', () => {
+    it('edge : Maison sans passeport publié → aucun axe alimenté, total 0', () => {
         const h = computeHealthScore({
             publishedCount: 0,
             passportLimit: Number.POSITIVE_INFINITY,
             avgIrisScore: 0,
-            overrideCount90d: 0,
         });
         expect(h.capacityScore).toBe(0);
         expect(h.irisScore).toBe(0);
-        expect(h.total).toBe(25);
+        expect(h.total).toBe(0);
     });
 });
 

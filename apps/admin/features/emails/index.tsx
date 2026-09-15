@@ -10,7 +10,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@lumiris/ui/hooks/use-toast';
 import { isApiError, useAdminEmailsList, useRetryEmail } from '@lumiris/api-client/react';
 import type { EmailOutboxResponse, EmailOutboxStatus } from '@lumiris/api-client';
-import { usePermission } from '@/lib/auth/permissions';
 import { EmptyState } from '../_shared/empty-state';
 
 // Le back pagine à taille fixe sans renvoyer de total : "page pleine" sert d'heuristique pour
@@ -43,7 +42,6 @@ function formatDate(iso: string | null) {
 
 export function EmailLogs() {
     const { toast } = useToast();
-    const canRetry = usePermission('governance.read_audit_log');
 
     const [searchInput, setSearchInput] = useState('');
     const [recipientEmail, setRecipientEmail] = useState('');
@@ -175,7 +173,7 @@ export function EmailLogs() {
                                                         <Button
                                                             size="sm"
                                                             variant="outline"
-                                                            disabled={!canRetry || retryEmail.isPending}
+                                                            disabled={retryEmail.isPending}
                                                             onClick={() => retry(email)}
                                                             className="h-8 gap-1.5"
                                                         >

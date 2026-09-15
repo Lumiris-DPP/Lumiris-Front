@@ -5,15 +5,23 @@ import Image from 'next/image';
 import { ArrowRight, QrCode } from 'lucide-react';
 import { IrisGrade } from '@lumiris/scoring-ui/components/iris-grade';
 
-function getEsprCountdown(): number {
-    const esprDate = new Date('2026-07-19');
-    const now = new Date();
-    const diffTime = esprDate.getTime() - now.getTime();
-    return Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+const ESPR_MILESTONES: ReadonlyArray<{ date: string; label: string }> = [
+    { date: '2026-07-19', label: "l'ouverture du registre central DPP" },
+    { date: '2027-01-01', label: "l'acte délégué textile" },
+    { date: '2028-07-01', label: "l'obligation DPP européenne" },
+];
+
+function getNextEsprMilestone(): { days: number; label: string } | null {
+    const now = Date.now();
+    for (const milestone of ESPR_MILESTONES) {
+        const days = Math.ceil((new Date(milestone.date).getTime() - now) / (1000 * 60 * 60 * 24));
+        if (days > 0) return { days, label: milestone.label };
+    }
+    return null;
 }
 
 export function HomeHero() {
-    const daysUntilEspr = getEsprCountdown();
+    const nextMilestone = getNextEsprMilestone();
 
     return (
         <section className="relative overflow-hidden pt-36 pb-24 sm:pt-44">
@@ -88,17 +96,19 @@ export function HomeHero() {
                 </div>
 
                 {/* ESPR countdown banner */}
-                <div className="mt-16 lg:mt-24">
-                    <div className="inline-flex items-center gap-3 rounded-full border border-border bg-muted/30 px-4 py-2">
-                        <span className="rounded-full bg-lumiris-cyan/10 px-2.5 py-0.5 text-xs font-semibold text-lumiris-cyan">
-                            ESPR
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                            <strong className="text-foreground">{daysUntilEspr} jours</strong> avant l&apos;obligation
-                            DPP européenne
-                        </span>
+                {nextMilestone ? (
+                    <div className="mt-16 lg:mt-24">
+                        <div className="inline-flex items-center gap-3 rounded-full border border-border bg-muted/30 px-4 py-2">
+                            <span className="rounded-full bg-lumiris-cyan/10 px-2.5 py-0.5 text-xs font-semibold text-lumiris-cyan">
+                                ESPR
+                            </span>
+                            <span className="text-sm text-muted-foreground">
+                                <strong className="text-foreground">{nextMilestone.days} jours</strong>
+                                {` avant ${nextMilestone.label}`}
+                            </span>
+                        </div>
                     </div>
-                </div>
+                ) : null}
             </div>
         </section>
     );

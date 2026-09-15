@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { AdminAuditLogEntry, Passport } from '@lumiris/types';
+import type { Passport } from '@lumiris/types';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -13,18 +13,15 @@ import {
     AlertDialogTitle,
 } from '@lumiris/ui/components/alert-dialog';
 import { Textarea } from '@lumiris/ui/components/textarea';
-import { useLogAction } from '@/lib/auth';
 import { useCurationStore } from '../curation-store';
 
 interface RequestChangesDialogProps {
     passport: Passport;
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onAfterAction: (entry: AdminAuditLogEntry) => void;
 }
 
-export function RequestChangesDialog({ passport, open, onOpenChange, onAfterAction }: RequestChangesDialogProps) {
-    const log = useLogAction();
+export function RequestChangesDialog({ passport, open, onOpenChange }: RequestChangesDialogProps) {
     const { setOverlay } = useCurationStore();
     const [message, setMessage] = useState('');
 
@@ -34,15 +31,8 @@ export function RequestChangesDialog({ passport, open, onOpenChange, onAfterActi
             status: 'changes_requested',
             changesMessage: message,
         });
-        const entry = log({
-            action: 'passport.request_changes',
-            targetType: 'passport',
-            targetId: passport.id,
-            payload: { message, artisanId: passport.artisanId },
-        });
         setMessage('');
         onOpenChange(false);
-        onAfterAction(entry);
     };
 
     return (
@@ -51,8 +41,7 @@ export function RequestChangesDialog({ passport, open, onOpenChange, onAfterActi
                 <AlertDialogHeader>
                     <AlertDialogTitle>Demander des changements à l&apos;artisan</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Précisez ce qui doit être complété ou corrigé. Un message sera envoyé à l&apos;artisan et
-                        l&apos;action sera tracée.
+                        Précisez ce qui doit être complété ou corrigé. Un message sera envoyé à l&apos;artisan.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <Textarea

@@ -56,10 +56,6 @@ export function openInvoiceWindow(sub: Subscription) {
 </body></html>`;
     // document.write est déprécié : on sert la facture via un Blob, que la fenêtre imprime seule.
     const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
-    const win = window.open(url, '_blank', 'noopener,noreferrer,width=720,height=900');
-    if (!win) {
-        URL.revokeObjectURL(url);
-        return;
-    }
-    win.addEventListener('pagehide', () => URL.revokeObjectURL(url), { once: true });
+    window.open(url, '_blank', 'noopener,noreferrer,width=720,height=900');
+    URL.revokeObjectURL(url);
 }

@@ -13,7 +13,6 @@ import {
     useResumeSubscription,
 } from '@lumiris/api-client/react';
 import { toast } from '@lumiris/ui/components/sonner';
-import { useAuthStore } from '@/lib/auth-store';
 import { useSubscription } from '@/lib/use-subscription';
 
 // Plan sélectionné par un nouveau souscripteur → alimente le CheckoutDialog embarqué.
@@ -23,9 +22,17 @@ interface CheckoutSelection {
 }
 
 export function useSubscriptionPage() {
-    const isRealMode = useAuthStore((s) => s.token != null);
-    const { subscription, quota, hasActiveSubscription, atelierPlus, isLoading, isError, refetch } = useSubscription();
-    const plansQuery = usePlans({ enabled: isRealMode });
+    const {
+        subscription,
+        quota,
+        hasActiveSubscription,
+        hasLiveSubscription,
+        atelierPlus,
+        isLoading,
+        isError,
+        refetch,
+    } = useSubscription();
+    const plansQuery = usePlans();
     const portal = useBillingPortal();
     const changePlan = useChangePlan();
     const cancelSub = useCancelSubscription();
@@ -157,10 +164,10 @@ export function useSubscriptionPage() {
     }
 
     return {
-        isRealMode,
         subscription,
         quota,
         hasActiveSubscription,
+        hasLiveSubscription,
         atelierPlus,
         isLoading,
         isError: isError || plansQuery.isError,

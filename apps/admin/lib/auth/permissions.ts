@@ -56,6 +56,7 @@ const ROLE_PERMISSIONS: Record<AdminUserRole, ReadonlySet<AdminAction>> = {
         'artisan.contact',
         'retoucheur.read',
         'retoucheur.kyc_verify',
+        'retoucheur.kyc_reject',
         'retoucheur.suspend',
         'retoucheur.review_hide',
         'vision_user.read',

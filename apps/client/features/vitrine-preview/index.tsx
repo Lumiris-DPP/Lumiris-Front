@@ -17,7 +17,7 @@ export function VitrinePreview({ profile }: Props) {
 
     return (
         <div className="min-h-screen bg-background">
-            <header className="sticky top-0 z-40 flex items-center justify-between gap-3 border-b border-border bg-card px-4 py-3">
+            <header className="sticky top-0 z-sticky flex items-center justify-between gap-3 border-b border-border bg-card px-4 py-3">
                 <Button asChild size="sm" variant="ghost">
                     <Link href="/profile">
                         <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Retour à l&apos;édition

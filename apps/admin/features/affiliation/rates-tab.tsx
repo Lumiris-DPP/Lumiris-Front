@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { SlidersHorizontal } from 'lucide-react';
-import { useLogAction, usePermission } from '@/lib/auth';
 import {
     DEFAULT_PURCHASE_RATES,
     DEFAULT_REPAIR_COMMISSION,
@@ -24,29 +23,15 @@ type HistoryKey = string;
 
 interface InFlightChange {
     target: RateChangeTarget;
-    kind: 'purchase' | 'repair-flat' | 'repair-pct';
     historyKey: HistoryKey;
     apply: (next: number) => void;
 }
 
 export function RatesTab() {
-    const canWriteRates = usePermission('affiliation.rate_change');
-    if (!canWriteRates) {
-        return (
-            <div className="rounded-xl border border-dashed border-border bg-muted/30 p-6 text-sm text-muted-foreground">
-                <p className="font-medium text-foreground">Accès restreint</p>
-                <p className="mt-0.5 text-xs">
-                    L&apos;édition des taux requiert la permission{' '}
-                    <code className="font-mono">affiliation.rate_change</code>.
-                </p>
-            </div>
-        );
-    }
     return <RatesEditor />;
 }
 
 function RatesEditor() {
-    const log = useLogAction();
     const [purchaseRates, setPurchaseRates] = useState<readonly PurchaseRate[]>(DEFAULT_PURCHASE_RATES);
     const [repair, setRepair] = useState<RepairCommission>(DEFAULT_REPAIR_COMMISSION);
     const [history, setHistory] = useState<ReadonlyMap<HistoryKey, readonly RateHistoryEntry[]>>(() => new Map());
@@ -54,27 +39,16 @@ function RatesEditor() {
 
     const handleConfirm = (newValue: number, reason: string) => {
         if (!inFlight) return;
-        const { target, kind, historyKey, apply } = inFlight;
-        const entry = log({
-            action: 'affiliation.rate_change',
-            targetType: 'affiliation_rate',
-            targetId: kind,
-            payload: {
-                kind,
-                label: target.label,
-                oldValue: `${target.current} ${target.suffix}`,
-                newValue: `${newValue} ${target.suffix}`,
-                reason,
-            },
-        });
+        const { target, historyKey, apply } = inFlight;
         apply(newValue);
+        const at = new Date().toISOString();
         const update: RateHistoryEntry = {
-            id: entry.id,
+            id: `${historyKey}-${at}`,
             label: target.label,
             oldValue: `${target.current} ${target.suffix}`,
             newValue: `${newValue} ${target.suffix}`,
             reason,
-            at: entry.ts,
+            at,
         };
         setHistory((prev) => {
             const next = new Map(prev);
@@ -94,7 +68,6 @@ function RatesEditor() {
                 bounds: PURCHASE_RATE_BOUNDS,
                 validate: (v) => validatePurchaseRate(v)?.message ?? null,
             },
-            kind: 'purchase',
             historyKey: purchaseKey(rate.category),
             apply: (next) =>
                 setPurchaseRates((prev) =>
@@ -111,7 +84,6 @@ function RatesEditor() {
                 bounds: REPAIR_FLAT_BOUNDS,
                 validate: (v) => validateRepairFlat(v)?.message ?? null,
             },
-            kind: 'repair-flat',
             historyKey: repairKey('flat'),
             apply: (next) => setRepair((prev) => ({ ...prev, flatEur: next })),
         });
@@ -125,7 +97,6 @@ function RatesEditor() {
                 bounds: REPAIR_PCT_BOUNDS,
                 validate: (v) => validateRepairPct(v)?.message ?? null,
             },
-            kind: 'repair-pct',
             historyKey: repairKey('pct'),
             apply: (next) => setRepair((prev) => ({ ...prev, pct: next })),
         });
@@ -144,8 +115,7 @@ function RatesEditor() {
                 <p className="mt-1 text-muted-foreground">
                     Achat {PURCHASE_RATE_BOUNDS.min}-{PURCHASE_RATE_BOUNDS.max} % · forfait retouche{' '}
                     {REPAIR_FLAT_BOUNDS.min}-{REPAIR_FLAT_BOUNDS.max} € · % devis {REPAIR_PCT_BOUNDS.min}-
-                    {REPAIR_PCT_BOUNDS.max} %. Toute modification est audit-loguée (
-                    <code className="font-mono">affiliation.rate_change</code>) avec justification ≥{' '}
+                    {REPAIR_PCT_BOUNDS.max} %. Toute modification exige une justification ≥{' '}
                     {RATE_CHANGE_REASON_MIN_LENGTH} caractères.
                 </p>
             </div>

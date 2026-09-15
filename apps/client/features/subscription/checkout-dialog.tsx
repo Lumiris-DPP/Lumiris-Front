@@ -56,9 +56,7 @@ export function CheckoutDialog({
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>Souscrire — {planLabel}</DialogTitle>
-                    <DialogDescription>
-                        {amountLabel} · paiement sécurisé par Stripe. Carte de test : 4242 4242 4242 4242.
-                    </DialogDescription>
+                    <DialogDescription>{amountLabel} · paiement sécurisé par Stripe.</DialogDescription>
                 </DialogHeader>
 
                 {!intent || !stripePromise ? (

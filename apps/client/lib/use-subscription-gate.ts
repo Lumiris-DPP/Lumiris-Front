@@ -13,11 +13,11 @@ interface SubscriptionGate {
 }
 
 export function useSubscriptionGate(): SubscriptionGate {
-    const { hasActiveSubscription, isRealMode, isLoading } = useSubscription();
+    const { hasActiveSubscription, isLoading } = useSubscription();
 
     return {
-        blocked: isRealMode && !isLoading && !hasActiveSubscription,
-        isLoading: isRealMode && isLoading,
+        blocked: !isLoading && !hasActiveSubscription,
+        isLoading,
         notifyBlocked: () =>
             toast.error(SUBSCRIPTION_REQUIRED_MESSAGE, {
                 description: 'Souscrivez un palier ATELIER pour créer vos passeports.',

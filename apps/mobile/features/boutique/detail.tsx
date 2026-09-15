@@ -26,6 +26,7 @@ import {
     addToCart,
     formatCents,
     installmentLabel,
+    marketplaceCategoryLabel,
     preparationLabel,
     toMarketplaceItem,
     useCart,
@@ -195,7 +196,7 @@ function DetailBody({
                             <dt className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                                 Catégorie
                             </dt>
-                            <dd className="mt-0.5 text-foreground">{product.category}</dd>
+                            <dd className="mt-0.5 text-foreground">{marketplaceCategoryLabel(product.category)}</dd>
                         </div>
                     ) : null}
                     {product.originCountry ? (
@@ -255,7 +256,7 @@ function DetailBody({
 
             <motion.aside
                 aria-label="Acheter cette pièce"
-                className="fixed inset-x-0 bottom-[4.75rem] z-40 mx-auto max-w-md border-t border-border/60 bg-background/90 px-4 pt-3 pb-3 backdrop-blur-xl"
+                className="fixed inset-x-0 bottom-[4.75rem] z-nav mx-auto max-w-md border-t border-border/60 bg-background/90 px-4 pt-3 pb-3 backdrop-blur-xl"
                 initial={{ y: 60, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ type: 'spring', stiffness: 360, damping: 32, delay: 0.2 }}

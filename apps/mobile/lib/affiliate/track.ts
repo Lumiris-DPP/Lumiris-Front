@@ -21,6 +21,8 @@ type AffiliateClickPayload = PassportBuyPayload | RepairRequestPayload;
 
 type AffiliateClickRecord = AffiliateClickPayload & { ts: string };
 
+const MAX_RETAINED_CLICKS = 50;
+
 function currentKey(): string {
     return userScopedKey(readUser()?.id ?? null, USER_KEYS.affiliateClicks);
 }
@@ -41,7 +43,7 @@ export function trackAffiliateClick(payload: AffiliateClickPayload): void {
     if (typeof window === 'undefined') return;
     const record = { ...payload, ts: new Date().toISOString() } as AffiliateClickRecord;
     try {
-        const next = [...read(), record];
+        const next = [...read(), record].slice(-MAX_RETAINED_CLICKS);
         window.localStorage.setItem(currentKey(), JSON.stringify(next));
     } catch {
         // localStorage indisponible (mode privé / quota) — on retombe sur le log dev.

@@ -16,7 +16,6 @@ import {
 } from '@lumiris/ui/components/alert-dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@lumiris/ui/components/tooltip';
 import { useToast } from '@lumiris/ui/hooks/use-toast';
-import { useLogAction, usePermission } from '@/lib/auth';
 import { useCurationStore } from './curation-store';
 import type { PassportRow } from './types';
 
@@ -43,8 +42,6 @@ interface BulkActionsBarProps {
 }
 
 export function BulkActionsBar({ rows, selectedIds, onClear }: BulkActionsBarProps) {
-    const canCurate = usePermission('passport.curate');
-    const canRequest = usePermission('passport.request_changes');
     const [validateOpen, setValidateOpen] = useState(false);
     const [requestOpen, setRequestOpen] = useState(false);
 
@@ -67,50 +64,45 @@ export function BulkActionsBar({ rows, selectedIds, onClear }: BulkActionsBarPro
                 </span>
                 <span className="text-[10px] text-muted-foreground">· {eligible.length} éligible(s)</span>
                 <div className="ml-auto flex flex-wrap gap-2">
-                    {canCurate ? (
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    size="sm"
-                                    className="gap-1.5 bg-lumiris-emerald text-primary-foreground hover:bg-lumiris-emerald/90"
-                                    disabled={eligible.length === 0}
-                                    onClick={() => setValidateOpen(true)}
-                                    aria-describedby="bulk-validate-hint"
-                                >
-                                    <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
-                                    Valider · {eligible.length}
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="top">Grade ≥ B et PendingReview uniquement.</TooltipContent>
-                        </Tooltip>
-                    ) : null}
-                    {canRequest ? (
-                        <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setRequestOpen(true)}>
-                            <MessageSquare className="h-3.5 w-3.5" aria-hidden />
-                            Demander modifs
-                        </Button>
-                    ) : null}
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                size="sm"
+                                className="gap-1.5 bg-lumiris-emerald text-primary-foreground hover:bg-lumiris-emerald/90"
+                                disabled={eligible.length === 0}
+                                onClick={() => setValidateOpen(true)}
+                                aria-describedby="bulk-validate-hint"
+                            >
+                                <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
+                                Valider · {eligible.length}
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">Grade ≥ B et PendingReview uniquement.</TooltipContent>
+                    </Tooltip>
+
+                    <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setRequestOpen(true)}>
+                        <MessageSquare className="h-3.5 w-3.5" aria-hidden />
+                        Demander modifs
+                    </Button>
+
                     <Button size="sm" variant="ghost" onClick={onClear}>
                         Vider
                     </Button>
                 </div>
 
-                {canCurate ? (
-                    <BulkValidateDialog
-                        rows={eligible}
-                        open={validateOpen}
-                        onOpenChange={setValidateOpen}
-                        onDone={onClear}
-                    />
-                ) : null}
-                {canRequest ? (
-                    <BulkRequestChangesDialog
-                        rows={selectedRows}
-                        open={requestOpen}
-                        onOpenChange={setRequestOpen}
-                        onDone={onClear}
-                    />
-                ) : null}
+                <BulkValidateDialog
+                    rows={eligible}
+                    open={validateOpen}
+                    onOpenChange={setValidateOpen}
+                    onDone={onClear}
+                />
+
+                <BulkRequestChangesDialog
+                    rows={selectedRows}
+                    open={requestOpen}
+                    onOpenChange={setRequestOpen}
+                    onDone={onClear}
+                />
             </div>
         </TooltipProvider>
     );
@@ -124,7 +116,6 @@ interface BulkDialogProps {
 }
 
 function BulkValidateDialog({ rows, open, onOpenChange, onDone }: BulkDialogProps) {
-    const log = useLogAction();
     const { setOverlay } = useCurationStore();
     const { toast } = useToast();
 
@@ -132,18 +123,6 @@ function BulkValidateDialog({ rows, open, onOpenChange, onDone }: BulkDialogProp
         const publishedAt = new Date().toISOString();
         for (const row of rows) {
             setOverlay(row.passport.id, { status: 'validated', publishedAt });
-            log({
-                action: 'passport.curate',
-                targetType: 'passport',
-                targetId: row.passport.id,
-                payload: {
-                    decision: 'validated',
-                    bulk: true,
-                    publishedAt,
-                    qrCodeUrl: row.passport.gs1.verificationUrl,
-                    artisanId: row.passport.artisanId,
-                },
-            });
         }
         toast({
             title: `${rows.length} passeport(s) validé(s)`,
@@ -182,7 +161,6 @@ function BulkValidateDialog({ rows, open, onOpenChange, onDone }: BulkDialogProp
 }
 
 function BulkRequestChangesDialog({ rows, open, onOpenChange, onDone }: BulkDialogProps) {
-    const log = useLogAction();
     const { setOverlay } = useCurationStore();
     const { toast } = useToast();
     const [message, setMessage] = useState(REQUEST_TEMPLATE);
@@ -191,14 +169,8 @@ function BulkRequestChangesDialog({ rows, open, onOpenChange, onDone }: BulkDial
         if (message.trim().length === 0) return;
         for (const row of rows) {
             setOverlay(row.passport.id, { status: 'changes_requested', changesMessage: message });
-            log({
-                action: 'passport.request_changes',
-                targetType: 'passport',
-                targetId: row.passport.id,
-                payload: { message, bulk: true, artisanId: row.passport.artisanId },
-            });
         }
-        toast({ title: `${rows.length} demande(s) envoyée(s)`, description: 'Une entrée audit log par passeport.' });
+        toast({ title: `${rows.length} demande(s) envoyée(s)` });
         onOpenChange(false);
         onDone();
     };

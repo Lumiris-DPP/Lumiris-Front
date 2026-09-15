@@ -113,7 +113,7 @@ export function AddressStep({
                     : 'Tu recevras un colis avec son numéro de suivi dès son expédition.'}
             </p>
 
-            <div className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-md border-t border-border/60 bg-background/90 px-4 pt-3 pb-6 backdrop-blur md:static md:mx-0 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
+            <div className="fixed inset-x-0 bottom-0 z-nav mx-auto max-w-md border-t border-border/60 bg-background/90 px-4 pt-3 pb-6 backdrop-blur md:static md:mx-0 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
                 <button
                     type="submit"
                     disabled={!complete}

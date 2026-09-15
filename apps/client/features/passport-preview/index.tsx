@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ShieldCheck } from 'lucide-react';
 import { computeScore } from '@lumiris/core/scoring';
-import type { Artisan, Passport } from '@lumiris/types';
+import { useApiClient } from '@lumiris/api-client/react';
+import type { Artisan, Passport, ScoreResult } from '@lumiris/types';
 import { mockCertificates } from '@lumiris/mock-data';
 import {
     ArtisanCard,
@@ -29,16 +30,19 @@ import {
 interface PassportPreviewProps {
     passport: Passport;
     artisan: Artisan;
+    dppId?: string | null;
 }
 
 const STORY_PREVIEW_LIMIT = 280;
 
-export function PassportPreview({ passport, artisan }: PassportPreviewProps) {
+export function PassportPreview({ passport, artisan, dppId = null }: PassportPreviewProps) {
     const now = useMemo(() => new Date(), []);
-    const score = useMemo(
+    const localScore = useMemo(
         () => computeScore(passport, { artisan, certificates: mockCertificates, now }),
         [passport, artisan, now],
     );
+    const serverScore = useServerIrisScore(dppId);
+    const score = dppId ? serverScore : localScore;
 
     const [storyExpanded, setStoryExpanded] = useState(false);
     const longStory = artisan.story.length > STORY_PREVIEW_LIMIT;
@@ -57,7 +61,7 @@ export function PassportPreview({ passport, artisan }: PassportPreviewProps) {
 
     return (
         <div className="min-h-screen bg-background">
-            <header className="sticky top-0 z-40 border-b border-lumiris-amber/40 bg-lumiris-amber/10 backdrop-blur">
+            <header className="sticky top-0 z-sticky border-b border-lumiris-amber/40 bg-lumiris-amber/10 backdrop-blur">
                 <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-2.5">
                     <p className="text-xs text-foreground sm:text-sm">
                         <span className="font-semibold">Aperçu</span> — voici ce que verra votre client après scan QR.
@@ -73,7 +77,7 @@ export function PassportPreview({ passport, artisan }: PassportPreviewProps) {
             <main className="mx-auto max-w-3xl space-y-6 px-4 py-6 sm:px-6">
                 {passport.status === 'InCompletion' && <IncompletionBanner />}
 
-                <PreviewHero passport={passport} artisan={artisan} kindLabel={kindLabel} grade={score.grade} />
+                <PreviewHero passport={passport} artisan={artisan} kindLabel={kindLabel} grade={score?.grade ?? null} />
 
                 <ProductHeader passport={passport} kindLabel={kindLabel} dimensions={dimensions} />
 
@@ -94,7 +98,11 @@ export function PassportPreview({ passport, artisan }: PassportPreviewProps) {
 
                 <section className="space-y-3">
                     <SectionTitle>Score Iris</SectionTitle>
-                    <ScoreCard passport={passport} score={score} />
+                    {score ? (
+                        <ScoreCard passport={passport} score={score} />
+                    ) : (
+                        <p className="text-sm text-muted-foreground">Calcul du score en cours…</p>
+                    )}
                 </section>
 
                 <section className="space-y-3">
@@ -148,4 +156,30 @@ export function PassportPreview({ passport, artisan }: PassportPreviewProps) {
             </main>
         </div>
     );
+}
+
+function useServerIrisScore(dppId: string | null): ScoreResult | null {
+    const api = useApiClient();
+    const [score, setScore] = useState<ScoreResult | null>(null);
+
+    useEffect(() => {
+        if (!dppId) {
+            setScore(null);
+            return;
+        }
+        let cancelled = false;
+        api.dpp
+            .getIrisScore(dppId)
+            .then((s) => {
+                if (!cancelled) setScore(s);
+            })
+            .catch(() => {
+                if (!cancelled) setScore(null);
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [dppId, api]);
+
+    return score;
 }

@@ -20,9 +20,7 @@ import { DetailDrawer } from '@lumiris/ui/components/detail-drawer';
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
-import { useLogAction, usePermission } from '@/lib/auth';
 import { PRICE_LINES, formatEur } from '@/lib/pricing';
-import { PermissionRequiredAction } from '../_shared/permission-required-action';
 import { openInvoiceWindow } from './print-invoice';
 import { statusBadgeProps } from './status';
 
@@ -37,9 +35,6 @@ export function SubscriptionDetailDrawer({ subscription, onClose }: Props) {
 }
 
 function DetailDrawerBody({ subscription: sub, onClose }: { subscription: Subscription; onClose: () => void }) {
-    const log = useLogAction();
-    const canDun = usePermission('billing.dunning');
-    const canIssueInvoice = usePermission('billing.invoice_issue');
     const [dunningOpen, setDunningOpen] = useState(false);
     const [typed, setTyped] = useState('');
     const [dunned, setDunned] = useState(false);
@@ -81,24 +76,12 @@ function DetailDrawerBody({ subscription: sub, onClose }: { subscription: Subscr
     ];
 
     function handleDunning() {
-        log({
-            action: 'billing.dunning',
-            targetType: 'subscription',
-            targetId: sub.id,
-            payload: { tier: sub.tier, mrr: sub.mrrEur, attemptNumber: (sub.dunningAttempts ?? 0) + 1 },
-        });
         setDunned(true);
         setDunningOpen(false);
         setTyped('');
     }
 
     function handleInvoice() {
-        log({
-            action: 'billing.invoice_issue',
-            targetType: 'subscription',
-            targetId: sub.id,
-            payload: { tier: sub.tier, plus: sub.plus, mrr: sub.mrrEur, kind: sub.subscriberKind },
-        });
         setInvoiced(true);
         if (typeof window !== 'undefined') openInvoiceWindow(sub);
     }
@@ -166,19 +149,14 @@ function DetailDrawerBody({ subscription: sub, onClose }: { subscription: Subscr
                             <Button
                                 size="sm"
                                 variant="outline"
-                                disabled={!canDun || dunned}
+                                disabled={dunned}
                                 onClick={() => setDunningOpen(true)}
                                 className="gap-1.5"
                             >
                                 <Bell className="h-3 w-3" /> {dunned ? 'Relancé' : 'Relancer'}
                             </Button>
                         ) : null}
-                        <Button
-                            size="sm"
-                            disabled={!canIssueInvoice || sub.tier === 'free'}
-                            onClick={handleInvoice}
-                            className="gap-1.5"
-                        >
+                        <Button size="sm" disabled={sub.tier === 'free'} onClick={handleInvoice} className="gap-1.5">
                             <FileText className="h-3 w-3" /> {invoiced ? 'Re-générer facture' : 'Générer facture'}
                         </Button>
                     </div>
@@ -211,14 +189,9 @@ function DetailDrawerBody({ subscription: sub, onClose }: { subscription: Subscr
                     </div>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Annuler</AlertDialogCancel>
-                        <PermissionRequiredAction requires="billing.dunning">
-                            <AlertDialogAction
-                                disabled={!canDun || typed.trim() !== sub.displayName}
-                                onClick={handleDunning}
-                            >
-                                Envoyer la relance
-                            </AlertDialogAction>
-                        </PermissionRequiredAction>
+                        <AlertDialogAction disabled={typed.trim() !== sub.displayName} onClick={handleDunning}>
+                            Envoyer la relance
+                        </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

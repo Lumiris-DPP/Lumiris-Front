@@ -2,58 +2,43 @@ import { describe, expect, it } from 'bun:test';
 import { HEALTH_WEIGHTS, computeHealthScore, healthBand } from '@/lib/health-score';
 
 describe('HEALTH_WEIGHTS', () => {
-    it('somme = 1', () => {
-        expect(HEALTH_WEIGHTS.capacity + HEALTH_WEIGHTS.iris + HEALTH_WEIGHTS.overrides).toBeCloseTo(1, 5);
+    it('expose deux poids qui somment à 1, pour que le total reste sur 100', () => {
+        expect(HEALTH_WEIGHTS.capacity + HEALTH_WEIGHTS.iris).toBeCloseTo(1, 10);
     });
 
-    it('expose les 3 poids verrouillés (40 / 35 / 25)', () => {
-        expect(HEALTH_WEIGHTS.capacity).toBe(0.4);
-        expect(HEALTH_WEIGHTS.iris).toBe(0.35);
-        expect(HEALTH_WEIGHTS.overrides).toBe(0.25);
+    it('conserve le rapport 40:35 du barème à trois axes', () => {
+        expect(HEALTH_WEIGHTS.capacity / HEALTH_WEIGHTS.iris).toBeCloseTo(0.4 / 0.35, 10);
     });
 });
 
 describe('computeHealthScore — axes pondérés', () => {
-    it('artisan vide (0 passeport, 0 iris) → total ~25 (axe override plein)', () => {
+    it('artisan vide (0 passeport, 0 iris) → total 0', () => {
         const h = computeHealthScore({
             publishedCount: 0,
             passportLimit: 5,
             avgIrisScore: 0,
-            overrideCount90d: 0,
         });
         expect(h.capacityScore).toBe(0);
         expect(h.irisScore).toBe(0);
-        expect(h.overrideScore).toBe(100);
-        expect(h.total).toBe(25);
+        expect(h.total).toBe(0);
     });
 
-    it('plein régime (80 % capacité, 90 iris, 0 override) → > 75 = healthy', () => {
+    it('plein régime (80 % capacité, 90 iris) → > 75 = healthy', () => {
         const h = computeHealthScore({
             publishedCount: 4,
             passportLimit: 5,
             avgIrisScore: 90,
-            overrideCount90d: 0,
         });
         expect(h.total).toBeGreaterThan(75);
     });
 
-    it('overrideScore décroît de 25 points par override', () => {
-        const zero = computeHealthScore({ publishedCount: 0, passportLimit: 5, avgIrisScore: 0, overrideCount90d: 0 });
-        const one = computeHealthScore({ publishedCount: 0, passportLimit: 5, avgIrisScore: 0, overrideCount90d: 1 });
-        const two = computeHealthScore({ publishedCount: 0, passportLimit: 5, avgIrisScore: 0, overrideCount90d: 2 });
-        expect(zero.overrideScore).toBe(100);
-        expect(one.overrideScore).toBe(75);
-        expect(two.overrideScore).toBe(50);
-    });
-
-    it('overrideScore borné à 0 même avec un nombre absurde', () => {
+    it('les deux axes au maximum → total 100', () => {
         const h = computeHealthScore({
-            publishedCount: 0,
+            publishedCount: 5,
             passportLimit: 5,
-            avgIrisScore: 0,
-            overrideCount90d: 999,
+            avgIrisScore: 100,
         });
-        expect(h.overrideScore).toBe(0);
+        expect(h.total).toBe(100);
     });
 
     it('capacityUtilization atteint 100 dès 5/5 passeports (plafond inclusif)', () => {
@@ -61,7 +46,6 @@ describe('computeHealthScore — axes pondérés', () => {
             publishedCount: 5,
             passportLimit: 5,
             avgIrisScore: 0,
-            overrideCount90d: 0,
         });
         expect(h.capacityUtilization).toBe(100);
     });
@@ -71,13 +55,11 @@ describe('computeHealthScore — axes pondérés', () => {
             publishedCount: 4,
             passportLimit: 5,
             avgIrisScore: 0,
-            overrideCount90d: 0,
         });
         const at100 = computeHealthScore({
             publishedCount: 5,
             passportLimit: 5,
             avgIrisScore: 0,
-            overrideCount90d: 0,
         });
         expect(at80.capacityScore).toBe(100);
         expect(at100.capacityScore).toBe(100);
@@ -88,13 +70,11 @@ describe('computeHealthScore — axes pondérés', () => {
             publishedCount: 1,
             passportLimit: Number.POSITIVE_INFINITY,
             avgIrisScore: 60,
-            overrideCount90d: 0,
         });
         const inactive = computeHealthScore({
             publishedCount: 0,
             passportLimit: Number.POSITIVE_INFINITY,
             avgIrisScore: 0,
-            overrideCount90d: 0,
         });
         expect(active.capacityScore).toBe(100);
         expect(inactive.capacityScore).toBe(0);
@@ -105,13 +85,11 @@ describe('computeHealthScore — axes pondérés', () => {
             publishedCount: 0,
             passportLimit: 5,
             avgIrisScore: 150,
-            overrideCount90d: 0,
         });
         const negative = computeHealthScore({
             publishedCount: 0,
             passportLimit: 5,
             avgIrisScore: -5,
-            overrideCount90d: 0,
         });
         expect(high.irisScore).toBe(100);
         expect(negative.irisScore).toBe(0);

@@ -3,6 +3,9 @@ import { createNextConfig } from '@lumiris/config/next';
 
 const withMDX = createMDX({
     extension: /\.mdx?$/,
+    options: {
+        remarkPlugins: [['remark-gfm', {}]],
+    },
 });
 
 export default withMDX(

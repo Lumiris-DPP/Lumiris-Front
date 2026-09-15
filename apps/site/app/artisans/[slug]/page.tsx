@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ArtisanPublicView } from '@/features/artisan-public-view';
 import { JsonLd } from '@/features/json-ld';
 import { fetchPublicArtisanProfile } from '@/lib/public-artisan-api';
+import { fetchArtisanPieces } from '@/lib/public-passport-api';
 
 interface RouteProps {
     params: Promise<{ slug: string }>;
@@ -64,7 +65,7 @@ export default async function ArtisanPage({ params }: RouteProps) {
     return (
         <>
             <JsonLd data={localBusinessJsonLd} />
-            <ArtisanPublicView artisan={artisan} />
+            <ArtisanPublicView artisan={artisan} pieces={await fetchArtisanPieces(artisan.slug)} />
         </>
     );
 }

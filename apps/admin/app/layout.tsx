@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google';
 import { Geist_Mono } from 'next/font/google';
 import { ConsentBanner } from '@lumiris/ui/components/consent-banner';
 
-import { AdminUserProvider, AuditLogProvider } from '@/lib/auth';
+import { AdminUserProvider } from '@/lib/auth';
 import { ClientApiProvider } from './api-provider';
 import { Analytics } from './analytics';
 import { WebVitals } from './web-vitals';
@@ -44,9 +44,7 @@ export default function RootLayout({
             <body className="font-sans antialiased">
                 <ClientApiProvider>
                     <WebVitals />
-                    <AdminUserProvider>
-                        <AuditLogProvider>{children}</AuditLogProvider>
-                    </AdminUserProvider>
+                    <AdminUserProvider>{children}</AdminUserProvider>
                     <ConsentBanner />
                 </ClientApiProvider>
                 <Analytics />

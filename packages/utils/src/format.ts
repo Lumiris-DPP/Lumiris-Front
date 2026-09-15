@@ -88,6 +88,14 @@ export function slugify(input: string): string {
         .replace(/^-+|-+$/g, '');
 }
 
+export function deslugify(slug: string): string {
+    return slug
+        .split('-')
+        .filter(Boolean)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+}
+
 /** Date courte FR (jj/mm/aaaa). Accepte un ISO ou un Date ; « — » si vide/invalide. */
 export function formatDateFr(value: string | Date | undefined | null): string {
     if (!value) return '—';

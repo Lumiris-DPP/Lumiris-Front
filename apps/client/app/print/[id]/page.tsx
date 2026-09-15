@@ -3,6 +3,7 @@
 import { use } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { LumirisLogo } from '@lumiris/ui/components/logo';
+import { PrintButton } from '@/features/print-button';
 import { PrintMessage } from '@/features/print-message';
 import { usePassportSource } from '@/lib/use-passport-source';
 import { useAutoPrint } from '@/lib/use-auto-print';
@@ -30,6 +31,7 @@ export default function PrintLabelPage({ params }: PageProps) {
 
     return (
         <div className="bg-white text-neutral-900">
+            <PrintButton />
             <div className="mx-auto flex min-h-screen w-[80mm] flex-col items-center justify-center gap-3 p-4 print:min-h-0">
                 <LumirisLogo title="" className="h-6 w-auto" />
                 <p className="font-mono text-[10px] tracking-widest uppercase">LUMIRIS · Iris</p>

@@ -6,7 +6,6 @@ import { IdentityTab } from './identity-tab';
 import { LabelsTab } from './labels-tab';
 import { SecurityTab } from './security-tab';
 import { ShippingTab } from './shipping-tab';
-import { TeamTab } from './team-tab';
 import { VitrineTab } from './vitrine-tab';
 
 export function WorkspaceProfile() {
@@ -22,7 +21,6 @@ export function WorkspaceProfile() {
                         <TabsTrigger value="vitrine">Vitrine publique</TabsTrigger>
                         <TabsTrigger value="shipping">Expédition</TabsTrigger>
                         <TabsTrigger value="labels">Labels</TabsTrigger>
-                        <TabsTrigger value="team">Équipe</TabsTrigger>
                         <TabsTrigger value="security">Sécurité</TabsTrigger>
                     </TabsList>
                     <TabsContent value="identity" className="pt-4">
@@ -36,9 +34,6 @@ export function WorkspaceProfile() {
                     </TabsContent>
                     <TabsContent value="labels" className="pt-4">
                         <LabelsTab />
-                    </TabsContent>
-                    <TabsContent value="team" className="pt-4">
-                        <TeamTab />
                     </TabsContent>
                     <TabsContent value="security" className="pt-4">
                         <SecurityTab />

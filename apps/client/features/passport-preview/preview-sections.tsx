@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import { AlertTriangle, ShieldCheck } from 'lucide-react';
 import type { Artisan, Material, Passport, ScoreResult } from '@lumiris/types';
-import { mockSuppliers } from '@lumiris/mock-data';
 import { flagEmoji } from '@lumiris/utils';
 import { FIBER_LABEL, IrisGrade, MissingFieldsBadge, ScoreBreakdown, ScoreCapWarning } from '@lumiris/scoring-ui';
 import { Badge } from '@lumiris/ui/components/badge';
@@ -52,7 +51,7 @@ export function PreviewHero({
     passport: Passport;
     artisan: Artisan;
     kindLabel: string;
-    grade: ScoreResult['grade'];
+    grade: ScoreResult['grade'] | null;
 }) {
     return (
         <section className="relative overflow-hidden rounded-2xl border border-border/60 bg-card">
@@ -85,7 +84,7 @@ export function PreviewHero({
                         <p className="truncate text-base font-semibold sm:text-lg">{artisan.displayName}</p>
                         {artisan.atelierName && <p className="truncate text-xs opacity-90">{artisan.atelierName}</p>}
                     </div>
-                    <IrisGrade grade={grade} size="xl" tone="solid" className="shrink-0" />
+                    {grade ? <IrisGrade grade={grade} size="xl" tone="solid" className="shrink-0" /> : null}
                 </div>
             </div>
         </section>
@@ -161,9 +160,8 @@ export function WarrantyNote({ warranty }: { warranty: Passport['warranty'] }) {
 }
 
 export function MaterialRow({ material, now }: { material: Material; now: Date }) {
-    const supplier = mockSuppliers.find((s) => s.id === material.supplierId);
-    const supplierName = supplier?.name ?? material.supplierId ?? 'Fournisseur non renseigné';
-    const country = material.originCountry || supplier?.country;
+    const supplierName = material.supplierId || 'Fournisseur non renseigné';
+    const country = material.originCountry;
     const flag = flagEmoji(country);
     return (
         <li className="rounded-2xl border border-border bg-card p-4">

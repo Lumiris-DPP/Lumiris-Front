@@ -11,6 +11,13 @@ import { useWardrobe, type WardrobeItem } from '../wardrobe-storage';
 
 const FALLBACK_WEIGHT_G = 400;
 
+const IRIS_GRADES: readonly IrisGrade[] = ['A', 'B', 'C', 'D', 'E'];
+
+function toIrisGrade(value: string | undefined): IrisGrade | null {
+    const upper = value?.toUpperCase();
+    return IRIS_GRADES.find((grade) => grade === upper) ?? null;
+}
+
 type GradeDistribution = Record<IrisGrade, number>;
 
 export function getGradeDistribution(grades: readonly IrisGrade[]): GradeDistribution {
@@ -77,6 +84,11 @@ export function useWardrobeStats(now: Date = new Date()): WardrobeStats {
         let co2Avoided = 0;
         let waterSaved = 0;
         for (const item of items) {
+            if (item.kind === 'public-dpp') {
+                const grade = toIrisGrade(item.grade);
+                if (grade) grades.push(grade);
+                continue;
+            }
             if (item.kind !== 'lumiris-passport') continue;
             const passport = mockPassportById(item.passportId);
             if (!passport) continue;

@@ -20,8 +20,6 @@ import { DetailDrawer } from '@lumiris/ui/components/detail-drawer';
 import { Label } from '@lumiris/ui/components/label';
 import { Textarea } from '@lumiris/ui/components/textarea';
 import { cn } from '@lumiris/ui/lib/cn';
-import { useLogAction, usePermission } from '@/lib/auth';
-import { PermissionRequiredAction } from '../_shared/permission-required-action';
 import { CommissionsTab } from './commissions-tab';
 import { deriveSubscription, KycTab, ProfileTab } from './drawer-tabs';
 import { ReviewsTab } from './reviews-tab';
@@ -36,10 +34,6 @@ interface RetoucheurDrawerProps {
 }
 
 export function RetoucheurDrawer({ retoucheur, overlay, onClose, onPatchOverlay }: RetoucheurDrawerProps) {
-    const log = useLogAction();
-    const canVerify = usePermission('retoucheur.kyc_verify');
-    const canModerate = usePermission('retoucheur.review_hide');
-
     const [verifyOpen, setVerifyOpen] = useState(false);
     const [rejectOpen, setRejectOpen] = useState(false);
     const [rejectReason, setRejectReason] = useState('');
@@ -52,26 +46,14 @@ export function RetoucheurDrawer({ retoucheur, overlay, onClose, onPatchOverlay 
 
     const handleVerify = () => {
         onPatchOverlay(retoucheur.id, { candidatureStatus: 'verified' });
-        const entry = log({
-            action: 'retoucheur.kyc_verify',
-            targetType: 'repairer',
-            targetId: retoucheur.id,
-            payload: { decision: 'verified' },
-        });
-        setAnnouncement(`KYC vérifié pour ${retoucheur.displayName} — audit log ${entry.id}.`);
+        setAnnouncement(`KYC vérifié pour ${retoucheur.displayName}.`);
         setVerifyOpen(false);
     };
 
     const handleReject = () => {
         if (!rejectConfirmed) return;
         onPatchOverlay(retoucheur.id, { candidatureStatus: 'rejected', rejectReason });
-        const entry = log({
-            action: 'retoucheur.kyc_reject',
-            targetType: 'repairer',
-            targetId: retoucheur.id,
-            payload: { decision: 'rejected', reason: rejectReason },
-        });
-        setAnnouncement(`Candidature rejetée pour ${retoucheur.displayName} — audit log ${entry.id}.`);
+        setAnnouncement(`Candidature rejetée pour ${retoucheur.displayName}.`);
         setRejectReason('');
         setRejectConfirmed(false);
         setRejectOpen(false);
@@ -80,13 +62,7 @@ export function RetoucheurDrawer({ retoucheur, overlay, onClose, onPatchOverlay 
     const handleLocalDunning = () => {
         const sub = deriveSubscription(retoucheur, overlay);
         onPatchOverlay(retoucheur.id, { subscriptionOverride: { ...sub, status: 'active' } });
-        const entry = log({
-            action: 'retoucheur.local_dunning',
-            targetType: 'repairer',
-            targetId: retoucheur.id,
-            payload: { subscription: 'overdue_resolved' },
-        });
-        setAnnouncement(`Impayé Local résolu pour ${retoucheur.displayName} — audit log ${entry.id}.`);
+        setAnnouncement(`Impayé Local résolu pour ${retoucheur.displayName}.`);
     };
 
     const tabs = [
@@ -99,7 +75,6 @@ export function RetoucheurDrawer({ retoucheur, overlay, onClose, onPatchOverlay 
                     <KycTab
                         retoucheur={retoucheur}
                         overlay={overlay}
-                        canVerify={canVerify}
                         onOpenVerify={() => setVerifyOpen(true)}
                         onOpenReject={() => setRejectOpen(true)}
                         onResolveOverdue={handleLocalDunning}
@@ -115,7 +90,6 @@ export function RetoucheurDrawer({ retoucheur, overlay, onClose, onPatchOverlay 
                     <ReviewsTab
                         retoucheur={retoucheur}
                         overlay={overlay}
-                        canModerate={canModerate}
                         onPatchOverlay={onPatchOverlay}
                         onAnnounce={setAnnouncement}
                     />
@@ -156,19 +130,17 @@ export function RetoucheurDrawer({ retoucheur, overlay, onClose, onPatchOverlay 
                             <ShieldCheck className="h-4 w-4" aria-hidden /> Vérifier le KYC ?
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            Le retoucheur passera en <strong>vérifié</strong>. Action tracée.
+                            Le retoucheur passera en <strong>vérifié</strong>.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Annuler</AlertDialogCancel>
-                        <PermissionRequiredAction requires="retoucheur.kyc_verify">
-                            <AlertDialogAction
-                                onClick={handleVerify}
-                                className="bg-lumiris-emerald hover:bg-lumiris-emerald/90"
-                            >
-                                Confirmer
-                            </AlertDialogAction>
-                        </PermissionRequiredAction>
+                        <AlertDialogAction
+                            onClick={handleVerify}
+                            className="bg-lumiris-emerald hover:bg-lumiris-emerald/90"
+                        >
+                            Confirmer
+                        </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -187,7 +159,7 @@ export function RetoucheurDrawer({ retoucheur, overlay, onClose, onPatchOverlay 
                     <AlertDialogHeader>
                         <AlertDialogTitle>Rejeter la candidature ?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Cette décision sera tracée dans le journal d&apos;audit.
+                            Précisez le motif du rejet de cette candidature.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <div className="space-y-3">
@@ -214,15 +186,13 @@ export function RetoucheurDrawer({ retoucheur, overlay, onClose, onPatchOverlay 
                     </div>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Annuler</AlertDialogCancel>
-                        <PermissionRequiredAction requires="retoucheur.kyc_verify">
-                            <AlertDialogAction
-                                onClick={handleReject}
-                                disabled={!rejectConfirmed}
-                                className="bg-lumiris-rose hover:bg-lumiris-rose/90"
-                            >
-                                Rejeter
-                            </AlertDialogAction>
-                        </PermissionRequiredAction>
+                        <AlertDialogAction
+                            onClick={handleReject}
+                            disabled={!rejectConfirmed}
+                            className="bg-lumiris-rose hover:bg-lumiris-rose/90"
+                        >
+                            Rejeter
+                        </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

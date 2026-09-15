@@ -3,10 +3,9 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Command, Search, X } from 'lucide-react';
-import type { AdminUserRole } from '@lumiris/types';
 import { cn } from '@lumiris/ui/lib/cn';
+import { Dialog, DialogContent, DialogTitle } from '@lumiris/ui/components/dialog';
 import { useCurrentUser } from '@/lib/auth';
-import { can } from '@/lib/auth/permissions';
 import { NAV_GROUPS, type NavRoute } from './nav-routes';
 
 interface FlatItem {
@@ -14,10 +13,8 @@ interface FlatItem {
     readonly route: NavRoute;
 }
 
-function buildItems(role: AdminUserRole): readonly FlatItem[] {
-    return NAV_GROUPS.flatMap((group) =>
-        group.routes.filter((route) => can(role, route.requires)).map((route) => ({ group: group.label, route })),
-    );
+function buildItems(): readonly FlatItem[] {
+    return NAV_GROUPS.flatMap((group) => group.routes.map((route) => ({ group: group.label, route })));
 }
 
 function CommandPaletteComponent() {
@@ -29,7 +26,7 @@ function CommandPaletteComponent() {
     const inputRef = useRef<HTMLInputElement>(null);
     const chordBuffer = useRef<{ key: string; expiresAt: number } | null>(null);
 
-    const items = useMemo(() => (user ? buildItems(user.role) : []), [user]);
+    const items = useMemo(() => (user ? buildItems() : []), [user]);
 
     const filtered = useMemo(() => {
         if (!query.trim()) return items;
@@ -141,79 +138,70 @@ function CommandPaletteComponent() {
                 </kbd>
             </button>
 
-            <>
-                {open && (
-                    <>
+            <Dialog
+                open={open}
+                onOpenChange={(next) => {
+                    if (!next) close();
+                }}
+            >
+                <DialogContent
+                    showCloseButton={false}
+                    className="top-[20%] max-w-lg translate-y-0 gap-0 overflow-hidden rounded-xl bg-card p-0"
+                >
+                    <DialogTitle srOnly>Palette de commandes</DialogTitle>
+                    <div className="flex items-center gap-3 border-b border-border px-4 py-3">
+                        <Search className="h-4 w-4 text-muted-foreground" aria-hidden />
+                        <input
+                            ref={inputRef}
+                            aria-label="Rechercher un module"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            onKeyDown={onKeyDownInList}
+                            placeholder="Rechercher un module…"
+                            className="flex-1 bg-transparent text-sm text-foreground placeholder-muted-foreground/60 outline-none"
+                        />
                         <button
                             type="button"
-                            aria-label="Fermer la palette de commandes"
-                            className="fixed inset-0 z-50 bg-foreground/10 backdrop-blur-sm"
                             onClick={close}
-                        />
-                        <div
-                            role="dialog"
-                            aria-label="Palette de commandes"
-                            className="fixed top-[20%] left-1/2 z-50 w-full max-w-lg -translate-x-1/2 overflow-hidden rounded-xl border border-border bg-card shadow-lg"
+                            className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                            aria-label="Fermer la palette"
                         >
-                            <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-                                <Search className="h-4 w-4 text-muted-foreground" aria-hidden />
-                                <input
-                                    ref={inputRef}
-                                    aria-label="Rechercher un module"
-                                    value={query}
-                                    onChange={(e) => setQuery(e.target.value)}
-                                    onKeyDown={onKeyDownInList}
-                                    placeholder="Rechercher un module…"
-                                    className="flex-1 bg-transparent text-sm text-foreground placeholder-muted-foreground/60 outline-none"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={close}
-                                    className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                                    aria-label="Fermer la palette"
-                                >
-                                    <X className="h-4 w-4" aria-hidden />
-                                </button>
-                            </div>
-                            <div className="max-h-72 overflow-y-auto p-2">
-                                {filtered.map((item, index) => (
-                                    <button
-                                        type="button"
-                                        key={item.route.href}
-                                        onClick={() => navigate(item.route.href)}
-                                        onMouseEnter={() => setActiveIndex(index)}
-                                        className={cn(
-                                            'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground transition-colors',
-                                            index === activeIndex
-                                                ? 'bg-lumiris-cyan/8 text-lumiris-cyan'
-                                                : 'hover:bg-muted',
-                                        )}
-                                    >
-                                        <item.route.icon className="h-4 w-4" aria-hidden />
-                                        <span className="font-medium">{item.route.label}</span>
-                                        <span className="ml-2 text-xs text-muted-foreground/60">{item.group}</span>
-                                        {item.route.shortcut ? (
-                                            <span className="ml-auto flex items-center gap-1">
-                                                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
-                                                    {item.route.shortcut[0]}
-                                                </kbd>
-                                                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
-                                                    {item.route.shortcut[1]}
-                                                </kbd>
-                                            </span>
-                                        ) : null}
-                                    </button>
-                                ))}
-                                {filtered.length === 0 && (
-                                    <p className="px-3 py-6 text-center text-sm text-muted-foreground">
-                                        Aucun résultat.
-                                    </p>
+                            <X className="h-4 w-4" aria-hidden />
+                        </button>
+                    </div>
+                    <div className="max-h-72 overflow-y-auto p-2">
+                        {filtered.map((item, index) => (
+                            <button
+                                type="button"
+                                key={item.route.href}
+                                onClick={() => navigate(item.route.href)}
+                                onMouseEnter={() => setActiveIndex(index)}
+                                className={cn(
+                                    'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground transition-colors',
+                                    index === activeIndex ? 'bg-lumiris-cyan/8 text-lumiris-cyan' : 'hover:bg-muted',
                                 )}
-                            </div>
-                        </div>
-                    </>
-                )}
-            </>
+                            >
+                                <item.route.icon className="h-4 w-4" aria-hidden />
+                                <span className="font-medium">{item.route.label}</span>
+                                <span className="ml-2 text-xs text-muted-foreground/60">{item.group}</span>
+                                {item.route.shortcut ? (
+                                    <span className="ml-auto flex items-center gap-1">
+                                        <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+                                            {item.route.shortcut[0]}
+                                        </kbd>
+                                        <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+                                            {item.route.shortcut[1]}
+                                        </kbd>
+                                    </span>
+                                ) : null}
+                            </button>
+                        ))}
+                        {filtered.length === 0 && (
+                            <p className="px-3 py-6 text-center text-sm text-muted-foreground">Aucun résultat.</p>
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }

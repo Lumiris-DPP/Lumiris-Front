@@ -8,9 +8,7 @@ export const metadata: Metadata = {
     alternates: { canonical: '/telecharger' },
 };
 
-// The APK is dropped at public/downloads/lumiris.apk by the Android build
-// (see apps/mobile/ANDROID.md).
-const APK_HREF = '/downloads/lumiris.apk';
+const APK_HREF = '/telecharger/apk';
 
 export default function TelechargerPage() {
     return (

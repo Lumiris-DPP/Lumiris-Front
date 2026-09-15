@@ -1,5 +1,4 @@
 import type { MetadataRoute } from 'next';
-import { mockPassportsPublic } from '@lumiris/mock-data';
 import { fetchPublicArtisans } from '@/lib/public-artisan-api';
 import { getAllArticles } from '@/lib/journal';
 import { getAllRegulations } from '@/lib/reglementation';
@@ -28,13 +27,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: s.priority,
     }));
 
-    const passportEntries: MetadataRoute.Sitemap = mockPassportsPublic.map((view) => ({
-        url: `${SITE_URL}/passeport/${view.passport.id}`,
-        lastModified: new Date(view.passport.updatedAt),
-        changeFrequency: 'monthly' as const,
-        priority: 0.7,
-    }));
-
     const artisanEntries: MetadataRoute.Sitemap = (await fetchPublicArtisans()).map((a) => ({
         url: `${SITE_URL}/artisans/${a.slug}`,
         lastModified: now,
@@ -56,5 +48,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.8,
     }));
 
-    return [...staticEntries, ...passportEntries, ...artisanEntries, ...journalEntries, ...regulationEntries];
+    return [...staticEntries, ...artisanEntries, ...journalEntries, ...regulationEntries];
 }

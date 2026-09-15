@@ -1,6 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { Download } from 'lucide-react';
 
 export function VisionCta() {
     return (
@@ -21,7 +23,8 @@ export function VisionCta() {
                         Téléchargez VISION gratuitement
                     </h2>
                     <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
-                        Disponible sur iOS et Android. Scannez votre premier DPP en 10 secondes.
+                        Disponible sur Android ou depuis n&apos;importe quel navigateur. Scannez votre premier DPP en 10
+                        secondes.
                     </p>
                 </motion.div>
 
@@ -32,37 +35,20 @@ export function VisionCta() {
                     transition={{ duration: 0.4, delay: 0.1 }}
                     className="mt-10 flex flex-wrap items-center justify-center gap-4"
                 >
-                    {/* App Store badge — URL store à brancher quand l'app est publiée */}
-                    <button
-                        type="button"
-                        disabled
-                        className="inline-flex items-center gap-3 rounded-xl bg-foreground px-5 py-3 text-background transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-                        aria-label="Télécharger sur l'App Store — bientôt disponible"
+                    <Link
+                        href="/telecharger"
+                        className="inline-flex items-center gap-3 rounded-xl bg-foreground px-6 py-3.5 text-background transition-opacity hover:opacity-90"
                     >
-                        <svg className="h-7 w-7" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
-                        </svg>
-                        <div className="text-left">
-                            <p className="text-xs opacity-80">Bientôt sur</p>
-                            <p className="text-sm font-semibold">App Store</p>
-                        </div>
-                    </button>
+                        <Download className="h-5 w-5" aria-hidden />
+                        <span className="text-sm font-semibold">Installer VISION (Android)</span>
+                    </Link>
 
-                    {/* Google Play badge — URL store à brancher quand l'app est publiée */}
-                    <button
-                        type="button"
-                        disabled
-                        className="inline-flex items-center gap-3 rounded-xl bg-foreground px-5 py-3 text-background transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-                        aria-label="Télécharger sur Google Play — bientôt disponible"
+                    <a
+                        href="https://mobile.lumiris.eu"
+                        className="text-sm font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
                     >
-                        <svg className="h-7 w-7" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                            <path d="M3 20.5v-17c0-.83.67-1.5 1.5-1.5.32 0 .62.1.88.27l14.12 8.5c.52.32.52 1.14 0 1.46l-14.12 8.5c-.26.17-.56.27-.88.27-.83 0-1.5-.67-1.5-1.5z" />
-                        </svg>
-                        <div className="text-left">
-                            <p className="text-xs opacity-80">Bientôt sur</p>
-                            <p className="text-sm font-semibold">Google Play</p>
-                        </div>
-                    </button>
+                        ou ouvrir dans le navigateur
+                    </a>
                 </motion.div>
 
                 <motion.p

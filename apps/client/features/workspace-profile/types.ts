@@ -40,17 +40,6 @@ export function slugify(input: string): string {
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)/g, '');
 }
-
-export function initials(name: string): string {
-    return name
-        .split(' ')
-        .filter(Boolean)
-        .map((p) => p[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase();
-}
-
 export function isValidEmail(s: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
 }

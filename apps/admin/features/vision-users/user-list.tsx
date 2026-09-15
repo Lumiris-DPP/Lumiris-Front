@@ -16,7 +16,6 @@ import { Checkbox } from '@lumiris/ui/components/checkbox';
 import { DataTableFilters } from '@lumiris/ui/components/data-table-filters';
 import { Label } from '@lumiris/ui/components/label';
 import { Textarea } from '@lumiris/ui/components/textarea';
-import { useAdminAuditLog, useLogAction } from '@/lib/auth';
 import { SEGMENT_KEYS, SEGMENT_META, getSegments, type SegmentKey } from './segments';
 import { UserDetailDrawer } from './user-detail-drawer';
 import { UserTable } from './user-table';
@@ -24,8 +23,6 @@ import { FIXTURE_NOW } from '@/lib/fixture-clock';
 
 export function UserList() {
     const searchParams = useSearchParams();
-    const auditLog = useAdminAuditLog();
-    const log = useLogAction();
 
     const [search, setSearch] = useState('');
     const [segmentFilter, setSegmentFilter] = useState<SegmentKey | 'all'>('all');
@@ -70,28 +67,12 @@ export function UserList() {
 
     const confirmRead = () => {
         if (!pendingUser || !readConfirmed) return;
-        const entry = log({
-            action: 'vision_user.read',
-            targetType: 'vision_user',
-            targetId: pendingUser.id,
-            payload: { reason: readReason.trim() },
-        });
-        setAnnouncement(`Ouverture fiche enregistrée — audit log ${entry.id}.`);
+        setAnnouncement('Ouverture fiche enregistrée.');
         setSelected(pendingUser);
         setPendingUser(null);
         setReadReason('');
         setReadConfirmed(false);
     };
-
-    const lastAccessByUser = useMemo(() => {
-        const map = new Map<string, string>();
-        for (const entry of auditLog) {
-            if (entry.action !== 'vision_user.read') continue;
-            const prev = map.get(entry.targetId);
-            if (!prev || entry.ts > prev) map.set(entry.targetId, entry.ts);
-        }
-        return map;
-    }, [auditLog]);
 
     return (
         <div className="space-y-4">
@@ -131,11 +112,7 @@ export function UserList() {
 
             <UserTable rows={filtered} onOpen={setPendingUser} onResetFilters={resetFilters} />
 
-            <UserDetailDrawer
-                user={selected}
-                onClose={() => setSelected(null)}
-                lastAccessAt={selected ? lastAccessByUser.get(selected.id) : undefined}
-            />
+            <UserDetailDrawer user={selected} onClose={() => setSelected(null)} />
 
             <AlertDialog
                 open={pendingUser !== null}
@@ -169,7 +146,7 @@ export function UserList() {
                                 htmlFor="vision-user-read-confirm"
                                 className="cursor-pointer text-xs text-foreground"
                             >
-                                Je confirme — l&apos;accès est tracé
+                                Je confirme l&apos;ouverture de cette fiche
                             </Label>
                         </div>
                     </div>
