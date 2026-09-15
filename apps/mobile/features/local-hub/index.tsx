@@ -17,8 +17,14 @@ import { ListView } from './list-view';
 import { MapView } from './map-view';
 import { MiniPointCard } from './mini-point-card';
 import { PermissionPrompt } from './permission-prompt';
+import { SearchField } from './search-field';
 import type { LocalPoint } from './types';
 import { ViewToggle, type LocalView } from './view-toggle';
+
+// Insensible à la casse et aux accents : "reparateur" doit trouver "Réparateur".
+function normalize(value: string): string {
+    return value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+}
 
 // Paris, used as the repairer search origin until the user shares (or denies) their location —
 // the backend geo-search needs a lat/lng to query, unlike the artisan directory (no geo-search
@@ -34,6 +40,7 @@ export function LocalHub() {
 
     const [view, setView] = useState<LocalView>('list');
     const [kind, setKind] = useState<LocalFilter>(forParam ? 'repair' : 'all');
+    const [search, setSearch] = useState('');
     const [filters, setFilters] = useState<LocalFilters>(EMPTY_FILTERS);
     const [filterSheetOpen, setFilterSheetOpen] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -68,8 +75,8 @@ export function LocalHub() {
 
     const distanceEnabled = coords !== null;
 
-    // Filtres spécialité + distance (partagés entre Liste et Carte).
-    const refined = useMemo(() => applyRefinements(points, filters), [points, filters]);
+    // Recherche + filtres spécialité/distance (partagés entre Liste et Carte).
+    const refined = useMemo(() => applyRefinements(points, filters, search), [points, filters, search]);
 
     const counts = useMemo<Record<LocalFilter, number>>(
         () => ({
@@ -135,30 +142,33 @@ export function LocalHub() {
                 <ViewToggle value={view} onChange={handleViewChange} />
             </header>
 
-            <div className="sticky top-0 z-20 flex shrink-0 items-center gap-2 bg-background/85 px-5 pt-1 pb-3 backdrop-blur-xl">
-                <div className="min-w-0 flex-1 overflow-x-auto">
-                    <FilterPills value={kind} onChange={setKind} counts={counts} />
+            <div className="sticky top-0 z-20 flex shrink-0 flex-col gap-2 bg-background/85 px-5 pt-1 pb-3 backdrop-blur-xl">
+                <SearchField value={search} onChange={setSearch} />
+                <div className="flex items-center gap-2">
+                    <div className="min-w-0 flex-1 overflow-x-auto">
+                        <FilterPills value={kind} onChange={setKind} counts={counts} />
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setFilterSheetOpen(true)}
+                        aria-label={`Filtres${filterCount > 0 ? `, ${filterCount} actif${filterCount > 1 ? 's' : ''}` : ''}`}
+                        className={cn(
+                            'relative inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-colors',
+                            'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:outline-none',
+                            filterCount > 0
+                                ? 'border-primary bg-primary/10 text-primary'
+                                : 'border-border/60 bg-card text-muted-foreground hover:text-foreground',
+                        )}
+                    >
+                        <SlidersHorizontal className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                        Filtres
+                        {filterCount > 0 ? (
+                            <span className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 font-mono text-[10px] font-bold text-primary-foreground tabular-nums">
+                                {filterCount}
+                            </span>
+                        ) : null}
+                    </button>
                 </div>
-                <button
-                    type="button"
-                    onClick={() => setFilterSheetOpen(true)}
-                    aria-label={`Filtres${filterCount > 0 ? `, ${filterCount} actif${filterCount > 1 ? 's' : ''}` : ''}`}
-                    className={cn(
-                        'relative inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-colors',
-                        'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:outline-none',
-                        filterCount > 0
-                            ? 'border-primary bg-primary/10 text-primary'
-                            : 'border-border/60 bg-card text-muted-foreground hover:text-foreground',
-                    )}
-                >
-                    <SlidersHorizontal className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-                    Filtres
-                    {filterCount > 0 ? (
-                        <span className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 font-mono text-[10px] font-bold text-primary-foreground tabular-nums">
-                            {filterCount}
-                        </span>
-                    ) : null}
-                </button>
             </div>
 
             {showDeniedBanner ? (
@@ -223,8 +233,10 @@ export function LocalHub() {
     );
 }
 
-function applyRefinements(points: readonly LocalPoint[], filters: LocalFilters): LocalPoint[] {
+function applyRefinements(points: readonly LocalPoint[], filters: LocalFilters, search: string): LocalPoint[] {
+    const query = normalize(search.trim());
     return points.filter((point) => {
+        if (query.length > 0 && !normalize(point.name).includes(query)) return false;
         if (filters.specialties.length > 0) {
             const labels = point.specialties ?? [];
             if (!filters.specialties.some((s) => labels.includes(s))) return false;
