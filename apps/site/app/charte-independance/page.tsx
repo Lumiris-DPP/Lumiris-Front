@@ -46,7 +46,7 @@ const COMMISSION: readonly Commissioner[] = [
 ];
 
 const COMMISSION_SIGNED_AT = '2026-01-15';
-const SOURCE_REPO_URL = 'https://github.com/lumiris-fr/lumiris';
+const SOURCE_REPO_URL = 'https://github.com/Lumiris-DPP/Lumiris-Front';
 
 interface BaselineRelease {
     version: string;
@@ -276,7 +276,7 @@ export default function CharteIndependancePage() {
                         rel="noopener noreferrer"
                         className="text-foreground underline-offset-4 hover:underline"
                     >
-                        github.com/lumiris-fr/lumiris/releases
+                        github.com/Lumiris-DPP/Lumiris-Front/releases
                     </a>{' '}
                     - un mirror RSS est disponible pour les agences de presse et les auditeurs.
                 </p>
@@ -301,7 +301,7 @@ export default function CharteIndependancePage() {
                     className="hover:border-grade-a/40 mt-5 inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-colors"
                 >
                     <GithubMark className="h-4 w-4" />
-                    github.com/lumiris-fr/lumiris
+                    github.com/Lumiris-DPP/Lumiris-Front
                 </a>
             </section>
 
