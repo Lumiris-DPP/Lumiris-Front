@@ -48,19 +48,36 @@ function EmptyShell({ Icon, title, message, primary, secondary }: EmptyShellProp
     );
 }
 
+export type CameraIssue = 'denied' | 'unavailable';
+
 interface CameraDeniedStateProps {
+    issue: CameraIssue;
     onAllow: () => void;
     onManualEntry: () => void;
 }
 
-export function CameraDeniedState({ onAllow, onManualEntry }: CameraDeniedStateProps) {
+const CAMERA_ISSUE_COPY: Record<CameraIssue, { title: string; message: string }> = {
+    denied: {
+        title: 'Caméra non autorisée',
+        message: "Autorise l'accès à la caméra pour scanner un QR code, ou saisis le code à la main.",
+    },
+    unavailable: {
+        title: 'Aucune caméra disponible',
+        message: "Cet appareil n'expose pas de caméra utilisable. Saisis le code inscrit sur l'étiquette.",
+    },
+};
+
+export function CameraDeniedState({ issue, onAllow, onManualEntry }: CameraDeniedStateProps) {
+    const copy = CAMERA_ISSUE_COPY[issue];
+    const manualEntry = { label: 'Saisir un code à la main', onClick: onManualEntry };
+
     return (
         <EmptyShell
             Icon={CameraOff}
-            title="Caméra non disponible"
-            message="Autorise l'accès à la caméra pour scanner un QR code, ou saisis le code à la main."
-            primary={{ label: 'Autoriser la caméra', onClick: onAllow }}
-            secondary={{ label: 'Saisir un code à la main', onClick: onManualEntry }}
+            title={copy.title}
+            message={copy.message}
+            primary={issue === 'denied' ? { label: 'Autoriser la caméra', onClick: onAllow } : manualEntry}
+            secondary={issue === 'denied' ? manualEntry : undefined}
         />
     );
 }

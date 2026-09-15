@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { AdminAuditLogEntry, IrisGrade as IrisGradeLetter, Passport, ScoreResult } from '@lumiris/types';
+import type { IrisGrade as IrisGradeLetter, Passport, ScoreResult } from '@lumiris/types';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -16,7 +16,6 @@ import { Checkbox } from '@lumiris/ui/components/checkbox';
 import { Input } from '@lumiris/ui/components/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@lumiris/ui/components/select';
 import { Textarea } from '@lumiris/ui/components/textarea';
-import { useLogAction } from '@/lib/auth';
 import { useCurationStore } from '../curation-store';
 
 interface OverrideDialogProps {
@@ -24,11 +23,9 @@ interface OverrideDialogProps {
     score: ScoreResult;
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onAfterAction: (entry: AdminAuditLogEntry) => void;
 }
 
-export function OverrideDialog({ passport, score, open, onOpenChange, onAfterAction }: OverrideDialogProps) {
-    const log = useLogAction();
+export function OverrideDialog({ passport, score, open, onOpenChange }: OverrideDialogProps) {
     const { setOverlay } = useCurationStore();
     const grade = score.grade;
     const [overrideGrade, setOverrideGrade] = useState<IrisGradeLetter>(grade);
@@ -51,21 +48,7 @@ export function OverrideDialog({ passport, score, open, onOpenChange, onAfterAct
     const handleOverride = () => {
         if (!canSubmit) return;
         setOverlay(passport.id, { overrideGrade, overrideReason: reason, overrideSource: source });
-        const entry = log({
-            action: 'passport.override',
-            targetType: 'passport',
-            targetId: passport.id,
-            payload: {
-                from: grade,
-                to: overrideGrade,
-                fromScore: +score.total.toFixed(1),
-                reason,
-                source,
-                artisanId: passport.artisanId,
-            },
-        });
         onOpenChange(false);
-        onAfterAction(entry);
     };
 
     return (
@@ -74,8 +57,7 @@ export function OverrideDialog({ passport, score, open, onOpenChange, onAfterAct
                 <AlertDialogHeader>
                     <AlertDialogTitle className="text-lumiris-rose">Override de grade</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Vous remplacez le grade calculé par l&apos;algorithme. Action tracée publiquement dans la
-                        timeline gouvernance.
+                        Vous remplacez le grade calculé par l&apos;algorithme.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <div className="space-y-3">

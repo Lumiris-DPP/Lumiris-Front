@@ -1,4 +1,5 @@
 export * from './product';
+export * from './labels';
 export * from './cart-storage';
 export * from './use-cart-details';
 export * from './shipping-address';

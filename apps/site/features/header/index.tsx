@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetClose } from '@lumiris/ui/components/sheet';
+import { InstallButton } from './install-button';
 
 const navLinks = [
     { label: 'Accueil', href: '/' },
@@ -39,7 +40,7 @@ export function Header() {
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className={`fixed top-4 left-1/2 z-50 w-[calc(100%-2rem)] max-w-5xl -translate-x-1/2 rounded-2xl transition-all duration-500 ${
+            className={`fixed top-4 left-1/2 z-nav w-[calc(100%-2rem)] max-w-5xl -translate-x-1/2 rounded-2xl transition-all duration-500 ${
                 scrolled ? 'glass shadow-lg shadow-foreground/3' : 'bg-card/40 backdrop-blur-sm'
             }`}
         >
@@ -77,40 +78,50 @@ export function Header() {
                     })}
                 </ul>
 
-                <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-                    <SheetTrigger asChild>
-                        <button className="text-foreground lg:hidden" aria-label="Ouvrir le menu">
-                            <Menu className="h-5 w-5" />
-                        </button>
-                    </SheetTrigger>
-                    <SheetContent side="right" className="w-[300px] sm:w-[350px]">
-                        <SheetHeader>
-                            <SheetTitle className="flex items-center gap-2.5">
-                                <LumirisLogo className="h-7 w-auto" />
-                                <span className="text-base font-semibold tracking-tight text-foreground">LUMIRIS</span>
-                            </SheetTitle>
-                        </SheetHeader>
-                        <div className="flex flex-col gap-1 px-4 py-6">
-                            {navLinks.map((link) => {
-                                const active = isActive(link.href);
-                                return (
-                                    <SheetClose asChild key={link.label}>
-                                        <Link
-                                            href={link.href}
-                                            className={`rounded-lg px-3 py-2.5 text-sm transition-colors ${
-                                                active
-                                                    ? 'bg-lumiris-cyan/10 font-medium text-lumiris-cyan'
-                                                    : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
-                                            }`}
-                                        >
-                                            {link.label}
-                                        </Link>
-                                    </SheetClose>
-                                );
-                            })}
-                        </div>
-                    </SheetContent>
-                </Sheet>
+                <div className="flex items-center gap-3">
+                    <InstallButton className="hidden lg:inline-flex" />
+
+                    <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+                        <SheetTrigger asChild>
+                            <button className="text-foreground lg:hidden" aria-label="Ouvrir le menu">
+                                <Menu className="h-5 w-5" />
+                            </button>
+                        </SheetTrigger>
+                        <SheetContent side="right" className="w-[300px] sm:w-[350px]">
+                            <SheetHeader>
+                                <SheetTitle className="flex items-center gap-2.5">
+                                    <LumirisLogo className="h-7 w-auto" />
+                                    <span className="text-base font-semibold tracking-tight text-foreground">
+                                        LUMIRIS
+                                    </span>
+                                </SheetTitle>
+                            </SheetHeader>
+                            <div className="flex flex-col gap-1 px-4 py-6">
+                                <SheetClose asChild>
+                                    <InstallButton className="mb-3 justify-center py-2.5" />
+                                </SheetClose>
+
+                                {navLinks.map((link) => {
+                                    const active = isActive(link.href);
+                                    return (
+                                        <SheetClose asChild key={link.label}>
+                                            <Link
+                                                href={link.href}
+                                                className={`rounded-lg px-3 py-2.5 text-sm transition-colors ${
+                                                    active
+                                                        ? 'bg-lumiris-cyan/10 font-medium text-lumiris-cyan'
+                                                        : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+                                                }`}
+                                            >
+                                                {link.label}
+                                            </Link>
+                                        </SheetClose>
+                                    );
+                                })}
+                            </div>
+                        </SheetContent>
+                    </Sheet>
+                </div>
             </nav>
         </motion.header>
     );

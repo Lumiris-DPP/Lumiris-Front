@@ -6,7 +6,6 @@ Demo fixtures shared across surfaces. Pure data, no logic.
 | --------------------------------- | ----------------------------------------------- |
 | `@lumiris/mock-data/dpp`          | `mockDpps`, `mockDppById`, `mockDppBySku`       |
 | `@lumiris/mock-data/certificates` | `mockCertificates`, `mockCertificatesByFactory` |
-| `@lumiris/mock-data/audit-log`    | `mockAuditLog`                                  |
 | `@lumiris/mock-data/journal`      | `mockJournalArticles`, `mockJournalArticleById` |
 | `@lumiris/mock-data/regulatory`   | `mockRegulatoryItems`                           |
 | `@lumiris/mock-data/team`         | `mockTeamActivity` + `MockTeamActivityEntry`    |

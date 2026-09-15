@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { PauseCircle } from 'lucide-react';
-import { mockAdminAuditLog, mockPassports, mockRepairers } from '@lumiris/mock-data';
+import { mockPassports, mockRepairers } from '@lumiris/mock-data';
 import type { Artisan } from '@lumiris/types';
 import {
     AlertDialog,
@@ -18,7 +18,6 @@ import { Button } from '@lumiris/ui/components/button';
 import { Checkbox } from '@lumiris/ui/components/checkbox';
 import { DetailDrawer } from '@lumiris/ui/components/detail-drawer';
 import { Textarea } from '@lumiris/ui/components/textarea';
-import { useAdminAuditLog, useLogAction, usePermission } from '@/lib/auth';
 import { buildArtisanRow } from '@/lib/artisan-analytics';
 import { ContactDialog } from './contact-dialog';
 import { ActionsTab, PassportsTab, SynthesisTab } from './drawer-tabs';
@@ -30,12 +29,6 @@ interface ArtisanDrawerProps {
 }
 
 export function ArtisanDrawer({ artisan, onClose }: ArtisanDrawerProps) {
-    const log = useLogAction();
-    const auditLog = useAdminAuditLog();
-    const canSuspend = usePermission('artisan.suspend');
-    const canContact = usePermission('artisan.contact');
-    const canDunning = usePermission('billing.dunning');
-
     const [suspendOpen, setSuspendOpen] = useState(false);
     const [suspendReason, setSuspendReason] = useState('');
     const [suspendConfirmed, setSuspendConfirmed] = useState(false);
@@ -51,27 +44,11 @@ export function ArtisanDrawer({ artisan, onClose }: ArtisanDrawerProps) {
     if (!artisan) return null;
 
     const passports = mockPassports.filter((p) => p.artisanId === artisan.id);
-    const combinedAuditLog = [...auditLog, ...mockAdminAuditLog];
-    const row = buildArtisanRow(artisan, mockPassports, mockRepairers, combinedAuditLog, FIXTURE_NOW);
+    const row = buildArtisanRow(artisan, mockPassports, mockRepairers, FIXTURE_NOW);
 
     const handleSuspend = () => {
         if (!suspendConfirmed) return;
-        log({
-            action: 'artisan.suspend',
-            targetType: 'artisan',
-            targetId: artisan.id,
-            payload: { reason: suspendReason },
-        });
         setSuspendOpen(false);
-    };
-
-    const handleDunning = () => {
-        log({
-            action: 'billing.dunning',
-            targetType: 'artisan',
-            targetId: artisan.id,
-            payload: { stage: 'reminder-1', triggeredFrom: 'artisans-module' },
-        });
     };
 
     return (
@@ -86,7 +63,7 @@ export function ArtisanDrawer({ artisan, onClose }: ArtisanDrawerProps) {
                     {
                         value: 'synthesis',
                         label: 'Synthèse',
-                        content: <SynthesisTab artisan={artisan} row={row} auditLog={combinedAuditLog} />,
+                        content: <SynthesisTab artisan={artisan} row={row} />,
                     },
                     {
                         value: 'passports',
@@ -96,15 +73,7 @@ export function ArtisanDrawer({ artisan, onClose }: ArtisanDrawerProps) {
                     {
                         value: 'actions',
                         label: 'Actions',
-                        content: (
-                            <ActionsTab
-                                artisan={artisan}
-                                canContact={canContact}
-                                canDunning={canDunning}
-                                onContact={() => setContactOpen(true)}
-                                onDunning={handleDunning}
-                            />
-                        ),
+                        content: <ActionsTab artisan={artisan} onContact={() => setContactOpen(true)} />,
                     },
                 ]}
                 footer={
@@ -113,7 +82,6 @@ export function ArtisanDrawer({ artisan, onClose }: ArtisanDrawerProps) {
                             size="sm"
                             variant="outline"
                             onClick={() => setSuspendOpen(true)}
-                            disabled={!canSuspend}
                             className="gap-1.5 border-lumiris-rose/40 text-lumiris-rose hover:bg-lumiris-rose/10"
                         >
                             <PauseCircle className="h-3.5 w-3.5" /> Suspendre
@@ -129,9 +97,7 @@ export function ArtisanDrawer({ artisan, onClose }: ArtisanDrawerProps) {
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Suspendre {artisan.atelierName} ?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Passeports actifs archivés. Tracé dans l&apos;audit log.
-                        </AlertDialogDescription>
+                        <AlertDialogDescription>Les passeports actifs seront archivés.</AlertDialogDescription>
                     </AlertDialogHeader>
                     <Textarea
                         value={suspendReason}
@@ -146,7 +112,7 @@ export function ArtisanDrawer({ artisan, onClose }: ArtisanDrawerProps) {
                             onCheckedChange={(v) => setSuspendConfirmed(v === true)}
                         />
                         <label htmlFor="suspend-confirm" className="cursor-pointer text-foreground">
-                            Je confirme — l&apos;action est tracée
+                            Je confirme la suspension de cet atelier
                         </label>
                     </div>
                     <AlertDialogFooter>

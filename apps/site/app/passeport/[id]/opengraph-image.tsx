@@ -1,7 +1,6 @@
 import { ImageResponse } from 'next/og';
-import { mockPassportsPublic, passportPublicByIdOrSlug } from '@lumiris/mock-data';
-import { KIND_LABEL_FR } from '@lumiris/utils';
 import { OG_LOGO_DATA_URI } from '@/lib/og-logo';
+import { fetchPublicPassport, passportProductName } from '@/lib/public-passport-api';
 
 export const alt = 'Passeport LUMIRIS';
 export const size = { width: 1200, height: 630 };
@@ -16,20 +15,15 @@ const GRADE_BG: Record<string, string> = {
     E: '#c81f45', // lumiris-rose
 };
 
-export function generateStaticParams() {
-    return mockPassportsPublic.map((view) => ({ id: view.passport.id }));
-}
-
 interface OgProps {
     params: Promise<{ id: string }>;
 }
 
 export default async function Image({ params }: OgProps) {
     const { id } = await params;
-    const view = passportPublicByIdOrSlug(id);
-    const kind = view ? (KIND_LABEL_FR[view.passport.garment.kind] ?? KIND_LABEL_FR.other) : 'Pièce';
-    const title = view ? `${kind} ${view.passport.garment.reference}` : 'Passeport LUMIRIS';
-    const sub = view ? `${view.artisan.atelierName} · ${view.artisan.city}` : '';
+    const view = (await fetchPublicPassport(id))?.view ?? null;
+    const title = view ? passportProductName(view.passport) : 'Passeport LUMIRIS';
+    const sub = view ? [view.artisan.atelierName, view.artisan.city].filter(Boolean).join(' · ') : '';
     const grade = view?.irisScore?.grade ?? null;
 
     return new ImageResponse(

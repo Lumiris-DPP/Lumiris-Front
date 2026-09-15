@@ -10,7 +10,6 @@ import {
     LayoutDashboard,
     Lock,
     PlusCircle,
-    Receipt,
     ShoppingBag,
     Store,
     Truck,
@@ -19,13 +18,9 @@ import {
 } from 'lucide-react';
 import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { Sheet, SheetContent } from '@lumiris/ui/components/sheet';
-import { toast } from '@lumiris/ui/components/sonner';
-import { Switch } from '@lumiris/ui/components/switch';
 import { cn } from '@lumiris/ui/lib/cn';
-import { ATELIER_PASSPORT_LIMIT_LABEL, useHasAtelierPlus, usePassportCount, usePendingOrderCount } from './hooks';
+import { usePendingOrderCount } from './hooks';
 import { useCurrentArtisan } from '@/lib/current-artisan';
-import { useBilling, useBillingStore } from '@/lib/billing-store';
-import { useAuthStore } from '@/lib/auth-store';
 import { useAuthRole } from '@/lib/use-auth';
 import { useSubscription } from '@/lib/use-subscription';
 import { useSubscriptionGate } from '@/lib/use-subscription-gate';
@@ -44,7 +39,6 @@ const NAV_ITEMS: readonly NavItem[] = [
     { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
     { href: '/passports', label: 'Mes passeports', icon: FileText },
     { href: '/create', label: 'Création', icon: PlusCircle, primary: true, requiresSubscription: true },
-    { href: '/invoices', label: 'Factures fournisseurs', icon: Receipt },
     { href: '/certifications', label: 'Mes certifications', icon: BookCheck },
     { href: '/shop', label: 'Boutique', icon: ShoppingBag },
     { href: '/commandes', label: 'Commandes', icon: Truck, showPendingOrders: true },
@@ -164,37 +158,15 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     const role = useAuthRole();
     const isRepairer = role === 'repairer';
     const artisan = useCurrentArtisan();
-    const isRealMode = useAuthStore((s) => s.token != null);
     const { subscription, quota, atelierPlus } = useSubscription();
     const navItems = isRepairer ? REPAIRER_NAV_ITEMS : NAV_ITEMS;
 
     // Charge de travail en attente : le vendeur doit voir depuis n'importe quel écran qu'un colis
     // ou un litige l'attend, sans avoir à ouvrir l'onglet.
     const pendingOrders = usePendingOrderCount();
-    const demoPassportCount = usePassportCount(artisan.id);
-    const demoHasPlus = useHasAtelierPlus(artisan.id);
-    const billing = useBilling(artisan.id);
-    const setBillingCycle = useBillingStore((s) => s.setBillingCycle);
-
-    // Real mode: tier comes from useCurrentArtisan (live subscription), quota from GET /api/subscription.
-    // ATELIER+ is now a live add-on signal (subscription.atelierPlus); demo keeps the mock billing store.
-    const hasAtelierPlus = isRealMode ? atelierPlus : demoHasPlus;
-    const usedCount = isRealMode ? (quota?.used ?? 0) : demoPassportCount;
-    const limitLabel = isRealMode
-        ? quota?.unlimited
-            ? '∞'
-            : quota?.limit != null
-              ? String(quota.limit)
-              : '—'
-        : ATELIER_PASSPORT_LIMIT_LABEL[artisan.tier];
-
-    const onToggleCycle = (annual: boolean) => {
-        const next = annual ? 'annual' : 'monthly';
-        setBillingCycle(artisan.id, next);
-        toast.success(next === 'annual' ? 'Cycle annuel — 2 mois offerts' : 'Cycle mensuel', {
-            description: next === 'annual' ? "−17% sur l'année" : 'Plus de flexibilité',
-        });
-    };
+    const hasAtelierPlus = atelierPlus;
+    const usedCount = quota?.used ?? 0;
+    const limitLabel = quota?.unlimited ? '∞' : quota?.limit != null ? String(quota.limit) : '—';
 
     return (
         <div className="flex h-full flex-col">
@@ -255,31 +227,6 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                     <p className="font-mono text-[11px] text-muted-foreground">
                         {usedCount} / {limitLabel} passeports actifs
                     </p>
-                    {/* The cycle switch only ever wrote to a local mock billing store — a fake control
-                    in real mode, where the true cycle is managed on the /subscription page. */}
-                    {!isRealMode && (
-                        <div className="flex items-center justify-between gap-2 pt-1">
-                            <span className="text-[10px] tracking-wider text-muted-foreground uppercase">Cycle</span>
-                            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                                <span
-                                    className={cn(billing.billingCycle === 'monthly' && 'font-medium text-foreground')}
-                                >
-                                    mois
-                                </span>
-                                <Switch
-                                    checked={billing.billingCycle === 'annual'}
-                                    onCheckedChange={onToggleCycle}
-                                    aria-label="Basculer entre cycle mensuel et annuel"
-                                    className="h-4 w-7"
-                                />
-                                <span
-                                    className={cn(billing.billingCycle === 'annual' && 'font-medium text-foreground')}
-                                >
-                                    an <span className="font-mono text-lumiris-cyan">−17%</span>
-                                </span>
-                            </div>
-                        </div>
-                    )}
                 </div>
             )}
         </div>

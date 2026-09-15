@@ -1,28 +1,12 @@
 'use client';
 
 import { useMemo } from 'react';
-import type { Artisan, ArtisanTier } from '@lumiris/types';
+import type { Artisan } from '@lumiris/types';
 import { useNotifications, useSellerOrders } from '@lumiris/api-client/react';
 import { useAuthStore } from '@/lib/auth-store';
 import { useAuthRole } from '@/lib/use-auth';
-import { useBilling } from '@/lib/billing-store';
 import { usePassports } from '@/lib/passports-source';
 import { buildNotifications, toAtelierNotifications, type AtelierNotification } from '@/lib/notifications';
-
-export const ATELIER_PASSPORT_LIMIT_LABEL: Record<ArtisanTier, string> = {
-    Solo: '50',
-    Studio: '300',
-    Maison: '∞',
-};
-
-export function usePassportCount(artisanId: string): number {
-    const passports = usePassports(artisanId);
-    return passports.filter((p) => p.status !== 'Draft').length;
-}
-
-export function useHasAtelierPlus(artisanId: string): boolean {
-    return useBilling(artisanId).atelierPlus;
-}
 
 // Commandes qui attendent une action du vendeur : colis à expédier, retour à trancher ou à
 // réceptionner, litige ouvert. Alimente le compteur de la navigation.

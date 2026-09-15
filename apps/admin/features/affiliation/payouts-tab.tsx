@@ -5,7 +5,6 @@ import { ArrowDownToLine, Landmark } from 'lucide-react';
 import type { AffiliationEvent, Payout } from '@lumiris/types';
 import { Button } from '@lumiris/ui/components/button';
 import { DataTableFilters } from '@lumiris/ui/components/data-table-filters';
-import { useLogAction, usePermission } from '@/lib/auth';
 import { NOW_REF, type SuspiciousFlag } from '@/lib/affiliation-fraud';
 import { usePagination } from '../_shared/use-pagination';
 import { PayoutDetailDrawer } from './payout-detail-drawer';
@@ -48,9 +47,6 @@ export function PayoutsTab({
     onUpdateComment,
     onPreparePayout,
 }: PayoutsTabProps) {
-    const log = useLogAction();
-    const canPrepare = usePermission('affiliation.prepare_payout');
-
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState<BankStatus | 'all'>('awaiting');
     const [openPayoutId, setOpenPayoutId] = useState<string | null>(null);
@@ -96,17 +92,6 @@ export function PayoutsTab({
 
     const handleConfirmPrepare = () => {
         const month = '2026-04';
-        log({
-            action: 'affiliation.prepare_payout',
-            targetType: 'period',
-            targetId: month,
-            payload: {
-                mois: month,
-                totalEuros: +currentPeriodStats.total.toFixed(2),
-                nbBeneficiaires: currentPeriodStats.beneficiaryCount,
-                exclusions: currentPeriodStats.excluded.map((e) => e.id),
-            },
-        });
         if (typeof window !== 'undefined') {
             const header = ['eventId', 'beneficiaryId', 'beneficiaryName', 'kind', 'amountEur'].join(',');
             const lines = currentPeriodStats.eligible.map((e) =>
@@ -128,20 +113,7 @@ export function PayoutsTab({
     };
 
     const setBankStatus = (payout: Payout, status: BankStatus) => {
-        const previous = bankStatuses.get(payout.id) ?? inferBankStatus(payout);
         onUpdateBankStatus(payout.id, status);
-        log({
-            action: 'affiliation.payout_reconcile',
-            targetType: 'payout',
-            targetId: payout.id,
-            payload: {
-                period: payout.period,
-                totalEur: payout.totalEur,
-                beneficiaryCount: payout.beneficiaryCount,
-                previousStatus: previous,
-                newStatus: status,
-            },
-        });
     };
 
     return (
@@ -160,7 +132,7 @@ export function PayoutsTab({
                 </div>
                 <Button
                     size="sm"
-                    disabled={!canPrepare || currentPeriodStats.eligible.length === 0}
+                    disabled={currentPeriodStats.eligible.length === 0}
                     onClick={() => setConfirmOpen(true)}
                     className="gap-1.5"
                 >
@@ -214,7 +186,6 @@ export function PayoutsTab({
                 payout={openPayout}
                 events={events}
                 bankStatus={openPayout ? (bankStatuses.get(openPayout.id) ?? inferBankStatus(openPayout)) : 'awaiting'}
-                canPrepare={canPrepare}
                 comment={openPayout ? (comments.get(openPayout.id) ?? '') : ''}
                 onCommentChange={(value) => openPayout && onUpdateComment(openPayout.id, value)}
                 onReconcile={() => openPayout && setBankStatus(openPayout, 'reconciled')}

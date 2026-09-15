@@ -45,18 +45,15 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 interface UserDetailDrawerProps {
     user: MockVisionUser | null;
     onClose: () => void;
-    lastAccessAt?: string | undefined;
 }
 
-export function UserDetailDrawer({ user, onClose, lastAccessAt }: UserDetailDrawerProps) {
+export function UserDetailDrawer({ user, onClose }: UserDetailDrawerProps) {
     const [rgpdStatus, setRgpdStatus] = useState<RgpdLocalStatus>(() => (user ? getRgpdStatus(user) : 'none'));
 
     if (!user) return null;
 
     const segments = getSegments(user, FIXTURE_NOW);
-    const subtitle = lastAccessAt
-        ? `${user.email ?? user.id} · dernier accès admin ${new Date(lastAccessAt).toLocaleString('fr-FR')}`
-        : (user.email ?? user.id);
+    const subtitle = user.email ?? user.id;
 
     return (
         <DetailDrawer
@@ -277,7 +274,7 @@ function RgpdTab({
                 <p className="text-foreground">
                     Toutes les actions ci-dessous sont tracées dans le journal d&apos;audit.
                 </p>
-                <RgpdDialog user={user} status={rgpdStatus} onStatusChange={onStatusChange} />
+                <RgpdDialog status={rgpdStatus} onStatusChange={onStatusChange} />
             </div>
 
             {user.rgpdRequests && user.rgpdRequests.length > 0 ? (

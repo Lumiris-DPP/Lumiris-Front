@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import { LumirisLogo } from '@lumiris/ui/components/logo';
 import { cn } from '@lumiris/ui/lib/cn';
 import { useCurrentUser } from '@/lib/auth';
-import { can } from '@/lib/auth/permissions';
 import { NAV_GROUPS, type NavGroup, type NavRoute } from '../_shared/nav-routes';
 
 function isActive(pathname: string, href: string): boolean {
@@ -21,11 +20,11 @@ function SidebarComponent() {
 
     const visibleGroups: ReadonlyArray<{ group: NavGroup; routes: readonly NavRoute[] }> = NAV_GROUPS.map((group) => ({
         group,
-        routes: group.routes.filter((route) => can(user.role, route.requires)),
+        routes: group.routes,
     })).filter((entry) => entry.routes.length > 0);
 
     return (
-        <aside className="fixed top-0 left-0 z-40 flex h-screen w-60 flex-col border-r border-border bg-sidebar">
+        <aside className="fixed top-0 left-0 z-nav flex h-screen w-60 flex-col border-r border-border bg-sidebar">
             <div className="flex items-center gap-3 border-b border-border px-5 py-6">
                 <LumirisLogo className="h-8 w-auto" />
                 <div>

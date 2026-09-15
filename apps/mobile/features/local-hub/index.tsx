@@ -193,7 +193,7 @@ export function LocalHub() {
                         />
                         <AnimatePresence>
                             {selected ? (
-                                <div key="mini-card" className="pointer-events-none absolute inset-x-3 bottom-3 z-1000">
+                                <div key="mini-card" className="pointer-events-none absolute inset-x-3 bottom-3 z-nav">
                                     <div className="pointer-events-auto">
                                         <MiniPointCard point={selected} onClose={() => setSelectedId(null)} />
                                     </div>

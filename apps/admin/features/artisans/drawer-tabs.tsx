@@ -1,10 +1,10 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Award, FileCheck2, Mail, Sparkles } from 'lucide-react';
+import { Award, FileCheck2, Mail } from 'lucide-react';
 import { computeScore } from '@lumiris/core/scoring';
 import { mockPassports, mockRepairers } from '@lumiris/mock-data';
-import type { AdminAuditLogEntry, Artisan } from '@lumiris/types';
+import type { Artisan } from '@lumiris/types';
 import { Wardrobe, type WardrobeCardItem } from '@lumiris/scoring-ui';
 import { Badge } from '@lumiris/ui/components/badge';
 import { Button } from '@lumiris/ui/components/button';
@@ -29,11 +29,10 @@ function InfoCard({ label, children }: { label: string; children: React.ReactNod
 interface SynthesisTabProps {
     artisan: Artisan;
     row: ReturnType<typeof buildArtisanRow>;
-    auditLog: readonly AdminAuditLogEntry[];
 }
 
-export function SynthesisTab({ artisan, row, auditLog }: SynthesisTabProps) {
-    const timeline = useMemo(() => buildTimeline(auditLog, artisan).slice(0, 4), [auditLog, artisan]);
+export function SynthesisTab({ artisan, row }: SynthesisTabProps) {
+    const timeline = useMemo(() => buildTimeline(artisan).slice(0, 4), [artisan]);
 
     return (
         <div className="space-y-4 text-xs">
@@ -80,8 +79,7 @@ export function SynthesisTab({ artisan, row, auditLog }: SynthesisTabProps) {
             <InfoCard label="Santé compte">
                 <p className="font-mono text-sm">{row.health.total}/100</p>
                 <p className="mt-0.5 text-[11px] text-muted-foreground">
-                    Capacité {row.health.capacityScore} · Iris {row.health.irisScore} · Overrides{' '}
-                    {row.health.overrideScore} ({row.health.overrideCount90d} sur 90j)
+                    Capacité {row.health.capacityScore} · Iris {row.health.irisScore}
                 </p>
             </InfoCard>
             <InfoCard label="Bio">
@@ -98,20 +96,9 @@ export function SynthesisTab({ artisan, row, auditLog }: SynthesisTabProps) {
                             <li key={event.id} className="relative">
                                 <span className="absolute -left-1.25 mt-1 block h-2 w-2 rounded-full bg-foreground" />
                                 <p className="flex flex-wrap items-center gap-1.5 text-foreground">
-                                    {event.kind === 'passport-published' ? (
-                                        <FileCheck2 className="h-3 w-3 text-lumiris-emerald" />
-                                    ) : (
-                                        <Sparkles className="h-3 w-3 text-muted-foreground" />
-                                    )}
+                                    <FileCheck2 className="h-3 w-3 text-lumiris-emerald" />
                                     <span className="font-mono">{event.label}</span>
-                                    {event.actor ? (
-                                        <span className="text-muted-foreground">
-                                            · <strong>{event.actor}</strong>
-                                        </span>
-                                    ) : null}
-                                    {event.refId ? (
-                                        <span className="font-mono text-muted-foreground">· {event.refId}</span>
-                                    ) : null}
+                                    <span className="font-mono text-muted-foreground">· {event.refId}</span>
                                 </p>
                                 <p className="text-[10px] text-muted-foreground">{fmtDate(event.ts)}</p>
                             </li>
@@ -156,13 +143,10 @@ export function PassportsTab({ artisan }: { artisan: Artisan }) {
 
 interface ActionsTabProps {
     artisan: Artisan;
-    canContact: boolean;
-    canDunning: boolean;
     onContact: () => void;
-    onDunning: () => void;
 }
 
-export function ActionsTab({ artisan, canContact, canDunning, onContact, onDunning }: ActionsTabProps) {
+export function ActionsTab({ artisan, onContact }: ActionsTabProps) {
     return (
         <div className="space-y-4 text-xs">
             <InfoCard label="Plan actif">
@@ -174,12 +158,6 @@ export function ActionsTab({ artisan, canContact, canDunning, onContact, onDunni
                     <p className="font-mono">{TIER_MRR[artisan.tier] + (artisan.plus ? PLUS_ADDON : 0)} €/mois</p>
                 </div>
             </InfoCard>
-            <InfoCard label="Méthode de paiement (mock)">
-                <p className="font-mono text-[11px]">Visa · last4 4242 · expire 12/29</p>
-            </InfoCard>
-            <InfoCard label="Prochain prélèvement">
-                <p className="font-mono text-[11px]">2026-05-15</p>
-            </InfoCard>
             <InfoCard label="Création compte">
                 <p className="font-mono text-[11px]">
                     {fmtDate(artisan.joinedAt)} · {artisan.tier}
@@ -187,11 +165,8 @@ export function ActionsTab({ artisan, canContact, canDunning, onContact, onDunni
             </InfoCard>
 
             <div className="flex flex-wrap gap-2">
-                <Button size="sm" variant="outline" onClick={onContact} disabled={!canContact} className="gap-1.5">
+                <Button size="sm" variant="outline" onClick={onContact} className="gap-1.5">
                     <Mail className="h-3.5 w-3.5" aria-hidden /> Contacter
-                </Button>
-                <Button size="sm" variant="outline" onClick={onDunning} disabled={!canDunning} className="gap-1.5">
-                    Relancer dunning
                 </Button>
             </div>
         </div>
@@ -201,44 +176,19 @@ export function ActionsTab({ artisan, canContact, canDunning, onContact, onDunni
 interface TimelineEvent {
     id: string;
     ts: string;
-    kind: 'audit' | 'passport-published';
     label: string;
-    actor?: string;
-    refId?: string;
+    refId: string;
 }
 
-function buildTimeline(auditEntries: readonly AdminAuditLogEntry[], artisan: Artisan): readonly TimelineEvent[] {
-    const artisanPassports = mockPassports.filter((p) => p.artisanId === artisan.id);
-    const passportIds = new Set(artisanPassports.map((p) => p.id));
-
-    const auditEvents: TimelineEvent[] = auditEntries
-        .filter((entry) => {
-            if (entry.targetId === artisan.id) return true;
-            if (typeof entry.payload?.artisanId === 'string' && (entry.payload.artisanId as string) === artisan.id)
-                return true;
-            if (entry.targetType === 'passport' && passportIds.has(entry.targetId)) return true;
-            return false;
-        })
-        .map((entry) => ({
-            id: entry.id,
-            ts: entry.ts,
-            kind: 'audit' as const,
-            label: entry.action,
-            actor: entry.actorId,
-            refId: entry.targetId,
-        }));
-
-    const publishedEvents: TimelineEvent[] = artisanPassports
-        .filter((p) => p.status === 'Published')
+function buildTimeline(artisan: Artisan): readonly TimelineEvent[] {
+    return mockPassports
+        .filter((p) => p.artisanId === artisan.id && p.status === 'Published')
         .map((p) => ({
             id: `pub-${p.id}`,
             ts: p.publishedAt ?? p.updatedAt ?? p.createdAt,
-            kind: 'passport-published' as const,
             label: 'passeport publié',
             refId: p.id,
-        }));
-
-    return [...auditEvents, ...publishedEvents]
+        }))
         .sort((a, b) => new Date(b.ts).getTime() - new Date(a.ts).getTime())
         .slice(0, 20);
 }

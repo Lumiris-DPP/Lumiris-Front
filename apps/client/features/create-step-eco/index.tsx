@@ -34,8 +34,8 @@ export function CreateStepEco({ draftId }: { draftId: string }) {
     const { goTo } = useStepNavigation(draftId);
     const router = useRouter();
     // Le brouillon est libre ; seule la publication exige un abonnement dans le quota.
-    const { quota, isRealMode } = useSubscription();
-    const publishBlocked = isRealMode && quota?.canCreate === false;
+    const { quota } = useSubscription();
+    const publishBlocked = quota?.canCreate === false;
 
     const [form, setForm] = useState<EcoInfo>(draft?.eco ?? {});
     const [publishing, setPublishing] = useState(false);

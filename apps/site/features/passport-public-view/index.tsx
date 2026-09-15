@@ -15,6 +15,7 @@ import {
     useUniqueCertificates,
 } from '@lumiris/scoring-ui';
 import type { PassportPublicView } from '@lumiris/mock-data';
+import type { PassportNote } from '@/lib/public-passport-api';
 
 const OriginMap = dynamic(() => import('./origin-map').then((m) => m.OriginMap), {
     ssr: false,
@@ -28,20 +29,25 @@ const OriginMap = dynamic(() => import('./origin-map').then((m) => m.OriginMap),
 interface PassportPublicViewProps {
     view: PassportPublicView;
     artisanSlug: string;
+    notes?: readonly PassportNote[];
 }
 
 const SCORING_NOW = new Date('2026-04-30T08:00:00Z');
 
-export function PassportPublicViewSection({ view, artisanSlug }: PassportPublicViewProps) {
+export function PassportPublicViewSection({ view, artisanSlug, notes = [] }: PassportPublicViewProps) {
     const { passport, artisan, irisScore, inProgress } = view;
     const now = SCORING_NOW;
+    const productName = passport.garment.name;
 
     const certificates = useUniqueCertificates(passport);
 
     return (
         <article className="mx-auto max-w-5xl space-y-8 px-6 pt-28 pb-20" aria-labelledby="passport-title">
-            <h1 id="passport-title" className="sr-only">
-                Passeport {passport.garment.reference}
+            <h1
+                id="passport-title"
+                className={productName ? 'text-3xl font-bold tracking-tight text-balance text-foreground' : 'sr-only'}
+            >
+                {productName ?? `Passeport ${passport.garment.reference}`}
             </h1>
 
             <PassportHeader passport={passport} artisan={artisan} grade={irisScore?.grade ?? 'E'} />
@@ -92,6 +98,12 @@ export function PassportPublicViewSection({ view, artisanSlug }: PassportPublicV
                     <CareGuide care={passport.care} warranty={passport.warranty} />
                 </Section>
             ) : null}
+
+            {notes.map((note) => (
+                <Section key={note.title} title={note.title}>
+                    <p className="text-sm leading-relaxed text-foreground/90">{note.body}</p>
+                </Section>
+            ))}
 
             <RepairCallout />
 

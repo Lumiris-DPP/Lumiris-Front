@@ -2,11 +2,10 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { mockArtisanById } from '@lumiris/mock-data';
 import { useArtisanMe, useRepairerMe } from '@lumiris/api-client/react';
 import { toast } from '@lumiris/ui/components/sonner';
-import { useAuthArtisanId, useAuthUserId, useAuthRole, useAuthToken, useAuthHydrated } from '@/lib/use-auth';
 import { signOut } from '@/lib/auth-store';
+import { useAuthUserId, useAuthRole, useAuthToken, useAuthHydrated } from '@/lib/use-auth';
 import { useVerificationStore, type VerificationStatus } from '@/lib/verification-store';
 import { PendingScreen } from '@/features/verification-status/pending';
 import { RejectedScreen } from '@/features/verification-status/rejected';
@@ -21,7 +20,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const hydrated = useAuthHydrated();
     const userId = useAuthUserId();
-    const artisanId = useAuthArtisanId();
     const role = useAuthRole();
     const token = useAuthToken();
     const getRecord = useVerificationStore((s) => s.getRecord);
@@ -29,9 +27,9 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
     const isArtisan = role === 'artisan';
     const isRepairer = role === 'repairer';
-    // ATELIER is for artisan and repairer accounts only. `role === null` covers mock/demo-mode
-    // sessions that never went through `signInWithToken` — those don't carry a real role and
-    // must not be bounced by this real-mode-only check.
+    // ATELIER is for artisan and repairer accounts only. `role === null` covers sessions that
+    // never went through `signInWithToken` — those don't carry a real role and must not be
+    // bounced by this real-mode-only check.
     const isAllowedRole = role === null || isArtisan || isRepairer;
 
     // Real mode: GET /api/artisans/me (resp. /api/repairers/me) is the source of truth on every
@@ -49,8 +47,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     }, [isArtisan, me.data, artisanSubmitted, userId, setFromProfile]);
 
     const record = userId ? getRecord(userId) : null;
-    // ponytail: existing mock artisans are pre-verified so the demo works out of the box
-    const isExistingMockArtisan = artisanId ? mockArtisanById(artisanId) !== null : false;
 
     let status: VerificationStatus;
     if (isRepairer) {
@@ -66,16 +62,13 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
             status = record?.status ?? 'unregistered';
         }
     } else if (!isArtisan) {
-        status = 'verified'; // consumer/admin never reach here (blocked earlier); mock-mode fallback
+        status = 'verified'; // consumer/admin never reach here (blocked by isAllowedRole above)
     } else if (token) {
         if (me.data) status = artisanSubmitted ? (STATUS_MAP[me.data.status] ?? 'unregistered') : 'unregistered';
         else if (me.isLoading) status = record?.status ?? 'unregistered';
         else status = 'unregistered'; // 404 (no profile yet) or any other fetch error
     } else {
-        status =
-            record?.status === 'unregistered' && isExistingMockArtisan
-                ? 'verified'
-                : (record?.status ?? 'unregistered');
+        status = record?.status ?? 'unregistered';
     }
 
     const awaitingLiveCheck =

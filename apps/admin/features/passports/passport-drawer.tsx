@@ -1,22 +1,19 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import Link from 'next/link';
-import { AlertTriangle, ExternalLink, Sparkles } from 'lucide-react';
-import type { AdminAuditLogEntry, Passport } from '@lumiris/types';
+import { useMemo } from 'react';
+import { AlertTriangle, Sparkles } from 'lucide-react';
+import type { Passport } from '@lumiris/types';
 import { mockArtisans, mockInvoices } from '@lumiris/mock-data';
 import { CompositionList, FactureOcrViewer, ManufacturingTimeline, PassportPhonePreview } from '@lumiris/scoring-ui';
 import { Badge } from '@lumiris/ui/components/badge';
 import { DetailDrawer } from '@lumiris/ui/components/detail-drawer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@lumiris/ui/components/tabs';
 import { cn } from '@lumiris/ui/lib/cn';
-import { useAdminAuditLog } from '@/lib/auth';
 import { CuratorActions } from './curator-actions';
 import { useCurationStore } from './curation-store';
 import { deriveCurationStatus } from '@/lib/curation-status';
 import { useIrisScore } from './hooks';
 import { BreakdownSection } from './inspection/breakdown-section';
-import { HistorySection } from './inspection/history-section';
 import { SimulatorSection } from './inspection/simulator-section';
 import { STATUS_LABEL, STATUS_TONE } from './status';
 import { FIXTURE_NOW } from '@/lib/fixture-clock';
@@ -49,7 +46,6 @@ function tabs(passport: Passport) {
     return [
         { value: 'detail', label: 'Détail', content: <DetailTab passport={passport} /> },
         { value: 'iris', label: 'Iris', content: <IrisTab passport={passport} /> },
-        { value: 'audit', label: 'Audit', content: <AuditTab passport={passport} /> },
     ];
 }
 
@@ -179,7 +175,6 @@ function IrisTab({ passport }: { passport: Passport }) {
                 <TabsList>
                     <TabsTrigger value="breakdown">Breakdown</TabsTrigger>
                     <TabsTrigger value="simulator">Simulator</TabsTrigger>
-                    <TabsTrigger value="history">Historique</TabsTrigger>
                 </TabsList>
                 <TabsContent value="breakdown" className="mt-4 outline-none">
                     <BreakdownSection passport={passport} score={score} />
@@ -187,59 +182,8 @@ function IrisTab({ passport }: { passport: Passport }) {
                 <TabsContent value="simulator" className="mt-4 outline-none">
                     <SimulatorSection passport={passport} baseScore={score} />
                 </TabsContent>
-                <TabsContent value="history" className="mt-4 outline-none">
-                    <HistorySection passportId={passport.id} />
-                </TabsContent>
             </Tabs>
         </div>
-    );
-}
-
-function AuditTab({ passport }: { passport: Passport }) {
-    const auditLog = useAdminAuditLog();
-    const entries = useMemo(
-        () => auditLog.filter((entry) => entry.targetType === 'passport' && entry.targetId === passport.id),
-        [auditLog, passport.id],
-    );
-
-    if (entries.length === 0) {
-        return <p className="text-xs text-muted-foreground">Pas encore d&apos;historique pour ce passeport.</p>;
-    }
-    return (
-        <ol className="relative space-y-3 border-l border-dashed pl-5">
-            {entries.map((entry) => (
-                <AuditEntry key={entry.id} entry={entry} />
-            ))}
-        </ol>
-    );
-}
-
-function AuditEntry({ entry }: { entry: AdminAuditLogEntry }) {
-    return (
-        <li className="relative">
-            <span className="absolute top-2 -left-[27px] block h-2 w-2 rounded-full bg-foreground" />
-            <div className="rounded-lg border border-border bg-card p-3 text-xs">
-                <div className="flex items-baseline justify-between gap-3">
-                    <p className="font-mono text-[11px] text-foreground">{entry.action}</p>
-                    <span className="font-mono text-[10px] text-muted-foreground">
-                        {new Date(entry.ts).toLocaleString('fr-FR', {
-                            day: '2-digit',
-                            month: 'short',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                        })}
-                    </span>
-                </div>
-                <p className="mt-1 truncate text-[11px] text-muted-foreground">
-                    par <strong className="text-foreground">{entry.actorId}</strong> · {entry.actorRole}
-                </p>
-                {Object.keys(entry.payload).length > 0 ? (
-                    <pre className="mt-2 overflow-x-auto text-[10px] whitespace-pre-wrap text-muted-foreground/80">
-                        {JSON.stringify(entry.payload, null, 2)}
-                    </pre>
-                ) : null}
-            </div>
-        </li>
     );
 }
 
@@ -248,7 +192,6 @@ function DrawerFooter({ passport }: { passport: Passport }) {
     const { overlays } = useCurationStore();
     const overlay = overlays.get(passport.id);
     const status = deriveCurationStatus(passport, overlay?.status);
-    const [lastAction, setLastAction] = useState<AdminAuditLogEntry | null>(null);
 
     return (
         <div className="space-y-2">
@@ -256,17 +199,8 @@ function DrawerFooter({ passport }: { passport: Passport }) {
                 <Badge variant="outline" className={cn('font-mono text-[10px]', STATUS_TONE[status])}>
                     {STATUS_LABEL[status]}
                 </Badge>
-                {lastAction ? (
-                    <Link
-                        href={`/audit?focus=${lastAction.id}`}
-                        className="inline-flex items-center gap-1 font-mono text-[10px] text-lumiris-emerald underline-offset-2 hover:text-lumiris-emerald/80 hover:underline"
-                    >
-                        Action <strong>{lastAction.action}</strong> tracée{' '}
-                        <ExternalLink className="h-3 w-3" aria-hidden />
-                    </Link>
-                ) : null}
             </div>
-            <CuratorActions passport={passport} score={score} onAfterAction={setLastAction} />
+            <CuratorActions passport={passport} score={score} />
         </div>
     );
 }

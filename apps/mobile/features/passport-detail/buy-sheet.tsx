@@ -44,7 +44,7 @@ export function BuySheet({ open, onOpenChange, passport, artisan }: BuySheetProp
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetContent side="bottom" className="mx-auto max-h-[85vh] max-w-md overflow-y-auto rounded-t-2xl pb-8">
+            <SheetContent side="bottom" className="mx-auto max-h-[85dvh] max-w-md overflow-y-auto rounded-t-2xl pb-8">
                 <SheetHeader className="pt-5 pb-3">
                     <SheetTitle className="text-base text-foreground">Acheter chez l&apos;atelier</SheetTitle>
                     <SheetDescription>Achat direct, sans intermédiaire.</SheetDescription>

@@ -43,7 +43,7 @@ export function ScoreSheet({ open, onOpenChange, score }: ScoreSheetProps) {
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetContent side="bottom" className="mx-auto max-h-[85vh] max-w-md overflow-y-auto rounded-t-2xl pb-8">
+            <SheetContent side="bottom" className="mx-auto max-h-[85dvh] max-w-md overflow-y-auto rounded-t-2xl pb-8">
                 <SheetHeader className="pt-5 pb-1">
                     <SheetTitle className="text-base text-foreground">Détail du score Iris V2</SheetTitle>
                     <SheetDescription>

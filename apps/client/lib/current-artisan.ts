@@ -1,21 +1,46 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { mockArtisanById } from '@lumiris/mock-data';
-import type { Artisan, ArtisanTier } from '@lumiris/types';
+import type { Artisan, ArtisanTier, UserRole } from '@lumiris/types';
 import { ARTISAN_PASSPORT_LIMIT } from '@lumiris/types';
-import { signOut, useAuthStore } from './auth-store';
+import { useAuthStore } from './auth-store';
+import { elideDe } from './french-elision';
 import { useAuthArtisanId, useAuthRole, useAuthUserName } from './use-auth';
 import { useSubscription } from './use-subscription';
 
-const FALLBACK_ID = 'art-marie';
-
-const FALLBACK_RAW = mockArtisanById(FALLBACK_ID);
-if (!FALLBACK_RAW) {
-    throw new Error('Mock data missing persona art-marie - atelier dev expects Marie Le Goff.');
+function atelierNameFor(userName: string | null, role: UserRole | null): string {
+    if (userName == null) {
+        return role === 'repairer' ? 'Mon compte' : 'Mon Atelier';
+    }
+    return role === 'repairer' ? userName : `Atelier ${elideDe(userName)}`;
 }
-const FALLBACK: Artisan = FALLBACK_RAW;
+
+function buildArtisan(
+    id: string,
+    userName: string | null,
+    role: UserRole | null,
+    tier: ArtisanTier,
+    passportLimit: number,
+): Artisan {
+    return {
+        id,
+        displayName: userName ?? (role === 'repairer' ? 'Mon compte' : 'Mon Atelier'),
+        atelierName: atelierNameFor(userName, role),
+        city: '',
+        region: 'Île-de-France',
+        tier,
+        plus: false,
+        epvLabeled: false,
+        ofgLabeled: false,
+        specialities: [],
+        story: '',
+        photoUrl: '',
+        joinedAt: new Date().toISOString(),
+        passportLimit,
+    };
+}
+
+/** Identité neutre servie hors session — jamais affichée derrière le garde du workspace. */
+const UNRESOLVED_ARTISAN: Artisan = buildArtisan('', null, null, 'Solo', ARTISAN_PASSPORT_LIMIT.Solo);
 
 /** Normalises the backend subscription tier string onto the local ArtisanTier. */
 function artisanTierFromSubscription(tier: string | null | undefined): ArtisanTier {
@@ -33,53 +58,16 @@ export function useCurrentArtisan(): Artisan {
     const id = useAuthArtisanId();
     const userName = useAuthUserName();
     const role = useAuthRole();
-    const router = useRouter();
     // Live plan + quota (real mode only; the hook self-disables without a token).
     const { subscription, quota } = useSubscription();
-
-    const mockArtisan = id != null ? (mockArtisanById(id) ?? null) : null;
     const isRealMode = useAuthStore((s) => s.token != null);
 
-    useEffect(() => {
-        // In demo mode, if the stored ID doesn't match any mock artisan, sign out
-        if (id != null && mockArtisan === null && !isRealMode) {
-            console.warn(`[atelier] Artisan id "${id}" introuvable dans mockArtisans. Sign-out automatique.`);
-            signOut();
-            router.replace('/login');
-        }
-    }, [id, mockArtisan, isRealMode, router]);
-
-    // Demo mode: use mock data
-    if (mockArtisan !== null) return mockArtisan;
-
-    // Real mode: construct a minimal Artisan from stored identity, with tier + quota
-    // driven by the live subscription (GET /api/subscription) — never hardcoded.
-    // Repairer accounts have no ArtisanProfile (id stays null) but still land on shared
-    // workspace chrome (header, sidebar) that reads this hook — build from userName so it
-    // shows their real identity instead of silently falling back to the mock persona below.
-    if (isRealMode) {
-        const tier = artisanTierFromSubscription(subscription?.tier);
-        const passportLimit = quota?.unlimited
-            ? Number.POSITIVE_INFINITY
-            : (quota?.limit ?? ARTISAN_PASSPORT_LIMIT[tier]);
-        return {
-            id: id ?? 'me',
-            displayName: userName ?? 'Mon compte',
-            atelierName:
-                role === 'repairer' ? (userName ?? 'Mon compte') : userName ? `Atelier de ${userName}` : 'Mon Atelier',
-            city: '',
-            region: 'Île-de-France',
-            tier,
-            plus: false,
-            epvLabeled: false,
-            ofgLabeled: false,
-            specialities: [],
-            story: '',
-            photoUrl: '',
-            joinedAt: new Date().toISOString(),
-            passportLimit,
-        };
+    if (!isRealMode) {
+        return UNRESOLVED_ARTISAN;
     }
 
-    return FALLBACK;
+    const tier = artisanTierFromSubscription(subscription?.tier);
+    const passportLimit = quota?.unlimited ? Number.POSITIVE_INFINITY : (quota?.limit ?? ARTISAN_PASSPORT_LIMIT[tier]);
+
+    return buildArtisan(id ?? 'me', userName ?? null, role, tier, passportLimit);
 }

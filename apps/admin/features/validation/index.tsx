@@ -23,6 +23,7 @@ import {
 import type { ArtisanProfileResponse, RepairerProfileResponse } from '@lumiris/api-client';
 import { usePermission } from '@/lib/auth/permissions';
 import { EmptyState } from '../_shared/empty-state';
+import { ReasonDialog } from '../_shared/reason-dialog';
 import { KybComparisonDrawer } from '../kyb-review/comparison-drawer';
 
 type PendingItem =
@@ -56,6 +57,9 @@ export function ValidationQueue() {
     const canVerifyRepairer = usePermission('retoucheur.kyc_verify');
     const canRejectRepairer = usePermission('retoucheur.kyc_reject');
     const [selected, setSelected] = useState<PendingItem | null>(null);
+    const [reasonPrompt, setReasonPrompt] = useState<{ item: PendingItem; intent: 'reject' | 'incomplete' } | null>(
+        null,
+    );
 
     const { data: rawArtisans = [], isLoading: artisansLoading } = useAdminArtisansList();
     const { data: rawRepairers = [], isLoading: repairersLoading } = useAdminRepairersList();
@@ -100,8 +104,7 @@ export function ValidationQueue() {
         });
     }
 
-    function reject(item: PendingItem) {
-        const reason = window.prompt(`Motif du refus pour ${itemName(item)} (optionnel) :`) ?? undefined;
+    function reject(item: PendingItem, reason: string | undefined) {
         const mutation = item.type === 'artisan' ? rejectArtisan : rejectRepairer;
         mutation.mutate(
             { id: item.data.id, reason },
@@ -136,9 +139,7 @@ export function ValidationQueue() {
         });
     }
 
-    function markIncompleteAction(item: PendingItem) {
-        const reason = window.prompt(`Qu'est-ce qui manque pour ${itemName(item)} ?`) ?? undefined;
-        if (reason === undefined) return;
+    function markIncompleteAction(item: PendingItem, reason: string | undefined) {
         const mutation = item.type === 'artisan' ? markArtisanIncomplete : markRepairerIncomplete;
         mutation.mutate(
             { id: item.data.id, reason },
@@ -244,7 +245,7 @@ export function ValidationQueue() {
                                                             ? !canRejectArtisan
                                                             : !canRejectRepairer) || rejecting
                                                     }
-                                                    onClick={() => reject(item)}
+                                                    onClick={() => setReasonPrompt({ item, intent: 'reject' })}
                                                     className="h-8 gap-1.5 bg-lumiris-rose text-white hover:bg-lumiris-rose/90 disabled:opacity-40"
                                                 >
                                                     <XCircle className="h-3.5 w-3.5" />
@@ -281,9 +282,9 @@ export function ValidationQueue() {
                 siret={selected?.data.siret}
                 kyb={selected?.data.kyb}
                 onApprove={() => selected && approve(selected)}
-                onReject={() => selected && reject(selected)}
+                onReject={() => selected && setReasonPrompt({ item: selected, intent: 'reject' })}
                 onMarkOngoing={() => selected && markOngoingAction(selected)}
-                onMarkIncomplete={() => selected && markIncompleteAction(selected)}
+                onMarkIncomplete={() => selected && setReasonPrompt({ item: selected, intent: 'incomplete' })}
                 approving={approving}
                 rejecting={rejecting}
                 markingOngoing={markingOngoing}
@@ -291,6 +292,37 @@ export function ValidationQueue() {
                 canApprove={canVerify}
                 canReject={canReject}
             />
+
+            {reasonPrompt ? (
+                <ReasonDialog
+                    open
+                    onOpenChange={(next) => {
+                        if (!next) setReasonPrompt(null);
+                    }}
+                    title={
+                        reasonPrompt.intent === 'reject'
+                            ? `Rejeter ${itemName(reasonPrompt.item)}`
+                            : `Renvoyer le dossier de ${itemName(reasonPrompt.item)}`
+                    }
+                    description={
+                        reasonPrompt.intent === 'reject'
+                            ? "L'inscription passe en rejetée et le compte est notifié par e-mail."
+                            : 'Le dossier repart chez le candidat avec ce motif, sans rejet définitif.'
+                    }
+                    placeholder={
+                        reasonPrompt.intent === 'reject'
+                            ? 'Motif du refus (SIRET non conforme, activité hors périmètre…) — optionnel'
+                            : 'Ce qui manque ou doit être corrigé'
+                    }
+                    confirmLabel={reasonPrompt.intent === 'reject' ? 'Rejeter' : 'Renvoyer le dossier'}
+                    emphasis={reasonPrompt.intent === 'reject' ? 'destructive' : 'default'}
+                    onConfirm={(reason) => {
+                        if (reasonPrompt.intent === 'reject') reject(reasonPrompt.item, reason);
+                        else markIncompleteAction(reasonPrompt.item, reason);
+                        setReasonPrompt(null);
+                    }}
+                />
+            ) : null}
         </FeatureLayout>
     );
 }

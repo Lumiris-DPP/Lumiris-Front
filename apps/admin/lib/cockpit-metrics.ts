@@ -1,7 +1,6 @@
 import { computeScore } from '@lumiris/core/scoring';
 import {
     IRIS_GRADES,
-    type AdminAuditLogEntry,
     type Artisan,
     type ArtisanTier,
     type IrisGrade,
@@ -31,26 +30,13 @@ const DAY_MS = 86_400_000;
 interface ArtisanKpi {
     readonly total: number;
     readonly splitByTier: Record<ArtisanTier, number>;
-    readonly churn30d: number;
 }
 
-export function buildArtisanKpi(
-    artisans: readonly Artisan[],
-    auditLog: readonly AdminAuditLogEntry[],
-    now: Date,
-): ArtisanKpi {
+export function buildArtisanKpi(artisans: readonly Artisan[]): ArtisanKpi {
     const splitByTier: Record<ArtisanTier, number> = { Solo: 0, Studio: 0, Maison: 0 };
     for (const a of artisans) splitByTier[a.tier] += 1;
 
-    const thirtyDaysAgo = now.getTime() - 30 * DAY_MS;
-    // `artisan.unsubscribe` n'est pas encore typée dans AdminAction (arrive avec le backend billing) — match string pour rester forward-compatible.
-    const churn30d = auditLog
-        .filter(
-            (e) => e.targetType === 'artisan' && e.action === ('artisan.unsubscribe' as AdminAuditLogEntry['action']),
-        )
-        .filter((e) => new Date(e.ts).getTime() >= thirtyDaysAgo).length;
-
-    return { total: artisans.length, splitByTier, churn30d };
+    return { total: artisans.length, splitByTier };
 }
 
 interface CurationKpi {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { AdminAuditLogEntry, Passport } from '@lumiris/types';
+import type { Passport } from '@lumiris/types';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -15,7 +15,6 @@ import {
 import { Checkbox } from '@lumiris/ui/components/checkbox';
 import { Textarea } from '@lumiris/ui/components/textarea';
 import { cn } from '@lumiris/ui/lib/cn';
-import { useLogAction } from '@/lib/auth';
 import { useCurationStore } from '../curation-store';
 import { FLAG_TAGS } from '../types';
 
@@ -23,11 +22,9 @@ interface RejectDialogProps {
     passport: Passport;
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onAfterAction: (entry: AdminAuditLogEntry) => void;
 }
 
-export function RejectDialog({ passport, open, onOpenChange, onAfterAction }: RejectDialogProps) {
-    const log = useLogAction();
+export function RejectDialog({ passport, open, onOpenChange }: RejectDialogProps) {
     const { setOverlay } = useCurationStore();
     const [reason, setReason] = useState('');
     const [tags, setTags] = useState<string[]>([]);
@@ -44,14 +41,7 @@ export function RejectDialog({ passport, open, onOpenChange, onAfterAction }: Re
     const handleReject = () => {
         if (!confirmed) return;
         setOverlay(passport.id, { status: 'flagged', flagReason: reason, flagTags: tags });
-        const entry = log({
-            action: 'passport.flag',
-            targetType: 'passport',
-            targetId: passport.id,
-            payload: { reason, tags, artisanId: passport.artisanId },
-        });
         onOpenChange(false);
-        onAfterAction(entry);
     };
 
     return (
@@ -60,8 +50,7 @@ export function RejectDialog({ passport, open, onOpenChange, onAfterAction }: Re
                 <AlertDialogHeader>
                     <AlertDialogTitle>Rejeter ce passeport</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Le passeport sera retiré de la file principale et marqué <strong>rejeté</strong>. Action tracée
-                        dans le log de gouvernance.
+                        Le passeport sera retiré de la file principale et marqué <strong>rejeté</strong>.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <Textarea

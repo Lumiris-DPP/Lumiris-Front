@@ -320,7 +320,7 @@ function CartSummary({
     const installment = installmentLabel(totalCents, paymentOptions);
 
     return (
-        <div className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-md border-t border-border/60 bg-background/90 px-4 pt-3 pb-6 backdrop-blur">
+        <div className="fixed inset-x-0 bottom-0 z-nav mx-auto max-w-md border-t border-border/60 bg-background/90 px-4 pt-3 pb-6 backdrop-blur">
             <dl className="mb-3 flex flex-col gap-1">
                 <div className="flex items-center justify-between text-xs">
                     <dt className="text-muted-foreground">Sous-total</dt>

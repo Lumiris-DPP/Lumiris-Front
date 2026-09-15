@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Download, ShieldAlert, Trash2 } from 'lucide-react';
-import type { MockVisionUser } from '@lumiris/mock-data';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -17,22 +16,15 @@ import { Button } from '@lumiris/ui/components/button';
 import { Checkbox } from '@lumiris/ui/components/checkbox';
 import { Label } from '@lumiris/ui/components/label';
 import { Textarea } from '@lumiris/ui/components/textarea';
-import { useLogAction, usePermission } from '@/lib/auth';
-import { PermissionRequiredAction } from '../_shared/permission-required-action';
 import type { RgpdLocalStatus } from './segments';
 
 interface RgpdDialogProps {
-    user: MockVisionUser;
     status: RgpdLocalStatus;
     onStatusChange: (next: RgpdLocalStatus) => void;
     onAnnounce?: (message: string) => void;
 }
 
-export function RgpdDialog({ user, status, onStatusChange, onAnnounce }: RgpdDialogProps) {
-    const log = useLogAction();
-    const canExport = usePermission('vision_user.gdpr_export');
-    const canErase = usePermission('vision_user.gdpr_delete');
-
+export function RgpdDialog({ status, onStatusChange, onAnnounce }: RgpdDialogProps) {
     const [exportOpen, setExportOpen] = useState(false);
     const [exportReason, setExportReason] = useState('');
     const [exportConfirmed, setExportConfirmed] = useState(false);
@@ -52,17 +44,7 @@ export function RgpdDialog({ user, status, onStatusChange, onAnnounce }: RgpdDia
 
     const handleExportConfirm = () => {
         if (!exportConfirmed) return;
-        const entry = log({
-            action: 'vision_user.gdpr_export',
-            targetType: 'vision_user',
-            targetId: user.id,
-            payload: {
-                reason: exportReason.trim(),
-                kind: 'gdpr_export',
-                generated: false,
-            },
-        });
-        announce(`Export RGPD enregistré — audit log ${entry.id} créé.`);
+        announce('Export RGPD enregistré.');
         onStatusChange('requested');
         setExportReason('');
         setExportConfirmed(false);
@@ -71,17 +53,7 @@ export function RgpdDialog({ user, status, onStatusChange, onAnnounce }: RgpdDia
 
     const handleDeleteConfirm = () => {
         if (!deleteConfirmed) return;
-        const entry = log({
-            action: 'vision_user.gdpr_delete',
-            targetType: 'vision_user',
-            targetId: user.id,
-            payload: {
-                reason: deleteReason.trim(),
-                kind: 'gdpr_delete',
-                email_at_request: user.email,
-            },
-        });
-        announce(`Suppression enregistrée — audit log ${entry.id} créé.`);
+        announce('Suppression enregistrée.');
         onStatusChange('pending_deletion');
         setDeleteReason('');
         setDeleteConfirmed(false);
@@ -94,28 +66,24 @@ export function RgpdDialog({ user, status, onStatusChange, onAnnounce }: RgpdDia
                 {announcement}
             </div>
             <div className="flex flex-wrap gap-2">
-                <PermissionRequiredAction requires="vision_user.gdpr_export">
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={!canExport || isCompleted}
-                        onClick={() => setExportOpen(true)}
-                        className="gap-1.5"
-                    >
-                        <Download className="h-3.5 w-3.5" aria-hidden /> Export RGPD
-                    </Button>
-                </PermissionRequiredAction>
-                <PermissionRequiredAction requires="vision_user.gdpr_delete">
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={!canErase || isCompleted || isPendingDeletion}
-                        onClick={() => setDeleteOpen(true)}
-                        className="gap-1.5 border-lumiris-rose/40 text-lumiris-rose hover:bg-lumiris-rose/10"
-                    >
-                        <Trash2 className="h-3.5 w-3.5" aria-hidden /> Supprimer compte
-                    </Button>
-                </PermissionRequiredAction>
+                <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={isCompleted}
+                    onClick={() => setExportOpen(true)}
+                    className="gap-1.5"
+                >
+                    <Download className="h-3.5 w-3.5" aria-hidden /> Export RGPD
+                </Button>
+                <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={isCompleted || isPendingDeletion}
+                    onClick={() => setDeleteOpen(true)}
+                    className="gap-1.5 border-lumiris-rose/40 text-lumiris-rose hover:bg-lumiris-rose/10"
+                >
+                    <Trash2 className="h-3.5 w-3.5" aria-hidden /> Supprimer compte
+                </Button>
             </div>
 
             <AlertDialog
@@ -158,11 +126,9 @@ export function RgpdDialog({ user, status, onStatusChange, onAnnounce }: RgpdDia
                     </div>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Annuler</AlertDialogCancel>
-                        <PermissionRequiredAction requires="vision_user.gdpr_export">
-                            <AlertDialogAction onClick={handleExportConfirm} disabled={!exportConfirmed}>
-                                Confirmer
-                            </AlertDialogAction>
-                        </PermissionRequiredAction>
+                        <AlertDialogAction onClick={handleExportConfirm} disabled={!exportConfirmed}>
+                            Confirmer
+                        </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -205,15 +171,13 @@ export function RgpdDialog({ user, status, onStatusChange, onAnnounce }: RgpdDia
                     </div>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Annuler</AlertDialogCancel>
-                        <PermissionRequiredAction requires="vision_user.gdpr_delete">
-                            <AlertDialogAction
-                                onClick={handleDeleteConfirm}
-                                disabled={!deleteConfirmed}
-                                className="bg-lumiris-rose hover:bg-lumiris-rose/90"
-                            >
-                                Supprimer
-                            </AlertDialogAction>
-                        </PermissionRequiredAction>
+                        <AlertDialogAction
+                            onClick={handleDeleteConfirm}
+                            disabled={!deleteConfirmed}
+                            className="bg-lumiris-rose hover:bg-lumiris-rose/90"
+                        >
+                            Supprimer
+                        </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

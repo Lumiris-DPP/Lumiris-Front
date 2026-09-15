@@ -1,7 +1,6 @@
 import { computeScore } from '@lumiris/core/scoring';
 import {
     IRIS_GRADES,
-    type AdminAuditLogEntry,
     type Artisan,
     type ArtisanTier,
     type IrisGrade,
@@ -13,8 +12,6 @@ import { computeHealthScore, type HealthBreakdown } from '@/lib/health-score';
 
 export const TIER_MRR: Record<ArtisanTier, number> = { Solo: 29, Studio: 79, Maison: 149 };
 export const PLUS_ADDON = 19;
-
-const NINETY_DAYS_MS = 90 * 86_400_000;
 
 function nextTier(tier: ArtisanTier): ArtisanTier | null {
     if (tier === 'Solo') return 'Studio';
@@ -30,7 +27,6 @@ export interface ArtisanRow {
     cappedShare: number;
     flaggedShare: number;
     health: HealthBreakdown;
-    overrideCount90d: number;
     cohortMonth: string;
     /** Offset en mois par rapport à `now` (0 = mois courant, -3 = il y a 3 mois). */
     cohortOffset: number;
@@ -48,39 +44,19 @@ function monthOffset(iso: string, now: Date): number {
     return (joined.getUTCFullYear() - now.getUTCFullYear()) * 12 + (joined.getUTCMonth() - now.getUTCMonth());
 }
 
-function countOverridesFor(
-    auditLog: readonly AdminAuditLogEntry[],
-    artisan: Artisan,
-    artisanPassports: readonly Passport[],
-    now: Date,
-): number {
-    const cutoff = now.getTime() - NINETY_DAYS_MS;
-    const passportIds = new Set(artisanPassports.map((p) => p.id));
-    return auditLog.filter((entry) => {
-        if (entry.action !== 'passport.override') return false;
-        if (new Date(entry.ts).getTime() < cutoff) return false;
-        if (entry.targetType === 'passport' && passportIds.has(entry.targetId)) return true;
-        const payloadArtisanId =
-            typeof entry.payload?.artisanId === 'string' ? (entry.payload.artisanId as string) : null;
-        return payloadArtisanId === artisan.id;
-    }).length;
-}
-
 export function buildArtisanRows(
     artisans: readonly Artisan[],
     passports: readonly Passport[],
     repairers: readonly Repairer[],
-    auditLog: readonly AdminAuditLogEntry[],
     now: Date,
 ): readonly ArtisanRow[] {
-    return artisans.map((artisan) => buildArtisanRow(artisan, passports, repairers, auditLog, now));
+    return artisans.map((artisan) => buildArtisanRow(artisan, passports, repairers, now));
 }
 
 export function buildArtisanRow(
     artisan: Artisan,
     passports: readonly Passport[],
     repairers: readonly Repairer[],
-    auditLog: readonly AdminAuditLogEntry[],
     now: Date,
 ): ArtisanRow {
     const artisanPassports = passports.filter((p) => p.artisanId === artisan.id);
@@ -105,12 +81,10 @@ export function buildArtisanRow(
             ? '-'
             : IRIS_GRADES.reduce<IrisGrade>((best, g) => (gradeCounts[g] > gradeCounts[best] ? g : best), 'A');
 
-    const overrideCount90d = countOverridesFor(auditLog, artisan, artisanPassports, now);
     const health = computeHealthScore({
         publishedCount: published.length,
         passportLimit: artisan.passportLimit,
         avgIrisScore: avgScore,
-        overrideCount90d,
     });
 
     const upgradeHint =
@@ -128,7 +102,6 @@ export function buildArtisanRow(
         cappedShare,
         flaggedShare: 0,
         health,
-        overrideCount90d,
         cohortMonth: monthKey(artisan.joinedAt),
         cohortOffset: monthOffset(artisan.joinedAt, now),
         upgradeHint,

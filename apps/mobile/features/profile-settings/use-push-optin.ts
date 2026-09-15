@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { toast } from '@lumiris/ui/components/sonner';
 import { useVapidPublicKey, usePushSubscribe, usePushUnsubscribe } from '@lumiris/api-client/react';
 import type { PushSubscriptionPayload } from '@lumiris/api-client';
 import { getExistingPushSubscription, isPushSupported, subscribeToPush } from '@/lib/push';
@@ -44,6 +45,12 @@ export function usePushOptIn() {
     const enable = useCallback(async () => {
         if (!vapidPublicKey) return;
         const permission = await Notification.requestPermission();
+        if (permission === 'denied') {
+            toast.error('Notifications bloquées', {
+                description: 'Autorise-les pour ce site dans les réglages de ton navigateur.',
+            });
+            return;
+        }
         if (permission !== 'granted') return;
         const subscription = await subscribeToPush(vapidPublicKey);
         await subscribeMutation.mutateAsync(subscription.toJSON() as PushSubscriptionPayload);
@@ -59,9 +66,23 @@ export function usePushOptIn() {
         setSubscribed(false);
     }, [unsubscribeMutation]);
 
+    const toggle = useCallback(
+        (next: boolean) => {
+            const run = next ? enable : disable;
+            void run().catch(() => {
+                toast.error(
+                    next
+                        ? "Impossible d'activer les notifications push."
+                        : 'Impossible de désactiver les notifications push.',
+                );
+            });
+        },
+        [enable, disable],
+    );
+
     return {
         status,
         pending: subscribeMutation.isPending || unsubscribeMutation.isPending,
-        toggle: (next: boolean) => void (next ? enable() : disable()),
+        toggle,
     };
 }

@@ -19,7 +19,6 @@ import { Button } from '@lumiris/ui/components/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
 import { Textarea } from '@lumiris/ui/components/textarea';
 import { cn } from '@lumiris/ui/lib/cn';
-import { useLogAction } from '@/lib/auth';
 import { ACTION_LABEL, REASON_LABEL, type GapEntry, type RecommendedAction } from '@/lib/regulatory-calendar';
 
 interface GapAnalysisProps {
@@ -144,28 +143,11 @@ function CampaignDialog({
     onOpenChange: (open: boolean) => void;
     gaps: readonly GapEntry[];
 }) {
-    const log = useLogAction();
     const [message, setMessage] = useState(
         "L'échéance ESPR textile arrive en 2028 — programmons un point pour finaliser votre DPP.",
     );
 
     const handleLaunch = () => {
-        log({
-            action: 'artisan.contact',
-            targetType: 'period',
-            targetId: `espr-campaign-${new Date().toISOString().slice(0, 10)}`,
-            payload: {
-                campaign: 'espr-activation',
-                recipientCount: gaps.length,
-                recipientIds: gaps.map((g) => g.artisanId),
-                breakdown: gaps.reduce<Record<RecommendedAction, number>>(
-                    (acc, g) => ({ ...acc, [g.recommendedAction]: (acc[g.recommendedAction] ?? 0) + 1 }),
-                    { relance: 0, demo: 0, training: 0 },
-                ),
-                messagePreview: message.slice(0, 200),
-                dryRun: true,
-            },
-        });
         onOpenChange(false);
     };
 
@@ -174,9 +156,7 @@ function CampaignDialog({
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Lancer la campagne</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Envoi groupé à {gaps.length} ateliers. Tracé dans l&apos;audit log.
-                    </AlertDialogDescription>
+                    <AlertDialogDescription>Envoi groupé à {gaps.length} ateliers.</AlertDialogDescription>
                 </AlertDialogHeader>
                 <Textarea
                     value={message}

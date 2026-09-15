@@ -1,5 +1,5 @@
-import { Suspense } from 'react';
 import type { Metadata, Viewport } from 'next';
+import { Suspense } from 'react';
 import { Toaster } from '@lumiris/ui/components/sonner';
 import { ConsentBanner } from '@lumiris/ui/components/consent-banner';
 

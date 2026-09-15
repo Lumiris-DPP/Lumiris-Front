@@ -11,7 +11,7 @@ interface PageProps {
 
 export default function PassportPreviewPage({ params }: PageProps) {
     const { id } = use(params);
-    const { passport, artisan, isLoading } = usePassportSource(id);
+    const { passport, artisan, isLoading, isDraft } = usePassportSource(id);
 
     // La résolution est entièrement côté client (session en storage) : appeler `notFound()` ici
     // ferait répondre 404 au rendu serveur sur un passeport qui s'affiche ensuite normalement.
@@ -34,5 +34,5 @@ export default function PassportPreviewPage({ params }: PageProps) {
         );
     }
 
-    return <PassportPreview passport={passport} artisan={artisan} />;
+    return <PassportPreview passport={passport} artisan={artisan} dppId={isDraft ? null : id} />;
 }

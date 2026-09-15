@@ -110,6 +110,7 @@ export function MapClient({ points, userCoords, selectedId, onSelect, onMoveEnd 
                 zoom={initialZoom}
                 scrollWheelZoom
                 attributionControl={false}
+                className="isolate"
                 style={{ position: 'absolute', inset: 0, height: '100%', width: '100%' }}
             >
                 <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" maxZoom={19} />
@@ -162,7 +163,7 @@ export function MapClient({ points, userCoords, selectedId, onSelect, onMoveEnd 
             </MapContainer>
 
             {visiblePoints.length === 0 ? (
-                <div className="pointer-events-none absolute inset-0 z-500 flex items-center justify-center px-6">
+                <div className="pointer-events-none absolute inset-0 z-sticky flex items-center justify-center px-6">
                     <p className="rounded-2xl border border-border/40 bg-card/90 px-4 py-3 text-center text-xs text-muted-foreground backdrop-blur-md">
                         Aucun point partenaire pour ce filtre.
                     </p>
@@ -170,7 +171,7 @@ export function MapClient({ points, userCoords, selectedId, onSelect, onMoveEnd 
             ) : null}
 
             {hiddenCount > 0 ? (
-                <div className="pointer-events-none absolute top-3 left-3 z-500">
+                <div className="pointer-events-none absolute top-3 left-3 z-sticky">
                     <span className="rounded-full border border-border/40 bg-card/90 px-3 py-1 text-[11px] font-semibold text-muted-foreground backdrop-blur-md">
                         +{hiddenCount} autre{hiddenCount > 1 ? 's' : ''} ateliers
                     </span>

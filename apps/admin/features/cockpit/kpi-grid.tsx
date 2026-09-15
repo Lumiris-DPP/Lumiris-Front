@@ -56,7 +56,6 @@ export function KpiGrid({ artisanKpi, curationKpi, irisKpi, mrrKpi }: KpiGridPro
             borderClass: 'border-lumiris-emerald/15',
             ariaLabel: `Artisans actifs : ${artisanKpi.total}.`,
             href: '/artisans',
-            ...(artisanKpi.churn30d > 0 ? { trend: { value: `−${artisanKpi.churn30d}`, up: false } } : {}),
         },
         {
             key: 'curation',

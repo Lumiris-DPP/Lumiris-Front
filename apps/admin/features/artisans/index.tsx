@@ -6,7 +6,6 @@ import { type Artisan } from '@lumiris/types';
 import { DataTableFilters } from '@lumiris/ui/components/data-table-filters';
 import { FeatureLayout } from '@lumiris/ui/components/feature-layout';
 import { TooltipProvider } from '@lumiris/ui/components/tooltip';
-import { useAdminAuditLog } from '@/lib/auth';
 import { buildArtisanRows, type ArtisanRow } from '@/lib/artisan-analytics';
 import { ArtisanDrawer } from './artisan-drawer';
 import { ArtisanTable } from './artisan-table';
@@ -26,14 +25,13 @@ function ArtisansComponent() {
 
 function ArtisansInner() {
     const { selectedId, setSelectedId } = useDeepLinkId();
-    const auditLog = useAdminAuditLog();
 
     const [search, setSearch] = useState('');
     const [healthFilter, setHealthFilter] = useState<HealthFilter>('all');
 
     const rows: readonly ArtisanRow[] = useMemo(
-        () => buildArtisanRows(mockArtisans, mockPassports, mockRepairers, auditLog, FIXTURE_NOW),
-        [auditLog],
+        () => buildArtisanRows(mockArtisans, mockPassports, mockRepairers, FIXTURE_NOW),
+        [],
     );
 
     const selected: Artisan | null = useMemo(

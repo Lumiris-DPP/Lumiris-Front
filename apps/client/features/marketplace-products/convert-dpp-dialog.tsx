@@ -40,8 +40,8 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
     const { data: dpps = [], isLoading } = useDppForms({ enabled: open });
     const convert = useConvertDppToProduct();
     // Vendre exige un abonnement ATELIER actif (le backend renvoie 422 sinon).
-    const { hasActiveSubscription, isRealMode } = useSubscription();
-    const sellBlocked = isRealMode && !hasActiveSubscription;
+    const { hasActiveSubscription } = useSubscription();
+    const sellBlocked = !hasActiveSubscription;
 
     const [dppFormId, setDppFormId] = useState('');
     const [priceEuros, setPriceEuros] = useState('');

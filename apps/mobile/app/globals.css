@@ -1,5 +1,8 @@
 @import '@lumiris/ui/styles/prismatic.css';
 
+@source "../../../packages/ui/src/**/*.{ts,tsx}";
+@source "../../../packages/scoring-ui/src/**/*.{ts,tsx}";
+
 /* Polices auto-hébergées (@fontsource, importées dans app/layout.tsx) exposées sous les mêmes
    noms de variables que next/font, pour que --font-sans / --font-mono de prismatic.css
    continuent de résoudre. */
@@ -91,4 +94,15 @@ html[data-reduce-motion='true'] *::after {
     animation-duration: 0ms !important;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0ms !important;
+        animation-duration: 0ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+    }
 }

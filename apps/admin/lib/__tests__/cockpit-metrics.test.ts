@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'bun:test';
 import { buildArtisanKpi, buildCurationKpi, buildIrisKpi, buildMrrKpi, buildTrajectory } from '../cockpit-metrics';
-import { makeArtisan, makeAuditEntry, makePassport, makeSubscription } from '@/test/factories';
+import { makeArtisan, makePassport, makeSubscription } from '@/test/factories';
 
 const NOW = new Date('2026-04-30T00:00:00Z');
 
-describe('buildArtisanKpi — split par tier + churn 30 j', () => {
+describe('buildArtisanKpi — split par tier', () => {
     it('agrège par tier (Solo / Studio / Maison)', () => {
         const artisans = [
             makeArtisan({ tier: 'Solo' }),
@@ -12,34 +12,13 @@ describe('buildArtisanKpi — split par tier + churn 30 j', () => {
             makeArtisan({ tier: 'Studio' }),
             makeArtisan({ tier: 'Maison' }),
         ];
-        const kpi = buildArtisanKpi(artisans, [], NOW);
+        const kpi = buildArtisanKpi(artisans);
         expect(kpi.total).toBe(4);
         expect(kpi.splitByTier).toEqual({ Solo: 2, Studio: 1, Maison: 1 });
     });
 
     it('renvoie 0 sur liste vide', () => {
-        expect(buildArtisanKpi([], [], NOW).total).toBe(0);
-    });
-
-    it('compte les artisan.unsubscribe < 30 jours (string-side, type pas encore exporté)', () => {
-        const log = [
-            makeAuditEntry({
-                targetType: 'artisan',
-                action: 'artisan.unsubscribe' as never,
-                ts: '2026-04-15T00:00:00Z',
-            }),
-            makeAuditEntry({
-                targetType: 'artisan',
-                action: 'artisan.unsubscribe' as never,
-                ts: '2026-01-01T00:00:00Z',
-            }),
-        ];
-        expect(buildArtisanKpi([], log, NOW).churn30d).toBe(1);
-    });
-
-    it('ignore les autres actions même targetType=artisan', () => {
-        const log = [makeAuditEntry({ targetType: 'artisan', action: 'artisan.suspend', ts: '2026-04-15T00:00:00Z' })];
-        expect(buildArtisanKpi([], log, NOW).churn30d).toBe(0);
+        expect(buildArtisanKpi([]).total).toBe(0);
     });
 });
 

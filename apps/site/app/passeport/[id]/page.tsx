@@ -1,15 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { mockArtisanById, mockPassportsPublic, passportPublicByIdOrSlug } from '@lumiris/mock-data';
-import { KIND_LABEL_FR } from '@lumiris/utils';
 import { JsonLd } from '@/features/json-ld';
 import { PassportPublicViewSection } from '@/features/passport-public-view';
-
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-    return mockPassportsPublic.map((view) => ({ id: view.passport.id }));
-}
+import { fetchPublicPassport, passportProductName } from '@/lib/public-passport-api';
 
 interface RouteProps {
     params: Promise<{ id: string }>;
@@ -17,12 +10,12 @@ interface RouteProps {
 
 export async function generateMetadata({ params }: RouteProps): Promise<Metadata> {
     const { id } = await params;
-    const view = passportPublicByIdOrSlug(id);
-    if (!view) return {};
+    const passport = await fetchPublicPassport(id);
+    if (!passport) return {};
 
-    const productLabel = KIND_LABEL_FR[view.passport.garment.kind] ?? KIND_LABEL_FR.other;
+    const { view } = passport;
     const grade = view.irisScore?.grade ?? null;
-    const productName = `${productLabel} ${view.passport.garment.reference}`;
+    const productName = passportProductName(view.passport);
     const title = `${productName} | ${view.artisan.atelierName} - LUMIRIS`;
     const description = grade
         ? `Passeport numérique : matières, fabrication, certifications. Score Iris ${grade}. ${view.excerpt}`
@@ -34,6 +27,8 @@ export async function generateMetadata({ params }: RouteProps): Promise<Metadata
         title,
         description,
         alternates: { canonical },
+        // Catalogue de démonstration : indexer ces fiches promettrait une traçabilité qui n'existe pas.
+        robots: { index: false, follow: false },
         openGraph: {
             type: 'article',
             url: canonical,
@@ -52,20 +47,16 @@ export async function generateMetadata({ params }: RouteProps): Promise<Metadata
 
 export default async function PassportPage({ params }: RouteProps) {
     const { id } = await params;
-    const view = passportPublicByIdOrSlug(id);
-    if (!view) notFound();
+    const passport = await fetchPublicPassport(id);
+    if (!passport) notFound();
 
-    const artisan = mockArtisanById(view.artisan.id);
-    const artisanSlug = artisan?.slug ?? view.artisan.id;
-
-    const productLabel = KIND_LABEL_FR[view.passport.garment.kind] ?? KIND_LABEL_FR.other;
-    const productName = `${productLabel} ${view.passport.garment.reference}`;
+    const { view } = passport;
     const grade = view.irisScore?.grade;
 
     const productJsonLd = {
         '@context': 'https://schema.org',
         '@type': 'Product',
-        name: productName,
+        name: passportProductName(view.passport),
         description: view.excerpt,
         image: view.passport.garment.mainPhotoUrl || undefined,
         sku: view.passport.garment.reference,
@@ -104,7 +95,7 @@ export default async function PassportPage({ params }: RouteProps) {
     return (
         <>
             <JsonLd data={productJsonLd} />
-            <PassportPublicViewSection view={view} artisanSlug={artisanSlug} />
+            <PassportPublicViewSection {...passport} />
         </>
     );
 }

@@ -13,9 +13,13 @@ import { getCameraPermissionState, hasSeenCameraPrompt, markCameraPromptSeen } f
 import type { processVideoFrame } from '@/lib/scan/qr-processor';
 import { IrisRing, type IrisRingStatus } from './iris-ring';
 import { ScanResultModal } from './scan-result-modal';
-import { CameraDeniedState, QrUnreadableState, NonLumirisQrState } from './empty-states';
+import { CameraDeniedState, QrUnreadableState, NonLumirisQrState, type CameraIssue } from './empty-states';
 import { PermissionPrompt } from './permission-prompt';
 import { ManualEntrySheet } from './manual-entry';
+
+function isCameraMissing(error: unknown): boolean {
+    return error instanceof DOMException && (error.name === 'NotFoundError' || error.name === 'OverconstrainedError');
+}
 
 const UNREADABLE_TIMEOUT_MS = 12_000;
 const FRAME_INTERVAL_MS = 1000 / 30;
@@ -33,9 +37,12 @@ export function ScanPassport() {
     const processFrameRef = useRef<ProcessVideoFrame | null>(null);
 
     const [status, setStatus] = useState<IrisRingStatus>('idle');
+    const [cameraIssue, setCameraIssue] = useState<CameraIssue>('denied');
     const [phase, setPhase] = useState<'pre-prompt' | 'live'>('live');
     const [match, setMatch] = useState<Passport | null>(null);
     const [manualOpen, setManualOpen] = useState(false);
+
+    const cameraReleasedRef = useRef(false);
 
     const stopCamera = useCallback(() => {
         if (rafRef.current !== null) {
@@ -50,6 +57,7 @@ export function ScanPassport() {
 
     const startCamera = useCallback(async () => {
         if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+            setCameraIssue('unavailable');
             setStatus('denied');
             return;
         }
@@ -62,6 +70,10 @@ export function ScanPassport() {
                 video: { facingMode: 'environment' },
                 audio: false,
             });
+            if (cameraReleasedRef.current) {
+                stream.getTracks().forEach((track) => track.stop());
+                return;
+            }
             streamRef.current = stream;
             const video = videoRef.current;
             if (video) {
@@ -70,7 +82,8 @@ export function ScanPassport() {
             }
             startedAtRef.current = performance.now();
             setStatus('scanning');
-        } catch {
+        } catch (error) {
+            setCameraIssue(isCameraMissing(error) ? 'unavailable' : 'denied');
             setStatus('denied');
         }
     }, []);
@@ -129,6 +142,7 @@ export function ScanPassport() {
 
     useEffect(() => {
         let cancelled = false;
+        cameraReleasedRef.current = false;
         (async () => {
             const state = await getCameraPermissionState();
             if (cancelled) return;
@@ -146,6 +160,7 @@ export function ScanPassport() {
         })();
         return () => {
             cancelled = true;
+            cameraReleasedRef.current = true;
             stopCamera();
         };
     }, [startCamera, stopCamera]);
@@ -222,7 +237,9 @@ export function ScanPassport() {
 
             {phase === 'pre-prompt' ? <PermissionPrompt onActivate={onAcceptPrompt} /> : null}
 
-            {status === 'denied' ? <CameraDeniedState onAllow={startCamera} onManualEntry={openManualEntry} /> : null}
+            {status === 'denied' ? (
+                <CameraDeniedState issue={cameraIssue} onAllow={startCamera} onManualEntry={openManualEntry} />
+            ) : null}
             {status === 'unreadable' ? <QrUnreadableState onRetry={restart} onManualEntry={openManualEntry} /> : null}
             {status === 'unknown' ? <NonLumirisQrState onRetry={restart} onManualEntry={openManualEntry} /> : null}
 

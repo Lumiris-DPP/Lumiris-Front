@@ -5,7 +5,7 @@
     "description": "LUMIRIS Client - workspace B2B des artisans (offre ATELIER) pour créer leurs DPP textile.",
     "scripts": {
         "dev": "next dev --port 3003",
-        "build": "next build",
+        "build": "node ./node_modules/.bin/next build",
         "start": "next start --port 3003",
         "lint": "eslint .",
         "typecheck": "tsc --noEmit",

@@ -16,20 +16,17 @@ import {
 import { Button } from '@lumiris/ui/components/button';
 import { Textarea } from '@lumiris/ui/components/textarea';
 import { cn } from '@lumiris/ui/lib/cn';
-import { useLogAction } from '@/lib/auth';
 import { REVIEW_HIDE_REASON_MIN_CHARS } from './specialties';
 import type { RetoucheurOverlay } from './types';
 
 interface ReviewsTabProps {
     retoucheur: Repairer;
     overlay: RetoucheurOverlay | undefined;
-    canModerate: boolean;
     onPatchOverlay: (id: string, patch: Partial<RetoucheurOverlay>) => void;
     onAnnounce: (message: string) => void;
 }
 
-export function ReviewsTab({ retoucheur, overlay, canModerate, onPatchOverlay, onAnnounce }: ReviewsTabProps) {
-    const log = useLogAction();
+export function ReviewsTab({ retoucheur, overlay, onPatchOverlay, onAnnounce }: ReviewsTabProps) {
     const [pendingHideId, setPendingHideId] = useState<string | null>(null);
     const [hideReason, setHideReason] = useState('');
 
@@ -51,13 +48,7 @@ export function ReviewsTab({ retoucheur, overlay, canModerate, onPatchOverlay, o
         onPatchOverlay(retoucheur.id, {
             hiddenReviewReasons: { ...hidden, [pendingHideId]: hideReason.trim() },
         });
-        const entry = log({
-            action: 'retoucheur.review_hide',
-            targetType: 'repairer',
-            targetId: retoucheur.id,
-            payload: { reviewId: pendingHideId, decision: 'hidden', reason: hideReason.trim() },
-        });
-        onAnnounce(`Avis masqué — audit log ${entry.id}.`);
+        onAnnounce('Avis masqué.');
         close();
     };
 
@@ -65,13 +56,7 @@ export function ReviewsTab({ retoucheur, overlay, canModerate, onPatchOverlay, o
         const next = { ...hidden };
         delete next[reviewId];
         onPatchOverlay(retoucheur.id, { hiddenReviewReasons: next });
-        const entry = log({
-            action: 'retoucheur.review_hide',
-            targetType: 'repairer',
-            targetId: retoucheur.id,
-            payload: { reviewId, decision: 'published' },
-        });
-        onAnnounce(`Avis publié — audit log ${entry.id}.`);
+        onAnnounce('Avis publié.');
     };
 
     return (
@@ -98,7 +83,6 @@ export function ReviewsTab({ retoucheur, overlay, canModerate, onPatchOverlay, o
                                     size="sm"
                                     variant="ghost"
                                     onClick={() => handlePublish(rev.id)}
-                                    disabled={!canModerate}
                                     className="h-7 text-[11px] text-lumiris-emerald"
                                 >
                                     Publier
@@ -109,7 +93,6 @@ export function ReviewsTab({ retoucheur, overlay, canModerate, onPatchOverlay, o
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => setPendingHideId(rev.id)}
-                                disabled={!canModerate}
                                 className="mt-2 h-7 text-[11px] text-lumiris-rose"
                             >
                                 Masquer
@@ -124,7 +107,7 @@ export function ReviewsTab({ retoucheur, overlay, canModerate, onPatchOverlay, o
                     <AlertDialogHeader>
                         <AlertDialogTitle>Masquer cet avis ?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Précisez la raison (≥ {REVIEW_HIDE_REASON_MIN_CHARS} caractères). Action tracée.
+                            Précisez la raison (≥ {REVIEW_HIDE_REASON_MIN_CHARS} caractères).
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <Textarea

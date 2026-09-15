@@ -23,7 +23,7 @@ export function WorkspaceHeader({ title, actions }: WorkspaceHeaderProps) {
     const { openSidebar } = useWorkspaceShell();
     const artisan = useCurrentArtisan();
     const notifications = useWorkspaceNotifications(artisan);
-    const { subscription, quota, isRealMode } = useSubscription();
+    const { subscription, quota } = useSubscription();
 
     return (
         <header className="sticky top-0 z-20 border-b border-border bg-card">
@@ -45,11 +45,7 @@ export function WorkspaceHeader({ title, actions }: WorkspaceHeaderProps) {
 
                 <div className="flex items-center gap-2 md:gap-3">
                     {actions}
-                    {isRealMode ? (
-                        <QuotaBadge subscription={subscription} quota={quota} />
-                    ) : (
-                        <TierBadge tier={artisan.tier} />
-                    )}
+                    <QuotaBadge subscription={subscription} quota={quota} />
                     <NotificationsBell notifications={notifications} />
                     <UserMenu artisan={artisan} />
                 </div>
@@ -83,27 +79,6 @@ function QuotaBadge({ subscription, quota }: { subscription: SubscriptionDto | n
             <TooltipContent>
                 {active ? `Passeports : ${usage} — voir l’abonnement` : 'Aucun abonnement actif — souscrire'}
             </TooltipContent>
-        </Tooltip>
-    );
-}
-
-function TierBadge({ tier }: { tier: 'Solo' | 'Studio' | 'Maison' }) {
-    return (
-        <Tooltip>
-            <TooltipTrigger asChild>
-                <Link
-                    href="/subscription"
-                    className={cn(
-                        'rounded-md px-2 py-1 font-mono text-[10px] font-semibold uppercase',
-                        tier === 'Solo' && 'bg-tier-solo/15 text-tier-solo',
-                        tier === 'Studio' && 'bg-tier-studio/15 text-tier-studio',
-                        tier === 'Maison' && 'bg-tier-maison/15 text-tier-maison',
-                    )}
-                >
-                    {tier}
-                </Link>
-            </TooltipTrigger>
-            <TooltipContent>Plan {tier} — voir l’abonnement</TooltipContent>
         </Tooltip>
     );
 }

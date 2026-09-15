@@ -73,6 +73,7 @@ export default function OnboardingPage() {
     const repairerMe = useRepairerMe({ enabled: Boolean(token) && isRepairer });
 
     const [step, setStep] = useState<Step>('entity');
+    const verifiedCompany = registerArtisan.data ?? me.data;
     const siretInputRef = useRef<HTMLInputElement>(null);
     const [siret, setSiret] = useState('');
     const [siretError, setSiretError] = useState('');
@@ -414,6 +415,22 @@ export default function OnboardingPage() {
                         <p className="mt-1 text-sm text-muted-foreground">
                             Lisez attentivement et certifiez l&apos;exactitude de vos informations.
                         </p>
+
+                        {verifiedCompany?.companyName && (
+                            <div className="mt-5 rounded-lg border border-lumiris-cyan/30 bg-lumiris-cyan/5 p-4">
+                                <p className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
+                                    Entité identifiée
+                                </p>
+                                <p className="mt-1 text-sm font-semibold text-foreground">
+                                    {verifiedCompany.companyName}
+                                </p>
+                                {verifiedCompany.nafCode && (
+                                    <p className="mt-0.5 font-mono text-xs text-muted-foreground">
+                                        Code NAF {verifiedCompany.nafCode}
+                                    </p>
+                                )}
+                            </div>
+                        )}
 
                         <div className="mt-5 rounded-lg border border-border bg-muted/30 p-4 text-sm leading-relaxed">
                             <p className="font-medium text-foreground">Déclaration sur l&apos;honneur</p>

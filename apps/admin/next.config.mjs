@@ -15,8 +15,6 @@ export default createNextConfig({
             { source: '/billing/:path*', destination: '/revenus?tab=subscriptions', permanent: false },
             { source: '/affiliation', destination: '/revenus?tab=affiliation', permanent: false },
             { source: '/affiliation/:path*', destination: '/revenus?tab=affiliation', permanent: false },
-            { source: '/gouvernance', destination: '/audit', permanent: false },
-            { source: '/gouvernance/:path*', destination: '/audit', permanent: false },
         ];
     },
 });

@@ -18,8 +18,8 @@ export function MarketplaceProducts() {
     const [convertOpen, setConvertOpen] = useState(false);
     // Vendre exige un abonnement ATELIER actif : on pré-désactive la conversion sinon (le
     // backend renvoie 422). Le blocage ne s'applique qu'en mode réel.
-    const { hasActiveSubscription, isRealMode } = useSubscription();
-    const sellBlocked = isRealMode && !hasActiveSubscription;
+    const { hasActiveSubscription } = useSubscription();
+    const sellBlocked = !hasActiveSubscription;
 
     return (
         <div className="space-y-4 p-8">

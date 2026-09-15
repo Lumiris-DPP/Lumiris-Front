@@ -9,14 +9,12 @@ import { DetailDrawer } from '@lumiris/ui/components/detail-drawer';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
 import { Textarea } from '@lumiris/ui/components/textarea';
 import { cn } from '@lumiris/ui/lib/cn';
-import { useAdminAuditLog } from '@/lib/auth';
 import { BANK_STATUS_LABEL, BANK_STATUS_TONE, inferExpectedDate, type BankStatus } from './types';
 
 interface PayoutDetailDrawerProps {
     payout: Payout | null;
     events: readonly AffiliationEvent[];
     bankStatus: BankStatus;
-    canPrepare: boolean;
     comment: string;
     onCommentChange: (value: string) => void;
     onReconcile: () => void;
@@ -28,15 +26,12 @@ export function PayoutDetailDrawer({
     payout,
     events,
     bankStatus,
-    canPrepare,
     comment,
     onCommentChange,
     onReconcile,
     onReject,
     onClose,
 }: PayoutDetailDrawerProps) {
-    const auditLog = useAdminAuditLog();
-
     const beneficiaries = useMemo(() => {
         if (!payout) return [] as ReadonlyArray<{ id: string; name: string; total: number; count: number }>;
         const periodEvents = events.filter((e) => new Date(e.occurredAt).toISOString().slice(0, 7) === payout.period);
@@ -51,15 +46,6 @@ export function PayoutDetailDrawer({
             .map(([id, info]) => ({ id, ...info }))
             .sort((a, b) => b.total - a.total);
     }, [payout, events]);
-
-    const auditEntries = useMemo(() => {
-        if (!payout) return [];
-        return auditLog.filter(
-            (entry) =>
-                (entry.targetType === 'payout' && entry.targetId === payout.id) ||
-                (entry.targetType === 'period' && entry.targetId === payout.period),
-        );
-    }, [auditLog, payout]);
 
     if (!payout) {
         return <DetailDrawer open={false} onOpenChange={onClose} title="" />;
@@ -158,36 +144,14 @@ export function PayoutDetailDrawer({
         </div>
     );
 
-    const auditContent = (
-        <ul className="space-y-2 text-xs">
-            {auditEntries.length === 0 ? (
-                <li className="text-muted-foreground italic">Aucune entrée d&apos;audit pour ce payout.</li>
-            ) : (
-                auditEntries.map((entry) => (
-                    <li key={entry.id} className="rounded-lg border border-border bg-card p-3">
-                        <div className="flex items-baseline justify-between gap-2">
-                            <p className="font-mono text-[11px] text-foreground">{entry.action}</p>
-                            <p className="font-mono text-[10px] text-muted-foreground">
-                                {new Date(entry.ts).toLocaleString('fr-FR')}
-                            </p>
-                        </div>
-                        <p className="mt-1 text-[11px] text-muted-foreground">
-                            {entry.actorId} · {entry.actorRole}
-                        </p>
-                    </li>
-                ))
-            )}
-        </ul>
-    );
-
     const footer = (
         <div className="flex items-center justify-end gap-2">
-            {canPrepare && bankStatus !== 'reconciled' ? (
+            {bankStatus !== 'reconciled' ? (
                 <Button size="sm" variant="outline" onClick={onReconcile} className="gap-1.5">
                     <CheckCircle2 className="h-3.5 w-3.5" /> Marquer payé
                 </Button>
             ) : null}
-            {canPrepare && bankStatus !== 'failed' ? (
+            {bankStatus !== 'failed' ? (
                 <Button size="sm" variant="outline" onClick={onReject} className="gap-1.5">
                     <ShieldOff className="h-3.5 w-3.5" /> Marquer rejeté
                 </Button>
@@ -201,11 +165,8 @@ export function PayoutDetailDrawer({
             onOpenChange={(o) => !o && onClose()}
             title={`Payout ${payout.period}`}
             subtitle={`${payout.totalEur.toFixed(2)} € · ${payout.beneficiaryCount} bénéficiaires`}
-            tabs={[
-                { value: 'detail', label: 'Détail', content: detailContent },
-                { value: 'audit', label: 'Audit log', content: auditContent },
-            ]}
-            footer={canPrepare ? footer : undefined}
+            tabs={[{ value: 'detail', label: 'Détail', content: detailContent }]}
+            footer={footer}
             width="md"
         />
     );

@@ -19,7 +19,6 @@ import { Label } from '@lumiris/ui/components/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@lumiris/ui/components/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
 import { cn } from '@lumiris/ui/lib/cn';
-import { useLogAction, usePermission } from '@/lib/auth';
 import { formatEur } from '@/lib/pricing';
 import { EmptyState } from '../_shared/empty-state';
 import { PaginationBar } from '../_shared/pagination-bar';
@@ -56,7 +55,6 @@ const PERIOD_MS: Record<PaymentPeriodFilter, number> = {
 };
 
 export function PaymentsTab() {
-    const canIssueInvoice = usePermission('billing.invoice_issue');
     const [search, setSearch] = useState('');
     const [statusF, setStatusF] = useState<PaymentStatusFilter>('all');
     const [kind, setKind] = useState<SubscriberKindFilter>('all');
@@ -143,13 +141,7 @@ export function PaymentsTab() {
                     ),
                 }}
                 rightSlot={
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={!canIssueInvoice}
-                        onClick={() => setIssueOpen(true)}
-                        className="gap-1.5"
-                    >
+                    <Button size="sm" variant="outline" onClick={() => setIssueOpen(true)} className="gap-1.5">
                         <FileText className="h-3.5 w-3.5" /> Émettre une facture
                     </Button>
                 }
@@ -230,25 +222,12 @@ export function PaymentsTab() {
 }
 
 function IssueInvoiceDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
-    const log = useLogAction();
     const [subId, setSubId] = useState<string>('');
     const candidates = useMemo(() => mockSubscriptions.filter((s) => s.tier !== 'free'), []);
 
     function handleConfirm() {
         const sub = candidates.find((s) => s.id === subId);
         if (!sub) return;
-        log({
-            action: 'billing.invoice_issue',
-            targetType: 'subscription',
-            targetId: sub.id,
-            payload: {
-                tier: sub.tier,
-                plus: sub.plus,
-                mrr: sub.mrrEur,
-                kind: sub.subscriberKind,
-                source: 'payments_tab',
-            },
-        });
         openInvoiceWindow(sub);
         onClose();
         setSubId('');

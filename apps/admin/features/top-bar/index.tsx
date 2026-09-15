@@ -1,6 +1,7 @@
 'use client';
 
 import { memo, Fragment, Suspense, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { CalendarClock, ChevronRight, LogOut } from 'lucide-react';
 import type { AdminUserRole } from '@lumiris/types';
@@ -15,10 +16,9 @@ import {
 } from '@lumiris/ui/components/dropdown-menu';
 import { cn } from '@lumiris/ui/lib/cn';
 import { daysUntil, majorMilestones } from '@/lib/regulatory-calendar';
-import { auth, useCurrentUser, useLogAction } from '@/lib/auth';
+import { auth, useCurrentUser } from '@/lib/auth';
 import { findRoute } from '../_shared/nav-routes';
 import { CommandPalette } from '../_shared/command-palette';
-import { DevUserSwitcher } from '../_shared/dev-user-switcher';
 
 const ROLE_LABEL: Record<AdminUserRole, string> = {
     curator: 'Curateur',
@@ -97,7 +97,7 @@ function EsprCountdownChip() {
         : `J-${days.toLocaleString('fr-FR')} avant ${next.title}`;
 
     return (
-        <a
+        <Link
             href="/conformite"
             aria-label={label}
             className={cn(
@@ -112,7 +112,7 @@ function EsprCountdownChip() {
             <span className="hidden text-[11px] text-muted-foreground sm:inline">
                 {overdue ? next.title : `avant ${next.title}`}
             </span>
-        </a>
+        </Link>
     );
 }
 
@@ -129,18 +129,10 @@ function getInitials(fullName: string): string {
 function UserAvatar() {
     const user = useCurrentUser();
     const router = useRouter();
-    const log = useLogAction();
 
     if (!user) return null;
 
     const handleLogout = async () => {
-        log({
-            action: 'auth.signout',
-            targetType: 'session',
-            targetId: user.id,
-            payload: {},
-            actor: { id: user.id, role: user.role },
-        });
         await auth.signOut();
         router.replace('/login');
     };
@@ -184,8 +176,6 @@ function UserAvatar() {
     );
 }
 
-const IS_DEV = process.env.NODE_ENV !== 'production';
-
 function TopBarComponent() {
     return (
         <header className="fixed top-0 right-0 left-60 z-30 flex h-14 items-center gap-3 border-b border-border bg-card/80 px-6 backdrop-blur-sm">
@@ -198,7 +188,6 @@ function TopBarComponent() {
 
             <CommandPalette />
             <EsprCountdownChip />
-            {IS_DEV ? <DevUserSwitcher /> : null}
             <UserAvatar />
         </header>
     );

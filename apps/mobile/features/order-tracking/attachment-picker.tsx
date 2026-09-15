@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { ImagePlus, Loader2, X } from 'lucide-react';
 import { useApiClient } from '@lumiris/api-client/react';
@@ -29,8 +29,27 @@ export function AttachmentPicker({
 }) {
     const client = useApiClient();
     const inputRef = useRef<HTMLInputElement>(null);
+    const previewUrlsRef = useRef(new Set<string>());
     const [uploading, setUploading] = useState(false);
     const full = files.length >= MAX_FILES;
+
+    useEffect(() => {
+        const tracked = previewUrlsRef.current;
+        const stillShown = new Set(files.map((file) => file.previewUrl));
+        for (const url of tracked) {
+            if (stillShown.has(url)) continue;
+            URL.revokeObjectURL(url);
+            tracked.delete(url);
+        }
+    }, [files]);
+
+    useEffect(() => {
+        const tracked = previewUrlsRef.current;
+        return () => {
+            for (const url of tracked) URL.revokeObjectURL(url);
+            tracked.clear();
+        };
+    }, []);
 
     async function handleSelect(event: React.ChangeEvent<HTMLInputElement>) {
         const selected = [...(event.target.files ?? [])].slice(0, MAX_FILES - files.length);
@@ -46,10 +65,12 @@ export function AttachmentPicker({
         setUploading(true);
         try {
             const uploaded = await Promise.all(
-                selected.map(async (file) => ({
-                    id: (await client.storage.upload(file)).id,
-                    previewUrl: URL.createObjectURL(file),
-                })),
+                selected.map(async (file) => {
+                    const { id } = await client.storage.upload(file);
+                    const previewUrl = URL.createObjectURL(file);
+                    previewUrlsRef.current.add(previewUrl);
+                    return { id, previewUrl };
+                }),
             );
             onChange([...files, ...uploaded]);
         } catch {

@@ -1,16 +1,19 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Award, CalendarClock, ExternalLink, MapPin } from 'lucide-react';
+import { IrisGrade } from '@lumiris/scoring-ui';
 import { Badge } from '@lumiris/ui/components/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import { formatDateFr } from '@lumiris/utils';
 import type { ArtisanPublicProfileDto } from '@/lib/public-artisan-api';
+import type { ArtisanPiece } from '@/lib/public-passport-api';
 
 interface Props {
     artisan: ArtisanPublicProfileDto;
+    pieces: readonly ArtisanPiece[];
 }
 
-export function ArtisanPublicView({ artisan }: Props) {
+export function ArtisanPublicView({ artisan, pieces }: Props) {
     const name = artisan.atelierName ?? artisan.displayName ?? 'Atelier';
 
     return (
@@ -146,6 +149,46 @@ export function ArtisanPublicView({ artisan }: Props) {
                             ))}
                         </CardContent>
                     </Card>
+                )}
+            </section>
+
+            <section className="mx-auto mt-12 max-w-5xl px-6" aria-labelledby="artisan-pieces">
+                <h2 id="artisan-pieces" className="text-2xl font-semibold tracking-tight text-foreground">
+                    Ses pièces
+                </h2>
+                <p className="mt-2 text-sm text-muted-foreground">Les passeports numériques publiés par cet atelier.</p>
+                {pieces.length > 0 ? (
+                    <ul className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                        {pieces.map((piece) => (
+                            <li key={piece.href}>
+                                <Link href={piece.href} className="group flex flex-col gap-2">
+                                    <div className="relative aspect-square overflow-hidden rounded-xl border border-border bg-muted">
+                                        {piece.photoUrl ? (
+                                            <Image
+                                                src={piece.photoUrl}
+                                                alt={piece.name}
+                                                fill
+                                                sizes="(min-width: 1024px) 25vw, 50vw"
+                                                className="object-cover transition-transform group-hover:scale-105"
+                                            />
+                                        ) : null}
+                                        {piece.grade ? (
+                                            <span className="absolute top-2 right-2">
+                                                <IrisGrade grade={piece.grade} size="sm" tone="solid" />
+                                            </span>
+                                        ) : null}
+                                    </div>
+                                    <p className="text-sm font-medium text-foreground group-hover:underline">
+                                        {piece.name}
+                                    </p>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className="mt-6 rounded-2xl border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
+                        Aucune pièce publiée pour le moment.
+                    </p>
                 )}
             </section>
         </article>

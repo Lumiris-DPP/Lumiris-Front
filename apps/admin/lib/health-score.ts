@@ -1,8 +1,7 @@
-// Trois axes pondérés : 40% utilisation plafond passeports, 35% Iris moyen, 25% pénalité d'overrides 90j.
+// Rapport 40:35 hérité du barème à trois axes, ramené à 1 depuis le retrait de l'axe overrides.
 export const HEALTH_WEIGHTS = {
-    capacity: 0.4,
-    iris: 0.35,
-    overrides: 0.25,
+    capacity: 8 / 15,
+    iris: 7 / 15,
 } as const;
 
 interface HealthInput {
@@ -10,16 +9,12 @@ interface HealthInput {
     /** `Number.POSITIVE_INFINITY` pour Maison — score plein si actif. */
     passportLimit: number;
     avgIrisScore: number;
-    overrideCount90d: number;
 }
 
 export interface HealthBreakdown {
     capacityUtilization: number;
     capacityScore: number;
     irisScore: number;
-    overrideCount90d: number;
-    /** 100 = aucun override. */
-    overrideScore: number;
     total: number;
 }
 
@@ -44,19 +39,13 @@ export function computeHealthScore(input: HealthInput): HealthBreakdown {
             : clamp((capacityUtilization / 80) * 100, 0, 100);
 
     const irisScore = clamp(input.avgIrisScore, 0, 100);
-    const overrideScore = clamp(100 - input.overrideCount90d * 25, 0, 100);
 
-    const total =
-        capacityScore * HEALTH_WEIGHTS.capacity +
-        irisScore * HEALTH_WEIGHTS.iris +
-        overrideScore * HEALTH_WEIGHTS.overrides;
+    const total = capacityScore * HEALTH_WEIGHTS.capacity + irisScore * HEALTH_WEIGHTS.iris;
 
     return {
         capacityUtilization: Math.round(capacityUtilization),
         capacityScore: Math.round(capacityScore),
         irisScore: Math.round(irisScore),
-        overrideCount90d: input.overrideCount90d,
-        overrideScore: Math.round(overrideScore),
         total: Math.round(total),
     };
 }

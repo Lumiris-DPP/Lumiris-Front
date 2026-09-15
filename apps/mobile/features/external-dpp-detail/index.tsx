@@ -165,7 +165,7 @@ export function ExternalDppDetail({ dpp }: ExternalDppDetailProps) {
 
             <motion.nav
                 aria-label="Actions du DPP externe"
-                className="fixed inset-x-0 bottom-0 z-50 mx-auto flex max-w-md items-center justify-around gap-1 border-t border-border/50 bg-background/85 px-4 pt-3 pb-6 backdrop-blur-xl"
+                className="fixed inset-x-0 bottom-0 z-nav mx-auto flex max-w-md items-center justify-around gap-1 border-t border-border/50 bg-background/85 px-4 pt-3 pb-6 backdrop-blur-xl"
                 initial={{ y: 80, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ type: 'spring', stiffness: 380, damping: 32, delay: 0.4 }}

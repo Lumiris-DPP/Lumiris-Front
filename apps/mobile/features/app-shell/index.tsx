@@ -141,7 +141,7 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
                     <motion.nav
                         key="tab-bar"
                         aria-label="Navigation principale"
-                        className="absolute inset-x-0 bottom-0 z-50 border-t border-border/40 bg-background/85 px-4 pt-2 pb-[max(env(safe-area-inset-bottom),1.75rem)] backdrop-blur-xl"
+                        className="absolute inset-x-0 bottom-0 z-nav border-t border-border/40 bg-background/85 px-4 pt-2 pb-[max(env(safe-area-inset-bottom),1.75rem)] backdrop-blur-xl"
                         initial={{ y: 80 }}
                         animate={{ y: 0 }}
                         exit={{ y: 80 }}

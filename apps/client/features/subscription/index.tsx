@@ -28,18 +28,6 @@ type SubscriptionPage = ReturnType<typeof useSubscriptionPage>;
 export function Subscription() {
     const sub = useSubscriptionPage();
 
-    if (!sub.isRealMode) {
-        return (
-            <Notice>
-                <p className="font-medium text-foreground">Abonnement indisponible en mode démo</p>
-                <p>
-                    Créez un compte ou connectez-vous avec vos identifiants pour gérer votre abonnement ATELIER et
-                    débloquer la création de passeports.
-                </p>
-            </Notice>
-        );
-    }
-
     if (sub.isError) {
         return (
             <Notice>
@@ -269,7 +257,7 @@ function CurrentSubscriptionCard({ sub }: { sub: SubscriptionPage }) {
 // autonome. Activable uniquement lorsqu'un abonnement de base est actif.
 function AtelierPlusCard({ sub }: { sub: SubscriptionPage }) {
     const active = sub.atelierPlus;
-    const canManage = sub.hasActiveSubscription;
+    const canManage = sub.hasLiveSubscription;
     const pending = sub.addAtelierPlus.isPending || sub.removeAtelierPlus.isPending;
 
     return (
@@ -301,7 +289,7 @@ function AtelierPlusCard({ sub }: { sub: SubscriptionPage }) {
                     </p>
                     {!canManage && (
                         <p className="text-xs text-lumiris-amber">
-                            Un abonnement ATELIER actif est requis pour ajouter cette option.
+                            Un abonnement en cours est requis pour ajouter cette option.
                         </p>
                     )}
                 </div>
