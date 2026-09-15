@@ -22,7 +22,7 @@ export function toLocalPoints(
     const points: LocalPoint[] = [];
 
     for (const a of artisans) {
-        const coords = a.lat !== undefined && a.lng !== undefined ? { lat: a.lat, lng: a.lng } : undefined;
+        const coords = a.lat != null && a.lng != null ? { lat: a.lat, lng: a.lng } : undefined;
         points.push({
             kind: 'artisan',
             id: a.slug,
@@ -39,6 +39,7 @@ export function toLocalPoints(
     }
 
     for (const r of repairers) {
+        const coords = r.lat != null && r.lng != null ? { lat: r.lat, lng: r.lng } : undefined;
         points.push({
             kind: 'repairer',
             id: r.id,
@@ -46,7 +47,7 @@ export function toLocalPoints(
             name: r.displayName ?? r.companyName ?? 'Retoucheur',
             city: r.city ?? '',
             region: r.region ?? '',
-            coords: { lat: r.lat, lng: r.lng },
+            coords,
             distanceKm: r.distanceKm,
             rating: r.averageRating,
             reviewCount: r.reviewCount,
