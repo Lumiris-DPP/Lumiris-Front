@@ -3,7 +3,7 @@ import type { AdminUser } from '@lumiris/types';
 export const mockAdminUsers: readonly AdminUser[] = [
     {
         id: 'ADM-001',
-        email: 'lea.marchand@lumiris.fr',
+        email: 'lea.marchand@lumiris.eu',
         fullName: 'Léa Marchand',
         role: 'platform_admin',
         avatarUrl: 'https://cdn.lumiris.local/admins/lea.jpg',
@@ -12,7 +12,7 @@ export const mockAdminUsers: readonly AdminUser[] = [
     },
     {
         id: 'ADM-002',
-        email: 'antoine.berger@lumiris.fr',
+        email: 'antoine.berger@lumiris.eu',
         fullName: 'Antoine Berger',
         role: 'curator',
         avatarUrl: 'https://cdn.lumiris.local/admins/antoine.jpg',
@@ -21,7 +21,7 @@ export const mockAdminUsers: readonly AdminUser[] = [
     },
     {
         id: 'ADM-003',
-        email: 'sophie.duval@lumiris.fr',
+        email: 'sophie.duval@lumiris.eu',
         fullName: 'Sophie Duval',
         role: 'curator',
         avatarUrl: 'https://cdn.lumiris.local/admins/sophie.jpg',
@@ -30,7 +30,7 @@ export const mockAdminUsers: readonly AdminUser[] = [
     },
     {
         id: 'ADM-005',
-        email: 'thomas.morel@lumiris.fr',
+        email: 'thomas.morel@lumiris.eu',
         fullName: 'Thomas Morel',
         role: 'billing_ops',
         avatarUrl: 'https://cdn.lumiris.local/admins/thomas.jpg',
@@ -39,7 +39,7 @@ export const mockAdminUsers: readonly AdminUser[] = [
     },
     {
         id: 'ADM-006',
-        email: 'nadia.khelifi@lumiris.fr',
+        email: 'nadia.khelifi@lumiris.eu',
         fullName: 'Nadia Khelifi',
         role: 'dpo',
         avatarUrl: 'https://cdn.lumiris.local/admins/nadia.jpg',
@@ -48,7 +48,7 @@ export const mockAdminUsers: readonly AdminUser[] = [
     },
     {
         id: 'ADM-007',
-        email: 'maxime.laurent@lumiris.fr',
+        email: 'maxime.laurent@lumiris.eu',
         fullName: 'Maxime Laurent',
         role: 'platform_admin',
         avatarUrl: 'https://cdn.lumiris.local/admins/maxime.jpg',
@@ -57,7 +57,7 @@ export const mockAdminUsers: readonly AdminUser[] = [
     },
     {
         id: 'ADM-008',
-        email: 'agathe.gervais@lumiris.fr',
+        email: 'agathe.gervais@lumiris.eu',
         fullName: 'Agathe Gervais',
         role: 'lead_curator',
         avatarUrl: 'https://cdn.lumiris.local/admins/agathe.jpg',

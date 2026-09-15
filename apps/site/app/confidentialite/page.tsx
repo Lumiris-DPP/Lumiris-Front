@@ -60,10 +60,10 @@ export default function ConfidentialitePage() {
                         d&apos;effacement et d&apos;opposition au traitement de vos données personnelles. Pour exercer
                         ces droits, contactez&nbsp;:{' '}
                         <a
-                            href="mailto:privacy@lumiris.fr"
+                            href="mailto:privacy@lumiris.eu"
                             className="text-foreground underline-offset-4 hover:underline"
                         >
-                            privacy@lumiris.fr
+                            privacy@lumiris.eu
                         </a>
                         .
                     </p>

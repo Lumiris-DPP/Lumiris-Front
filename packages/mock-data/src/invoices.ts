@@ -4,7 +4,7 @@ export const mockInvoices: readonly SupplierInvoice[] = [
     {
         id: 'inv-001',
         supplierId: 'sup-filature-bretagne',
-        fileUrl: 'https://lumiris.fr/mock/inv/inv-001.pdf',
+        fileUrl: 'https://lumiris.eu/mock/inv/inv-001.pdf',
         uploadedAt: '2026-02-12T09:32:00Z',
         ocrExtracted: {
             supplierName: 'Filature Bretagne',
@@ -18,7 +18,7 @@ export const mockInvoices: readonly SupplierInvoice[] = [
     {
         id: 'inv-002',
         supplierId: 'sup-tannerie-roux',
-        fileUrl: 'https://lumiris.fr/mock/inv/inv-002.pdf',
+        fileUrl: 'https://lumiris.eu/mock/inv/inv-002.pdf',
         uploadedAt: '2026-01-28T11:05:00Z',
         ocrExtracted: {
             supplierName: 'Tannerie Roux',
@@ -35,7 +35,7 @@ export const mockInvoices: readonly SupplierInvoice[] = [
     {
         id: 'inv-003',
         supplierId: 'sup-laine-arles',
-        fileUrl: 'https://lumiris.fr/mock/inv/inv-003.pdf',
+        fileUrl: 'https://lumiris.eu/mock/inv/inv-003.pdf',
         uploadedAt: '2026-03-04T08:50:00Z',
         ocrExtracted: {
             supplierName: 'Coopérative Laine d’Arles',
@@ -49,7 +49,7 @@ export const mockInvoices: readonly SupplierInvoice[] = [
     {
         id: 'inv-004',
         supplierId: 'sup-soie-cevennes',
-        fileUrl: 'https://lumiris.fr/mock/inv/inv-004.pdf',
+        fileUrl: 'https://lumiris.eu/mock/inv/inv-004.pdf',
         uploadedAt: '2026-02-22T14:18:00Z',
         ocrExtracted: {
             supplierName: 'Magnanerie des Cévennes',
@@ -63,7 +63,7 @@ export const mockInvoices: readonly SupplierInvoice[] = [
     {
         id: 'inv-005',
         supplierId: 'sup-coton-bio-belgique',
-        fileUrl: 'https://lumiris.fr/mock/inv/inv-005.pdf',
+        fileUrl: 'https://lumiris.eu/mock/inv/inv-005.pdf',
         uploadedAt: '2026-03-15T16:40:00Z',
         ocrExtracted: {
             supplierName: 'BioCotton BV - Gent',
@@ -78,7 +78,7 @@ export const mockInvoices: readonly SupplierInvoice[] = [
     {
         id: 'inv-006',
         supplierId: 'sup-chanvre-allier',
-        fileUrl: 'https://lumiris.fr/mock/inv/inv-006.pdf',
+        fileUrl: 'https://lumiris.eu/mock/inv/inv-006.pdf',
         uploadedAt: '2026-04-02T10:11:00Z',
         ocrExtracted: null,
         linkedPassportIds: ['pass-pauline-002'],
@@ -86,7 +86,7 @@ export const mockInvoices: readonly SupplierInvoice[] = [
     {
         id: 'inv-007',
         supplierId: 'sup-cachemire-mongolie',
-        fileUrl: 'https://lumiris.fr/mock/inv/inv-007.pdf',
+        fileUrl: 'https://lumiris.eu/mock/inv/inv-007.pdf',
         uploadedAt: '2026-04-10T13:25:00Z',
         ocrExtracted: null,
         linkedPassportIds: ['pass-laurens-001'],
@@ -94,7 +94,7 @@ export const mockInvoices: readonly SupplierInvoice[] = [
     {
         id: 'inv-008',
         supplierId: 'sup-laine-tarn',
-        fileUrl: 'https://lumiris.fr/mock/inv/inv-008.pdf',
+        fileUrl: 'https://lumiris.eu/mock/inv/inv-008.pdf',
         uploadedAt: '2026-04-22T09:01:00Z',
         ocrExtracted: null,
         linkedPassportIds: [],

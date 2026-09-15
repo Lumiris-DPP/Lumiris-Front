@@ -8,7 +8,7 @@ export const mockCertificates: readonly CertificationRef[] = [
         issuedAt: '2024-03-12T00:00:00Z',
         expiresAt: '2027-03-12T00:00:00Z',
         verified: true,
-        fileUrl: 'https://lumiris.fr/mock/cert/gots-marie-lin.pdf',
+        fileUrl: 'https://lumiris.eu/mock/cert/gots-marie-lin.pdf',
         scope: 'Lin breton - filature Quimper',
     },
     {
@@ -18,7 +18,7 @@ export const mockCertificates: readonly CertificationRef[] = [
         issuedAt: '2025-01-05T00:00:00Z',
         expiresAt: '2027-01-05T00:00:00Z',
         verified: true,
-        fileUrl: 'https://lumiris.fr/mock/cert/oeko-claire-laine.pdf',
+        fileUrl: 'https://lumiris.eu/mock/cert/oeko-claire-laine.pdf',
         scope: 'Laine mérinos - Tarn',
     },
     {
@@ -28,7 +28,7 @@ export const mockCertificates: readonly CertificationRef[] = [
         issuedAt: '2023-06-20T00:00:00Z',
         expiresAt: '2028-06-20T00:00:00Z',
         verified: true,
-        fileUrl: 'https://lumiris.fr/mock/cert/epv-paul.pdf',
+        fileUrl: 'https://lumiris.eu/mock/cert/epv-paul.pdf',
         scope: 'Tannerie Chevreau - Graulhet',
     },
     {
@@ -38,7 +38,7 @@ export const mockCertificates: readonly CertificationRef[] = [
         issuedAt: '2024-09-01T00:00:00Z',
         expiresAt: '2027-09-01T00:00:00Z',
         verified: true,
-        fileUrl: 'https://lumiris.fr/mock/cert/ofg-marie.pdf',
+        fileUrl: 'https://lumiris.eu/mock/cert/ofg-marie.pdf',
         scope: 'Atelier de Marie - Quimper',
     },
     {
@@ -48,7 +48,7 @@ export const mockCertificates: readonly CertificationRef[] = [
         issuedAt: '2025-04-10T00:00:00Z',
         expiresAt: '2027-04-10T00:00:00Z',
         verified: true,
-        fileUrl: 'https://lumiris.fr/mock/cert/grs-jules.pdf',
+        fileUrl: 'https://lumiris.eu/mock/cert/grs-jules.pdf',
         scope: 'Coton recyclé - filière Hauts-de-France',
     },
     {
@@ -58,7 +58,7 @@ export const mockCertificates: readonly CertificationRef[] = [
         issuedAt: '2024-12-01T00:00:00Z',
         expiresAt: '2026-12-01T00:00:00Z',
         verified: true,
-        fileUrl: 'https://lumiris.fr/mock/cert/bluesign-romain.pdf',
+        fileUrl: 'https://lumiris.eu/mock/cert/bluesign-romain.pdf',
         scope: 'Tissage Mazamet - chaîne énergétique',
     },
     {
@@ -68,7 +68,7 @@ export const mockCertificates: readonly CertificationRef[] = [
         issuedAt: '2024-05-15T00:00:00Z',
         expiresAt: '2027-05-15T00:00:00Z',
         verified: true,
-        fileUrl: 'https://lumiris.fr/mock/cert/iso14001-laurens.pdf',
+        fileUrl: 'https://lumiris.eu/mock/cert/iso14001-laurens.pdf',
         scope: 'Maison Laurens - Paris',
     },
     {
@@ -79,7 +79,7 @@ export const mockCertificates: readonly CertificationRef[] = [
         issuedAt: '2022-09-01T00:00:00Z',
         expiresAt: '2032-09-01T00:00:00Z',
         verified: true,
-        fileUrl: 'https://lumiris.fr/mock/cert/custom-amelie.pdf',
+        fileUrl: 'https://lumiris.eu/mock/cert/custom-amelie.pdf',
         scope: 'Amélie Berthier - Lyon',
     },
 
@@ -90,7 +90,7 @@ export const mockCertificates: readonly CertificationRef[] = [
         issuedAt: '2022-02-10T00:00:00Z',
         expiresAt: '2025-02-10T00:00:00Z',
         verified: true,
-        fileUrl: 'https://lumiris.fr/mock/cert/gots-pauline-expired.pdf',
+        fileUrl: 'https://lumiris.eu/mock/cert/gots-pauline-expired.pdf',
         scope: 'Lin breton - Pauline Roux',
     },
     {
@@ -100,7 +100,7 @@ export const mockCertificates: readonly CertificationRef[] = [
         issuedAt: '2021-11-01T00:00:00Z',
         expiresAt: '2024-11-01T00:00:00Z',
         verified: true,
-        fileUrl: 'https://lumiris.fr/mock/cert/oeko-soraya-expired.pdf',
+        fileUrl: 'https://lumiris.eu/mock/cert/oeko-soraya-expired.pdf',
         scope: 'Laine vierge Reims',
     },
 
@@ -112,7 +112,7 @@ export const mockCertificates: readonly CertificationRef[] = [
         issuedAt: '2021-06-30T00:00:00Z',
         expiresAt: '2031-06-30T00:00:00Z',
         verified: false,
-        fileUrl: 'https://lumiris.fr/mock/cert/custom-leila.pdf',
+        fileUrl: 'https://lumiris.eu/mock/cert/custom-leila.pdf',
         scope: 'Leïla Benamar - diplôme initial',
     },
     {
@@ -122,7 +122,7 @@ export const mockCertificates: readonly CertificationRef[] = [
         issuedAt: '2025-07-01T00:00:00Z',
         expiresAt: '2028-07-01T00:00:00Z',
         verified: false,
-        fileUrl: 'https://lumiris.fr/mock/cert/ofg-nicolas.pdf',
+        fileUrl: 'https://lumiris.eu/mock/cert/ofg-nicolas.pdf',
         scope: 'Atelier Faure - en cours de vérification',
     },
 ];

@@ -38,7 +38,7 @@ const PLAIGNANT_LABEL: Record<Saisine['plaignant'], string> = {
     concurrent: 'Concurrent',
 };
 
-// TODO(saisines-réelles) : remplacer ce tableau par un fetch vers commission@lumiris.fr dès la première saisine réelle.
+// TODO(saisines-réelles) : remplacer ce tableau par un fetch vers commission@lumiris.eu dès la première saisine réelle.
 const SAISINES: readonly Saisine[] = [
     {
         id: 'SAI-2026-001',
@@ -206,10 +206,10 @@ export default function SaisinesPage() {
                 <p className="text-sm text-muted-foreground">
                     Une saisine ?{' '}
                     <a
-                        href="mailto:commission@lumiris.fr"
+                        href="mailto:commission@lumiris.eu"
                         className="text-foreground underline-offset-4 hover:underline"
                     >
-                        commission@lumiris.fr
+                        commission@lumiris.eu
                     </a>{' '}
                     · Décision rendue publique sous 30 jours maximum.
                 </p>

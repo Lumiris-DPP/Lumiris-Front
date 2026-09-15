@@ -31,7 +31,7 @@ export function openInvoiceWindow(sub: Subscription) {
       <p class="meta">${invoiceNo} · émise le ${now.toLocaleDateString('fr-FR')}</p>
     </div>
     <div class="meta right">
-      LUMIRIS SAS<br>RCS Paris · TVA FR 00 000000000<br>contact@lumiris.fr
+      LUMIRIS SAS<br>RCS Paris · TVA FR 00 000000000<br>contact@lumiris.eu
     </div>
   </header>
   <section style="margin-top:32px;">

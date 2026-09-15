@@ -209,10 +209,10 @@ export default function CharteIndependancePage() {
                 <p className="mt-6 text-sm text-muted-foreground">
                     Une saisine ?{' '}
                     <a
-                        href="mailto:commission@lumiris.fr"
+                        href="mailto:commission@lumiris.eu"
                         className="text-foreground underline-offset-4 hover:underline"
                     >
-                        commission@lumiris.fr
+                        commission@lumiris.eu
                     </a>{' '}
                     - toutes les saisines reçues et leurs décisions sont publiées sur{' '}
                     <Link

@@ -41,8 +41,8 @@ function Block({ heading, children }: { heading: string; children: ReactNode }) 
 }
 
 const privacyMail = (
-    <a href="mailto:privacy@lumiris.fr" className="text-foreground underline underline-offset-4">
-        privacy@lumiris.fr
+    <a href="mailto:privacy@lumiris.eu" className="text-foreground underline underline-offset-4">
+        privacy@lumiris.eu
     </a>
 );
 
@@ -146,8 +146,8 @@ export function LegalNotice({ appLabel }: { appLabel: string }) {
             </Block>
             <Block heading="Contact">
                 <p>
-                    <a href="mailto:legal@lumiris.fr" className="text-foreground underline underline-offset-4">
-                        legal@lumiris.fr
+                    <a href="mailto:legal@lumiris.eu" className="text-foreground underline underline-offset-4">
+                        legal@lumiris.eu
                     </a>{' '}
                     pour les questions légales, {privacyMail} pour les données personnelles.
                 </p>
