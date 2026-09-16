@@ -21,7 +21,7 @@ import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import { Toaster, toast } from '@lumiris/ui/components/sonner';
 import { IrisScoreCard } from '@lumiris/scoring-ui';
-import { useDeleteDppForm, useDppForm, useDuplicateDppForm } from '@lumiris/api-client/react';
+import { useDeleteDppForm, useDppForm, useDuplicateDppForm, useRepairerRequests } from '@lumiris/api-client/react';
 import { isApiError, type DppFormDto } from '@lumiris/api-client';
 import { useAuthStore } from '@/lib/auth-store';
 import { useAuthRole } from '@/lib/use-auth';
@@ -49,6 +49,14 @@ export function PassportDetail({ passportId }: { passportId: string }) {
     const role = useAuthRole();
     const isRepairerViewer = role === 'repairer';
     const token = useAuthStore((s) => s.token);
+    // Le backend (DppEventService) ne laisse le retoucheur écrire un événement / voir l'historique
+    // que si sa demande est ACCEPTED/IN_PROGRESS/COMPLETED — on masque ces cartes tant que ce n'est
+    // pas le cas pour ne pas afficher un formulaire dont la soumission échouerait en 403/404.
+    const { data: repairerRequests = [] } = useRepairerRequests({ enabled: isRepairerViewer });
+    const repairerRequest = isRepairerViewer ? repairerRequests.find((r) => r.dppFormId === passportId) : undefined;
+    const canManageEvents =
+        !isRepairerViewer ||
+        (repairerRequest !== undefined && ['ACCEPTED', 'IN_PROGRESS', 'COMPLETED'].includes(repairerRequest.status));
     const drafts = useDraftStore((s) => s.drafts);
     const draft = drafts[passportId];
 
@@ -128,7 +136,7 @@ export function PassportDetail({ passportId }: { passportId: string }) {
                         <>
                             <DocumentsCard documents={apiDpp.documents ?? []} />
                             {/* Events and Iris score only exist once a DPP is published. */}
-                            {!isDraft && (
+                            {!isDraft && canManageEvents && (
                                 <>
                                     <EventFormCard
                                         passportId={passportId}
