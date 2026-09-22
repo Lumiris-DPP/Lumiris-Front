@@ -216,6 +216,16 @@ export interface RepairRequestResponse {
     appointmentAt?: string;
     paidAt?: string;
     createdAt: string;
+    // COMPLETED is the only terminal status, but it covers three different outcomes: a quote the
+    // client refused (quoteRefusedAt), a request the repairer declined before ever quoting
+    // (repairerDeclinedAt), or work actually finished (neither set).
+    quoteRefusedAt?: string;
+    repairerDeclinedAt?: string;
+    repairerDeclineReason?: string;
+}
+
+export interface RepairDeclineRequest {
+    reason?: string;
 }
 
 export interface RepairMessageRequest {

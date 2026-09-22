@@ -41,6 +41,17 @@ const STATUS_LABEL: Record<RepairRequestStatus, string> = {
 
 const STATUS_ORDER: readonly RepairRequestStatus[] = ['PENDING', 'DRAFT', 'ACCEPTED', 'IN_PROGRESS', 'COMPLETED'];
 
+// COMPLETED recouvre trois cas très différents (devis refusé, demande déclinée par le retoucheur,
+// ou intervention réellement terminée) — on affine le libellé par demande plutôt que par statut brut,
+// pour ne pas afficher un check vert de succès sur une demande qui n'a jamais été honorée.
+function requestStatusLabel(request: RepairRequestResponse): string {
+    if (request.status === 'COMPLETED') {
+        if (request.repairerDeclinedAt) return 'Déclinée par le retoucheur';
+        if (request.quoteRefusedAt) return 'Devis refusé';
+    }
+    return STATUS_LABEL[request.status];
+}
+
 export function MyRepairs() {
     const router = useRouter();
     const { data: requests, isLoading } = useMyRepairRequests();
@@ -147,9 +158,14 @@ function Empty() {
     );
 }
 
-function StatusIcon({ status }: { status: RepairRequestStatus }) {
-    if (status === 'COMPLETED') return <CheckCircle2 className="h-3.5 w-3.5 text-lumiris-emerald" />;
-    if (status === 'REFUSED') return <XCircle className="h-3.5 w-3.5 text-muted-foreground" />;
+function StatusIcon({ request }: { request: RepairRequestResponse }) {
+    if (request.status === 'COMPLETED') {
+        if (request.repairerDeclinedAt || request.quoteRefusedAt) {
+            return <XCircle className="h-3.5 w-3.5 text-muted-foreground" />;
+        }
+        return <CheckCircle2 className="h-3.5 w-3.5 text-lumiris-emerald" />;
+    }
+    if (request.status === 'REFUSED') return <XCircle className="h-3.5 w-3.5 text-muted-foreground" />;
     return <Clock3 className="h-3.5 w-3.5 text-lumiris-cyan" />;
 }
 
@@ -170,8 +186,8 @@ function RequestCard({ request, onView }: { request: RepairRequestResponse; onVi
                     <p className="truncate text-xs text-muted-foreground">{reference}</p>
                 </div>
                 <span className="inline-flex shrink-0 items-center gap-1 text-[11px] font-semibold">
-                    <StatusIcon status={request.status} />
-                    {STATUS_LABEL[request.status]}
+                    <StatusIcon request={request} />
+                    {requestStatusLabel(request)}
                 </span>
             </div>
 
@@ -331,6 +347,15 @@ function RequestDetailOverlay({ request, onClose }: { request: RepairRequestResp
                         </p>
                         {request.quoteDescription ? (
                             <p className="text-xs text-muted-foreground">{request.quoteDescription}</p>
+                        ) : null}
+                    </div>
+                ) : null}
+
+                {request.repairerDeclinedAt ? (
+                    <div className="mt-3 flex flex-col gap-1 rounded-2xl border border-border/60 bg-background p-3">
+                        <p className="text-sm font-semibold text-foreground">Le retoucheur a décliné cette demande</p>
+                        {request.repairerDeclineReason ? (
+                            <p className="text-xs text-muted-foreground">« {request.repairerDeclineReason} »</p>
                         ) : null}
                     </div>
                 ) : null}

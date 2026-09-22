@@ -31,6 +31,23 @@ function normalize(value: string): string {
 // backend yet, so it's a flat list regardless of position).
 const DEFAULT_COORDS = { lat: 48.8566, lng: 2.3522 };
 
+// Le endpoint réparateurs est géo-borné (nécessite lat/lng) — sans recherche active, on reste sur
+// le rayon "à proximité" habituel. Dès qu'une recherche par nom est en cours, on l'élargit à toute
+// la plateforme : un rayon couvrant la Terre entière + la taille de page max exposée par le back.
+const PLATFORM_WIDE_RADIUS_KM = 20_000;
+const PLATFORM_WIDE_PAGE_SIZE = 100;
+
+// Attend une pause dans la saisie avant d'élargir la recherche réparateurs à toute la plateforme —
+// la recherche artisans/nom reste instantanée (filtre local), seul l'appel réseau est débouncé.
+function useDebounced<T>(value: T, delayMs: number): T {
+    const [debounced, setDebounced] = useState(value);
+    useEffect(() => {
+        const timer = window.setTimeout(() => setDebounced(value), delayMs);
+        return () => window.clearTimeout(timer);
+    }, [value, delayMs]);
+    return debounced;
+}
+
 export function LocalHub() {
     const online = useOnlineStatus();
     const { coords, status, request } = useUserCoords();
@@ -51,10 +68,15 @@ export function LocalHub() {
 
     const searchOrigin = mapCenter ?? coords ?? DEFAULT_COORDS;
     const artisansQuery = useArtisansDirectory();
+    // Le filtre nom reste instantané (applyRefinements, côté client) ; seul l'appel réseau
+    // réparateurs est débouncé et élargi, pour ne pas spammer l'API à chaque frappe.
+    const debouncedSearch = useDebounced(search, 400);
+    const hasActiveSearch = debouncedSearch.trim().length > 0;
     const repairersQuery = useRepairerSearch({
         lat: searchOrigin.lat,
         lng: searchOrigin.lng,
-        radiusKm: DISTANCE_MAX_KM,
+        radiusKm: hasActiveSearch ? PLATFORM_WIDE_RADIUS_KM : DISTANCE_MAX_KM,
+        size: hasActiveSearch ? PLATFORM_WIDE_PAGE_SIZE : undefined,
     });
     const loading = artisansQuery.isLoading || repairersQuery.isLoading;
 

@@ -33,6 +33,23 @@ const STATUS_TONE: Record<RepairRequestStatus, string> = {
 
 const STATUS_ORDER: RepairRequestStatus[] = ['PENDING', 'DRAFT', 'ACCEPTED', 'IN_PROGRESS', 'COMPLETED', 'REFUSED'];
 
+// COMPLETED recouvre trois cas très différents (devis refusé, demande déclinée, ou travail
+// réellement terminé) — on affine le libellé/la couleur par ligne plutôt que par statut brut.
+function requestStatusLabel(request: RepairRequestResponse): string {
+    if (request.status === 'COMPLETED') {
+        if (request.repairerDeclinedAt) return 'Déclinée';
+        if (request.quoteRefusedAt) return 'Devis refusé';
+    }
+    return STATUS_LABEL[request.status];
+}
+
+function requestStatusTone(request: RepairRequestResponse): string {
+    if (request.status === 'COMPLETED' && (request.repairerDeclinedAt || request.quoteRefusedAt)) {
+        return 'border-lumiris-rose/40 bg-lumiris-rose/10 text-lumiris-rose';
+    }
+    return STATUS_TONE[request.status];
+}
+
 const HEAD_CLASS = 'h-11 text-[11px] font-medium tracking-wider text-muted-foreground uppercase';
 
 function formatAmount(cents?: number): string {
@@ -184,9 +201,9 @@ export function RepairerPassports() {
                                     <TableCell className="py-3">
                                         <Badge
                                             variant="outline"
-                                            className={`text-[10px] ${STATUS_TONE[request.status]}`}
+                                            className={`text-[10px] ${requestStatusTone(request)}`}
                                         >
-                                            {STATUS_LABEL[request.status]}
+                                            {requestStatusLabel(request)}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="py-3 text-sm text-muted-foreground tabular-nums">
