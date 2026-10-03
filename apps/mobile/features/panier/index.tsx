@@ -244,8 +244,6 @@ function ChooseVariantNotice({ lines }: { lines: readonly UnavailableLine[] }) {
     );
 }
 
-// Une pièce disparue ou en rupture ne doit pas se découvrir à l'écran de paiement, sous forme
-// d'erreur technique : on nomme le problème ici, avec le geste qui le résout.
 // Le catalogue n'a pas répondu : le panier est conservé tel quel et le paiement attend une relecture.
 function LoadErrorNotice({ onRetry }: { onRetry: () => void }) {
     return (
@@ -270,6 +268,8 @@ function LoadErrorNotice({ onRetry }: { onRetry: () => void }) {
     );
 }
 
+// Une pièce disparue ou en rupture ne doit pas se découvrir à l'écran de paiement, sous forme
+// d'erreur technique : on nomme le problème ici, avec le geste qui le résout.
 function UnavailableNotice({ lines }: { lines: readonly UnavailableLine[] }) {
     return (
         <div className="mb-2 px-4">

@@ -2,6 +2,8 @@
 // l'URL, ni le retour de Stripe.js ne prouvent qu'une commande est payée. Calcul pur, testé avec Bun.
 
 import type { OrderGroup } from '@lumiris/api-client';
+// Module pur importé directement : l'index de lib/marketplace charge aussi des hooks React.
+import { isPaidOrderStatus } from '@/lib/marketplace/cart-model';
 
 type ConfirmationView =
     | 'signed-out'
@@ -32,8 +34,7 @@ export function confirmationView(input: ConfirmationInput): ConfirmationView {
     if (!input.isAuthenticated) return 'signed-out';
     if (input.group) {
         if (input.group.status === 'PENDING') return input.timedOut ? 'pending-timeout' : 'pending';
-        if (input.group.status === 'CANCELLED' || input.group.status === 'REFUNDED') return 'unwound';
-        return 'confirmed';
+        return isPaidOrderStatus(input.group.status) ? 'confirmed' : 'unwound';
     }
     if (input.failureStatus !== null) return input.failureStatus === 404 ? 'not-found' : 'error';
     if (!input.targetPaymentIntentId) return input.noRecentOrder ? 'no-order' : input.timedOut ? 'error' : 'resolving';

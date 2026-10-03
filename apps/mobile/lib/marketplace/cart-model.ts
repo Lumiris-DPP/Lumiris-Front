@@ -5,7 +5,7 @@
 // chacun facture son port. Les lignes sont regroupées par atelier pour que l'acheteur voie ce qu'il
 // paie et combien de colis il recevra — le backend applique exactement le même calcul.
 
-import type { MarketplaceVariant } from '@lumiris/api-client';
+import type { MarketplaceVariant, OrderStatus } from '@lumiris/api-client';
 import type { MarketplaceItem } from './product';
 
 export interface CartLine {
@@ -66,12 +66,18 @@ export interface CartDetails {
     count: number;
     /** Pièces qui ne sont plus en vente, nommées pour que l'acheteur sache lesquelles retirer. */
     unavailable: readonly UnavailableLine[];
-    /** Pièces dont le stock ne couvre plus la quantité choisie. */
+    /**
+     * Pièces dont le stock PUBLIC ne couvre plus la quantité choisie. Simple avertissement : ce stock
+     * exclut ce que l'acheteur a lui-même réservé à une tentative précédente, que le serveur compte.
+     */
     overstocked: readonly CartItemDetail[];
     /** Lignes héritées dont la déclinaison n'est plus déterminable : l'acheteur doit rechoisir. */
     needsVariant: readonly UnavailableLine[];
     loadState: CartLoadState;
-    /** Vrai tant qu'une ligne, ou la lecture du catalogue, empêche de payer en l'état. */
+    /**
+     * Vrai tant que la lecture du catalogue, une pièce retirée ou une taille à choisir empêche de payer.
+     * Le stock n'en fait pas partie : le serveur le tranche, réservation de l'acheteur comprise.
+     */
     hasBlockingIssue: boolean;
 }
 
@@ -139,8 +145,7 @@ export function buildCartDetails(
         overstocked,
         needsVariant,
         loadState,
-        hasBlockingIssue:
-            loadState !== 'ready' || unavailable.length > 0 || overstocked.length > 0 || needsVariant.length > 0,
+        hasBlockingIssue: loadState !== 'ready' || unavailable.length > 0 || needsVariant.length > 0,
     };
 }
 
@@ -162,6 +167,29 @@ export function subtractPurchase(lines: readonly CartLine[], purchased: readonly
         if (line.quantity > toRemove) remaining.push({ ...line, quantity: line.quantity - toRemove });
     }
     return remaining;
+}
+
+/** Une commande dans un de ces états a été payée et n'est pas défaite : ses lignes ont quitté le panier. */
+export function isPaidOrderStatus(status: OrderStatus): boolean {
+    return status !== 'PENDING' && status !== 'CANCELLED' && status !== 'REFUNDED';
+}
+
+/**
+ * Tri des paiements mémorisés d'après la liste des commandes : payés (lignes à retirer du panier),
+ * annulés ou remboursés (mémo à oublier, panier intact) ; les autres attendent leur confirmation.
+ */
+export function purchasesToSettle(
+    paymentIntentIds: readonly string[],
+    orders: ReadonlyArray<{ paymentIntentId?: string | null; status: OrderStatus }>,
+): { paid: string[]; dropped: string[] } {
+    const paid: string[] = [];
+    const dropped: string[] = [];
+    for (const id of paymentIntentIds) {
+        const statuses = orders.filter((order) => order.paymentIntentId === id).map((order) => order.status);
+        if (statuses.length === 0 || statuses.includes('PENDING')) continue;
+        (statuses.some(isPaidOrderStatus) ? paid : dropped).push(id);
+    }
+    return { paid, dropped };
 }
 
 // Une ligne sans déclinaison vient d'un bundle antérieur : elle se résout tant que l'annonce n'en
