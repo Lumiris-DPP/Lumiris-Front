@@ -18,6 +18,7 @@ it('le rendu en attente ne prétend ni que le montant est payé ni que la garde-
     );
     expect(html).toContain('Total à confirmer');
     expect(html).toContain('Ta Garde-Robe après validation');
+    expect(html).toContain('La préparation commence après confirmation du paiement.');
     expect(html).not.toContain('Total payé');
     expect(html).not.toContain('Ajouté à ta Garde-Robe');
     expect(html).not.toContain('Un reçu t’a été envoyé');

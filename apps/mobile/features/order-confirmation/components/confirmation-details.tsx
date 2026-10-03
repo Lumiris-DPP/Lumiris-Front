@@ -181,6 +181,11 @@ export function ConfirmationDetails({
                         )}
                         <h2 className="text-sm font-semibold text-foreground">Et maintenant ?</h2>
                     </div>
+                    {settling ? (
+                        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                            La préparation commence après confirmation du paiement.
+                        </p>
+                    ) : null}
                     {unwound ? (
                         <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
                             {group.status === 'REFUNDED'
