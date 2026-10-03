@@ -1,11 +1,10 @@
 import type { ConvertDppRequest } from '@lumiris/api-client';
 import { MIN_PUBLISHED_PRICE_CENTS, sizesOf, toSizeGuidePayload, toVariantPayload } from './product-payload';
 import type { SizeGuideDraft, VariantRow } from './product-payload';
-import { requireEuros, requireInteger } from './product-input';
-import { MAX_PREPARATION_DAYS, MAX_WEIGHT_GRAMS } from './product-form-model';
+import { MAX_PREPARATION_DAYS, MAX_WEIGHT_GRAMS, requireEuros, requireInteger } from './product-input';
 
 /** Décrit les saisies de conversion du passeport en annonce. */
-export interface ConversionDraft {
+interface ConversionDraft {
     priceEuros: string;
     shippingEuros: string;
     stock: string;

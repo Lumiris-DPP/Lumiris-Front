@@ -1,4 +1,6 @@
 export const MAX_INTEGER = 2_147_483_647;
+export const MAX_PREPARATION_DAYS = 90;
+export const MAX_WEIGHT_GRAMS = 30000;
 
 /** Convertit un montant français complet en centimes sans arrondi ni repli. */
 export function eurosToCents(raw: string): number | null {
