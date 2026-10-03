@@ -7,14 +7,7 @@
 import { useSyncExternalStore } from 'react';
 import { readUser } from '../auth/storage';
 import { USER_KEYS, userScopedKey } from '../storage-keys';
-
-export interface CartLine {
-    productId: string;
-    /** Déclinaison achetée. `null` sur les lignes créées avant les déclinaisons. */
-    variantId: string | null;
-    quantity: number;
-    addedAt: string;
-}
+import { cartLineKey, subtractPurchase, type CartLine, type PurchasedLine } from './cart-model';
 
 const EVENT = 'lumiris:cart-changed';
 const USER_CHANGED = 'lumiris:user-changed';
@@ -45,10 +38,6 @@ function isCartLine(value: unknown): value is CartLine {
 
 function sameLine(line: CartLine, productId: string, variantId: string | null): boolean {
     return line.productId === productId && line.variantId === variantId;
-}
-
-function lineKey(productId: string, variantId: string | null): string {
-    return `${productId}:${variantId ?? ''}`;
 }
 
 function read(): CartLine[] {
@@ -97,8 +86,67 @@ export function removeFromCart(productId: string, variantId: string | null): voi
     write(read().filter((line) => !sameLine(line, productId, variantId)));
 }
 
-export function clearCart(): void {
-    write([]);
+// Lignes réservées par chaque PaymentIntent préparé. Seul ce mémo permet de retirer du panier ce
+// qui a été payé, et rien d'autre : l'URL de confirmation, elle, ne prouve rien.
+interface PendingPurchase {
+    paymentIntentId: string;
+    lines: PurchasedLine[];
+}
+
+// Borne le mémo : une tentative remplacée (panier modifié, nouveau paiement) n'est jamais confirmée.
+const MAX_PENDING_PURCHASES = 20;
+
+function purchasesKey(): string {
+    return userScopedKey(readUser()?.id ?? null, USER_KEYS.pendingPurchases);
+}
+
+function isPendingPurchase(value: unknown): value is PendingPurchase {
+    if (!value || typeof value !== 'object') return false;
+    const v = value as Record<string, unknown>;
+    return (
+        typeof v.paymentIntentId === 'string' &&
+        Array.isArray(v.lines) &&
+        v.lines.every(
+            (line: unknown) =>
+                !!line &&
+                typeof line === 'object' &&
+                typeof (line as PurchasedLine).productId === 'string' &&
+                typeof (line as PurchasedLine).quantity === 'number',
+        )
+    );
+}
+
+function readPurchases(): PendingPurchase[] {
+    if (typeof window === 'undefined') return [];
+    try {
+        const parsed: unknown = JSON.parse(window.localStorage.getItem(purchasesKey()) ?? '[]');
+        return Array.isArray(parsed) ? parsed.filter(isPendingPurchase) : [];
+    } catch {
+        return [];
+    }
+}
+
+/** Mémorise les lignes que le PaymentIntent vient de réserver, pour les retirer une fois payées. */
+export function rememberPurchase(paymentIntentId: string, lines: readonly PurchasedLine[]): void {
+    if (typeof window === 'undefined') return;
+    const others = readPurchases().filter((purchase) => purchase.paymentIntentId !== paymentIntentId);
+    const next = [...others, { paymentIntentId, lines: [...lines] }].slice(-MAX_PENDING_PURCHASES);
+    window.localStorage.setItem(purchasesKey(), JSON.stringify(next));
+}
+
+/**
+ * Retire du panier les lignes d'un paiement confirmé par le serveur, une seule fois : le mémo est
+ * consommé, et une nouvelle visite de la confirmation ne retire plus rien.
+ */
+export function settlePurchase(paymentIntentId: string): void {
+    const purchases = readPurchases();
+    const purchase = purchases.find((p) => p.paymentIntentId === paymentIntentId);
+    if (!purchase) return;
+    window.localStorage.setItem(
+        purchasesKey(),
+        JSON.stringify(purchases.filter((p) => p.paymentIntentId !== paymentIntentId)),
+    );
+    write(subtractPurchase(read(), purchase.lines));
 }
 
 function readKey(key: string): CartLine[] {
@@ -140,9 +188,9 @@ export function migrateAnonCartToUser(userId: string): void {
     // La clé de fusion porte la déclinaison : sans elle, un invité qui avait ajouté du M et du L
     // n'en garderait qu'un après connexion.
     const merged = new Map<string, CartLine>();
-    for (const line of readKey(userKey)) merged.set(lineKey(line.productId, line.variantId), line);
+    for (const line of readKey(userKey)) merged.set(cartLineKey(line.productId, line.variantId), line);
     for (const line of anonLines) {
-        const key = lineKey(line.productId, line.variantId);
+        const key = cartLineKey(line.productId, line.variantId);
         const existing = merged.get(key);
         merged.set(key, existing ? { ...existing, quantity: Math.max(existing.quantity, line.quantity) } : line);
     }

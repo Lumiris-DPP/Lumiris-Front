@@ -19,9 +19,12 @@ import {
     type UnavailableLine,
 } from '@/lib/marketplace';
 
+// Panier de l'acheteur : colis par atelier, lignes à corriger et total. Une lecture du catalogue en
+// cours ou en panne ne vide rien et ne déclare aucune pièce indisponible.
 export function Panier() {
     const router = useRouter();
     const {
+        lines,
         shipments,
         subtotalCents,
         shippingCents,
@@ -31,9 +34,12 @@ export function Panier() {
         overstocked,
         needsVariant,
         hasBlockingIssue,
-        isLoading,
+        loadState,
+        retry,
     } = useCartDetails();
-    const empty = shipments.length === 0 && unavailable.length === 0;
+    const empty = lines.length === 0;
+    // Tant que les fiches ne sont pas relues, le compteur dit ce que contient le panier local.
+    const shownCount = loadState === 'ready' ? count : lines.reduce((sum, line) => sum + line.quantity, 0);
 
     return (
         <div className="flex h-full flex-col overflow-y-auto bg-background pb-52">
@@ -53,7 +59,7 @@ export function Panier() {
                 <div className="min-w-0 flex-1">
                     <h1 className="text-base font-bold text-foreground">Panier</h1>
                     <p className="text-xs text-muted-foreground">
-                        {count} article{count > 1 ? 's' : ''}
+                        {shownCount} article{shownCount > 1 ? 's' : ''}
                         {shipments.length > 1 ? ` · ${shipments.length} ateliers` : ''}
                     </p>
                 </div>
@@ -63,12 +69,14 @@ export function Panier() {
             {needsVariant.length > 0 ? <ChooseVariantNotice lines={needsVariant} /> : null}
             {overstocked.length > 0 ? <StockNotice items={overstocked} /> : null}
 
-            {isLoading && empty ? (
+            {empty ? (
+                <EmptyCart />
+            ) : loadState === 'loading' ? (
                 <div className="flex flex-1 items-center justify-center gap-2 text-sm text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" /> Chargement du panier…
                 </div>
-            ) : empty ? (
-                <EmptyCart />
+            ) : loadState === 'error' ? (
+                <LoadErrorNotice onRetry={retry} />
             ) : (
                 <>
                     <div className="flex flex-col gap-4 px-4">
@@ -238,6 +246,30 @@ function ChooseVariantNotice({ lines }: { lines: readonly UnavailableLine[] }) {
 
 // Une pièce disparue ou en rupture ne doit pas se découvrir à l'écran de paiement, sous forme
 // d'erreur technique : on nomme le problème ici, avec le geste qui le résout.
+// Le catalogue n'a pas répondu : le panier est conservé tel quel et le paiement attend une relecture.
+function LoadErrorNotice({ onRetry }: { onRetry: () => void }) {
+    return (
+        <div className="px-4">
+            <div className="rounded-2xl border border-lumiris-amber/30 bg-lumiris-amber/10 p-3" role="alert">
+                <p className="flex items-center gap-1.5 text-xs font-semibold text-lumiris-amber">
+                    <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
+                    Impossible de charger ton panier
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                    Tes pièces sont conservées. Vérifie ta connexion puis réessaie.
+                </p>
+                <button
+                    type="button"
+                    onClick={onRetry}
+                    className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-lumiris-amber/40 px-3 py-1.5 text-xs font-semibold text-foreground"
+                >
+                    Réessayer
+                </button>
+            </div>
+        </div>
+    );
+}
+
 function UnavailableNotice({ lines }: { lines: readonly UnavailableLine[] }) {
     return (
         <div className="mb-2 px-4">
