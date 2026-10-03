@@ -1,17 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Loader2, Lock, LogIn, UserPlus } from 'lucide-react';
 import { Elements } from '@stripe/react-stripe-js';
-import { useApiClient, useTrackEvent } from '@lumiris/api-client/react';
-import type { PaymentIntentResponse } from '@lumiris/api-client';
+import { isApiError, useTrackEvent } from '@lumiris/api-client/react';
 import { routes } from '@/lib/routes';
 import { useUser } from '@/lib/auth/use-user';
 import {
-    clearCart,
     readShippingAddress,
     takeConversionOrigins,
     useCartDetails,
@@ -20,78 +18,46 @@ import {
 } from '@/lib/marketplace';
 import { getStripe } from '@/lib/stripe';
 import { AddressStep } from './address-step';
+import type { CheckoutContext } from './checkout-context';
 import { CheckoutRecap } from './recap';
 import { PaymentStep } from './payment-step';
+import { resetCheckoutIntents, useCheckoutIntent } from './use-checkout-intent';
 
 // Chemin de retour après connexion : ramène l'utilisateur directement au paiement.
 const CHECKOUT_RETURN = encodeURIComponent('/checkout');
 
-// Un panier + une adresse = un PaymentIntent. Ce cache (au niveau module) dédoublonne la création
-// à travers les remounts StrictMode et les allers-retours entre les deux étapes, ce qui évite de
-// créer des PaymentIntents (et des commandes en attente) orphelins à chaque montage.
-const intentCache = new Map<string, Promise<PaymentIntentResponse>>();
-
-// La signature porte la DÉCLINAISON : sans elle, deux choix de taille du même produit partagent une
-// entrée de cache et le second réutiliserait le PaymentIntent du premier.
-function checkoutSignature(
-    items: ReadonlyArray<{ product: { id: string }; variant: { id: string }; quantity: number }>,
-): string {
-    return items
-        .map((it) => `${it.product.id}:${it.variant.id}:${it.quantity}`)
-        .sort()
-        .join('|');
-}
-
 type Step = 'address' | 'payment';
 
+// Tunnel de paiement en deux étapes, adresse puis Payment Element, sur un panier relu sans erreur.
 export function Checkout() {
     const router = useRouter();
     const { user, isAuthenticated } = useUser();
-    const client = useApiClient();
     const { mutate: trackEvent } = useTrackEvent();
-    const { items, shipments, subtotalCents, shippingCents, totalCents, isLoading } = useCartDetails();
+    const cart = useCartDetails();
+    const { items, shipments, subtotalCents, shippingCents, totalCents, loadState, hasBlockingIssue } = cart;
 
     const [step, setStep] = useState<Step>('address');
     const [address, setAddress] = useState<ShippingAddress | null>(null);
-    const [intent, setIntent] = useState<PaymentIntentResponse | null>(null);
-    const [intentError, setIntentError] = useState<string | null>(null);
 
     // L'adresse déjà utilisée est proposée d'office ; l'acheteur la confirme d'un geste au lieu
     // de la retaper. Lue au montage seulement — ensuite l'état de l'écran fait foi.
     const [savedAddress] = useState(() => readShippingAddress());
 
-    // Le PaymentIntent n'est préparé qu'une fois l'adresse connue et validée : c'est aussi ce qui
-    // garantit que la commande créée côté serveur porte une adresse d'expédition.
-    useEffect(() => {
-        if (step !== 'payment' || !address || items.length === 0 || !isAuthenticated) return;
-        const signature = `${checkoutSignature(items)}#${JSON.stringify(address)}`;
-        let promise = intentCache.get(signature);
-        if (!promise) {
-            promise = client.marketplace.checkoutIntent({
-                items: items.map((it) => ({
-                    productId: it.product.id,
-                    variantId: it.variant.id,
-                    quantity: it.quantity,
-                })),
-                shipping: address,
-            });
-            intentCache.set(signature, promise);
-        }
-        let cancelled = false;
-        promise
-            .then((res) => {
-                if (!cancelled) setIntent(res);
-            })
-            .catch((err: Error) => {
-                intentCache.delete(signature);
-                if (!cancelled) setIntentError(err.message || 'Impossible de préparer le paiement. Réessaie.');
-            });
-        return () => {
-            cancelled = true;
+    // Le PaymentIntent n'est préparé qu'une fois l'adresse validée et le panier relu sans problème :
+    // un panier en chargement, en panne ou avec une ligne invalide ne se paie pas, même en partie.
+    // Le contexte porte l'acheteur, les lignes exactes et l'adresse : si l'un change, il change.
+    const buyerId = user?.id ?? null;
+    const context = useMemo<CheckoutContext | null>(() => {
+        if (step !== 'payment' || !address || !buyerId || hasBlockingIssue || items.length === 0) return null;
+        return {
+            buyerId,
+            lines: items.map((it) => ({ productId: it.product.id, variantId: it.variant.id, quantity: it.quantity })),
+            address,
         };
-    }, [step, address, items, isAuthenticated, client]);
+    }, [step, address, buyerId, hasBlockingIssue, items]);
+    const { intent, error: intentError, retry: retryIntent } = useCheckoutIntent(context);
 
-    if (!isLoading && items.length === 0 && !intent) {
+    if (loadState === 'ready' && cart.lines.length === 0) {
         return (
             <CheckoutMessage
                 title="Aucun article à régler"
@@ -106,18 +72,45 @@ export function Checkout() {
         return <SignInGate onBack={() => router.replace('/panier')} />;
     }
 
-    if (intentError) {
+    if (loadState === 'loading') {
+        return <CheckoutLoader label="Chargement du panier…" />;
+    }
+
+    if (loadState === 'error') {
         return (
             <CheckoutMessage
+                title="Panier indisponible"
+                description="Impossible de vérifier ton panier pour le moment. Réessaie dans quelques instants."
+                action={{ label: 'Réessayer', onClick: cart.retry }}
+            />
+        );
+    }
+
+    if (hasBlockingIssue) {
+        return (
+            <CheckoutMessage
+                title="Ton panier a changé"
+                description="Une pièce n’est plus disponible telle que tu l’as choisie. Ajuste ton panier avant de payer."
+                action={{ label: 'Revenir au panier', onClick: () => router.replace('/panier') }}
+            />
+        );
+    }
+
+    if (intentError) {
+        // Refus métier (stock, atelier, taille) : le message du serveur dit quoi corriger. Incident
+        // (réseau, service indisponible) : on propose de réessayer, sans message technique.
+        const refused = isApiError(intentError) && ['VALIDATION_ERROR', 'NOT_FOUND'].includes(intentError.code);
+        return refused ? (
+            <CheckoutMessage
                 title="Paiement indisponible"
-                description={intentError}
-                action={{
-                    label: 'Modifier ma commande',
-                    onClick: () => {
-                        setIntentError(null);
-                        setStep('address');
-                    },
-                }}
+                description={intentError.message}
+                action={{ label: 'Modifier ma commande', onClick: () => setStep('address') }}
+            />
+        ) : (
+            <CheckoutMessage
+                title="Paiement indisponible"
+                description="Le paiement ne répond pas pour le moment. Réessaie dans quelques instants."
+                action={{ label: 'Réessayer', onClick: retryIntent }}
             />
         );
     }
@@ -145,7 +138,13 @@ export function Checkout() {
                         <Loader2 className="h-4 w-4 animate-spin" /> Préparation du paiement sécurisé…
                     </div>
                 ) : (
-                    <Elements stripe={getStripe(intent.publishableKey)} options={stripeOptions(intent.clientSecret)}>
+                    // Le client secret ne peut pas changer sous un Payment Element monté : un nouveau
+                    // contexte remonte le formulaire sur le nouveau PaymentIntent.
+                    <Elements
+                        key={intent.clientSecret}
+                        stripe={getStripe(intent.publishableKey)}
+                        options={stripeOptions(intent.clientSecret)}
+                    >
                         <PaymentStep
                             address={address}
                             shipments={shipments}
@@ -154,19 +153,28 @@ export function Checkout() {
                             amountTotalCents={intent.amountTotalCents}
                             onEditAddress={() => setStep('address')}
                             onPaid={(paymentIntentId) => {
-                                // Rattache la conversion au passeport d'origine (clic suggestion) avant de
-                                // vider le panier — après, l'info productId → publicCode n'a plus de sens.
+                                // Rattache la conversion au passeport d'origine (clic suggestion). Le
+                                // panier n'est pas vidé ici : l'écran de confirmation retire les lignes
+                                // payées une fois le paiement confirmé par le serveur.
                                 for (const publicCode of takeConversionOrigins(items.map((it) => it.product.id))) {
                                     trackEvent({ publicCode, type: 'CONVERSION' });
                                 }
-                                intentCache.clear();
-                                clearCart();
+                                resetCheckoutIntents();
                                 router.replace(routes.order(paymentIntentId));
                             }}
                         />
                     </Elements>
                 )}
             </div>
+        </div>
+    );
+}
+
+// Attente plein écran, le temps que le panier soit relu.
+function CheckoutLoader({ label }: { label: string }) {
+    return (
+        <div className="flex h-full items-center justify-center gap-2 bg-background text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" /> {label}
         </div>
     );
 }

@@ -21,6 +21,7 @@ export const USER_KEYS = {
     cart: 'cart.v1',
     shippingAddress: 'shipping-address.v1',
     orders: 'orders.v1',
+    pendingPurchases: 'pending-purchases.v1',
 } as const;
 
 /** `lumiris.users.{userId}.{suffix}` ou `lumiris.anon.{suffix}` (tampon avant signIn). */
