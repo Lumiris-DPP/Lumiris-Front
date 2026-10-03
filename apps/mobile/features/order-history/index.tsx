@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { AlertTriangle, ArrowLeft, ChevronRight, LogIn, Package, Shirt, Truck } from 'lucide-react';

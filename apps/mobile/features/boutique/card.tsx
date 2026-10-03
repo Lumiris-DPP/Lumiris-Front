@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Shirt, BadgeCheck } from 'lucide-react';
@@ -76,7 +76,7 @@ export function BoutiqueCard({ item, index }: BoutiqueCardProps) {
                 </div>
             </div>
 
-            <Link href={routes.product(item.id)} prefetch aria-label={item.name} className="absolute inset-0 z-10" />
+            <Link href={routes.product(item.id)} aria-label={item.name} className="absolute inset-0 z-10" />
         </motion.div>
     );
 }

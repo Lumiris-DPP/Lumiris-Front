@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState, type SyntheticEvent } from 'react';
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import { motion } from 'framer-motion';
 import { Store, PackageOpen, ShoppingBag, WifiOff } from 'lucide-react';
 import { useMarketplaceSearch } from '@lumiris/api-client/react';

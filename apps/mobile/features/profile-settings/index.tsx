@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useId, useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ChevronRight, ShieldCheck } from 'lucide-react';
 import { Button } from '@lumiris/ui/components/button';

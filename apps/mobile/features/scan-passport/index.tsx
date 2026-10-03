@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, HelpCircle, Keyboard } from 'lucide-react';
 import { mockArtisanById } from '@lumiris/mock-data';

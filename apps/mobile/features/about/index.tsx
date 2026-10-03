@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import { ArrowLeft, FileText, LifeBuoy, Mail, ShieldCheck, Sparkles } from 'lucide-react';
 import { LUMIRIS_WEIGHTS } from '@lumiris/core/scoring';
 import { SectionLabel } from '@/lib/section';
@@ -58,9 +58,8 @@ interface LegalLink {
 const LEGAL: readonly LegalLink[] = [
     { href: 'mailto:hello@lumiris.example', label: 'Contact - hello@lumiris.example' },
     { href: '/help', label: 'Aide & FAQ', Icon: LifeBuoy },
-    { href: '/about#mentions', label: 'Mentions légales' },
-    { href: '/about#cgu', label: 'Conditions générales d’utilisation' },
-    { href: '/about#rgpd', label: 'Politique de confidentialité (RGPD)' },
+    { href: '/mentions-legales/', label: 'Mentions légales' },
+    { href: '/confidentialite/', label: 'Politique de confidentialité (RGPD)' },
 ];
 
 export function About() {
@@ -97,7 +96,7 @@ export function About() {
                     />
                 </Section>
 
-                <Section title="Le score Iris V2">
+                <Section id="scoring-doc" title="Le score Iris V2">
                     <div className="grid grid-cols-2 gap-3">
                         {PILLARS.map((p) => (
                             <PillarCard key={p.label} pillar={p} />
@@ -105,11 +104,7 @@ export function About() {
                     </div>
                     <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
                         Algorithme open et déterministe - chaque score est reproductible à partir du passeport et des
-                        coefficients ADEME / Higg / WFN publiés.{' '}
-                        <Link href="/about#scoring-doc" className="text-foreground underline-offset-4 hover:underline">
-                            Documentation complète
-                        </Link>
-                        .
+                        coefficients ADEME / Higg / WFN publiés.
                     </p>
                 </Section>
 
@@ -171,9 +166,10 @@ export function About() {
     );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+// Identifie une section de présentation pour permettre les liens directs depuis l'aide.
+function Section({ id, title, children }: { id?: string; title: string; children: React.ReactNode }) {
     return (
-        <section className="flex flex-col gap-3">
+        <section id={id} className="flex flex-col gap-3">
             <SectionLabel title={title} />
             <div className="rounded-2xl border border-border/60 bg-card/60 p-4 backdrop-blur-md">{children}</div>
         </section>

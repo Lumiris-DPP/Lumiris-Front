@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import { ChevronRight, FileText, ShieldCheck } from 'lucide-react';
 import { useMyOrders, useWardrobe } from '@lumiris/api-client/react';
 import { formatDate } from '@lumiris/utils';
