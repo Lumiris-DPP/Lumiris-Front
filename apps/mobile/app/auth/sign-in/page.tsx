@@ -11,10 +11,12 @@ import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
 import { useUser } from '@/lib/auth';
+import { migrateAnonCartToUser } from '@/lib/marketplace/cart-storage';
 import { sanitizeReturnTo } from '@/lib/auth/return-to';
 
 const MIN_SIGNUP_PASSWORD_LENGTH = 8;
 
+/** Authentifie le consommateur et restaure son panier avant le retour sécurisé. */
 function SignInForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -32,6 +34,7 @@ function SignInForm() {
     // donc AUCUNE API — on affiche un message honnête renvoyant vers le support.
     const [showReset, setShowReset] = useState(false);
 
+    /** Valide la saisie puis connecte le consommateur et fusionne son panier invité. */
     async function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
         event.preventDefault();
         const trimmedEmail = email.trim().toLowerCase();
@@ -70,6 +73,10 @@ function SignInForm() {
                 return;
             }
             signIn(user, token, refreshToken);
+            // Le panier rempli en invité suit l'acheteur : sans cette fusion, ses articles resteraient
+            // sous la clé `anon`. Appelée ici et non dans `signIn`, pour que l'authentification ne
+            // dépende pas du panier, qui dépend déjà d'elle.
+            migrateAnonCartToUser(user.id);
             // Un `returnTo` interne (ex. depuis le paiement) est prioritaire sur la destination
             // par défaut, pour ramener l'utilisateur exactement là où il s'était arrêté.
             const returnTo = sanitizeReturnTo(searchParams.get('returnTo'));
@@ -194,6 +201,7 @@ function SignInForm() {
     );
 }
 
+/** Place la connexion sous la frontière nécessaire aux paramètres de retour. */
 export default function SignInPage() {
     return (
         <div className="relative flex h-full flex-col px-6 pt-12 pb-10">

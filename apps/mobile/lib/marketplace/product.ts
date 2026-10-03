@@ -67,6 +67,7 @@ export const MARKETPLACE_SORT_ORDER: readonly MarketplaceSort[] = [
 
 const GRADES: ReadonlySet<string> = new Set(['A', 'B', 'C', 'D', 'E']);
 
+/** Conserve uniquement une note Iris reconnue. */
 function asGrade(value: string | null | undefined): IrisGrade | null {
     return value && GRADES.has(value) ? (value as IrisGrade) : null;
 }
@@ -110,6 +111,7 @@ export function variantLabel(variant: MarketplaceVariant): string | null {
     return size || color || null;
 }
 
+/** Liste les tailles distinctes réellement proposées par l’atelier. */
 export function sizeOptionsOf(item: MarketplaceItem): readonly string[] {
     const sizes: string[] = [];
     for (const variant of item.variants) {
@@ -124,6 +126,7 @@ interface ColorOption {
     hex: string | null;
 }
 
+/** Liste les couleurs distinctes et leur teinte déclarée. */
 export function colorOptionsOf(item: MarketplaceItem): readonly ColorOption[] {
     const colors: ColorOption[] = [];
     for (const variant of item.variants) {
@@ -135,6 +138,7 @@ export function colorOptionsOf(item: MarketplaceItem): readonly ColorOption[] {
     return colors;
 }
 
+/** Résout la déclinaison correspondant exactement aux axes choisis. */
 export function findVariant(
     item: MarketplaceItem,
     size: string | null,

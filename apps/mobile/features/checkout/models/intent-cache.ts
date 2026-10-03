@@ -18,16 +18,20 @@ interface IntentCache<T> {
 export function createIntentCache<T>(): IntentCache<T> {
     let entry: { key: string; request: Promise<T> } | null = null;
     return {
+        /** Dédoublonne la demande du même contexte de paiement. */
         get(key, create) {
             if (entry?.key !== key) entry = { key, request: create() };
             return entry.request;
         },
+        /** Relit la demande du contexte sans en créer une. */
         peek(key) {
             return entry?.key === key ? entry.request : null;
         },
+        /** Oublie uniquement la demande encore active dans le cache. */
         forget(request) {
             if (entry?.request === request) entry = null;
         },
+        /** Oublie l’intention de paiement mémorisée. */
         clear() {
             entry = null;
         },

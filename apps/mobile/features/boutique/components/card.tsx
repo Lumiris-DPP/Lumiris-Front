@@ -7,7 +7,8 @@ import { Shirt, BadgeCheck } from 'lucide-react';
 import { IrisGrade } from '@lumiris/scoring-ui';
 import { cn } from '@lumiris/ui/lib/cn';
 import { routes } from '@/lib/routes';
-import { formatCents, preparationLabel, type MarketplaceItem } from '@/lib/marketplace';
+import { formatCents } from '@/lib/marketplace/money';
+import { preparationLabel, type MarketplaceItem } from '@/lib/marketplace/product';
 import { FavoriteButton } from './favorite-button';
 
 interface BoutiqueCardProps {

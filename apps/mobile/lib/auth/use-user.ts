@@ -2,7 +2,6 @@
 
 import { useSyncExternalStore } from 'react';
 import type { User } from '@lumiris/types';
-import { migrateAnonCartToUser } from '../marketplace/cart-storage';
 import { readUser, writeUser } from './storage';
 import type { AuthUser } from './types';
 
@@ -11,6 +10,7 @@ const EVENT = 'lumiris:auth-changed';
 const USER_CHANGED_EVENT = 'lumiris:user-changed';
 const subscribers = new Set<() => void>();
 
+/** Informe les lecteurs locaux du changement de stockage. */
 function notify(): void {
     if (typeof window === 'undefined') return;
     window.dispatchEvent(new CustomEvent(EVENT));
@@ -21,6 +21,7 @@ function notify(): void {
 let snapshot: AuthUser | null = null;
 let snapshotSerialized = '';
 
+/** Conserve un instantané stable tant que le stockage ne change pas. */
 function getSnapshot(): AuthUser | null {
     const current = readUser();
     const serialized = current ? JSON.stringify(current) : '';
@@ -31,10 +32,12 @@ function getSnapshot(): AuthUser | null {
     return snapshot;
 }
 
+/** Fournit l’état initial sans stockage navigateur. */
 function getServerSnapshot(): AuthUser | null {
     return null;
 }
 
+/** Abonne les lecteurs aux changements du stockage local et du compte. */
 function subscribe(cb: () => void): () => void {
     subscribers.add(cb);
     if (typeof window !== 'undefined') {
@@ -64,12 +67,14 @@ interface UseUserResult {
     updateUser: (patch: Partial<Omit<AuthUser, 'id' | 'email' | 'createdAt' | 'token' | 'refreshToken'>>) => void;
 }
 
+/** Expose la session locale et ses opérations de connexion. */
 export function useUser(): UseUserResult {
     const user = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
     return {
         user,
         isAuthenticated: user !== null,
+        /** Enregistre le compte authentifié avant de notifier ses lecteurs. */
         signIn(result, token, refreshToken) {
             const existing = readUser();
             const sameAccount = existing?.id === result.id;
@@ -84,12 +89,10 @@ export function useUser(): UseUserResult {
                 createdAt: sameAccount ? existing.createdAt : new Date().toISOString(),
             };
             writeUser(next);
-            // Conserve le panier rempli en tant qu'invité : on le fusionne dans le panier
-            // scopé user avant de notifier, sinon les articles resteraient bloqués sous `anon`.
-            migrateAnonCartToUser(next.id);
             notify();
         },
         signOut: clearUser,
+        /** Met à jour les préférences du compte courant. */
         updateUser(patch) {
             const current = readUser();
             if (!current) return;

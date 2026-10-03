@@ -12,7 +12,7 @@ import { useAuthHydrated, useUser } from '@/lib/auth';
 import { toMarketplaceItem, type MarketplaceItem } from '@/lib/marketplace';
 import { articlesForStyles } from '@/lib/discover/for-you';
 import { articleToFeedItem, JOURNAL_CATEGORIES_ORDERED, type DiscoverFeedItem } from '@/lib/discover/feed';
-import { BoutiqueCard } from '@/features/boutique/card';
+import { BoutiqueCard } from '@/features/boutique/components/card';
 import { HeroCard } from '@/features/discover/hero-card';
 import { CategoryRow } from '@/features/discover/category-row';
 import { CategoryChips, type CategoryFilter } from '@/features/discover/category-chips';

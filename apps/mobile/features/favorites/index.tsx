@@ -7,7 +7,7 @@ import { useFavorites } from '@lumiris/api-client/react';
 import { Skeleton } from '@lumiris/ui/components/skeleton';
 import { useUser } from '@/lib/auth/use-user';
 import { toMarketplaceItem } from '@/lib/marketplace';
-import { BoutiqueCard } from '@/features/boutique/card';
+import { BoutiqueCard } from '@/features/boutique/components/card';
 
 export function Favorites() {
     const { isAuthenticated } = useUser();

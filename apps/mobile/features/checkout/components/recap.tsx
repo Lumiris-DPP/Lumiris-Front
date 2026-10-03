@@ -4,15 +4,9 @@ import Image from 'next/image';
 import { Package, RotateCcw, ShieldCheck, Shirt } from 'lucide-react';
 import { joinNonEmpty } from '@lumiris/utils';
 import { usePaymentOptions } from '@lumiris/api-client/react';
-import {
-    formatCents,
-    installmentLabel,
-    preparationLabel,
-    shippingCostLabel,
-    variantLabel,
-    type CartItemDetail,
-    type CartShipment,
-} from '@/lib/marketplace';
+import { formatCents, installmentLabel, shippingCostLabel } from '@/lib/marketplace/money';
+import { preparationLabel, variantLabel } from '@/lib/marketplace/product';
+import { type CartItemDetail, type CartShipment } from '@/lib/marketplace/cart-model';
 
 // Récapitulatif du panier, identique aux deux étapes du tunnel : l'acheteur doit voir la même
 // décomposition avant de saisir son adresse et avant de payer, sinon le total semble bouger.
@@ -74,6 +68,7 @@ export function CheckoutRecap({
     );
 }
 
+/** Récapitule les articles et le port d’un atelier. */
 function ShipmentRecap({
     shipment,
     parcelNumber,
@@ -112,6 +107,7 @@ function ShipmentRecap({
     );
 }
 
+/** Affiche une ligne du colis et sa quantité. */
 function ShipmentRecapLine({ item }: { item: CartItemDetail }) {
     const { product, variant, quantity } = item;
     const details = joinNonEmpty([variantLabel(variant), quantity > 1 ? `×${quantity}` : null]);
@@ -168,6 +164,7 @@ function Reassurance({ shipments }: { shipments: readonly CartShipment[] }) {
     );
 }
 
+/** Rassemble les conditions de vente distinctes des pièces du colis. */
 function distinctProductTexts(
     shipments: readonly CartShipment[],
     pick: (product: CartItemDetail['product']) => string | null | undefined,

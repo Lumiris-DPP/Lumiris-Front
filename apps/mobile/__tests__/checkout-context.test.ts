@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'bun:test';
-import { checkoutContextKey, paymentIntentIdOf, type CheckoutContext } from '@/features/checkout/checkout-context';
+import {
+    checkoutContextKey,
+    paymentIntentIdOf,
+    type CheckoutContext,
+} from '@/features/checkout/models/checkout-context';
 
 const address = {
     fullName: 'Acheteur Test',

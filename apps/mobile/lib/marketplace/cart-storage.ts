@@ -14,10 +14,12 @@ const USER_CHANGED = 'lumiris:user-changed';
 
 const subscribers = new Set<() => void>();
 
+/** Choisit la clé du panier du compte courant ou de l’invité. */
 function currentKey(): string {
     return userScopedKey(readUser()?.id ?? null, USER_KEYS.cart);
 }
 
+/** Informe les lecteurs locaux du changement de stockage. */
 function notify(): void {
     if (typeof window === 'undefined') return;
     window.dispatchEvent(new CustomEvent(EVENT));
@@ -36,10 +38,12 @@ function isCartLine(value: unknown): value is CartLine {
     return v.variantId === undefined || v.variantId === null || typeof v.variantId === 'string';
 }
 
+/** Compare le produit et la déclinaison d’une ligne de panier. */
 function sameLine(line: CartLine, productId: string, variantId: string | null): boolean {
     return line.productId === productId && line.variantId === variantId;
 }
 
+/** Relit les lignes locales du panier courant. */
 function read(): CartLine[] {
     if (typeof window === 'undefined') return [];
     try {
@@ -56,12 +60,14 @@ function read(): CartLine[] {
     }
 }
 
+/** Enregistre le panier courant et prévient ses lecteurs. */
 function write(lines: readonly CartLine[]): void {
     if (typeof window === 'undefined') return;
     window.localStorage.setItem(currentKey(), JSON.stringify(lines));
     notify();
 }
 
+/** Ajoute une déclinaison au panier ou augmente sa quantité. */
 export function addToCart(productId: string, variantId: string | null, quantity = 1): void {
     const current = read();
     const existing = current.find((line) => sameLine(line, productId, variantId));
@@ -73,6 +79,7 @@ export function addToCart(productId: string, variantId: string | null, quantity 
     write([...current, { productId, variantId, quantity: Math.max(1, quantity), addedAt: new Date().toISOString() }]);
 }
 
+/** Modifie la quantité de la déclinaison ou la retire si elle est nulle. */
 export function setCartQuantity(productId: string, variantId: string | null, quantity: number): void {
     const current = read();
     if (quantity <= 0) {
@@ -82,6 +89,7 @@ export function setCartQuantity(productId: string, variantId: string | null, qua
     write(current.map((line) => (sameLine(line, productId, variantId) ? { ...line, quantity } : line)));
 }
 
+/** Retire seulement la déclinaison demandée du panier. */
 export function removeFromCart(productId: string, variantId: string | null): void {
     write(read().filter((line) => !sameLine(line, productId, variantId)));
 }
@@ -96,10 +104,12 @@ interface PendingPurchase {
 // Borne le mémo : une tentative remplacée (panier modifié, nouveau paiement) n'est jamais confirmée.
 const MAX_PENDING_PURCHASES = 20;
 
+/** Choisit la clé des paiements préparés du compte courant. */
 function purchasesKey(): string {
     return userScopedKey(readUser()?.id ?? null, USER_KEYS.pendingPurchases);
 }
 
+/** Vérifie la forme d’un paiement préparé relu du stockage. */
 function isPendingPurchase(value: unknown): value is PendingPurchase {
     if (!value || typeof value !== 'object') return false;
     const v = value as Record<string, unknown>;
@@ -116,6 +126,7 @@ function isPendingPurchase(value: unknown): value is PendingPurchase {
     );
 }
 
+/** Relit les paiements préparés dont le sort reste à connaître. */
 function readPurchases(): PendingPurchase[] {
     if (typeof window === 'undefined') return [];
     try {
@@ -127,8 +138,9 @@ function readPurchases(): PendingPurchase[] {
 }
 
 /** Mémorise les lignes que le PaymentIntent vient de réserver, pour les retirer une fois payées. */
-export function rememberPurchase(paymentIntentId: string, lines: readonly PurchasedLine[]): void {
-    if (typeof window === 'undefined') return;
+export function rememberPurchase(paymentIntentId: string, lines: readonly PurchasedLine[], buyerId: string): void {
+    // Une réponse tardive de paiement ne doit jamais écrire dans le panier d'un autre compte.
+    if (typeof window === 'undefined' || readUser()?.id !== buyerId) return;
     const others = readPurchases().filter((purchase) => purchase.paymentIntentId !== paymentIntentId);
     const next = [...others, { paymentIntentId, lines: [...lines] }].slice(-MAX_PENDING_PURCHASES);
     window.localStorage.setItem(purchasesKey(), JSON.stringify(next));
@@ -159,6 +171,7 @@ export function forgetPurchase(paymentIntentId: string): void {
     );
 }
 
+/** Relit les lignes du panier à la clé fournie. */
 function readKey(key: string): CartLine[] {
     if (typeof window === 'undefined') return [];
     try {
@@ -215,6 +228,7 @@ const EMPTY: readonly CartLine[] = [];
 let snapshotCache: readonly CartLine[] = EMPTY;
 let snapshotSerialized = '';
 
+/** Conserve un instantané stable tant que le stockage ne change pas. */
 function getSnapshot(): readonly CartLine[] {
     const current = read();
     const serialized = JSON.stringify(current);
@@ -225,10 +239,12 @@ function getSnapshot(): readonly CartLine[] {
     return snapshotCache;
 }
 
+/** Fournit l’état initial sans stockage navigateur. */
 function getServerSnapshot(): readonly CartLine[] {
     return EMPTY;
 }
 
+/** Abonne les lecteurs aux changements du stockage local et du compte. */
 function subscribe(cb: () => void): () => void {
     subscribers.add(cb);
     if (typeof window !== 'undefined') {
@@ -246,10 +262,12 @@ function subscribe(cb: () => void): () => void {
     };
 }
 
+/** Expose les lignes du panier courant aux composants. */
 export function useCart(): readonly CartLine[] {
     return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
+/** Compte les quantités des déclinaisons du panier courant. */
 export function useCartCount(): number {
     const lines = useCart();
     return lines.reduce((sum, line) => sum + line.quantity, 0);

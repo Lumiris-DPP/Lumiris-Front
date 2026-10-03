@@ -1,51 +1,22 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import Link from '@/components/navigation-link';
 import { motion } from 'framer-motion';
 import { Store, PackageOpen, ShoppingBag, WifiOff } from 'lucide-react';
-import { useMarketplaceSearch } from '@lumiris/api-client/react';
 import { Skeleton } from '@lumiris/ui/components/skeleton';
-import { toMarketplaceItem, useCartCount, type MarketplaceItem } from '@/lib/marketplace';
-import { BoutiqueCard } from './card';
-import {
-    BoutiqueFilters,
-    EMPTY_BOUTIQUE_FILTERS,
-    applyBoutiqueFilters,
-    categoryOptionsOf,
-    materialOptionsOf,
-    priceBoundsOf,
-    type BoutiqueFiltersState,
-} from './filters';
+import { useCartCount } from '@/lib/marketplace/cart-storage';
+import { BoutiqueCard } from './components/card';
+import { BoutiqueFilters } from './components/filters';
+import { EMPTY_BOUTIQUE_FILTERS, type BoutiqueFiltersState } from './models/filters-model';
+import { useBoutiqueCatalogue } from './hooks/use-boutique-catalogue';
 
+// Écran Boutique : l'état des filtres vit ici, la lecture du catalogue dans useBoutiqueCatalogue et
+// les calculs de facettes dans filters-model.
 export function Boutique() {
     const [filters, setFilters] = useState<BoutiqueFiltersState>(EMPTY_BOUTIQUE_FILTERS);
-    const query = filters.q.trim();
-
-    // Deux requêtes, et c'est délibéré : les facettes et les bornes de prix dérivent du catalogue
-    // ENTIER. Les faire dériver du résultat textuel ferait disparaître les puces à mesure qu'on tape
-    // et sauter les bornes du curseur sous le doigt, avec une sélection de prix devenue hors bornes.
-    // Le spread conditionnel garde la MÊME clé TanStack quand la recherche est vide : une requête.
-    const catalogue = useMarketplaceSearch({ sort: filters.sort });
-    const results = useMarketplaceSearch(
-        { sort: filters.sort, ...(query ? { q: query } : {}) },
-        { placeholderData: (previous) => previous },
-    );
-    const isLoading = results.isLoading;
-    const isError = results.isError;
-
-    // Seules les pièces réellement en vente in-app (inAppSale) apparaissent en Boutique.
-    const sellable = useMemo(() => (results.data?.items ?? []).filter((p) => p.inAppSale !== false), [results.data]);
-    const sorted = useMemo<readonly MarketplaceItem[]>(() => sellable.map(toMarketplaceItem), [sellable]);
-    const facetSource = useMemo<readonly MarketplaceItem[]>(
-        () => (catalogue.data?.items ?? []).filter((p) => p.inAppSale !== false).map(toMarketplaceItem),
-        [catalogue.data],
-    );
-    const priceBounds = useMemo(() => priceBoundsOf(facetSource), [facetSource]);
-    const categoryOptions = useMemo(() => categoryOptionsOf(facetSource), [facetSource]);
-    const materialOptions = useMemo(() => materialOptionsOf(facetSource), [facetSource]);
-
-    const items = useMemo<readonly MarketplaceItem[]>(() => applyBoutiqueFilters(sorted, filters), [sorted, filters]);
+    const { query, items, priceBounds, categoryOptions, materialOptions, isLoading, isError, retry } =
+        useBoutiqueCatalogue(filters);
 
     const cartCount = useCartCount();
 
@@ -85,10 +56,15 @@ export function Boutique() {
             />
 
             <div className="flex-1 overflow-y-auto px-5 pb-28">
+                {/* Le nombre de pièces change à chaque filtre : annoncé, il dit au lecteur d'écran ce
+                    que la grille vient de faire. */}
+                <p role="status" className="sr-only">
+                    {isLoading || isError ? '' : `${items.length} pièce${items.length > 1 ? 's' : ''}`}
+                </p>
                 {isLoading ? (
                     <BoutiqueSkeleton />
                 ) : isError ? (
-                    <BoutiqueError />
+                    <BoutiqueError onRetry={retry} />
                 ) : items.length === 0 ? (
                     query ? (
                         <BoutiqueEmpty
@@ -117,6 +93,7 @@ export function Boutique() {
     );
 }
 
+/** Affiche les cartes provisoires pendant le chargement du catalogue. */
 function BoutiqueSkeleton() {
     return (
         <div className="grid grid-cols-2 gap-3" aria-hidden>
@@ -127,9 +104,13 @@ function BoutiqueSkeleton() {
     );
 }
 
-function BoutiqueError() {
+/** Annonce une panne du catalogue et permet de relancer sa lecture. */
+function BoutiqueError({ onRetry }: { onRetry: () => void }) {
     return (
-        <div className="mt-10 flex flex-col items-center gap-3 rounded-2xl border border-border/60 bg-card/60 p-8 text-center">
+        <div
+            role="alert"
+            className="mt-10 flex flex-col items-center gap-3 rounded-2xl border border-border/60 bg-card/60 p-8 text-center"
+        >
             <span
                 aria-hidden
                 className="flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-background"
@@ -140,10 +121,18 @@ function BoutiqueError() {
             <p className="text-xs leading-relaxed text-muted-foreground">
                 Impossible de charger le catalogue pour le moment. Réessaie dans un instant.
             </p>
+            <button
+                type="button"
+                onClick={onRetry}
+                className="mt-1 rounded-full border border-border px-4 py-2 text-xs font-semibold text-foreground"
+            >
+                Réessayer
+            </button>
         </div>
     );
 }
 
+/** Présente une boutique ou une recherche sans résultat avec son action utile. */
 function BoutiqueEmpty({
     title,
     body,

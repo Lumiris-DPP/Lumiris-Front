@@ -20,16 +20,19 @@ export const EMPTY_ADDRESS: ShippingAddress = {
     phone: '',
 };
 
+/** Choisit la clé du panier du compte courant ou de l’invité. */
 function currentKey(): string {
     return userScopedKey(readUser()?.id ?? null, USER_KEYS.shippingAddress);
 }
 
+/** Vérifie la forme d’une adresse relue du stockage. */
 function isAddress(value: unknown): value is ShippingAddress {
     if (!value || typeof value !== 'object') return false;
     const v = value as Record<string, unknown>;
     return typeof v.fullName === 'string' && typeof v.line1 === 'string' && typeof v.city === 'string';
 }
 
+/** Relit l’adresse de livraison du compte courant. */
 export function readShippingAddress(): ShippingAddress | null {
     if (typeof window === 'undefined') return null;
     try {
@@ -42,6 +45,7 @@ export function readShippingAddress(): ShippingAddress | null {
     }
 }
 
+/** Enregistre l’adresse de livraison du compte courant. */
 export function writeShippingAddress(address: ShippingAddress): void {
     if (typeof window === 'undefined') return;
     window.localStorage.setItem(currentKey(), JSON.stringify(address));
