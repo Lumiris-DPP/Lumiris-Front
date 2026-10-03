@@ -1,5 +1,6 @@
 import { AlertTriangle } from 'lucide-react';
 
+/** Signale le litige ouvert et son motif au vendeur. */
 export function DisputeBanner({ reason }: { reason?: string | null }) {
     return (
         <div className="flex items-start gap-2.5 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm">

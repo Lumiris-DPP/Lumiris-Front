@@ -13,9 +13,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@lumiris/ui/components
 import { formatPriceCents } from '@lumiris/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { EmptyState } from '@/features/empty-state';
-import { OrdersTable } from './orders-table';
-import { OrderDetailSheet } from './order-detail-sheet';
-import { groupByTab, heldOrderCents } from './orders-model';
+import { OrdersTable } from './components/orders-table';
+import { OrderDetailSheet } from './components/order-detail-sheet';
+import { groupByTab, heldOrderCents } from './models/orders-model';
 
 // Ce que chaque onglet dit quand il est vide — un tableau vide sans phrase laisse le vendeur
 // se demander s'il attend une donnée ou s'il n'a simplement rien à faire.

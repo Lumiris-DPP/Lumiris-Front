@@ -9,7 +9,7 @@ import { StatCard } from '@lumiris/ui/components/stat-card';
 import { formatDateFr, formatPriceCents } from '@lumiris/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { EmptyState } from '@/features/empty-state';
-import { OrderStatusBadge } from '@/features/orders-dashboard/status-badge';
+import { OrderStatusBadge } from '@/features/orders-dashboard/components/status-badge';
 
 export function PayoutSchedule() {
     const token = useAuthStore((s) => s.token);

@@ -10,9 +10,9 @@ import { ORDER_STATUS_LABEL_BUYER } from '@lumiris/api-client';
 import { routes } from '@/lib/routes';
 import { useUser } from '@/lib/auth/use-user';
 import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
-import { OrderTimeline, TrackingSteps } from './timeline';
-import { ReasonSheet } from './reason-sheet';
-import { useOrderTracking } from './use-order-tracking';
+import { OrderTimeline, TrackingSteps } from './components/timeline';
+import { ReasonSheet } from './components/reason-sheet';
+import { useOrderTracking } from './hooks/use-order-tracking';
 import {
     AmountsCard,
     AddressCard,
@@ -21,8 +21,8 @@ import {
     PreparationCard,
     ReturnInstructions,
     TrackingCard,
-} from './order-sections';
-import { isOrderNotFound } from './tracking-model';
+} from './components/order-sections';
+import { isOrderNotFound } from './models/tracking-model';
 
 const RETURN_REASONS = [
     'La taille ne convient pas',

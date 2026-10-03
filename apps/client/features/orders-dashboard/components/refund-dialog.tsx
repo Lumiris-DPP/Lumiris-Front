@@ -20,7 +20,7 @@ import { Textarea } from '@lumiris/ui/components/textarea';
 import { toast } from '@lumiris/ui/components/sonner';
 import { formatPriceCents } from '@lumiris/utils';
 
-import { refundableCents, parseRefundCents } from './refund-model';
+import { refundableCents, parseRefundCents } from '../models/refund-model';
 
 // Prépare un remboursement dans le plafond renvoyé par la commande.
 export function RefundDialog({
