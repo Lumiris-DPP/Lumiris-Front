@@ -3,13 +3,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { CreditCard, Loader2, Lock, Pencil, ShieldCheck } from 'lucide-react';
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import { usePaymentOptions } from '@lumiris/api-client/react';
 import { routes } from '@/lib/routes';
-import { formatCents, type CartShipment, type ShippingAddress } from '@/lib/marketplace';
+import { formatCents, installmentLabel } from '@/lib/marketplace/money';
+import { type CartShipment } from '@/lib/marketplace/cart-model';
+import { type ShippingAddress } from '@/lib/marketplace/shipping-address';
 import { CheckoutRecap } from './recap';
 
 const PAYMENT_REFUSED =
     'Ta carte a été refusée. Aucun montant n’a été prélevé — saisis une autre carte pour réessayer.';
 
+/** Confirme le paiement avec Stripe et conserve le refus à l’écran. */
 export function PaymentStep({
     address,
     shipments,
@@ -29,6 +33,8 @@ export function PaymentStep({
 }) {
     const stripe = useStripe();
     const elements = useElements();
+    const { data: paymentOptions } = usePaymentOptions();
+    const installment = installmentLabel(amountTotalCents, paymentOptions);
     const [submitting, setSubmitting] = useState(false);
     const [payError, setPayError] = useState<string | null>(null);
     const errorRef = useRef<HTMLParagraphElement | null>(null);
@@ -39,6 +45,7 @@ export function PaymentStep({
         if (payError) errorRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }, [payError]);
 
+    /** Soumet le paiement Stripe et ouvre la confirmation serveur après son retour. */
     async function handleSubmit(event: React.SyntheticEvent) {
         event.preventDefault();
         if (!stripe || !elements || submitting) return;
@@ -105,7 +112,7 @@ export function PaymentStep({
                     </>
                 )}
             </button>
-            <p className="mt-2 text-center text-[11px] text-muted-foreground">Payez en plusieurs fois avec Klarna.</p>
+            {installment ? <p className="mt-2 text-center text-[11px] text-muted-foreground">{installment}</p> : null}
         </>
     );
 
@@ -159,6 +166,7 @@ export function PaymentStep({
     );
 }
 
+/** Récapitule l’adresse validée et permet de la modifier. */
 function DeliverySummary({ address, onEdit }: { address: ShippingAddress; onEdit: () => void }) {
     return (
         <section className="flex items-start gap-3 rounded-2xl border border-border/60 bg-card p-3">

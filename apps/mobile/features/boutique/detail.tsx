@@ -1,51 +1,32 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import Link from '@/components/navigation-link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import {
-    ArrowLeft,
-    BadgeCheck,
-    Check,
-    Clock,
-    Info,
-    MapPin,
-    RotateCcw,
-    ShieldCheck,
-    Shirt,
-    ShoppingCart,
-    Truck,
-} from 'lucide-react';
-import { isApiError, useApiClient, useMarketplaceProduct, usePaymentOptions } from '@lumiris/api-client/react';
+import { ArrowLeft, BadgeCheck, Clock, Info, MapPin, RotateCcw, ShieldCheck, Shirt, Truck } from 'lucide-react';
+import { isApiError, useApiClient, useMarketplaceProduct } from '@lumiris/api-client/react';
 import { IrisGrade } from '@lumiris/scoring-ui';
-import { Button } from '@lumiris/ui/components/button';
 import { Skeleton } from '@lumiris/ui/components/skeleton';
-import {
-    addToCart,
-    formatCents,
-    installmentLabel,
-    marketplaceCategoryLabel,
-    preparationLabel,
-    toMarketplaceItem,
-    useCart,
-    type MarketplaceItem,
-} from '@/lib/marketplace';
-import { toast } from '@/lib/toast';
-import { FavoriteButton } from './favorite-button';
-import { SizeGuideSheet } from './size-guide-sheet';
-import { PURCHASE_CTA_LABEL, VariantPicker, purchaseStateOf, type VariantSelection } from './variant-picker';
+import { marketplaceCategoryLabel } from '@/lib/marketplace/labels';
+import { preparationLabel, toMarketplaceItem, type MarketplaceItem } from '@/lib/marketplace/product';
+import { FavoriteButton } from './components/favorite-button';
+import { PurchaseBar } from './components/purchase-bar';
+import { shippingTermsOf } from './models/purchase-state';
+import { SizeGuideSheet } from './components/size-guide-sheet';
+import { useProductPurchase } from './hooks/use-product-purchase';
+import { VariantPicker } from './components/variant-picker';
 
 // Une vue comptée au plus une fois par produit et par chargement de page (évite le double
 // StrictMode + les refetch). Le backend agrège ces vues pour le tableau de bord vendeur.
 const viewed = new Set<string>();
 
+// Fiche produit publique : charge la pièce, compte une vue et distingue la pièce absente de la panne.
 export function BoutiqueDetail({ productId }: { productId: string }) {
     const router = useRouter();
     const client = useApiClient();
     // Fiche produit publique unique (deep-link direct) : plus de scan du catalogue complet.
-    const { data: dto, isLoading, error } = useMarketplaceProduct(productId);
+    const { data: dto, isLoading, error, refetch } = useMarketplaceProduct(productId);
 
     const product = useMemo<MarketplaceItem | null>(() => (dto ? toMarketplaceItem(dto) : null), [dto]);
 
@@ -59,6 +40,9 @@ export function BoutiqueDetail({ productId }: { productId: string }) {
     if (isLoading) {
         return (
             <div className="flex h-full flex-col gap-4 bg-background p-5 pt-14">
+                <p role="status" className="sr-only">
+                    Chargement de la pièce…
+                </p>
                 <Skeleton className="h-64 w-full rounded-3xl" />
                 <Skeleton className="h-6 w-2/3 rounded-full" />
                 <Skeleton className="h-4 w-1/3 rounded-full" />
@@ -70,68 +54,50 @@ export function BoutiqueDetail({ productId }: { productId: string }) {
         // 404 (NOT_FOUND) = pièce non publiée / vendeur non payable → « introuvable ».
         // Toute autre erreur (réseau/serveur) = chargement impossible, distinct de l'absence.
         const notFound = !error || (isApiError(error) && error.code === 'NOT_FOUND');
-        return (
-            <div className="flex h-full flex-col items-center justify-center gap-4 bg-background px-8 text-center">
-                <p className="text-base font-semibold text-foreground">
-                    {notFound ? 'Pièce introuvable' : 'Chargement impossible'}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                    {notFound
-                        ? 'Cette pièce n’est plus disponible à l’achat.'
-                        : 'Impossible d’afficher cette pièce pour le moment. Réessaie.'}
-                </p>
-                <Link
-                    href="/boutique"
-                    className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-primary-foreground"
-                >
-                    Retour à la Boutique
-                </Link>
-            </div>
-        );
+        return <ProductUnavailable notFound={notFound} onRetry={() => void refetch()} />;
     }
 
-    return <DetailBody product={product} onBack={() => router.back()} onBuyNow={() => router.push('/panier')} />;
+    return <DetailBody key={product.id} product={product} onBack={() => router.back()} />;
 }
 
-function DetailBody({
-    product,
-    onBack,
-    onBuyNow,
-}: {
-    product: MarketplaceItem;
-    onBack: () => void;
-    onBuyNow: () => void;
-}) {
-    const cart = useCart();
-    const [added, setAdded] = useState(false);
+// Pièce absente ou panne de lecture : la panne propose de réessayer, l'absence non.
+function ProductUnavailable({ notFound, onRetry }: { notFound: boolean; onRetry: () => void }) {
+    return (
+        <div
+            role={notFound ? undefined : 'alert'}
+            className="flex h-full flex-col items-center justify-center gap-4 bg-background px-8 text-center"
+        >
+            <h1 className="text-base font-semibold text-foreground">
+                {notFound ? 'Pièce introuvable' : 'Chargement impossible'}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+                {notFound
+                    ? 'Cette pièce n’est plus disponible à l’achat.'
+                    : 'Impossible d’afficher cette pièce pour le moment. Réessaie.'}
+            </p>
+            {notFound ? null : (
+                <button
+                    type="button"
+                    onClick={onRetry}
+                    className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-semibold text-foreground"
+                >
+                    Réessayer
+                </button>
+            )}
+            <Link
+                href="/boutique"
+                className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+            >
+                Retour à la Boutique
+            </Link>
+        </div>
+    );
+}
+
+// Corps de la fiche : la sélection et l'ajout au panier viennent de useProductPurchase, le reste s'affiche.
+function DetailBody({ product, onBack }: { product: MarketplaceItem; onBack: () => void }) {
+    const purchase = useProductPurchase(product);
     const [guideOpen, setGuideOpen] = useState(false);
-    // Une annonce à déclinaison unique présélectionne : rien ne change pour une pièce sans axe.
-    const [selection, setSelection] = useState<VariantSelection>(() => {
-        const only = product.variants.length === 1 ? product.variants[0] : undefined;
-        return { size: only?.sizeLabel?.trim() ?? null, color: only?.colorLabel?.trim() ?? null };
-    });
-
-    const { data: paymentOptions } = usePaymentOptions();
-    const installment = installmentLabel(product.priceCents, paymentOptions);
-    const state = purchaseStateOf(product, selection);
-    const variant = state.kind === 'ready' || state.kind === 'sold-out' ? state.variant : null;
-    const buyable = state.kind === 'ready';
-    const inCart = cart.some((line) => line.productId === product.id && line.variantId === (variant?.id ?? null));
-    const prepLabel = preparationLabel(product.preparationDays);
-
-    const onAdd = useCallback(() => {
-        if (!variant) return;
-        addToCart(product.id, variant.id, 1);
-        setAdded(true);
-        toast.success('Ajouté au panier');
-        window.setTimeout(() => setAdded(false), 1600);
-    }, [product.id, variant]);
-
-    const buyNow = useCallback(() => {
-        if (!variant) return;
-        addToCart(product.id, variant.id, 1);
-        onBuyNow();
-    }, [product.id, variant, onBuyNow]);
 
     return (
         <div className="relative flex h-full flex-col overflow-y-auto bg-background pb-44">
@@ -177,161 +143,110 @@ function DetailBody({
 
                 <VariantPicker
                     item={product}
-                    selection={selection}
-                    onChange={setSelection}
+                    selection={purchase.selection}
+                    onChange={purchase.setSelection}
                     onOpenSizeGuide={product.sizeGuide.length > 0 ? () => setGuideOpen(true) : undefined}
                 />
 
-                <dl className="grid grid-cols-2 gap-3 rounded-2xl border border-border/60 bg-card p-4 text-sm">
-                    {product.material ? (
-                        <div>
-                            <dt className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
-                                Matière
-                            </dt>
-                            <dd className="mt-0.5 text-foreground">{product.material}</dd>
-                        </div>
-                    ) : null}
-                    {product.category ? (
-                        <div>
-                            <dt className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
-                                Catégorie
-                            </dt>
-                            <dd className="mt-0.5 text-foreground">{marketplaceCategoryLabel(product.category)}</dd>
-                        </div>
-                    ) : null}
-                    {product.originCountry ? (
-                        <div>
-                            <dt className="inline-flex items-center gap-1 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
-                                <MapPin className="h-3 w-3" aria-hidden />
-                                Origine
-                            </dt>
-                            <dd className="mt-0.5 text-foreground">{product.originCountry}</dd>
-                        </div>
-                    ) : null}
-                    {product.dppFormId ? (
-                        <div>
-                            <dt className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
-                                Traçabilité
-                            </dt>
-                            <dd className="mt-0.5 text-foreground">Passeport numérique complet</dd>
-                        </div>
-                    ) : null}
-                </dl>
-
-                {/* Livraison, retours & garantie — annoncés AVANT l'achat (plus de « frais calculés au paiement »). */}
-                <section
-                    aria-label="Livraison, retours et garantie"
-                    className="flex flex-col divide-y divide-border/50 rounded-2xl border border-border/60 bg-card text-sm"
-                >
-                    {prepLabel ? (
-                        <InfoRow Icon={Clock} label="Préparation">
-                            Cette pièce est préparée par l&apos;atelier — expédiée sous {product.preparationDays} jour
-                            {product.preparationDays > 1 ? 's' : ''} après ta commande.
-                            {product.atelierPausedUntil
-                                ? ` L'atelier est en pause, de retour le ${formatShortDate(product.atelierPausedUntil)}.`
-                                : ''}
-                        </InfoRow>
-                    ) : null}
-                    <InfoRow Icon={Truck} label="Livraison">
-                        {product.shippingCents === null
-                            ? 'Expédiée à domicile.'
-                            : product.shippingCents === 0
-                              ? 'Offerte — expédiée à domicile.'
-                              : `${formatCents(product.shippingCents)} — expédiée à domicile.`}
-                    </InfoRow>
-                    {product.returnPolicy ? (
-                        <InfoRow Icon={RotateCcw} label="Retours">
-                            {product.returnPolicy}
-                        </InfoRow>
-                    ) : null}
-                    {product.warrantyDescription ? (
-                        <InfoRow Icon={ShieldCheck} label="Garantie">
-                            {product.warrantyDescription}
-                        </InfoRow>
-                    ) : null}
-                </section>
-
+                <ProductFacts product={product} />
+                <DeliveryTerms product={product} />
                 {product.irisGrade ? <IrisGradeExplainer grade={product.irisGrade} /> : null}
             </div>
 
-            <motion.aside
-                aria-label="Acheter cette pièce"
-                className="fixed inset-x-0 bottom-[4.75rem] z-nav mx-auto max-w-md border-t border-border/60 bg-background/90 px-4 pt-3 pb-3 backdrop-blur-xl"
-                initial={{ y: 60, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ type: 'spring', stiffness: 360, damping: 32, delay: 0.2 }}
-            >
-                <div className="flex items-end justify-between gap-3">
-                    <div className="min-w-0">
-                        <p className="font-mono text-xl leading-none font-bold text-foreground">
-                            {formatCents(product.priceCents)}
-                        </p>
-                        {installment ? (
-                            <p className="mt-0.5 text-[11px] font-medium text-lumiris-cyan">{installment}</p>
-                        ) : null}
-                        <p className="mt-1 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-                            <Truck className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
-                            {[
-                                prepLabel,
-                                product.shippingCents === null
-                                    ? 'Livraison à domicile'
-                                    : product.shippingCents === 0
-                                      ? 'Livraison offerte'
-                                      : `Livraison ${formatCents(product.shippingCents)}`,
-                            ]
-                                .filter(Boolean)
-                                .join(' · ')}
-                        </p>
-                    </div>
-                    {variant && variant.stock <= 0 ? (
-                        <span className="text-xs font-semibold text-lumiris-rose">Épuisé</span>
-                    ) : variant && variant.stock <= 3 ? (
-                        <span className="text-[11px] font-medium text-lumiris-amber">
-                            Plus que {variant.stock} en stock
-                        </span>
-                    ) : null}
-                </div>
-
-                <div className="mt-2.5 flex gap-2">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={onAdd}
-                        disabled={!buyable}
-                        className="h-11 flex-1 rounded-full text-sm font-semibold"
-                    >
-                        {added || inCart ? (
-                            <>
-                                <Check className="h-4 w-4" strokeWidth={1.5} />
-                                {inCart ? 'Dans le panier' : 'Ajouté'}
-                            </>
-                        ) : (
-                            <>
-                                <ShoppingCart className="h-4 w-4" strokeWidth={1.5} />
-                                Ajouter
-                            </>
-                        )}
-                    </Button>
-                    <Button
-                        type="button"
-                        onClick={buyNow}
-                        disabled={!buyable}
-                        className="h-11 flex-[1.4] rounded-full bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-                    >
-                        {buyable ? `Acheter — ${formatCents(product.priceCents)}` : PURCHASE_CTA_LABEL[state.kind]}
-                    </Button>
-                </div>
-            </motion.aside>
+            <PurchaseBar
+                product={product}
+                state={purchase.state}
+                added={purchase.added}
+                inCart={purchase.inCart}
+                onAdd={purchase.add}
+                onBuyNow={purchase.buyNow}
+            />
 
             <SizeGuideSheet open={guideOpen} onOpenChange={setGuideOpen} measurements={product.sizeGuide} />
         </div>
     );
 }
 
+// Caractéristiques déclarées de la pièce ; une donnée absente n'a pas de ligne.
+function ProductFacts({ product }: { product: MarketplaceItem }) {
+    return (
+        <dl className="grid grid-cols-2 gap-3 rounded-2xl border border-border/60 bg-card p-4 text-sm">
+            {product.material ? (
+                <div>
+                    <dt className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+                        Matière
+                    </dt>
+                    <dd className="mt-0.5 text-foreground">{product.material}</dd>
+                </div>
+            ) : null}
+            {product.category ? (
+                <div>
+                    <dt className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+                        Catégorie
+                    </dt>
+                    <dd className="mt-0.5 text-foreground">{marketplaceCategoryLabel(product.category)}</dd>
+                </div>
+            ) : null}
+            {product.originCountry ? (
+                <div>
+                    <dt className="inline-flex items-center gap-1 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+                        <MapPin className="h-3 w-3" aria-hidden />
+                        Origine
+                    </dt>
+                    <dd className="mt-0.5 text-foreground">{product.originCountry}</dd>
+                </div>
+            ) : null}
+            {product.dppFormId ? (
+                <div>
+                    <dt className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+                        Traçabilité
+                    </dt>
+                    <dd className="mt-0.5 text-foreground">Passeport numérique complet</dd>
+                </div>
+            ) : null}
+        </dl>
+    );
+}
+
+// Livraison, retours et garantie, annoncés AVANT l'achat (plus de « frais calculés au paiement »).
+function DeliveryTerms({ product }: { product: MarketplaceItem }) {
+    return (
+        <section
+            aria-label="Livraison, retours et garantie"
+            className="flex flex-col divide-y divide-border/50 rounded-2xl border border-border/60 bg-card text-sm"
+        >
+            {preparationLabel(product.preparationDays) ? (
+                <InfoRow Icon={Clock} label="Préparation">
+                    Cette pièce est préparée par l&apos;atelier — expédiée sous {product.preparationDays} jour
+                    {product.preparationDays > 1 ? 's' : ''} après ta commande.
+                    {product.atelierPausedUntil
+                        ? ` L'atelier est en pause, de retour le ${formatShortDate(product.atelierPausedUntil)}.`
+                        : ''}
+                </InfoRow>
+            ) : null}
+            <InfoRow Icon={Truck} label="Livraison">
+                {shippingTermsOf(product.shippingCents)}
+            </InfoRow>
+            {product.returnPolicy ? (
+                <InfoRow Icon={RotateCcw} label="Retours">
+                    {product.returnPolicy}
+                </InfoRow>
+            ) : null}
+            {product.warrantyDescription ? (
+                <InfoRow Icon={ShieldCheck} label="Garantie">
+                    {product.warrantyDescription}
+                </InfoRow>
+            ) : null}
+        </section>
+    );
+}
+
+/** Affiche la date de retour de l’atelier en français. */
 function formatShortDate(value: string): string {
     return new Date(value).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
 }
 
+/** Affiche une condition de vente avec son pictogramme et son libellé. */
 function InfoRow({ Icon, label, children }: { Icon: typeof Truck; label: string; children: ReactNode }) {
     return (
         <div className="flex items-start gap-3 p-4">
@@ -354,6 +269,7 @@ const IRIS_GRADE_LABEL_FR: Record<NonNullable<MarketplaceItem['irisGrade']>, str
     E: 'opaque',
 };
 
+/** Explique à l’acheteur la note Iris de la pièce. */
 function IrisGradeExplainer({ grade }: { grade: NonNullable<MarketplaceItem['irisGrade']> }) {
     return (
         <section aria-label="Comprendre le score Iris" className="rounded-2xl border border-border/60 bg-card p-4">

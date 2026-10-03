@@ -8,8 +8,9 @@ import {
     normalizeShippingAddress,
     writeShippingAddress,
     type ShippingAddress,
-} from '@/lib/marketplace';
+} from '@/lib/marketplace/shipping-address';
 
+/** Conserve les chiffres saisis pour le code postal. */
 const onlyDigits = (value: string) => value.replace(/\D/g, '');
 
 // Première étape du tunnel : on demande l'adresse AVANT de préparer le paiement. L'atelier ne
@@ -31,9 +32,11 @@ export function AddressStep({
     );
     const complete = isShippingAddressComplete(address);
 
+    /** Met à jour le champ de livraison demandé. */
     const set = <K extends keyof ShippingAddress>(key: K, value: ShippingAddress[K]) =>
         setAddress((a) => ({ ...a, [key]: value }));
 
+    /** Valide et mémorise l’adresse avant de préparer le paiement. */
     const submit = (event: React.SyntheticEvent) => {
         event.preventDefault();
         if (!complete) return;

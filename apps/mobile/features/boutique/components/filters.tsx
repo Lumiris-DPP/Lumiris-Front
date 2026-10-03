@@ -3,88 +3,20 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpDown, Search, SlidersHorizontal, X } from 'lucide-react';
-import type { IrisGrade } from '@lumiris/types';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@lumiris/ui/components/sheet';
 import { Slider } from '@lumiris/ui/components/slider';
 import { cn } from '@lumiris/ui/lib/cn';
 import { Chip } from '@/components/chip';
+import { MARKETPLACE_SORT_LABEL, MARKETPLACE_SORT_ORDER, type MarketplaceSort } from '@/lib/marketplace/product';
+import { capitalize, marketplaceCategoryLabel } from '@/lib/marketplace/labels';
 import {
-    MARKETPLACE_SORT_LABEL,
-    MARKETPLACE_SORT_ORDER,
-    capitalize,
-    marketplaceCategoryLabel,
-    type MarketplaceItem,
-    type MarketplaceSort,
-} from '@/lib/marketplace';
-
-const GRADE_OPTIONS: readonly IrisGrade[] = ['A', 'B', 'C', 'D', 'E'];
-
-interface PriceBounds {
-    min: number;
-    max: number;
-}
-
-export interface BoutiqueFiltersState {
-    /** Recherche plein texte, envoyée au backend (nom, matière, description). */
-    q: string;
-    /** Catégories produit (chaînes réelles du catalogue). */
-    categories: readonly string[];
-    grades: readonly IrisGrade[];
-    /** Matières dominantes (chaînes réelles du catalogue). */
-    materials: readonly string[];
-    /** Fourchette de prix [min, max] en euros, ou null si non bornée. */
-    priceRange: readonly [number, number] | null;
-    sort: MarketplaceSort;
-}
-
-export const EMPTY_BOUTIQUE_FILTERS: BoutiqueFiltersState = {
-    q: '',
-    categories: [],
-    grades: [],
-    materials: [],
-    priceRange: null,
-    sort: 'relevance',
-};
-
-/** Bornes de prix observées sur l'ensemble des pièces en vente. */
-export function priceBoundsOf(items: readonly MarketplaceItem[]): PriceBounds {
-    if (items.length === 0) return { min: 0, max: 0 };
-    const prices = items.map((i) => i.price);
-    return { min: Math.floor(Math.min(...prices)), max: Math.ceil(Math.max(...prices)) };
-}
-
-/** Options de catégories réellement présentes dans le catalogue. */
-export function categoryOptionsOf(items: readonly MarketplaceItem[]): readonly string[] {
-    const set = new Set<string>();
-    for (const item of items) if (item.category) set.add(item.category);
-    return [...set].sort((a, b) => a.localeCompare(b, 'fr'));
-}
-
-/** Options de matières réellement présentes dans le catalogue. */
-export function materialOptionsOf(items: readonly MarketplaceItem[]): readonly string[] {
-    const set = new Set<string>();
-    for (const item of items) if (item.material) set.add(item.material);
-    return [...set].sort((a, b) => a.localeCompare(b, 'fr'));
-}
-
-export function applyBoutiqueFilters(
-    items: readonly MarketplaceItem[],
-    state: BoutiqueFiltersState,
-): readonly MarketplaceItem[] {
-    return items.filter((item) => {
-        if (state.categories.length > 0 && (!item.category || !state.categories.includes(item.category))) return false;
-        if (state.grades.length > 0 && (!item.irisGrade || !state.grades.includes(item.irisGrade))) return false;
-        if (state.materials.length > 0 && (!item.material || !state.materials.includes(item.material))) return false;
-        if (state.priceRange) {
-            if (item.price < state.priceRange[0] || item.price > state.priceRange[1]) return false;
-        }
-        return true;
-    });
-}
-
-function activeBoutiqueFilterCount(state: BoutiqueFiltersState): number {
-    return state.categories.length + state.grades.length + state.materials.length + (state.priceRange ? 1 : 0);
-}
+    GRADE_OPTIONS,
+    activeBoutiqueFilterCount,
+    clearBoutiqueFacets,
+    toggleValue,
+    type BoutiqueFiltersState,
+    type PriceBounds,
+} from '../models/filters-model';
 
 interface BoutiqueFiltersProps {
     state: BoutiqueFiltersState;
@@ -174,6 +106,7 @@ interface SheetProps extends BoutiqueFiltersProps {
     onOpenChange: (open: boolean) => void;
 }
 
+/** Affiche les facettes du catalogue dans la feuille de filtres. */
 function BoutiqueFilterSheet({
     open,
     onOpenChange,
@@ -186,10 +119,6 @@ function BoutiqueFilterSheet({
 }: SheetProps) {
     const priceEnabled = priceBounds.max > priceBounds.min;
     const range = state.priceRange ?? [priceBounds.min, priceBounds.max];
-
-    function toggle<T>(list: readonly T[], value: T): readonly T[] {
-        return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
-    }
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
@@ -214,7 +143,9 @@ function BoutiqueFilterSheet({
                                 <Chip
                                     key={cat}
                                     selected={state.categories.includes(cat)}
-                                    onClick={() => onChange({ ...state, categories: toggle(state.categories, cat) })}
+                                    onClick={() =>
+                                        onChange({ ...state, categories: toggleValue(state.categories, cat) })
+                                    }
                                 >
                                     {marketplaceCategoryLabel(cat)}
                                 </Chip>
@@ -227,7 +158,7 @@ function BoutiqueFilterSheet({
                             <Chip
                                 key={grade}
                                 selected={state.grades.includes(grade)}
-                                onClick={() => onChange({ ...state, grades: toggle(state.grades, grade) })}
+                                onClick={() => onChange({ ...state, grades: toggleValue(state.grades, grade) })}
                             >
                                 {grade}
                             </Chip>
@@ -240,7 +171,9 @@ function BoutiqueFilterSheet({
                                 <Chip
                                     key={material}
                                     selected={state.materials.includes(material)}
-                                    onClick={() => onChange({ ...state, materials: toggle(state.materials, material) })}
+                                    onClick={() =>
+                                        onChange({ ...state, materials: toggleValue(state.materials, material) })
+                                    }
                                 >
                                     {capitalize(material)}
                                 </Chip>
@@ -275,7 +208,7 @@ function BoutiqueFilterSheet({
                 <div className="mt-7 flex items-center gap-3">
                     <button
                         type="button"
-                        onClick={() => onChange({ ...EMPTY_BOUTIQUE_FILTERS, sort: state.sort, q: state.q })}
+                        onClick={() => onChange(clearBoutiqueFacets(state))}
                         className="inline-flex h-12 items-center justify-center gap-1.5 px-4 text-sm font-medium text-muted-foreground hover:text-foreground"
                     >
                         <X className="h-4 w-4" strokeWidth={1.5} aria-hidden />
@@ -294,6 +227,7 @@ function BoutiqueFilterSheet({
     );
 }
 
+/** Regroupe les choix d’une même facette dans un champ accessible. */
 function FilterGroup({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <fieldset className="flex flex-col gap-3">

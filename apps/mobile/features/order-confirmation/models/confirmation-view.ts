@@ -1,7 +1,7 @@
 // Ce que l'écran de confirmation a le droit d'affirmer, déduit uniquement de l'état serveur : ni
 // l'URL, ni le retour de Stripe.js ne prouvent qu'une commande est payée. Calcul pur, testé avec Bun.
 
-import type { OrderGroup } from '@lumiris/api-client';
+import type { OrderGroup, OrderStatus } from '@lumiris/api-client';
 // Module pur importé directement : l'index de lib/marketplace charge aussi des hooks React.
 import { isPaidOrderStatus } from '@/lib/marketplace/cart-model';
 
@@ -39,4 +39,12 @@ export function confirmationView(input: ConfirmationInput): ConfirmationView {
     if (input.failureStatus !== null) return input.failureStatus === 404 ? 'not-found' : 'error';
     if (!input.targetPaymentIntentId) return input.noRecentOrder ? 'no-order' : input.timedOut ? 'error' : 'resolving';
     return input.timedOut ? 'error' : 'resolving';
+}
+
+/** N'annonce un montant payé ou remboursé que lorsque le statut serveur le permet. */
+export function confirmationTotalLabel(status: OrderStatus): string {
+    if (status === 'PENDING') return 'Total à confirmer';
+    if (status === 'CANCELLED') return 'Total de la commande annulée';
+    // Un remboursement peut être partiel : le total encaissé ne devient pas le total remboursé.
+    return 'Total payé';
 }

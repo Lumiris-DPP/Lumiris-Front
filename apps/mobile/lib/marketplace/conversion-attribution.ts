@@ -7,6 +7,7 @@
 
 const KEY = 'lumiris.marketplace.conversion-attribution.v1';
 
+/** Relit les passeports associés aux suggestions d’achat. */
 function read(): Record<string, string> {
     if (typeof window === 'undefined') return {};
     try {
@@ -17,6 +18,7 @@ function read(): Record<string, string> {
     }
 }
 
+/** Enregistre les associations entre produits suggérés et passeports d’origine. */
 function write(map: Record<string, string>): void {
     if (typeof window === 'undefined') return;
     window.localStorage.setItem(KEY, JSON.stringify(map));

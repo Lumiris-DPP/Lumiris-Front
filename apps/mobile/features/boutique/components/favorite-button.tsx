@@ -5,7 +5,7 @@ import { Heart } from 'lucide-react';
 import { useFavorites, useToggleFavorite } from '@lumiris/api-client/react';
 import { cn } from '@lumiris/ui/lib/cn';
 import { useUser } from '@/lib/auth/use-user';
-import type { MarketplaceItem } from '@/lib/marketplace';
+import type { MarketplaceItem } from '@/lib/marketplace/product';
 import { routes } from '@/lib/routes';
 import { toast } from '@/lib/toast';
 

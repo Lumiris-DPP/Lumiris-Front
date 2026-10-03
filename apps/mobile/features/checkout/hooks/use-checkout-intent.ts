@@ -8,9 +8,14 @@
 import { useEffect, useState } from 'react';
 import { useApiClient } from '@lumiris/api-client/react';
 import type { PaymentIntentResponse } from '@lumiris/api-client';
-import { rememberPurchase } from '@/lib/marketplace';
-import { checkoutContextKey, paymentIntentIdOf, type CheckoutContext } from './checkout-context';
-import { createIntentCache } from './intent-cache';
+import { rememberPurchase } from '@/lib/marketplace/cart-storage';
+import {
+    cartIntentRequestOf,
+    checkoutContextKey,
+    paymentIntentIdOf,
+    type CheckoutContext,
+} from '../models/checkout-context';
+import { createIntentCache } from '../models/intent-cache';
 
 // Une seule intention en mémoire, celle du contexte courant. La clé porte l'acheteur : deux comptes
 // sur le même navigateur ne partagent jamais une entrée.
@@ -22,6 +27,7 @@ export function resetCheckoutIntents(): void {
 }
 
 interface IntentState {
+    attempt: number;
     key: string;
     request: Promise<PaymentIntentResponse>;
     intent: PaymentIntentResponse | null;
@@ -41,26 +47,17 @@ export function useCheckoutIntent(context: CheckoutContext | null): {
     useEffect(() => {
         if (!context) return;
         const key = checkoutContextKey(context);
-        const request = intents.get(key, () =>
-            client.marketplace.checkoutIntent({
-                items: context.lines.map((line) => ({
-                    productId: line.productId,
-                    quantity: line.quantity,
-                    ...(line.variantId ? { variantId: line.variantId } : {}),
-                })),
-                shipping: context.address,
-            }),
-        );
+        const request = intents.get(key, () => client.marketplace.checkoutIntent(cartIntentRequestOf(context)));
         let cancelled = false;
         request.then(
             (intent) => {
-                rememberPurchase(paymentIntentIdOf(intent.clientSecret), context.lines);
-                if (!cancelled) setState({ key, request, intent, error: null });
+                rememberPurchase(paymentIntentIdOf(intent.clientSecret), context.lines, context.buyerId);
+                if (!cancelled) setState({ attempt, key, request, intent, error: null });
             },
             (error: unknown) => {
                 // Un échec n'est pas resservi : renvoyer le même contexte redemande l'intention.
                 intents.forget(request);
-                if (!cancelled) setState({ key, request, intent: null, error });
+                if (!cancelled) setState({ attempt, key, request, intent: null, error });
             },
         );
         return () => {
@@ -74,7 +71,12 @@ export function useCheckoutIntent(context: CheckoutContext | null): {
     const key = context ? checkoutContextKey(context) : null;
     const active = key ? intents.peek(key) : null;
     const current =
-        state && state.key === key && (state.error ? active === null : state.request === active) ? state : null;
+        state &&
+        state.attempt === attempt &&
+        state.key === key &&
+        (state.error ? active === null : state.request === active)
+            ? state
+            : null;
     return {
         intent: current?.intent ?? null,
         error: current?.error ?? null,

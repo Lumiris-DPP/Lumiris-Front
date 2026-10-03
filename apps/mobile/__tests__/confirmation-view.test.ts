@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { confirmationView, type ConfirmationInput } from '@/features/order-confirmation/confirmation-view';
+import { confirmationView, type ConfirmationInput } from '@/features/order-confirmation/models/confirmation-view';
 
 const base: ConfirmationInput = {
     isAuthenticated: true,
