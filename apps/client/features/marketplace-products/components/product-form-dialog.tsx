@@ -14,9 +14,9 @@ import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@lumiris/ui/components/select';
 import { Textarea } from '@lumiris/ui/components/textarea';
-import { STATUS_LABEL, STATUSES } from './labels';
-import { NO_DPP } from './product-form-model';
-import { useProductForm } from './use-product-form';
+import { STATUS_LABEL, STATUSES } from '../models/labels';
+import { NO_DPP } from '../models/product-form-model';
+import { useProductForm } from '../hooks/use-product-form';
 import { SizeGuideEditor } from './size-guide-editor';
 import { VariantsEditor } from './variants-editor';
 

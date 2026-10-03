@@ -5,7 +5,7 @@ import { Button } from '@lumiris/ui/components/button';
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
-import { cellKey, type SizeGuideDraft } from './product-payload';
+import { cellKey, type SizeGuideDraft } from '../models/product-payload';
 
 /** Décrit les tailles et mesures de leur éditeur. */
 interface SizeGuideEditorProps {

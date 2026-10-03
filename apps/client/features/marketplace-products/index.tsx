@@ -10,9 +10,9 @@ import { StatCard } from '@lumiris/ui/components/stat-card';
 import { formatPriceCents } from '@lumiris/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { useSubscription } from '@/lib/use-subscription';
-import { ConvertDppDialog } from './convert-dpp-dialog';
-import { ProductsTab } from './products-tab';
-import { VacationBanner } from './vacation-banner';
+import { ConvertDppDialog } from './components/convert-dpp-dialog';
+import { ProductsTab } from './components/products-tab';
+import { VacationBanner } from './components/vacation-banner';
 
 /** Affiche le catalogue artisan et ouvre la conversion des passeports. */
 export function MarketplaceProducts() {

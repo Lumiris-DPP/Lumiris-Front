@@ -5,10 +5,10 @@ import type { SyntheticEvent } from 'react';
 import type { MarketplaceItem } from '@lumiris/api-client';
 import { useDppForms, useUpdateProduct } from '@lumiris/api-client/react';
 import { toast } from '@lumiris/ui/components/sonner';
-import { initialState, editedProductPayload } from './product-form-model';
-import type { FormState } from './product-form-model';
-import { sizesOf } from './product-payload';
-import { productErrorMessage } from './product-error';
+import { initialState, editedProductPayload } from '../models/product-form-model';
+import type { FormState } from '../models/product-form-model';
+import { sizesOf } from '../models/product-payload';
+import { productErrorMessage } from '../models/product-error';
 
 /** Pilote les saisies et la sauvegarde du produit édité. */
 export function useProductForm(open: boolean, onOpenChange: (open: boolean) => void, product?: MarketplaceItem) {

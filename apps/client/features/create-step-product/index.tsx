@@ -5,8 +5,8 @@ import { Label } from '@lumiris/ui/components/label';
 import { Textarea } from '@lumiris/ui/components/textarea';
 import { WizardStepFrame } from '@/features/wizard-shell/step-frame';
 import { DocUploadField } from '@/features/wizard-shell/doc-upload-field';
-import { useProductStep } from './use-product-step';
-import { CategoryField, ColorsField, PhotoField, SizesField } from './product-fields';
+import { useProductStep } from './hooks/use-product-step';
+import { CategoryField, ColorsField, PhotoField, SizesField } from './components/product-fields';
 
 /** Affiche les informations et documents de la pièce à passeporter. */
 export function CreateStepProduct({ draftId }: { draftId: string }) {

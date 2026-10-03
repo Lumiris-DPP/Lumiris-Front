@@ -6,7 +6,7 @@ import { Button } from '@lumiris/ui/components/button';
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
-import { HEX_COLOR, newVariantRow, variantRowsError, type VariantRow } from './product-payload';
+import { HEX_COLOR, newVariantRow, variantRowsError, type VariantRow } from '../models/product-payload';
 
 /** Décrit les déclinaisons et suggestions de leur éditeur. */
 interface VariantsEditorProps {
