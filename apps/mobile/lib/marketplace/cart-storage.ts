@@ -134,19 +134,29 @@ export function rememberPurchase(paymentIntentId: string, lines: readonly Purcha
     window.localStorage.setItem(purchasesKey(), JSON.stringify(next));
 }
 
+/** Paiements préparés dont le sort n'est pas encore connu du panier. */
+export function pendingPurchaseIds(): string[] {
+    return readPurchases().map((purchase) => purchase.paymentIntentId);
+}
+
 /**
  * Retire du panier les lignes d'un paiement confirmé par le serveur, une seule fois : le mémo est
  * consommé, et une nouvelle visite de la confirmation ne retire plus rien.
  */
 export function settlePurchase(paymentIntentId: string): void {
-    const purchases = readPurchases();
-    const purchase = purchases.find((p) => p.paymentIntentId === paymentIntentId);
+    const purchase = readPurchases().find((p) => p.paymentIntentId === paymentIntentId);
     if (!purchase) return;
+    forgetPurchase(paymentIntentId);
+    write(subtractPurchase(read(), purchase.lines));
+}
+
+/** Oublie un paiement annulé ou remboursé : ses lignes restent dans le panier. */
+export function forgetPurchase(paymentIntentId: string): void {
+    if (typeof window === 'undefined') return;
     window.localStorage.setItem(
         purchasesKey(),
-        JSON.stringify(purchases.filter((p) => p.paymentIntentId !== paymentIntentId)),
+        JSON.stringify(readPurchases().filter((p) => p.paymentIntentId !== paymentIntentId)),
     );
-    write(subtractPurchase(read(), purchase.lines));
 }
 
 function readKey(key: string): CartLine[] {

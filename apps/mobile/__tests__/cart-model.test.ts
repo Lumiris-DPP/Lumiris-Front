@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'bun:test';
 import type { MarketplaceItem as MarketplaceItemDto } from '@lumiris/api-client';
-import { buildCartDetails, subtractPurchase, type CartLine } from '@/lib/marketplace/cart-model';
+import {
+    buildCartDetails,
+    isPaidOrderStatus,
+    purchasesToSettle,
+    subtractPurchase,
+    type CartLine,
+} from '@/lib/marketplace/cart-model';
 import type { MarketplaceItem } from '@/lib/marketplace/product';
 
 // Fiche minimale du catalogue : une annonce, ses déclinaisons, son atelier et son port.
@@ -81,10 +87,11 @@ describe('buildCartDetails — lecture du catalogue', () => {
         expect(cart.count).toBe(4);
     });
 
-    it('stock devenu insuffisant : la ligne est signalée et bloque le paiement', () => {
-        const cart = buildCartDetails([line('p1', 'p1-m', 3)], [product('p1', { stocks: { 'p1-m': 1 } })], 'ready');
+    it('stock public insuffisant : signalé sans bloquer, le serveur tranche (réservation de l’acheteur comprise)', () => {
+        // L'acheteur détient la dernière unité réservée à une tentative précédente : le stock public est à 0.
+        const cart = buildCartDetails([line('p1', 'p1-m', 1)], [product('p1', { stocks: { 'p1-m': 0 } })], 'ready');
         expect(cart.overstocked).toHaveLength(1);
-        expect(cart.hasBlockingIssue).toBe(true);
+        expect(cart.hasBlockingIssue).toBe(false);
     });
 
     it('ligne héritée sans déclinaison sur une annonce déclinée : l’acheteur doit choisir', () => {
@@ -122,5 +129,28 @@ describe('subtractPurchase — retrait des seules lignes payées', () => {
     it('ne retire rien quand la pièce a déjà quitté le panier', () => {
         const remaining = subtractPurchase([line('p2', 'p2-m')], [{ productId: 'p1', variantId: 'p1-m', quantity: 1 }]);
         expect(remaining).toEqual([line('p2', 'p2-m')]);
+    });
+});
+
+describe('purchasesToSettle — paiement confirmé après la fin de l’attente', () => {
+    it('payé : lignes à retirer ; annulé ou remboursé : mémo oublié ; en attente ou inconnu : on attend', () => {
+        const result = purchasesToSettle(
+            ['pi_paye', 'pi_annule', 'pi_rembourse', 'pi_attente', 'pi_inconnu'],
+            [
+                { paymentIntentId: 'pi_paye', status: 'PAID' },
+                { paymentIntentId: 'pi_annule', status: 'CANCELLED' },
+                { paymentIntentId: 'pi_rembourse', status: 'REFUNDED' },
+                { paymentIntentId: 'pi_attente', status: 'PENDING' },
+                { paymentIntentId: 'autre', status: 'PAID' },
+            ],
+        );
+        expect(result.paid).toEqual(['pi_paye']);
+        expect(result.dropped).toEqual(['pi_annule', 'pi_rembourse']);
+    });
+
+    it('une commande expédiée ou livrée a bien été payée', () => {
+        expect(isPaidOrderStatus('SHIPPED')).toBe(true);
+        expect(isPaidOrderStatus('DELIVERED')).toBe(true);
+        expect(isPaidOrderStatus('PENDING')).toBe(false);
     });
 });
