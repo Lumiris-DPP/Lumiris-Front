@@ -22,7 +22,7 @@
                 "env.ts",
                 "features/**/index.tsx"
             ],
-            "project": ["**/*.{ts,tsx}"]
+            "project": ["**/*.{ts,tsx,test.js}"]
         },
         "packages/ui": {
             "entry": ["src/components/**/*.{ts,tsx}", "src/hooks/*.ts", "src/lib/*.ts"],
