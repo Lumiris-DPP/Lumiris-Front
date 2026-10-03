@@ -7,14 +7,14 @@ import { Label } from '@lumiris/ui/components/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
 import { cellKey, type SizeGuideDraft } from './product-payload';
 
+/** Décrit les tailles et mesures de leur éditeur. */
 interface SizeGuideEditorProps {
     sizes: readonly string[];
     value: SizeGuideDraft;
     onChange: (next: SizeGuideDraft) => void;
 }
 
-// Les lignes sont les tailles déclarées par les déclinaisons : les deux ne peuvent pas diverger, et
-// le refus serveur d'une taille inconnue ne se déclenche jamais en pratique.
+/** Affiche les mesures des tailles déclarées par les déclinaisons. */
 export function SizeGuideEditor({ sizes, value, onChange }: SizeGuideEditorProps) {
     if (sizes.length === 0) {
         return (
@@ -27,9 +27,20 @@ export function SizeGuideEditor({ sizes, value, onChange }: SizeGuideEditorProps
         );
     }
 
-    const setLabel = (index: number, label: string) =>
-        onChange({ ...value, labels: value.labels.map((existing, i) => (i === index ? label : existing)) });
+    /** Renomme une mesure en conservant les valeurs déjà saisies. */
+    const setLabel = (index: number, label: string) => {
+        const previous = value.labels[index] ?? '';
+        const values = { ...value.values };
+        for (const size of sizes) {
+            const oldKey = cellKey(size, previous);
+            const measurement = values[oldKey];
+            delete values[oldKey];
+            if (measurement !== undefined) values[cellKey(size, label)] = measurement;
+        }
+        onChange({ labels: value.labels.map((existing, i) => (i === index ? label : existing)), values });
+    };
 
+    /** Retire une mesure et ses cellules pour toutes les tailles. */
     const removeLabel = (index: number) => {
         const removed = value.labels[index];
         const values = { ...value.values };
@@ -37,6 +48,7 @@ export function SizeGuideEditor({ sizes, value, onChange }: SizeGuideEditorProps
         onChange({ labels: value.labels.filter((_, i) => i !== index), values });
     };
 
+    /** Modifie la mesure saisie pour une taille donnée. */
     const setCell = (size: string, label: string, cm: string) =>
         onChange({ ...value, values: { ...value.values, [cellKey(size, label)]: cm } });
 
@@ -83,9 +95,8 @@ export function SizeGuideEditor({ sizes, value, onChange }: SizeGuideEditorProps
                                     <TableCell key={index} className="p-1.5">
                                         <Input
                                             aria-label={`${label || 'Mesure'} pour la taille ${size}`}
-                                            type="number"
-                                            min={0}
-                                            step="0.5"
+                                            type="text"
+                                            inputMode="decimal"
                                             placeholder="cm"
                                             value={value.values[cellKey(size, label)] ?? ''}
                                             onChange={(e) => setCell(size, label, e.target.value)}

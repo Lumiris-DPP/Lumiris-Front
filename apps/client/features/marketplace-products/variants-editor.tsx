@@ -8,6 +8,7 @@ import { Label } from '@lumiris/ui/components/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
 import { HEX_COLOR, newVariantRow, variantRowsError, type VariantRow } from './product-payload';
 
+/** Décrit les déclinaisons et suggestions de leur éditeur. */
 interface VariantsEditorProps {
     value: VariantRow[];
     onChange: (next: VariantRow[]) => void;
@@ -15,26 +16,31 @@ interface VariantsEditorProps {
     colorSuggestions?: readonly string[];
 }
 
+/** Affiche la grille des déclinaisons avec leurs erreurs de validation. */
 export function VariantsEditor({ value, onChange, sizeSuggestions, colorSuggestions }: VariantsEditorProps) {
     const error = variantRowsError(value);
 
+    /** Modifie un champ de la déclinaison sélectionnée. */
     const patch = (key: string, field: keyof VariantRow, fieldValue: string) =>
         onChange(value.map((row) => (row.key === key ? { ...row, [field]: fieldValue } : row)));
 
+    /** Retire la déclinaison sélectionnée de la grille. */
     const remove = (key: string) => onChange(value.filter((row) => row.key !== key));
 
+    /** Complète les combinaisons sans retirer les déclinaisons persistées. */
     const generate = (sizes: string[], colors: string[]) => {
         const existing = new Set(
-            value.map((row) => `${row.sizeLabel.trim().toLowerCase()} ${row.colorLabel.trim().toLowerCase()}`),
+            value.map((row) => `${row.sizeLabel.trim().toLowerCase()}\0${row.colorLabel.trim().toLowerCase()}`),
         );
         const added: VariantRow[] = [];
-        for (const size of sizes) {
+        for (const size of sizes.length > 0 ? sizes : ['']) {
             for (const color of colors.length > 0 ? colors : ['']) {
-                if (existing.has(`${size.toLowerCase()} ${color.toLowerCase()}`)) continue;
+                if (existing.has(`${size.toLowerCase()}\0${color.toLowerCase()}`)) continue;
+                existing.add(`${size.toLowerCase()}\0${color.toLowerCase()}`);
                 added.push(newVariantRow(size, color));
             }
         }
-        // Une grille générée remplace la ligne par défaut vide plutôt que de s'y ajouter.
+
         const kept = value.filter((row) => row.id || row.sizeLabel.trim() || row.colorLabel.trim());
         onChange([...kept, ...added]);
     };
@@ -81,8 +87,6 @@ export function VariantsEditor({ value, onChange, sizeSuggestions, colorSuggesti
                                 </TableCell>
                                 <TableCell className="p-1.5">
                                     <div className="flex items-center gap-2">
-                                        {/* Le sélecteur natif exige une valeur hexadécimale valide : sans teinte
-                                            saisie, il afficherait du noir comme si une couleur était choisie. */}
                                         <input
                                             type="color"
                                             aria-label="Choisir la teinte"
@@ -111,9 +115,8 @@ export function VariantsEditor({ value, onChange, sizeSuggestions, colorSuggesti
                                 <TableCell className="p-1.5">
                                     <Input
                                         aria-label="Stock"
-                                        type="number"
-                                        min={0}
-                                        step="1"
+                                        type="text"
+                                        inputMode="numeric"
                                         value={row.stock}
                                         onChange={(e) => patch(row.key, 'stock', e.target.value)}
                                     />
@@ -148,13 +151,16 @@ export function VariantsEditor({ value, onChange, sizeSuggestions, colorSuggesti
                 />
             </div>
 
-            {error ? <p className="text-xs text-destructive">{error}</p> : null}
+            {error ? (
+                <p role="alert" className="text-xs text-destructive">
+                    {error}
+                </p>
+            ) : null}
         </section>
     );
 }
 
-// Quatre tailles et deux couleurs en un geste, au lieu de huit lignes saisies à la main — c'est le
-// gain ergonomique qui remplace les quatre annonces séparées d'avant.
+/** Propose des tailles et couleurs pour compléter les déclinaisons. */
 function GridGenerator({
     sizeSuggestions,
     colorSuggestions,
@@ -168,6 +174,7 @@ function GridGenerator({
     const [sizes, setSizes] = useState(() => (sizeSuggestions ?? []).join(', '));
     const [colors, setColors] = useState(() => (colorSuggestions ?? []).join(', '));
 
+    /** Sépare et nettoie les valeurs saisies pour la génération de grille. */
     const parsed = (raw: string) =>
         raw
             .split(',')

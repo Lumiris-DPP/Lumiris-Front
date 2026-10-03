@@ -21,6 +21,7 @@ const CATEGORIES: ReadonlyArray<{ value: GarmentCategory; label: string }> = [
 
 const SIZES = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', 'Unique'];
 
+/** Propose la catégorie du vêtement parmi les valeurs autorisées. */
 export function CategoryField({
     value,
     onChange,
@@ -49,6 +50,7 @@ export function CategoryField({
     );
 }
 
+/** Affiche la photo existante ou le fichier choisi avec son aperçu. */
 export function PhotoField({
     value,
     onChange,
@@ -56,7 +58,7 @@ export function PhotoField({
 }: {
     value: File | null;
     onChange: (file: File | null) => void;
-    /** Photo déjà stockée côté backend, affichée tant qu'aucun nouveau fichier ne la remplace. */
+
     existingUrl?: string | null;
 }) {
     const objectUrl = useMemo(() => (value ? URL.createObjectURL(value) : null), [value]);
@@ -115,6 +117,7 @@ export function PhotoField({
     );
 }
 
+/** Propose les tailles disponibles pour la pièce. */
 export function SizesField({ selected, onToggle }: { selected: readonly string[]; onToggle: (size: string) => void }) {
     return (
         <div className="space-y-2 md:col-span-2">
@@ -142,9 +145,11 @@ export function SizesField({ selected, onToggle }: { selected: readonly string[]
     );
 }
 
+/** Affiche et complète les couleurs déclarées pour la pièce. */
 export function ColorsField({ colors, onChange }: { colors: readonly string[]; onChange: (colors: string[]) => void }) {
     const [input, setInput] = useState('');
 
+    /** Ajoute la couleur saisie sans doublon puis vide le champ. */
     const add = () => {
         const trimmed = input.trim();
         if (trimmed && !colors.includes(trimmed)) {

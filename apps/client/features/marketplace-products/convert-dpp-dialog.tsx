@@ -1,10 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { AlertTriangle, Wand2 } from 'lucide-react';
-import { useConvertDppToProduct, useDppForm, useDppForms } from '@lumiris/api-client/react';
-import { isApiError } from '@lumiris/api-client';
 import { Button } from '@lumiris/ui/components/button';
 import {
     Dialog,
@@ -17,122 +13,49 @@ import {
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@lumiris/ui/components/select';
-import { toast } from '@lumiris/ui/components/sonner';
-import { useSubscription } from '@/lib/use-subscription';
-import {
-    EMPTY_SIZE_GUIDE,
-    newVariantRow,
-    sizesOf,
-    toSizeGuidePayload,
-    toVariantPayload,
-    variantRowsError,
-    type SizeGuideDraft,
-    type VariantRow,
-} from './product-payload';
+import { newVariantRow } from './product-payload';
+import { useDppConversion } from './use-dpp-conversion';
 import { SizeGuideEditor } from './size-guide-editor';
 import { VariantsEditor } from './variants-editor';
 
-const MAX_PREPARATION_DAYS = 90;
-const MAX_WEIGHT_GRAMS = 30000;
-
+/** Affiche les sections de conversion du passeport en produit artisan. */
 export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-    const router = useRouter();
-    const { data: dpps = [], isLoading } = useDppForms({ enabled: open });
-    const convert = useConvertDppToProduct();
-    // Vendre exige un abonnement ATELIER actif (le backend renvoie 422 sinon).
-    const { hasActiveSubscription } = useSubscription();
-    const sellBlocked = !hasActiveSubscription;
-
-    const [dppFormId, setDppFormId] = useState('');
-    const [priceEuros, setPriceEuros] = useState('');
-    const [shippingEuros, setShippingEuros] = useState('');
-    const [stock, setStock] = useState('');
-    const [preparationDays, setPreparationDays] = useState('0');
-    const [weightGrams, setWeightGrams] = useState('');
-    const [variants, setVariants] = useState<VariantRow[]>([]);
-    const [sizeGuide, setSizeGuide] = useState<SizeGuideDraft>(EMPTY_SIZE_GUIDE);
-    const [returnPolicy, setReturnPolicy] = useState('');
-    const [externalOrderUrl, setExternalOrderUrl] = useState('');
-    const [photoUrl, setPhotoUrl] = useState('');
-
-    const priceCents = useMemo(() => Math.round(parseFloat(priceEuros.replace(',', '.')) * 100), [priceEuros]);
-    // Le détail du DPP porte les tailles et couleurs déjà déclarées au passeport : la grille se
-    // pré-remplit, et l'artisan n'a plus qu'un clic à faire.
-    const { data: selectedDpp } = useDppForm(dppFormId, { enabled: dppFormId !== '' });
-    const sizes = sizesOf(variants);
-    const variantsInvalid = variants.length > 0 && variantRowsError(variants) !== null;
-    // A live product needs a real price: require strictly > 0, not just non-negative.
-    const canSubmit =
-        dppFormId !== '' &&
-        Number.isFinite(priceCents) &&
-        priceCents > 0 &&
-        !variantsInvalid &&
-        !convert.isPending &&
-        !sellBlocked;
-
-    const reset = () => {
-        setDppFormId('');
-        setPriceEuros('');
-        setShippingEuros('');
-        setStock('');
-        setPreparationDays('0');
-        setWeightGrams('');
-        setVariants([]);
-        setSizeGuide(EMPTY_SIZE_GUIDE);
-        setReturnPolicy('');
-        setExternalOrderUrl('');
-        setPhotoUrl('');
-    };
-
-    const submit = () => {
-        if (!canSubmit) return;
-        convert.mutate(
-            {
-                dppFormId,
-                payload: {
-                    priceCents,
-                    currency: 'EUR',
-                    stock: stock ? Number(stock) : undefined,
-                    variants: variants.length > 0 ? toVariantPayload(variants) : undefined,
-                    sizeGuide: variants.length > 0 ? toSizeGuidePayload(sizeGuide, sizes) : undefined,
-                    preparationDays: Math.min(
-                        MAX_PREPARATION_DAYS,
-                        Math.max(0, Math.round(Number(preparationDays) || 0)),
-                    ),
-                    weightGrams: weightGrams
-                        ? Math.min(MAX_WEIGHT_GRAMS, Math.max(0, Math.round(Number(weightGrams) || 0)))
-                        : undefined,
-                    shippingCents: shippingEuros
-                        ? Math.round(parseFloat(shippingEuros.replace(',', '.')) * 100)
-                        : undefined,
-                    returnPolicy: returnPolicy.trim() || undefined,
-                    externalOrderUrl: externalOrderUrl.trim() || undefined,
-                    photoUrl: photoUrl.trim() || undefined,
-                    status: 'PUBLISHED',
-                },
-            },
-            {
-                onSuccess: (item) => {
-                    toast.success('DPP converti en produit', {
-                        description: `« ${item.name} » est en vente${item.inAppSale ? ' (paiement in-app)' : ''}.`,
-                    });
-                    reset();
-                    onOpenChange(false);
-                },
-                // 422 : aucun abonnement ATELIER actif — on relaie le message backend + CTA abonnement.
-                onError: (e) => {
-                    if (isApiError(e) && e.status === 422) {
-                        toast.error('Abonnement requis pour vendre', {
-                            description: e.message,
-                            action: { label: "Voir l'abonnement", onClick: () => router.push('/subscription') },
-                        });
-                        return;
-                    }
-                    toast.error('La conversion a échoué', { description: e.message });
-                },
-            },
-        );
-    };
+    const {
+        router,
+        dpps,
+        isLoading,
+        dppsError,
+        convert,
+        sellBlocked,
+        dppFormId,
+        setDppFormId,
+        priceEuros,
+        setPriceEuros,
+        shippingEuros,
+        setShippingEuros,
+        stock,
+        setStock,
+        preparationDays,
+        setPreparationDays,
+        weightGrams,
+        setWeightGrams,
+        variants,
+        setVariants,
+        sizeGuide,
+        setSizeGuide,
+        returnPolicy,
+        setReturnPolicy,
+        externalOrderUrl,
+        setExternalOrderUrl,
+        photoUrl,
+        setPhotoUrl,
+        selectedDpp,
+        sizes,
+        canSubmit,
+        reset,
+        submit,
+        error,
+    } = useDppConversion(open, onOpenChange);
 
     return (
         <Dialog open={open} onOpenChange={(o) => (o ? onOpenChange(true) : (reset(), onOpenChange(false)))}>
@@ -146,6 +69,16 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                 </DialogHeader>
 
                 <div className="space-y-4 py-2">
+                    {error && (
+                        <p role="alert" className="text-sm text-destructive">
+                            {error}
+                        </p>
+                    )}
+                    {dppsError && (
+                        <p role="alert" className="text-sm text-destructive">
+                            {dppsError.message}
+                        </p>
+                    )}
                     {sellBlocked && (
                         <div className="flex items-start gap-2.5 rounded-lg border border-lumiris-amber/40 bg-lumiris-amber/10 p-3 text-sm">
                             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-lumiris-amber" aria-hidden />
@@ -180,7 +113,7 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                                 ))}
                             </SelectContent>
                         </Select>
-                        {!isLoading && dpps.length === 0 ? (
+                        {!isLoading && !dppsError && dpps.length === 0 ? (
                             <p className="text-xs text-muted-foreground">
                                 Aucun DPP à convertir — créez d’abord un passeport.
                             </p>
@@ -194,9 +127,8 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                             </Label>
                             <Input
                                 id="convert-price"
-                                type="number"
-                                min={0}
-                                step="0.01"
+                                type="text"
+                                inputMode="decimal"
                                 value={priceEuros}
                                 placeholder="159.00"
                                 onChange={(e) => setPriceEuros(e.target.value)}
@@ -207,8 +139,8 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                                 <Label htmlFor="convert-stock">Stock (défaut : quantité du DPP)</Label>
                                 <Input
                                     id="convert-stock"
-                                    type="number"
-                                    min={0}
+                                    type="text"
+                                    inputMode="numeric"
                                     value={stock}
                                     placeholder="ex. 10"
                                     onChange={(e) => setStock(e.target.value)}
@@ -222,9 +154,8 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                             <Label htmlFor="convert-shipping">Frais de port (€)</Label>
                             <Input
                                 id="convert-shipping"
-                                type="number"
-                                min={0}
-                                step="0.01"
+                                type="text"
+                                inputMode="decimal"
                                 value={shippingEuros}
                                 placeholder="5.00"
                                 onChange={(e) => setShippingEuros(e.target.value)}
@@ -245,10 +176,8 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                         <Label htmlFor="convert-prep">Délai de préparation (jours)</Label>
                         <Input
                             id="convert-prep"
-                            type="number"
-                            min={0}
-                            max={MAX_PREPARATION_DAYS}
-                            step="1"
+                            type="text"
+                            inputMode="numeric"
                             value={preparationDays}
                             onChange={(e) => setPreparationDays(e.target.value)}
                         />
@@ -261,10 +190,8 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                         <Label htmlFor="convert-weight">Poids du colis (g)</Label>
                         <Input
                             id="convert-weight"
-                            type="number"
-                            min={0}
-                            max={MAX_WEIGHT_GRAMS}
-                            step="10"
+                            type="text"
+                            inputMode="numeric"
                             value={weightGrams}
                             placeholder="800"
                             onChange={(e) => setWeightGrams(e.target.value)}
@@ -320,7 +247,13 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => onOpenChange(false)}>
+                    <Button
+                        variant="outline"
+                        onClick={() => {
+                            reset();
+                            onOpenChange(false);
+                        }}
+                    >
                         Annuler
                     </Button>
                     <Button
