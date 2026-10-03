@@ -4,7 +4,7 @@
     "workspaces": {
         ".": {
             "entry": ["turbo.json", "lighthouserc.cjs", "knip.json", "syncpack.config.mjs", "scripts/*.{mjs,js,ts}"],
-            "ignoreDependencies": ["postcss-load-config"]
+            "ignoreDependencies": ["postcss-load-config", "lint-staged"]
         },
         "apps/admin": {
             "entry": [
