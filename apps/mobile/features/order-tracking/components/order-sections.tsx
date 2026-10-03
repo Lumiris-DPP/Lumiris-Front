@@ -18,9 +18,9 @@ import {
 import type { OrderDetail } from '@lumiris/api-client';
 import { TRACKING_STATUS_LABEL } from '@lumiris/api-client';
 import { routes } from '@/lib/routes';
-import { formatCents } from '@/lib/marketplace';
-import { GlassCard } from '@/lib/motion';
-import { formatDate, type SheetKind } from './tracking-model';
+import { formatCents } from '@/lib/marketplace/money';
+import { GlassCard } from '@/lib/motion/index';
+import { formatDate, type SheetKind } from '../models/tracking-model';
 
 // Propose les actions autorisées par la dernière lecture des permissions serveur.
 export function BuyerActions({

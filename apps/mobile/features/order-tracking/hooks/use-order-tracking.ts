@@ -10,7 +10,7 @@ import {
     useRequestReturn,
 } from '@lumiris/api-client/react';
 import { toast } from '@/lib/toast';
-import { canSubmitReason, type SheetKind } from './tracking-model';
+import { canSubmitReason, type SheetKind } from '../models/tracking-model';
 
 // Coordonne la lecture et les mutations sans déplacer les transitions du serveur.
 export function useOrderTracking(orderId: string | null, isAuthenticated: boolean) {

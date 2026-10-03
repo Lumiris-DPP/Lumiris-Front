@@ -10,6 +10,7 @@ import {
 } from '@lumiris/api-client';
 import { Check, CircleDot, PackageCheck, Truck } from 'lucide-react';
 
+/** Affiche la date et l’heure d’un événement de commande. */
 function formatDateTime(iso?: string | null): string {
     if (!iso) return '';
     const date = new Date(iso);
@@ -84,6 +85,7 @@ const ACTOR_LABEL: Record<OrderEvent['actorType'], string> = {
     SYSTEM: 'Automatique',
 };
 
+/** Présente le fil des événements serveur de la commande. */
 export function OrderTimeline({ events }: { events: readonly OrderEvent[] }) {
     if (events.length === 0) {
         return <p className="text-xs text-muted-foreground">Aucun évènement pour l’instant.</p>;

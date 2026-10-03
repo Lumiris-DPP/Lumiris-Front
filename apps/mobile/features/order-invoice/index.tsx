@@ -6,9 +6,9 @@ import { ArrowLeft, Loader2, LogIn, Printer } from 'lucide-react';
 import { useOrderGroup } from '@lumiris/api-client/react';
 import { routes } from '@/lib/routes';
 import { useUser } from '@/lib/auth/use-user';
-import { formatCents } from '@/lib/marketplace';
+import { formatCents } from '@/lib/marketplace/money';
 
-import { formatInvoiceDate, invoiceAmounts } from './invoice-model';
+import { formatInvoiceDate, invoiceAmounts } from './models/invoice-model';
 
 // Construit le retour de connexion vers la facture demandée.
 const INVOICE_RETURN = (pi: string) => encodeURIComponent(routes.orderInvoice(pi));
