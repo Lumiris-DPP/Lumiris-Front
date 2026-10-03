@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import { ArrowLeft, Loader2, LogIn, Printer } from 'lucide-react';
 import { useOrderGroup } from '@lumiris/api-client/react';
 import { routes } from '@/lib/routes';

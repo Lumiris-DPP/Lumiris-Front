@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Bell, CheckCheck, LogIn } from 'lucide-react';
 import type { Notification } from '@lumiris/api-client';

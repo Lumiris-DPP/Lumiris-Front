@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import { ArrowRight, Store } from 'lucide-react';
 import { GRADE_LABEL, IrisGrade } from '@lumiris/scoring-ui';
 import type { Artisan, Passport, ScoreResult } from '@lumiris/types';

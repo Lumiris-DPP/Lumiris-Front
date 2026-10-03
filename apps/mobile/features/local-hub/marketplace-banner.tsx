@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import { useMemo } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { mockPassports } from '@lumiris/mock-data';

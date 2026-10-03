@@ -1,7 +1,7 @@
 'use client';
 
 import { ExternalLink, Store } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import { Button } from '@lumiris/ui/components/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@lumiris/ui/components/sheet';
 import type { Passport } from '@lumiris/types';

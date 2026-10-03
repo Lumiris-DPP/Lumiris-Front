@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type ComponentType, type SVGProps } from 'react';
 import { motion } from 'framer-motion';

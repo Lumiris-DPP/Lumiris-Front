@@ -42,7 +42,8 @@ export function RepairRequestForm({ repairer, prefillPublicCode }: RepairRequest
         setError(null);
 
         if (!isAuthenticated) {
-            router.push(`/auth/sign-in?returnTo=${encodeURIComponent(window.location.pathname)}`);
+            const returnTo = window.location.pathname + window.location.search + window.location.hash;
+            router.push(`/auth/sign-in?returnTo=${encodeURIComponent(returnTo)}`);
             return;
         }
         if (!publicCode) {

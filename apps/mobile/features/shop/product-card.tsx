@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import { motion } from 'framer-motion';
 import { ExternalLink, ShoppingBag, Shirt } from 'lucide-react';
 import { IrisGrade } from '@lumiris/scoring-ui';

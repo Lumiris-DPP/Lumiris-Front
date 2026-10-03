@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import { motion } from 'framer-motion';
 import { Shirt, Sparkles } from 'lucide-react';
 import { gradeBackgroundSolid } from '@lumiris/scoring-ui';

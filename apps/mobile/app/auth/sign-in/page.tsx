@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, useState, type SyntheticEvent } from 'react';
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
@@ -11,15 +11,9 @@ import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
 import { useUser } from '@/lib/auth';
+import { sanitizeReturnTo } from '@/lib/auth/return-to';
 
 const MIN_SIGNUP_PASSWORD_LENGTH = 8;
-
-// N'autorise qu'un chemin interne absolu (barrière anti open-redirect) : une valeur externe
-// (`//evil.com`, `https://…`) est ignorée et on retombe sur la destination par défaut.
-function sanitizeReturnTo(value: string | null): string | null {
-    if (!value) return null;
-    return value.startsWith('/') && !value.startsWith('//') ? value : null;
-}
 
 function SignInForm() {
     const router = useRouter();

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Scan, Archive, MapPin, ShoppingBag, User } from 'lucide-react';
@@ -174,10 +174,6 @@ export function AppShell({ children, hideTabBar = false }: AppShellProps) {
                                     <Link
                                         key={id}
                                         href={href}
-                                        // Export statique : le préchargement RSC de Next 16 laisse une entrée
-                                        // annulée dans le cache du routeur, et la navigation suivante est
-                                        // abandonnée sans erreur. Ne pas remettre `prefetch`.
-                                        prefetch={false}
                                         aria-current={active ? 'page' : undefined}
                                         className={`relative flex flex-col items-center gap-0.5 px-2 py-1.5 transition-colors ${
                                             active ? 'text-lumiris-cyan' : 'text-muted-foreground'

@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ExternalLink, LifeBuoy, Mail, Send } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@lumiris/ui/components/accordion';
@@ -22,7 +22,7 @@ const FAQ: readonly FaqEntry[] = [
                 Quatre piliers - Transparence (40%), Savoir-faire (25%), Impact (25%), Réparabilité (10%). Le calcul est
                 déterministe et reproductible à partir du DPP.{' '}
                 <Link href="/about#scoring-doc" className="text-foreground underline-offset-4 hover:underline">
-                    Voir la documentation
+                    Comprendre le score
                 </Link>
                 .
             </>
@@ -34,7 +34,7 @@ const FAQ: readonly FaqEntry[] = [
             <>
                 Vérifie l&apos;éclairage et la mise au point. Si l&apos;étiquette est abîmée, tu peux saisir
                 manuellement le code à l&apos;ouverture du scanner -{' '}
-                <Link href="/scan" className="text-foreground underline-offset-4 hover:underline">
+                <Link href="/" className="text-foreground underline-offset-4 hover:underline">
                     réessayer maintenant
                 </Link>
                 .

@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/components/navigation-link';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Clock } from 'lucide-react';
 import { JOURNAL_CATEGORY_LABEL } from '@lumiris/types';
