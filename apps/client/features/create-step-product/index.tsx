@@ -1,64 +1,32 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import type { GarmentInfo } from '@lumiris/types';
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { Textarea } from '@lumiris/ui/components/textarea';
 import { WizardStepFrame } from '@/features/wizard-shell/step-frame';
-import { useStepNavigation } from '@/features/wizard-shell/use-step-navigation';
 import { DocUploadField } from '@/features/wizard-shell/doc-upload-field';
-import { useDraftStore } from '@/lib/draft-store';
-import { draftToValidationInput } from '@/features/wizard-shell/validation-input';
-import { validateStep } from './schema';
+import { useProductStep } from './use-product-step';
 import { CategoryField, ColorsField, PhotoField, SizesField } from './product-fields';
 
+/** Affiche les informations et documents de la pièce à passeporter. */
 export function CreateStepProduct({ draftId }: { draftId: string }) {
-    const draft = useDraftStore((s) => s.drafts[draftId]);
-    const setGarment = useDraftStore((s) => s.setGarment);
-    const setFile = useDraftStore((s) => s.setFile);
-    const { goNext } = useStepNavigation(draftId);
-
-    const [form, setForm] = useState<GarmentInfo>(
-        draft?.garment ?? {
-            kind: 'sweater',
-            name: '',
-            reference: '',
-            mainPhotoUrl: '',
-            dimensions: {},
-            retailPrice: 0,
-            currency: 'EUR',
-        },
-    );
-
-    const [photoFile, setPhotoFile] = useState<File | null>(() => draft?.files?.['PRODUCT_PHOTO'] ?? null);
-    const [saleInvoiceFile, setSaleInvoiceFile] = useState<File | null>(() => draft?.files?.['SALE_INVOICE'] ?? null);
-    const [creationPassportFile, setCreationPassportFile] = useState<File | null>(
-        () => draft?.files?.['CREATION_PASSPORT'] ?? null,
-    );
-
-    const persistedGarment = draft?.garment;
-    useEffect(() => {
-        if (persistedGarment) setForm(persistedGarment);
-    }, [persistedGarment]);
-
-    const validation = useMemo(() => validateStep(draftToValidationInput(draft, { garment: form })), [form, draft]);
-
-    const handleNext = () => {
-        setGarment(draftId, { ...form, mainPhotoUrl: '' });
-        setFile(draftId, 'PRODUCT_PHOTO', photoFile);
-        setFile(draftId, 'SALE_INVOICE', saleInvoiceFile);
-        setFile(draftId, 'CREATION_PASSPORT', creationPassportFile);
-        goNext('product', 'care');
-    };
-
-    const toggleSize = (size: string) => {
-        const current = form.availableSizes ?? [];
-        setForm((f) => ({
-            ...f,
-            availableSizes: current.includes(size) ? current.filter((s) => s !== size) : [...current, size],
-        }));
-    };
+    const {
+        draft,
+        form,
+        setForm,
+        photoFile,
+        setPhotoFile,
+        saleInvoiceFile,
+        setSaleInvoiceFile,
+        creationPassportFile,
+        setCreationPassportFile,
+        validation,
+        handleNext,
+        toggleSize,
+        weight,
+        setWeight,
+        weightInvalid,
+    } = useProductStep(draftId);
 
     return (
         <WizardStepFrame
@@ -115,22 +83,20 @@ export function CreateStepProduct({ draftId }: { draftId: string }) {
                 <Label htmlFor="weight">Poids du vêtement (grammes)</Label>
                 <Input
                     id="weight"
-                    type="number"
-                    min={1}
-                    max={50000}
+                    type="text"
+                    inputMode="numeric"
                     className="w-40"
-                    value={form.dimensions?.weightG ?? ''}
+                    value={weight}
                     placeholder="450"
-                    onChange={(e) =>
-                        setForm((f) => ({
-                            ...f,
-                            dimensions: {
-                                ...f.dimensions,
-                                weightG: e.target.value === '' ? undefined : Math.max(1, Number(e.target.value) || 1),
-                            },
-                        }))
-                    }
+                    onChange={(e) => setWeight(e.target.value)}
+                    aria-invalid={weightInvalid}
+                    aria-describedby={weightInvalid ? 'weight-error' : undefined}
                 />
+                {weightInvalid && (
+                    <p id="weight-error" role="alert" className="text-xs text-destructive">
+                        Saisissez un poids entier entre 1 et 50 000 g.
+                    </p>
+                )}
                 <p className="text-[11px] text-muted-foreground">
                     Facultatif. Renseigné, il affine les sous-scores carbone et eau ; laissé vide, ils sont simplement
                     exclus du calcul sans pénaliser le passeport.

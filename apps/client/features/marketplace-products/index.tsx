@@ -14,10 +14,10 @@ import { ConvertDppDialog } from './convert-dpp-dialog';
 import { ProductsTab } from './products-tab';
 import { VacationBanner } from './vacation-banner';
 
+/** Affiche le catalogue artisan et ouvre la conversion des passeports. */
 export function MarketplaceProducts() {
     const [convertOpen, setConvertOpen] = useState(false);
-    // Vendre exige un abonnement ATELIER actif : on pré-désactive la conversion sinon (le
-    // backend renvoie 422). Le blocage ne s'applique qu'en mode réel.
+
     const { hasActiveSubscription } = useSubscription();
     const sellBlocked = !hasActiveSubscription;
 
@@ -53,20 +53,23 @@ export function MarketplaceProducts() {
     );
 }
 
+/** Propose une activation des paiements lorsque le compte vendeur la nécessite. */
 function SellerConnectBanner() {
     const token = useAuthStore((s) => s.token);
     const { data: status } = useSellerStatus({ enabled: Boolean(token) });
     const onboarding = useStartSellerOnboarding();
 
-    // Une fois les paiements activés, plus de bandeau : l'activation est acquise.
     if (!token || status?.chargesEnabled) return null;
 
-    // Onboarding Stripe Connect en redirection pure (page hébergée Stripe), pas d'intégration front.
+    /** Ouvre le parcours hébergé d’activation des paiements. */
     const activate = () =>
         onboarding.mutate(undefined, {
+            /** Annonce la réussite et termine la mutation demandée. */
             onSuccess: ({ url }) => {
                 window.location.href = url;
             },
+
+            /** Affiche la cause exacte de l’échec de la requête. */
             onError: () => toast.error("Impossible d'ouvrir l'onboarding des paiements."),
         });
 
@@ -101,7 +104,7 @@ function SellerConnectBanner() {
     );
 }
 
-// Tableau de bord vendeur : ventes, revenus nets (net de commission), vues, pièces en garde-robe.
+/** Affiche les statistiques du catalogue vendeur connecté. */
 function SellerStatsCards() {
     const token = useAuthStore((s) => s.token);
     const { data: stats } = useSellerStats({ enabled: Boolean(token) });

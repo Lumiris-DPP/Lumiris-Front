@@ -1,3 +1,4 @@
+import { nonNegativeInteger, requireInteger } from './product-input';
 import type {
     MarketplaceItem,
     MarketplaceProductStatus,
@@ -6,9 +7,9 @@ import type {
     SizeMeasurementPayload,
 } from '@lumiris/api-client';
 
-// Prix minimum d'un produit publié (le backend rejette sinon en 422).
 export const MIN_PUBLISHED_PRICE_CENTS = 50;
 
+/** Décrit une déclinaison éditable avec son identité et sa version. */
 export interface VariantRow {
     key: string;
     id?: string;
@@ -20,6 +21,7 @@ export interface VariantRow {
     version?: number;
 }
 
+/** Décrit les mesures saisies en centimètres pour les tailles du produit. */
 export interface SizeGuideDraft {
     labels: string[];
     values: Record<string, string>;
@@ -27,17 +29,20 @@ export interface SizeGuideDraft {
 
 export const EMPTY_SIZE_GUIDE: SizeGuideDraft = { labels: [], values: {} };
 
+/** Identifie une cellule du guide par sa taille et sa mesure. */
 export function cellKey(sizeLabel: string, label: string): string {
     return `${sizeLabel}\0${label}`;
 }
 
+/** Crée une déclinaison locale sans identité serveur. */
 export function newVariantRow(sizeLabel = '', colorLabel = ''): VariantRow {
     return { key: crypto.randomUUID(), sizeLabel, colorLabel, colorHex: '', sku: '', stock: '0' };
 }
 
+/** Prépare les déclinaisons existantes en conservant stocks et versions. */
 export function variantRowsFrom(product?: MarketplaceItem): VariantRow[] {
     const variants = product?.variants ?? [];
-    if (variants.length === 0) return [newVariantRow()];
+    if (variants.length === 0) return [{ ...newVariantRow(), stock: String(product?.stock ?? 0) }];
     return variants.map((variant) => ({
         key: variant.id,
         id: variant.id,
@@ -50,6 +55,7 @@ export function variantRowsFrom(product?: MarketplaceItem): VariantRow[] {
     }));
 }
 
+/** Prépare les mesures existantes en centimètres dans leur ordre déclaré. */
 export function sizeGuideFrom(product?: MarketplaceItem): SizeGuideDraft {
     const measurements = product?.sizeGuide ?? [];
     const labels: string[] = [];
@@ -61,7 +67,7 @@ export function sizeGuideFrom(product?: MarketplaceItem): SizeGuideDraft {
     return { labels, values };
 }
 
-/** Tailles distinctes déclarées par les déclinaisons — seules valeurs autorisées dans le guide. */
+/** Liste les tailles distinctes déclarées par les déclinaisons. */
 export function sizesOf(rows: readonly VariantRow[]): string[] {
     const sizes: string[] = [];
     for (const row of rows) {
@@ -73,7 +79,7 @@ export function sizesOf(rows: readonly VariantRow[]): string[] {
 
 export const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
 
-/** Première raison pour laquelle la grille n'est pas enregistrable, ou null. */
+/** Retourne la première erreur de stock, de combinaison ou de teinte. */
 export function variantRowsError(rows: readonly VariantRow[]): string | null {
     if (rows.length === 0) return 'Ajoutez au moins une déclinaison.';
     const seen = new Set<string>();
@@ -81,8 +87,7 @@ export function variantRowsError(rows: readonly VariantRow[]): string | null {
         const combination = `${row.sizeLabel.trim().toLowerCase()}\0${row.colorLabel.trim().toLowerCase()}`;
         if (seen.has(combination)) return 'Deux déclinaisons portent la même combinaison de taille et de couleur.';
         seen.add(combination);
-        if (Number(row.stock) < 0 || !Number.isFinite(Number(row.stock)))
-            return 'Un stock doit être un entier positif.';
+        if (nonNegativeInteger(row.stock) === null) return 'Un stock doit être un entier positif ou nul.';
         if (row.colorHex.trim() && !HEX_COLOR.test(row.colorHex.trim())) {
             return 'Une teinte doit être un code hexadécimal, par exemple #1B3A5C.';
         }
@@ -90,21 +95,23 @@ export function variantRowsError(rows: readonly VariantRow[]): string | null {
     return null;
 }
 
+/** Construit les déclinaisons validées en conservant leurs identités et versions. */
 export function toVariantPayload(rows: readonly VariantRow[]): ProductVariantPayload[] {
+    const error = variantRowsError(rows);
+    if (error) throw new Error(error);
     return rows.map((row, index) => ({
         id: row.id,
         sizeLabel: row.sizeLabel.trim() || undefined,
         colorLabel: row.colorLabel.trim() || undefined,
         colorHex: row.colorHex.trim() || undefined,
         sku: row.sku.trim() || undefined,
-        stock: Math.max(0, Math.round(Number(row.stock) || 0)),
+        stock: requireInteger(row.stock, 'Stock'),
         position: index,
         version: row.version,
     }));
 }
 
-// L'artisan saisit des centimètres, le contrat porte des millimètres entiers — même discipline que
-// les centimes : aucun flottant n'atteint la base ni l'affichage.
+/** Convertit les mesures valides en millimètres entiers sans ignorer une erreur. */
 export function toSizeGuidePayload(draft: SizeGuideDraft, sizes: readonly string[]): SizeMeasurementPayload[] {
     const measurements: SizeMeasurementPayload[] = [];
     draft.labels.forEach((label, position) => {
@@ -112,19 +119,22 @@ export function toSizeGuidePayload(draft: SizeGuideDraft, sizes: readonly string
         if (!trimmedLabel) return;
         for (const sizeLabel of sizes) {
             const raw = draft.values[cellKey(sizeLabel, label)];
-            const cm = Number(String(raw ?? '').replace(',', '.'));
-            if (!raw || !Number.isFinite(cm) || cm <= 0) continue;
-            measurements.push({ sizeLabel, label: trimmedLabel, valueMm: Math.round(cm * 10), position });
+            if (raw === undefined || raw === '') continue;
+            if (!/^\d+(?:[,.]\d)?$/.test(raw.trim()))
+                throw new Error(
+                    `Mesure ${trimmedLabel} (${sizeLabel}) : saisissez des centimètres avec au plus une décimale.`,
+                );
+            const [whole, decimal = '0'] = raw.trim().replace(',', '.').split('.');
+            const valueMm = Number(whole) * 10 + Number(decimal);
+            if (!Number.isSafeInteger(valueMm) || valueMm <= 0 || valueMm > 2_147_483_647)
+                throw new Error(`Mesure ${trimmedLabel} (${sizeLabel}) : valeur hors limites.`);
+            measurements.push({ sizeLabel, label: trimmedLabel, valueMm, position });
         }
     });
     return measurements;
 }
 
-/**
- * Payload complet reconstruit depuis une annonce existante. Le PUT est un remplacement intégral :
- * toute action qui ne fait que basculer le statut doit repasser déclinaisons, guide, port, retours
- * et délai — les omettre les effacerait en silence.
- */
+/** Reconstruit le PUT complet en ne changeant que le statut demandé. */
 export function productPayloadFrom(product: MarketplaceItem, status?: MarketplaceProductStatus): ProductPayload {
     return {
         name: product.name,

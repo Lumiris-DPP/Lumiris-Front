@@ -1,5 +1,6 @@
 import type { DraftLike, ValidateStepResult } from '@/features/wizard-shell/use-step-navigation';
 
+/** Signale les informations obligatoires manquantes pour la pièce. */
 export function validateStep(draft: DraftLike): ValidateStepResult {
     const missing: string[] = [];
     if (!draft.garment.name?.trim()) missing.push('Nom du modèle');
