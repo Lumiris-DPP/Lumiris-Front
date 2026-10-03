@@ -13,8 +13,8 @@ import {
 import { Input } from '@lumiris/ui/components/input';
 import { Label } from '@lumiris/ui/components/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@lumiris/ui/components/select';
-import { newVariantRow } from './product-payload';
-import { useDppConversion } from './use-dpp-conversion';
+import { newVariantRow } from '../models/product-payload';
+import { useDppConversion } from '../hooks/use-dpp-conversion';
 import { SizeGuideEditor } from './size-guide-editor';
 import { VariantsEditor } from './variants-editor';
 

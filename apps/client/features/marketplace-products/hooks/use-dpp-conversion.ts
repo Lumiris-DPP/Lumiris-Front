@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useConvertDppToProduct, useDppForm, useDppForms } from '@lumiris/api-client/react';
 import { toast } from '@lumiris/ui/components/sonner';
 import { useSubscription } from '@/lib/use-subscription';
-import { EMPTY_SIZE_GUIDE, sizesOf } from './product-payload';
-import type { SizeGuideDraft, VariantRow } from './product-payload';
-import { convertedProductPayload } from './conversion-model';
-import { productErrorMessage } from './product-error';
+import { EMPTY_SIZE_GUIDE, sizesOf } from '../models/product-payload';
+import type { SizeGuideDraft, VariantRow } from '../models/product-payload';
+import { convertedProductPayload } from '../models/conversion-model';
+import { productErrorMessage } from '../models/product-error';
 
 /** Pilote les saisies et la conversion du passeport sélectionné. */
 export function useDppConversion(open: boolean, onOpenChange: (open: boolean) => void) {

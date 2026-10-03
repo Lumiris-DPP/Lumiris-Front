@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 import { validateStep } from './schema';
-import { nonNegativeInteger } from '../marketplace-products/product-input';
+import { nonNegativeInteger } from '../marketplace-products/models/product-input';
 
 test('le passeport exige un nom, une catégorie et un pays sans espace seul', () => {
     expect(validateStep({ garment: { name: ' ', originCountry: ' ' } })).toEqual({

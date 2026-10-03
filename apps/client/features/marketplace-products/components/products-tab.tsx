@@ -23,8 +23,8 @@ import { formatPriceCents } from '@lumiris/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { EmptyState } from '@/features/empty-state';
 import { ProductFormDialog } from './product-form-dialog';
-import { MIN_PUBLISHED_PRICE_CENTS, productPayloadFrom } from './product-payload';
-import { STATUS_LABEL } from './labels';
+import { MIN_PUBLISHED_PRICE_CENTS, productPayloadFrom } from '../models/product-payload';
+import { STATUS_LABEL } from '../models/labels';
 
 /** Affiche les produits et leurs actions de modification et de statut. */
 export function ProductsTab({ onCreate }: { onCreate: () => void }) {
