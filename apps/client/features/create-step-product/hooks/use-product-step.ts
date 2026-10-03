@@ -6,7 +6,6 @@ import { useStepNavigation } from '@/features/wizard-shell/use-step-navigation';
 import { useDraftStore } from '@/lib/draft-store';
 import { draftToValidationInput } from '@/features/wizard-shell/validation-input';
 import { validateStep } from '../schema';
-
 import { nonNegativeInteger } from '../../marketplace-products/models/product-input';
 
 /** Pilote les informations et documents de la pièce avant leur sauvegarde. */

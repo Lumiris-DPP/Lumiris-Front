@@ -6,13 +6,13 @@ import type { MarketplaceItem } from '@lumiris/api-client';
 import { useDppForms, useUpdateProduct } from '@lumiris/api-client/react';
 import { toast } from '@lumiris/ui/components/sonner';
 import { initialState, editedProductPayload } from '../models/product-form-model';
-import type { FormState } from '../models/product-form-model';
+import type { ProductFormState } from '../models/product-form-model';
 import { sizesOf } from '../models/product-payload';
 import { productErrorMessage } from '../models/product-error';
 
 /** Pilote les saisies et la sauvegarde du produit édité. */
 export function useProductForm(open: boolean, onOpenChange: (open: boolean) => void, product?: MarketplaceItem) {
-    const [form, setForm] = useState<FormState>(() => initialState(product));
+    const [form, setForm] = useState<ProductFormState>(() => initialState(product));
     const [error, setError] = useState<string | null>(null);
     const { data: dpps = [] } = useDppForms({ enabled: open });
     const updateMutation = useUpdateProduct();
@@ -27,7 +27,8 @@ export function useProductForm(open: boolean, onOpenChange: (open: boolean) => v
     }, [open, product]);
 
     /** Met à jour une saisie du produit sans écraser les autres champs. */
-    const set = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((f) => ({ ...f, [key]: value }));
+    const set = <K extends keyof ProductFormState>(key: K, value: ProductFormState[K]) =>
+        setForm((f) => ({ ...f, [key]: value }));
 
     /** Valide les saisies avant de demander la modification du produit. */
     const onSubmit = (event: SyntheticEvent) => {

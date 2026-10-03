@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import type { MarketplaceItem, MarketplaceProductStatus } from '@lumiris/api-client';
 import { Button } from '@lumiris/ui/components/button';
 import {
@@ -219,7 +220,7 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
 }
 
 /** Associe un libellé au champ du formulaire de produit. */
-function Field({ label, htmlFor, children }: { label: string; htmlFor: string; children: React.ReactNode }) {
+function Field({ label, htmlFor, children }: { label: string; htmlFor: string; children: ReactNode }) {
     return (
         <div className="grid gap-1.5">
             <Label htmlFor={htmlFor} className="text-xs">

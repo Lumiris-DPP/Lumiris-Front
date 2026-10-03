@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { AlertTriangle, Wand2 } from 'lucide-react';
 import { Button } from '@lumiris/ui/components/button';
 import {
@@ -20,12 +21,12 @@ import { VariantsEditor } from './variants-editor';
 
 /** Affiche les sections de conversion du passeport en produit artisan. */
 export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+    const router = useRouter();
     const {
-        router,
         dpps,
         isLoading,
         dppsError,
-        convert,
+        pending,
         sellBlocked,
         dppFormId,
         setDppFormId,
@@ -262,7 +263,7 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                         className="gap-1.5 bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90"
                     >
                         <Wand2 className="h-4 w-4" />
-                        {convert.isPending ? 'Conversion…' : 'Mettre en vente'}
+                        {pending ? 'Conversion…' : 'Mettre en vente'}
                     </Button>
                 </DialogFooter>
             </DialogContent>

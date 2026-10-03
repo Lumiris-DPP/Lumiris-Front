@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useConvertDppToProduct, useDppForm, useDppForms } from '@lumiris/api-client/react';
 import { toast } from '@lumiris/ui/components/sonner';
 import { useSubscription } from '@/lib/use-subscription';
@@ -12,7 +11,6 @@ import { productErrorMessage } from '../models/product-error';
 
 /** Pilote les saisies et la conversion du passeport sélectionné. */
 export function useDppConversion(open: boolean, onOpenChange: (open: boolean) => void) {
-    const router = useRouter();
     const { data: dpps = [], isLoading, error: dppsError } = useDppForms({ enabled: open });
     const convert = useConvertDppToProduct();
 
@@ -98,11 +96,10 @@ export function useDppConversion(open: boolean, onOpenChange: (open: boolean) =>
     };
 
     return {
-        router,
         dpps,
         isLoading,
         dppsError,
-        convert,
+        pending: convert.isPending,
         sellBlocked,
         dppFormId,
         setDppFormId,

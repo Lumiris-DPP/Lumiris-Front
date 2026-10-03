@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import type { SyntheticEvent } from 'react';
 import { CalendarClock, Sun } from 'lucide-react';
 import { useArtisanMe, usePauseAtelier, useResumeAtelier } from '@lumiris/api-client/react';
 import { Button } from '@lumiris/ui/components/button';
@@ -72,7 +73,7 @@ export function VacationBanner() {
     }
 
     /** Valide les saisies avant de lancer la mutation demandée. */
-    const submit = (event: React.SyntheticEvent) => {
+    const submit = (event: SyntheticEvent) => {
         event.preventDefault();
         pauseMutation.mutate(
             { until: new Date(`${until}T00:00:00`).toISOString() },

@@ -8,14 +8,12 @@ import {
     sizesOf,
 } from './product-payload';
 import type { SizeGuideDraft, VariantRow } from './product-payload';
-import { requireEuros, requireInteger } from './product-input';
+import { MAX_PREPARATION_DAYS, MAX_WEIGHT_GRAMS, requireEuros, requireInteger } from './product-input';
 
 export const NO_DPP = 'none';
-export const MAX_PREPARATION_DAYS = 90;
-export const MAX_WEIGHT_GRAMS = 30000;
 
 /** Décrit les saisies du formulaire de modification du produit. */
-export interface FormState {
+export interface ProductFormState {
     name: string;
     description: string;
     category: string;
@@ -35,7 +33,7 @@ export interface FormState {
 }
 
 /** Prépare les saisies depuis le produit existant sans perdre ses variantes. */
-export function initialState(product?: MarketplaceItem): FormState {
+export function initialState(product?: MarketplaceItem): ProductFormState {
     return {
         name: product?.name ?? '',
         description: product?.description ?? '',
@@ -57,7 +55,7 @@ export function initialState(product?: MarketplaceItem): FormState {
 }
 
 /** Construit le remplacement complet du produit depuis des saisies validées. */
-export function editedProductPayload(form: FormState, currency = 'EUR'): ProductPayload {
+export function editedProductPayload(form: ProductFormState, currency = 'EUR'): ProductPayload {
     if (!form.name.trim()) throw new Error('Le nom du produit est requis.');
     const priceCents = requireEuros(form.priceEuros, 'Prix');
     if (form.status === 'PUBLISHED' && priceCents < MIN_PUBLISHED_PRICE_CENTS) {
