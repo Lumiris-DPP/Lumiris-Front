@@ -76,7 +76,11 @@ export function OrderDetailSheet({ order, onClose }: { order: SellerOrder | null
                             ) : null}
 
                             <Separator />
-                            <MessageComposer orderId={order.id} disputeOpen={order.disputeStatus === 'OPEN'} />
+                            <MessageComposer
+                                key={order.id}
+                                orderId={order.id}
+                                disputeOpen={order.disputeStatus === 'OPEN'}
+                            />
 
                             <Separator />
                             <section>
@@ -97,8 +101,7 @@ export function OrderDetailSheet({ order, onClose }: { order: SellerOrder | null
     );
 }
 
-// N'affiche que les transitions réellement acceptées par le serveur (drapeaux `can*`) : un
-// bouton visible ici aboutit toujours.
+// Propose les transitions autorisées par la dernière lecture des permissions serveur.
 function OrderActions({
     order,
     onShip,
@@ -210,6 +213,7 @@ function CancelOrderButton({ order }: { order: SellerOrder }) {
     );
 }
 
+// Présente les montants et le reversement persistés pour cette commande.
 function MoneySection({ order }: { order: SellerOrder }) {
     const currency = order.currency ?? 'EUR';
     const rows = [
@@ -251,6 +255,7 @@ function MoneySection({ order }: { order: SellerOrder }) {
     );
 }
 
+// Affiche l’adresse de livraison du dossier vendeur.
 function AddressSection({ order }: { order: SellerOrder }) {
     return (
         <section>
@@ -284,6 +289,7 @@ function AddressSection({ order }: { order: SellerOrder }) {
     );
 }
 
+// Affiche le suivi fourni lors de l’expédition.
 function TrackingSection({ order }: { order: SellerOrder }) {
     return (
         <section>
@@ -312,6 +318,7 @@ function MessageComposer({ orderId, disputeOpen }: { orderId: string; disputeOpe
     const [message, setMessage] = useState('');
     const postMessage = usePostSellerMessage();
 
+    // Envoie le message à la commande affichée sans perdre le texte en cas d’échec.
     const send = () => {
         if (message.trim().length < 3 || postMessage.isPending) return;
         postMessage.mutate(

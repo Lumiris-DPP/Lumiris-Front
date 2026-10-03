@@ -8,15 +8,10 @@ import { routes } from '@/lib/routes';
 import { useUser } from '@/lib/auth/use-user';
 import { formatCents } from '@/lib/marketplace';
 
-const INVOICE_RETURN = (pi: string) => encodeURIComponent(routes.orderInvoice(pi));
+import { formatInvoiceDate, invoiceAmounts } from './invoice-model';
 
-function formatDate(iso: string | null | undefined): string {
-    if (!iso)
-        return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
-    const date = new Date(iso);
-    if (Number.isNaN(date.getTime())) return '—';
-    return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
-}
+// Construit le retour de connexion vers la facture demandée.
+const INVOICE_RETURN = (pi: string) => encodeURIComponent(routes.orderInvoice(pi));
 
 // Facture imprimable rattachée au PaymentIntent (GET /api/orders/group/{pi}). Le segment [id]
 // de la route est le paymentIntentId. La feuille porte `.facture-print` : l'impression (voir
@@ -31,16 +26,20 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
     } = useOrderGroup(paymentIntentId, {
         enabled: isAuthenticated && Boolean(paymentIntentId),
     });
-    const autoPrinted = useRef(false);
+    const autoPrinted = useRef<string | null>(null);
+    const amounts = group ? invoiceAmounts(group) : null;
+    const printable = isAuthenticated && !isError && Boolean(amounts?.paymentConfirmed);
 
     // Impression automatique une seule fois, dès que la facture est prête : le bouton
     // « Télécharger la facture » ouvre cette vue puis déclenche l'impression du navigateur.
     useEffect(() => {
-        if (autoPrinted.current || !group) return;
-        autoPrinted.current = true;
-        const timer = window.setTimeout(() => window.print(), 400);
+        if (!printable || !group || autoPrinted.current === paymentIntentId) return;
+        const timer = window.setTimeout(() => {
+            autoPrinted.current = paymentIntentId;
+            window.print();
+        }, 400);
         return () => window.clearTimeout(timer);
-    }, [group]);
+    }, [group, paymentIntentId, printable]);
 
     if (!isAuthenticated) {
         return (
@@ -82,11 +81,7 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
         );
     }
 
-    const isPaid = group.status !== 'PENDING';
-    // Une facture qui ignore les remboursements ment sur ce que le client a réellement payé —
-    // c'est la pièce qu'il produit à sa comptabilité ou à sa banque.
-    const refundedCents = group.lines.reduce((sum, line) => sum + (line.refundedCents ?? 0), 0);
-    const cancelledLines = group.lines.filter((line) => line.status === 'CANCELLED');
+    const { paymentConfirmed: isPaid, refundedCents, remainingCents } = invoiceAmounts(group);
 
     return (
         <div className="flex h-full flex-col overflow-y-auto bg-background">
@@ -101,6 +96,7 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
                 </Link>
                 <button
                     type="button"
+                    disabled={!printable}
                     onClick={() => window.print()}
                     className="inline-flex h-9 items-center gap-2 rounded-full bg-foreground px-4 text-xs font-semibold text-primary-foreground"
                 >
@@ -122,14 +118,14 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
                             {group.invoiceNumber ? (
                                 <p className="mt-0.5 font-mono text-sm text-foreground">{group.invoiceNumber}</p>
                             ) : null}
-                            <p className="mt-1 text-xs text-muted-foreground">{formatDate(group.createdAt)}</p>
+                            <p className="mt-1 text-xs text-muted-foreground">{formatInvoiceDate(group.createdAt)}</p>
                         </div>
                     </header>
 
                     {!isPaid ? (
                         <p className="mt-6 rounded-xl border border-lumiris-amber/30 bg-lumiris-amber/10 p-3 text-xs text-lumiris-amber">
-                            Paiement en cours de confirmation — cette facture sera définitive une fois le paiement
-                            validé.
+                            Le paiement de cette commande n’est pas confirmé. Ce document ne constitue pas une facture
+                            définitive.
                         </p>
                     ) : null}
 
@@ -198,22 +194,18 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
                             </dd>
                         </div>
                         <div className="mt-1 flex items-center justify-between border-t border-border/60 pt-2 text-base font-bold">
-                            <dt>Total payé</dt>
+                            <dt>{isPaid ? 'Total payé' : 'Montant de la commande'}</dt>
                             <dd className="tabular-nums">{formatCents(group.amountChargedCents)}</dd>
                         </div>
                         {refundedCents > 0 ? (
                             <>
                                 <div className="flex items-center justify-between text-sm">
-                                    <dt className="text-muted-foreground">
-                                        Remboursé{cancelledLines.length > 0 ? ' (annulation)' : ''}
-                                    </dt>
+                                    <dt className="text-muted-foreground">Remboursé</dt>
                                     <dd className="text-foreground tabular-nums">−{formatCents(refundedCents)}</dd>
                                 </div>
                                 <div className="flex items-center justify-between border-t border-border/60 pt-2 text-base font-bold">
                                     <dt>Reste à votre charge</dt>
-                                    <dd className="tabular-nums">
-                                        {formatCents(Math.max(0, group.amountChargedCents - refundedCents))}
-                                    </dd>
+                                    <dd className="tabular-nums">{formatCents(remainingCents)}</dd>
                                 </div>
                             </>
                         ) : null}

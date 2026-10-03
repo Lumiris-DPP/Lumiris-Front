@@ -22,15 +22,20 @@ export function AttachmentPicker({
     files,
     onChange,
     label = 'Ajouter une photo',
+    disabled = false,
+    onUploadingChange,
 }: {
     files: readonly PickedFile[];
     onChange: (files: PickedFile[]) => void;
     label?: string;
+    disabled?: boolean;
+    onUploadingChange: (uploading: boolean) => void;
 }) {
     const client = useApiClient();
     const inputRef = useRef<HTMLInputElement>(null);
     const previewUrlsRef = useRef(new Set<string>());
     const [uploading, setUploading] = useState(false);
+    const mounted = useRef(false);
     const full = files.length >= MAX_FILES;
 
     useEffect(() => {
@@ -44,14 +49,18 @@ export function AttachmentPicker({
     }, [files]);
 
     useEffect(() => {
+        mounted.current = true;
         const tracked = previewUrlsRef.current;
         return () => {
+            mounted.current = false;
             for (const url of tracked) URL.revokeObjectURL(url);
             tracked.clear();
         };
     }, []);
 
+    // Téléverse les photos sélectionnées et conserve chaque réussite du lot.
     async function handleSelect(event: React.ChangeEvent<HTMLInputElement>) {
+        if (uploading || disabled) return;
         const selected = [...(event.target.files ?? [])].slice(0, MAX_FILES - files.length);
         event.target.value = '';
         if (selected.length === 0) return;
@@ -63,20 +72,30 @@ export function AttachmentPicker({
         }
 
         setUploading(true);
+        onUploadingChange(true);
         try {
-            const uploaded = await Promise.all(
-                selected.map(async (file) => {
-                    const { id } = await client.storage.upload(file);
-                    const previewUrl = URL.createObjectURL(file);
-                    previewUrlsRef.current.add(previewUrl);
-                    return { id, previewUrl };
-                }),
-            );
+            const results = await Promise.allSettled(selected.map((file) => client.storage.upload(file)));
+            if (!mounted.current) return;
+            const uploaded: PickedFile[] = [];
+            results.forEach((result, index) => {
+                if (result.status !== 'fulfilled') return;
+                const file = selected[index];
+                if (!file) return;
+                const previewUrl = URL.createObjectURL(file);
+                previewUrlsRef.current.add(previewUrl);
+                uploaded.push({ id: result.value.id, previewUrl });
+            });
             onChange([...files, ...uploaded]);
+            if (results.some((result) => result.status === 'rejected')) {
+                toast('Certaines photos n’ont pas pu être envoyées. Les photos réussies sont conservées.');
+            }
         } catch {
             toast('Impossible d’envoyer la photo. Réessaie.');
         } finally {
-            setUploading(false);
+            if (mounted.current) {
+                setUploading(false);
+                onUploadingChange(false);
+            }
         }
     }
 
@@ -89,6 +108,7 @@ export function AttachmentPicker({
                         <button
                             type="button"
                             aria-label="Retirer cette photo"
+                            disabled={uploading || disabled}
                             onClick={() => onChange(files.filter((f) => f.id !== file.id))}
                             className="absolute top-0.5 right-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-background/90 text-foreground"
                         >
@@ -101,7 +121,7 @@ export function AttachmentPicker({
                     <button
                         type="button"
                         onClick={() => inputRef.current?.click()}
-                        disabled={uploading}
+                        disabled={uploading || disabled}
                         className="inline-flex h-16 w-16 flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-border text-[10px] text-muted-foreground disabled:opacity-50"
                     >
                         {uploading ? (
