@@ -35,8 +35,9 @@ export function ReturnDecisionDialog({
         if (open) setNote('');
     }, [open]);
 
+    // Transmet la décision de retour et le motif saisis par le vendeur.
     const decide = (accepted: boolean) => {
-        if (decideMutation.isPending) return;
+        if (decideMutation.isPending || !order.canDecideReturn) return;
         if (!accepted && note.trim().length < 3) {
             toast.error('Un refus doit être motivé.');
             return;
@@ -91,7 +92,7 @@ export function ReturnDecisionDialog({
                     <Button
                         type="button"
                         variant="outline"
-                        disabled={decideMutation.isPending}
+                        disabled={decideMutation.isPending || !order.canDecideReturn}
                         onClick={() => decide(false)}
                     >
                         {decideMutation.isPending ? (
@@ -103,7 +104,7 @@ export function ReturnDecisionDialog({
                     </Button>
                     <Button
                         type="button"
-                        disabled={decideMutation.isPending}
+                        disabled={decideMutation.isPending || !order.canDecideReturn}
                         onClick={() => decide(true)}
                         className="bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90"
                     >

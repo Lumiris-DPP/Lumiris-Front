@@ -14,6 +14,7 @@ import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
 
 const ORDERS_RETURN = encodeURIComponent('/me/orders');
 
+// Formate la date de commande sans inventer de valeur absente.
 function formatDate(iso: string | null | undefined): string | null {
     if (!iso) return null;
     const date = new Date(iso);
@@ -26,7 +27,7 @@ function formatDate(iso: string | null | undefined): string | null {
 // masquerait qu'un colis est arrivé pendant qu'un autre est encore en préparation.
 export function OrderHistory() {
     const { isAuthenticated } = useUser();
-    const { data: orders = [], isLoading } = useMyOrders({ enabled: isAuthenticated });
+    const { data: orders = [], isLoading, isError, refetch } = useMyOrders({ enabled: isAuthenticated });
     const visible = orders.filter((order) => order.status !== 'PENDING');
 
     return (
@@ -74,6 +75,19 @@ export function OrderHistory() {
                     </GlassCard>
                 ) : isLoading ? (
                     <p className="py-10 text-center text-sm text-muted-foreground">Chargement de tes commandes…</p>
+                ) : isError ? (
+                    <GlassCard className="flex flex-col items-center gap-3 p-7 text-center" intensity="subtle">
+                        <p role="alert" className="text-sm font-semibold text-foreground">
+                            Impossible de charger tes commandes
+                        </p>
+                        <button
+                            type="button"
+                            onClick={() => void refetch()}
+                            className="rounded-full border border-border px-4 py-2 text-xs font-semibold"
+                        >
+                            Réessayer
+                        </button>
+                    </GlassCard>
                 ) : visible.length === 0 ? (
                     <GlassCard className="flex flex-col items-center gap-3 p-7 text-center" intensity="subtle">
                         <Package className="h-10 w-10 text-muted-foreground/40" strokeWidth={1.25} aria-hidden />
@@ -102,6 +116,7 @@ export function OrderHistory() {
     );
 }
 
+// Relie chaque pièce à son suivi et à son statut actuel.
 function OrderRow({ order }: { order: OrderResponse }) {
     const date = formatDate(order.createdAt);
     const disputed = order.disputeStatus === 'OPEN';

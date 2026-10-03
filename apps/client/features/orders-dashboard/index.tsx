@@ -3,8 +3,9 @@
 import { useMemo, useState } from 'react';
 import { Package, PackageCheck, RotateCcw, Truck } from 'lucide-react';
 import type { SellerOrder, SellerOrderTab } from '@lumiris/api-client';
-import { SELLER_ORDER_TABS, SELLER_ORDER_TAB_LABEL, sellerOrderTab } from '@lumiris/api-client';
+import { SELLER_ORDER_TABS, SELLER_ORDER_TAB_LABEL } from '@lumiris/api-client';
 import { useSellerOrders } from '@lumiris/api-client/react';
+import { Button } from '@lumiris/ui/components/button';
 import { Badge } from '@lumiris/ui/components/badge';
 import { Skeleton } from '@lumiris/ui/components/skeleton';
 import { StatCard } from '@lumiris/ui/components/stat-card';
@@ -14,6 +15,7 @@ import { useAuthStore } from '@/lib/auth-store';
 import { EmptyState } from '@/features/empty-state';
 import { OrdersTable } from './orders-table';
 import { OrderDetailSheet } from './order-detail-sheet';
+import { groupByTab, heldOrderCents } from './orders-model';
 
 // Ce que chaque onglet dit quand il est vide — un tableau vide sans phrase laisse le vendeur
 // se demander s'il attend une donnée ou s'il n'a simplement rien à faire.
@@ -40,10 +42,11 @@ const EMPTY_COPY: Record<SellerOrderTab, { title: string; description: string }>
     },
 };
 
+// Compose les onglets à partir des commandes du vendeur connecté.
 export function OrdersDashboard() {
     const token = useAuthStore((s) => s.token);
-    const { data: orders = [], isLoading } = useSellerOrders({ enabled: Boolean(token) });
-    const [selected, setSelected] = useState<SellerOrder | null>(null);
+    const { data: orders = [], isLoading, isError, refetch } = useSellerOrders({ enabled: Boolean(token) });
+    const [selected, setSelected] = useState<string | null>(null);
 
     const byTab = useMemo(() => groupByTab(orders), [orders]);
     // Le vendeur arrive sur ce qui l'attend : le premier onglet non vide dans l'ordre de
@@ -53,13 +56,26 @@ export function OrdersDashboard() {
 
     // La commande sélectionnée doit refléter le rafraîchissement de la liste (une action change
     // son état) : on la relit dans les données fraîches plutôt que de figer une copie.
-    const selectedOrder = selected ? (orders.find((o) => o.id === selected.id) ?? selected) : null;
+    const selectedOrder = selected ? (orders.find((o) => o.id === selected) ?? null) : null;
 
     if (isLoading) {
         return (
             <div className="space-y-3 p-8">
                 <Skeleton className="h-10 w-full max-w-md" />
                 <Skeleton className="h-64 w-full" />
+            </div>
+        );
+    }
+
+    if (!token || isError) {
+        return (
+            <div className="space-y-3 p-8" role="alert">
+                <p>{!token ? 'Connectez-vous pour voir vos commandes.' : 'Impossible de charger les commandes.'}</p>
+                {token ? (
+                    <Button variant="outline" onClick={() => void refetch()}>
+                        Réessayer
+                    </Button>
+                ) : null}
             </div>
         );
     }
@@ -97,38 +113,27 @@ export function OrdersDashboard() {
                                 description={EMPTY_COPY[key].description}
                             />
                         ) : (
-                            <OrdersTable orders={byTab[key]} onSelect={setSelected} />
+                            <OrdersTable orders={byTab[key]} onSelect={(order) => setSelected(order.id)} />
                         )}
                     </TabsContent>
                 ))}
             </Tabs>
 
-            <OrderDetailSheet order={selectedOrder} onClose={() => setSelected(null)} />
+            <OrderDetailSheet
+                key={selectedOrder?.id ?? 'none'}
+                order={selectedOrder}
+                onClose={() => setSelected(null)}
+            />
         </div>
     );
 }
 
-function groupByTab(orders: readonly SellerOrder[]): Record<SellerOrderTab, SellerOrder[]> {
-    const grouped: Record<SellerOrderTab, SellerOrder[]> = {
-        TO_SHIP: [],
-        SHIPPED: [],
-        RETURNS: [],
-        DISPUTES: [],
-        CLOSED: [],
-    };
-    for (const order of orders) {
-        grouped[sellerOrderTab(order.status, order.disputeStatus)].push(order);
-    }
-    return grouped;
-}
-
-// Trois chiffres qui répondent aux seules questions urgentes : qu'est-ce que je dois faire
-// aujourd'hui, et combien d'argent m'attend.
+// Résume les expéditions, retours et fonds retenus des commandes chargées.
 function OrdersSummary({ orders }: { orders: readonly SellerOrder[] }) {
     const toShip = orders.filter((o) => o.canShip).length;
     const inTransit = orders.filter((o) => o.status === 'SHIPPED').length;
     const pendingReturns = orders.filter((o) => o.canDecideReturn || o.canMarkReturnReceived).length;
-    const heldCents = orders.filter((o) => !o.released && o.status !== 'REFUNDED').reduce((s, o) => s + o.netCents, 0);
+    const heldCents = orders.reduce((sum, order) => sum + heldOrderCents(order), 0);
 
     const cards = [
         { label: 'À expédier', value: String(toShip), icon: Package, hint: 'commandes payées' },

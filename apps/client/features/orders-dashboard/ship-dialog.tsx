@@ -35,6 +35,7 @@ const TRACKING_URL_TEMPLATE: Record<string, (tracking: string) => string> = {
     DPD: (t) => `https://www.dpd.fr/trace/${t}`,
 };
 
+// Prépare une expédition manuelle ou une étiquette avec le client API existant.
 export function ShipDialog({
     order,
     open,
@@ -61,11 +62,12 @@ export function ShipDialog({
 
     const carrier = carrierChoice === OTHER ? customCarrier.trim() : carrierChoice;
     const trackingUrl = TRACKING_URL_TEMPLATE[carrier]?.(trackingNumber.trim());
-    const valid = carrier.length > 1 && trackingNumber.trim().length > 3;
+    const valid = order.canShip && carrier.length > 1 && trackingNumber.trim().length > 3;
     const pending = shipMutation.isPending || labelMutation.isPending;
 
+    // Demande une étiquette si la commande autorise encore l’expédition.
     const onGenerateLabel = () => {
-        if (pending) return;
+        if (pending || !order.canShip) return;
         labelMutation.mutate(order.id, {
             onSuccess: (label) => {
                 toast.success('Étiquette éditée', {
@@ -80,9 +82,10 @@ export function ShipDialog({
         });
     };
 
+    // Envoie la saisie validée avec les contrats API existants.
     const onSubmit = (event: React.SyntheticEvent) => {
         event.preventDefault();
-        if (!valid || pending) return;
+        if (!valid || pending || !order.canShip) return;
         shipMutation.mutate(
             {
                 orderId: order.id,
@@ -117,7 +120,7 @@ export function ShipDialog({
                         {shipping?.enabled ? (
                             <OneClickLabel
                                 ready={shipping.senderAddressReady}
-                                pending={labelMutation.isPending}
+                                pending={pending || !order.canShip}
                                 onGenerate={onGenerateLabel}
                             />
                         ) : null}

@@ -20,10 +20,9 @@ import { Textarea } from '@lumiris/ui/components/textarea';
 import { toast } from '@lumiris/ui/components/sonner';
 import { formatPriceCents } from '@lumiris/utils';
 
-function refundableCents(order: SellerOrder): number {
-    return Math.max(0, order.amountTotalCents + (order.shippingCents ?? 0) - (order.refundedCents ?? 0));
-}
+import { refundableCents, parseRefundCents } from './refund-model';
 
+// Prépare un remboursement dans le plafond renvoyé par la commande.
 export function RefundDialog({
     order,
     open,
@@ -47,10 +46,11 @@ export function RefundDialog({
         }
     }, [open, maxCents]);
 
-    const partialCents = Math.round(Number(amountEuros.replace(',', '.')) * 100);
-    const partialValid = Number.isFinite(partialCents) && partialCents > 0 && partialCents <= maxCents;
-    const valid = mode === 'full' || partialValid;
+    const partialCents = parseRefundCents(amountEuros);
+    const partialValid = partialCents !== null && partialCents > 0 && partialCents <= maxCents;
+    const valid = order.canRefund && maxCents > 0 && (mode === 'full' || partialValid);
 
+    // Envoie la saisie validée avec les contrats API existants.
     const onSubmit = (event: React.SyntheticEvent) => {
         event.preventDefault();
         if (!valid || refundMutation.isPending) return;
@@ -58,7 +58,7 @@ export function RefundDialog({
             {
                 orderId: order.id,
                 input: {
-                    amountCents: mode === 'partial' ? partialCents : undefined,
+                    amountCents: mode === 'partial' ? (partialCents ?? undefined) : undefined,
                     reason: reason.trim() || undefined,
                 },
             },
