@@ -2,13 +2,6 @@ import type { OrderResponse } from '@lumiris/api-client';
 
 export type SheetKind = 'return' | 'dispute' | 'message' | 'cancel';
 
-export function formatDate(iso?: string | null): string {
-    if (!iso) return '';
-    const date = new Date(iso);
-    if (Number.isNaN(date.getTime())) return '';
-    return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long' }).format(date);
-}
-
 export function isOrderNotFound(error: unknown): boolean {
     return error instanceof Error && 'status' in error && error.status === 404;
 }

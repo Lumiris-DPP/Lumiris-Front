@@ -20,6 +20,7 @@ interface PurchaseBarProps {
 
 export function PurchaseBar({ product, state, added, inCart, onAdd, onBuyNow }: PurchaseBarProps) {
     const { data: paymentOptions } = usePaymentOptions();
+    const priceLabel = formatCents(product.priceCents);
     const installment = installmentLabel(product.priceCents, paymentOptions);
     const buyable = state.kind === 'ready';
     const stockHint = stockHintOf(state);
@@ -34,9 +35,7 @@ export function PurchaseBar({ product, state, added, inCart, onAdd, onBuyNow }: 
         >
             <div className="flex items-end justify-between gap-3">
                 <div className="min-w-0">
-                    <p className="font-mono text-xl leading-none font-bold text-foreground">
-                        {formatCents(product.priceCents)}
-                    </p>
+                    <p className="font-mono text-xl leading-none font-bold text-foreground">{priceLabel}</p>
                     {installment ? (
                         <p className="mt-0.5 text-[11px] font-medium text-lumiris-cyan">{installment}</p>
                     ) : null}
@@ -45,7 +44,7 @@ export function PurchaseBar({ product, state, added, inCart, onAdd, onBuyNow }: 
                         {deliverySummaryOf(product)}
                     </p>
                 </div>
-                {}
+
                 <p
                     aria-live="polite"
                     className={cn(
@@ -85,7 +84,7 @@ export function PurchaseBar({ product, state, added, inCart, onAdd, onBuyNow }: 
                     disabled={!buyable}
                     className="h-11 flex-[1.4] rounded-full bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90"
                 >
-                    {buyable ? `Acheter — ${formatCents(product.priceCents)}` : PURCHASE_CTA_LABEL[state.kind]}
+                    {buyable ? `Acheter — ${priceLabel}` : PURCHASE_CTA_LABEL[state.kind]}
                 </Button>
             </div>
         </motion.aside>

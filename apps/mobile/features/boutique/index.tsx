@@ -54,7 +54,6 @@ export function Boutique() {
             />
 
             <div className="flex-1 overflow-y-auto px-5 pb-28">
-                {}
                 <p role="status" className="sr-only">
                     {isLoading || isError ? '' : `${items.length} pièce${items.length > 1 ? 's' : ''}`}
                 </p>

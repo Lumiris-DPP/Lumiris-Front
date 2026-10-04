@@ -8,7 +8,8 @@ import { routes } from '@/lib/routes';
 import { useUser } from '@/lib/auth/use-user';
 import { formatCents } from '@/lib/marketplace/money';
 
-import { formatInvoiceDate, invoiceAmounts } from './models/invoice-model';
+import { formatLongDateFr } from '@lumiris/utils';
+import { invoiceAmounts } from './models/invoice-model';
 
 const INVOICE_RETURN = (pi: string) => encodeURIComponent(routes.orderInvoice(pi));
 
@@ -57,7 +58,7 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
         );
     }
 
-    if (isError || !group) {
+    if (isError || !group || !amounts) {
         return (
             <div className="flex h-full flex-col items-center justify-center gap-4 bg-background px-8 text-center">
                 <p className="text-base font-semibold text-foreground">Facture indisponible</p>
@@ -74,11 +75,10 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
         );
     }
 
-    const { paymentConfirmed: isPaid, refundedCents, remainingCents } = invoiceAmounts(group);
+    const { paymentConfirmed: isPaid, refundedCents, remainingCents } = amounts;
 
     return (
         <div className="flex h-full flex-col overflow-y-auto bg-background">
-            {}
             <div className="facture-no-print mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 pt-12 pb-3 md:px-6">
                 <Link
                     href={routes.order(paymentIntentId)}
@@ -98,7 +98,6 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
                 </button>
             </div>
 
-            {}
             <div className="mx-auto w-full max-w-3xl px-4 pb-24 md:px-6">
                 <article className="facture-print rounded-2xl border border-border/60 bg-card p-6 text-foreground md:p-10">
                     <header className="flex flex-col gap-4 border-b border-border/60 pb-6 sm:flex-row sm:items-start sm:justify-between">
@@ -111,7 +110,9 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
                             {group.invoiceNumber ? (
                                 <p className="mt-0.5 font-mono text-sm text-foreground">{group.invoiceNumber}</p>
                             ) : null}
-                            <p className="mt-1 text-xs text-muted-foreground">{formatInvoiceDate(group.createdAt)}</p>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                {formatLongDateFr(group.createdAt) ?? '—'}
+                            </p>
                         </div>
                     </header>
 

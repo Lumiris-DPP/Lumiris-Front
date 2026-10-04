@@ -124,7 +124,7 @@ export function ConfirmationDetails({
                     <h2 className="mb-3 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                         {group.lines.length > 1 ? `Articles (${group.lines.length})` : 'Article'}
                     </h2>
-                    {}
+
                     <ul className="flex flex-col gap-1">
                         {group.lines.map((line) => (
                             <li key={line.id}>
