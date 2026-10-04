@@ -12,16 +12,19 @@ import { useEffect, useMemo } from 'react';
 import { useMarketplaceProductsByIds, useMyOrders } from '@lumiris/api-client/react';
 import { useUser } from '../auth/use-user';
 import { buildCartDetails, purchasesToSettle, type CartDetails, type CartLine, type CartLoadState } from './cart-model';
-import { forgetPurchase, pendingPurchaseIds, settlePurchase, useCart } from './cart-storage';
+import { forgetPurchase, pendingPurchaseIds, resolveStoredCartLines, settlePurchase, useCart } from './cart-storage';
 import { toMarketplaceItem } from './product';
 
 /** Détail du panier et relance de la lecture du catalogue quand elle a échoué. */
 export function useCartDetails(): CartDetails & { retry: () => void } {
     const lines = useCart();
-    useSettlePaidPurchases(lines);
     const productIds = useMemo(() => lines.map((line) => line.productId), [lines]);
     const { data, isError, refetch } = useMarketplaceProductsByIds(productIds);
     const products = useMemo(() => data?.map(toMarketplaceItem), [data]);
+    useEffect(() => {
+        if (products) resolveStoredCartLines(products);
+    }, [products, lines]);
+    useSettlePaidPurchases(lines);
 
     // Une lecture réussie fait foi, même si un rafraîchissement ultérieur échoue ; sans elle, une
     // panne reste une panne et non un panier vidé de ses pièces.
