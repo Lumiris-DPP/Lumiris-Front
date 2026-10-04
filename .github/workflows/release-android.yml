@@ -98,7 +98,9 @@ jobs:
                   NDK_HOME: ${{ steps.ndk.outputs.home }}
                   ANDROID_NDK_HOME: ${{ steps.ndk.outputs.home }}
               working-directory: apps/mobile
-              run: bun x @tauri-apps/cli@latest android build --apk
+              # Même CLI que celle rappelée par Gradle (bun tauri, version du bun.lock) : une version
+              # différente ne trouve pas le fichier d'adresse du serveur mobile et le build s'arrête.
+              run: bun tauri android build --apk
 
             - name: Collect the signed APK
               id: apk
