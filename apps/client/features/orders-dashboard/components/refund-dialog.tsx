@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Loader2, Undo2 } from 'lucide-react';
 import type { RefundInput, SellerOrder } from '@lumiris/api-client';
-import { useRefundOrder } from '@lumiris/api-client/react';
+import { orderKeys, useApiQueryClient, useRefundOrder } from '@lumiris/api-client/react';
 import { Button } from '@lumiris/ui/components/button';
 import {
     Dialog,
@@ -20,7 +20,7 @@ import { Textarea } from '@lumiris/ui/components/textarea';
 import { toast } from '@lumiris/ui/components/sonner';
 import { formatPriceCents } from '@lumiris/utils';
 
-import { refundableCents, parseRefundCents } from '../models/refund-model';
+import { REFUND_REASON_MAX_LENGTH, refundFailureOf, refundableCents, parseRefundCents } from '../models/refund-model';
 import { forgetRefundOperation, readRefundOperation, rememberRefundOperation } from '../models/refund-operation';
 import { useAuthStore } from '@/lib/auth-store';
 
@@ -42,6 +42,7 @@ export function RefundDialog({
     const [operation, setOperation] = useState<RefundInput | null>(null);
     const [storageError, setStorageError] = useState(false);
     const refundMutation = useRefundOrder();
+    const queryClient = useApiQueryClient();
 
     useEffect(() => {
         if (open) {
@@ -100,8 +101,16 @@ export function RefundDialog({
                     });
                     onOpenChange(false);
                 },
-                onError: () =>
-                    toast.error('Réponse non confirmée. Reprenez la même opération pour vérifier son résultat.'),
+                onError: (error) => {
+                    const failure = refundFailureOf(error);
+                    if (failure.release) {
+                        forgetRefundOperation(userId, order.id);
+                        setOperation(null);
+                        // Le refus vient souvent d'une commande changée ailleurs : son plafond se relit.
+                        void queryClient.invalidateQueries({ queryKey: orderKeys.sellerAll() });
+                    }
+                    toast.error(failure.message);
+                },
             },
         );
     };
@@ -173,6 +182,7 @@ export function RefundDialog({
                                 id="refund-reason"
                                 rows={3}
                                 value={reason}
+                                maxLength={REFUND_REASON_MAX_LENGTH}
                                 disabled={Boolean(operation)}
                                 onChange={(e) => setReason(e.target.value)}
                                 placeholder="Pièce retournée en bon état, geste commercial…"
