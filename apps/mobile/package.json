@@ -1,6 +1,6 @@
 {
     "name": "@lumiris/mobile",
-    "version": "0.1.0",
+    "version": "0.3.0",
     "private": true,
     "description": "LUMIRIS Mobile - mobile-optimized consumer view (Iris Scanner). Web first, Tauri-ready.",
     "scripts": {

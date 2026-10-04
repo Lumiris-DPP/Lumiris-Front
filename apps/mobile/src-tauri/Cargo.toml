@@ -1,6 +1,6 @@
 [package]
 name = "lumiris-mobile"
-version = "0.1.0"
+version = "0.3.0"
 description = "Lumiris Mobile — native shell wrapping the Next.js consumer view"
 authors = ["Lumiris"]
 edition = "2021"
