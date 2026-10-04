@@ -237,6 +237,7 @@ export interface ReturnDecisionInput {
 
 /** `amountCents` absent ⇒ remboursement du solde intégral. */
 export interface RefundInput {
+    operationId: string;
     amountCents?: number;
     reason?: string;
 }

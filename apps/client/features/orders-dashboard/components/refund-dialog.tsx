@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Loader2, Undo2 } from 'lucide-react';
-import type { SellerOrder } from '@lumiris/api-client';
+import type { RefundInput, SellerOrder } from '@lumiris/api-client';
 import { useRefundOrder } from '@lumiris/api-client/react';
 import { Button } from '@lumiris/ui/components/button';
 import {
@@ -21,6 +21,8 @@ import { toast } from '@lumiris/ui/components/sonner';
 import { formatPriceCents } from '@lumiris/utils';
 
 import { refundableCents, parseRefundCents } from '../models/refund-model';
+import { forgetRefundOperation, readRefundOperation, rememberRefundOperation } from '../models/refund-operation';
+import { useAuthStore } from '@/lib/auth-store';
 
 // Prépare un remboursement dans le plafond renvoyé par la commande.
 export function RefundDialog({
@@ -36,15 +38,33 @@ export function RefundDialog({
     const [mode, setMode] = useState<'full' | 'partial'>('full');
     const [amountEuros, setAmountEuros] = useState('');
     const [reason, setReason] = useState('');
+    const userId = useAuthStore((s) => s.userId);
+    const [operation, setOperation] = useState<RefundInput | null>(null);
+    const [storageError, setStorageError] = useState(false);
     const refundMutation = useRefundOrder();
 
     useEffect(() => {
         if (open) {
+            let saved: RefundInput | null;
+            try {
+                saved = userId ? readRefundOperation(userId, order.id) : null;
+                setStorageError(false);
+            } catch {
+                setStorageError(true);
+                return;
+            }
+            setOperation(saved);
+            if (saved) {
+                setMode(saved.amountCents === undefined ? 'full' : 'partial');
+                setAmountEuros(((saved.amountCents ?? maxCents) / 100).toFixed(2));
+                setReason(saved.reason ?? '');
+                return;
+            }
             setMode('full');
             setAmountEuros((maxCents / 100).toFixed(2));
             setReason('');
         }
-    }, [open, maxCents]);
+    }, [open, maxCents, userId, order.id]);
 
     const partialCents = parseRefundCents(amountEuros);
     const partialValid = partialCents !== null && partialCents > 0 && partialCents <= maxCents;
@@ -53,23 +73,35 @@ export function RefundDialog({
     // Envoie la saisie validée avec les contrats API existants.
     const onSubmit = (event: React.SyntheticEvent) => {
         event.preventDefault();
-        if (!valid || refundMutation.isPending) return;
+        if ((!valid && !operation) || !userId || storageError || refundMutation.isPending) return;
+        const input: RefundInput = operation ?? {
+            operationId: crypto.randomUUID(),
+            amountCents: mode === 'partial' ? (partialCents ?? undefined) : undefined,
+            reason: reason.trim() || undefined,
+        };
+        try {
+            rememberRefundOperation(userId, order.id, input);
+        } catch {
+            setStorageError(true);
+            return;
+        }
+        setOperation(input);
         refundMutation.mutate(
             {
                 orderId: order.id,
-                input: {
-                    amountCents: mode === 'partial' ? (partialCents ?? undefined) : undefined,
-                    reason: reason.trim() || undefined,
-                },
+                input,
             },
             {
                 onSuccess: () => {
+                    forgetRefundOperation(userId, order.id);
+                    setOperation(null);
                     toast.success('Remboursement émis', {
                         description: 'L’acheteur est notifié ; les fonds repartent sur son moyen de paiement.',
                     });
                     onOpenChange(false);
                 },
-                onError: (e) => toast.error(e.message || 'Le remboursement a échoué.'),
+                onError: () =>
+                    toast.error('Réponse non confirmée. Reprenez la même opération pour vérifier son résultat.'),
             },
         );
     };
@@ -87,7 +119,21 @@ export function RefundDialog({
                     </DialogHeader>
 
                     <div className="space-y-4 py-4">
-                        <RadioGroup value={mode} onValueChange={(v) => setMode(v as 'full' | 'partial')}>
+                        {storageError ? (
+                            <p role="alert">
+                                Impossible de conserver cette opération. Aucun nouvel envoi ne sera effectué.
+                            </p>
+                        ) : null}
+                        {operation ? (
+                            <p role="status">
+                                Une opération attend confirmation. La reprise conserve son montant et son identifiant.
+                            </p>
+                        ) : null}
+                        <RadioGroup
+                            disabled={Boolean(operation)}
+                            value={mode}
+                            onValueChange={(v) => setMode(v as 'full' | 'partial')}
+                        >
                             <div className="flex items-center gap-2">
                                 <RadioGroupItem value="full" id="refund-full" />
                                 <Label htmlFor="refund-full" className="font-normal">
@@ -109,6 +155,7 @@ export function RefundDialog({
                                     id="refund-amount"
                                     inputMode="decimal"
                                     value={amountEuros}
+                                    disabled={Boolean(operation)}
                                     onChange={(e) => setAmountEuros(e.target.value)}
                                 />
                                 {!partialValid && amountEuros !== '' ? (
@@ -126,6 +173,7 @@ export function RefundDialog({
                                 id="refund-reason"
                                 rows={3}
                                 value={reason}
+                                disabled={Boolean(operation)}
                                 onChange={(e) => setReason(e.target.value)}
                                 placeholder="Pièce retournée en bon état, geste commercial…"
                             />
@@ -136,13 +184,17 @@ export function RefundDialog({
                         <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
                             Annuler
                         </Button>
-                        <Button type="submit" variant="destructive" disabled={!valid || refundMutation.isPending}>
+                        <Button
+                            type="submit"
+                            variant="destructive"
+                            disabled={(!valid && !operation) || !userId || storageError || refundMutation.isPending}
+                        >
                             {refundMutation.isPending ? (
                                 <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
                             ) : (
                                 <Undo2 className="mr-1.5 h-4 w-4" />
                             )}
-                            Rembourser
+                            {operation ? 'Reprendre le remboursement' : 'Rembourser'}
                         </Button>
                     </DialogFooter>
                 </form>

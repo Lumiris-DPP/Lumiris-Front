@@ -1,7 +1,7 @@
 import { strict as assert } from 'node:assert';
 import { test } from 'node:test';
 import type { SellerOrder } from '@lumiris/api-client';
-import { groupByTab, heldOrderCents } from './orders-model';
+import { groupByTab, heldOrderCents, orderFundsText } from './orders-model';
 import { parseRefundCents, refundableCents } from './refund-model';
 
 const order: SellerOrder = {
@@ -53,5 +53,19 @@ test('la saisie exige des centimes exacts et refuse les formats accidentels de N
     assert.equal(parseRefundCents('0'), 0);
     for (const value of ['', '1.005', '1e2', '0x10', '-1', 'Infinity', '12,3,4', '999999999999999999']) {
         assert.equal(parseRefundCents(value), null);
+    }
+});
+
+test('le texte des fonds respecte annulation, remboursement partiel/total et versement antérieur', () => {
+    for (const status of ['CANCELLED', 'REFUNDED'] as const) {
+        assert.match(orderFundsText({ ...order, status }), /Aucun versement futur/);
+        for (const released of [false, true]) {
+            const partial = orderFundsText({ ...order, status, released, refundedCents: 200 });
+            const full = orderFundsText({ ...order, status, released, refundedCents: 1200 });
+            assert.match(partial, /partiellement remboursé/);
+            assert.match(full, /intégralement remboursé/);
+            assert.doesNotMatch(partial + full, /partent automatiquement|Fonds retenus/);
+            assert.match(partial, released ? /versement initial/ : /Aucun versement effectué/);
+        }
     }
 });
