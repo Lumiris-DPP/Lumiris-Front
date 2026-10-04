@@ -19,10 +19,9 @@ export function checkoutContextKey(context: CheckoutContext): string {
     return `${context.buyerId}#${lines}#${address}`;
 }
 
-// Extrait l’identifiant de paiement du secret client.
-export function paymentIntentIdOf(clientSecret: string): string {
-    const end = clientSecret.indexOf('_secret_');
-    return end > 0 ? clientSecret.slice(0, end) : clientSecret;
+// Extrait l’identifiant de paiement du secret client, sans jamais renvoyer le secret.
+export function paymentIntentIdOf(clientSecret: string): string | null {
+    return /^(pi_[A-Za-z0-9]+)_secret_/.exec(clientSecret)?.[1] ?? null;
 }
 
 interface CheckoutContextInput {
