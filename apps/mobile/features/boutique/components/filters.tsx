@@ -27,6 +27,7 @@ interface BoutiqueFiltersProps {
     materialOptions: readonly string[];
 }
 
+// Affiche la recherche et l’accès aux filtres du catalogue.
 export function BoutiqueFilters({
     state,
     onChange,
@@ -105,6 +106,7 @@ interface SheetProps extends BoutiqueFiltersProps {
     onOpenChange: (open: boolean) => void;
 }
 
+// Affiche les filtres détaillés du catalogue.
 function BoutiqueFilterSheet({
     open,
     onOpenChange,
@@ -225,6 +227,7 @@ function BoutiqueFilterSheet({
     );
 }
 
+// Regroupe les contrôles d’un filtre sous un libellé.
 function FilterGroup({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <fieldset className="flex flex-col gap-3">
@@ -236,6 +239,7 @@ function FilterGroup({ label, children }: { label: string; children: React.React
     );
 }
 
+// Transmet la recherche après une courte pause de saisie.
 function SearchField({ value, onChange }: { value: string; onChange: (next: string) => void }) {
     const [draft, setDraft] = useState(value);
 

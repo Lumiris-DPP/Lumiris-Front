@@ -14,6 +14,7 @@ import {
     variantRowsFrom,
 } from './product-payload';
 
+// Prépare un produit pour les tests.
 function productFixture() {
     return {
         id: 'product',
@@ -53,6 +54,7 @@ function productFixture() {
     };
 }
 
+// Prépare une saisie de conversion pour les tests.
 function conversionFixture() {
     return {
         priceEuros: '159,99',

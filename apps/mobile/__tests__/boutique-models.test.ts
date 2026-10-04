@@ -18,6 +18,7 @@ import {
     stockHintOf,
 } from '@/features/boutique/models/purchase-state';
 
+// Prépare un produit pour les tests.
 function product(overrides: Partial<ProductDto> = {}): ProductDto {
     return {
         id: 'piece',

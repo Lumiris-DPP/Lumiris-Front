@@ -13,6 +13,7 @@ import { Check, CircleDot, PackageCheck, Truck } from 'lucide-react';
 
 const STEP_ICON = [CircleDot, Truck, PackageCheck, Check] as const;
 
+// Affiche la progression de la commande selon son statut.
 export function TrackingSteps({ status }: { status: OrderStatus }) {
     const current = trackingStepIndex(status);
     if (current < 0) {
@@ -70,6 +71,7 @@ const ACTOR_LABEL: Record<OrderEvent['actorType'], string> = {
     SYSTEM: 'Automatique',
 };
 
+// Affiche les évènements de la commande.
 export function OrderTimeline({ events }: { events: readonly OrderEvent[] }) {
     if (events.length === 0) {
         return <p className="text-xs text-muted-foreground">Aucun évènement pour l’instant.</p>;
@@ -96,6 +98,7 @@ export function OrderTimeline({ events }: { events: readonly OrderEvent[] }) {
     );
 }
 
+// Affiche les pièces jointes d’un évènement.
 function EventAttachments({ event }: { event: OrderEvent }) {
     const attachments = event.attachments ?? [];
     if (attachments.length === 0) {

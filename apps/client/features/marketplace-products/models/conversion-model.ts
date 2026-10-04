@@ -16,6 +16,7 @@ interface ConversionDraft {
     photoUrl: string;
 }
 
+// Vérifie la saisie et prépare le produit issu d’un passeport.
 export function convertedProductPayload(draft: ConversionDraft): ConvertDppRequest {
     const priceCents = requireEuros(draft.priceEuros, 'Prix');
     if (priceCents < MIN_PUBLISHED_PRICE_CENTS) throw new Error('Un produit publié doit coûter au moins 0,50 €.');

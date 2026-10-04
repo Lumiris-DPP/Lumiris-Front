@@ -1,5 +1,6 @@
 import type { OrderGroup } from '@lumiris/api-client';
 
+// Calcule les remboursements, le reste à charge et la confirmation du paiement.
 export function invoiceAmounts(group: OrderGroup) {
     const refundedCents = group.lines.reduce((sum, line) => sum + (line.refundedCents ?? 0), 0);
     const paymentConfirmed =

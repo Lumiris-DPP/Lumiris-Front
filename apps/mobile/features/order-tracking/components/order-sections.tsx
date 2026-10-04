@@ -23,6 +23,7 @@ import { GlassCard } from '@/lib/motion/index';
 import { formatDayMonthFr } from '@lumiris/utils';
 import type { SheetKind } from '../models/tracking-model';
 
+// Affiche les actions autorisées pour l’acheteur.
 export function BuyerActions({
     detail,
     submitting,
@@ -111,6 +112,7 @@ export function BuyerActions({
     );
 }
 
+// Affiche les consignes de retour de l’atelier.
 export function ReturnInstructions({ detail }: { detail: OrderDetail }) {
     const { order } = detail;
     const approved = order.status === 'RETURN_APPROVED';
@@ -151,6 +153,7 @@ export function ReturnInstructions({ detail }: { detail: OrderDetail }) {
     );
 }
 
+// Affiche la date d’expédition prévue par l’atelier.
 export function PreparationCard({ shipDueAt }: { shipDueAt: string }) {
     return (
         <GlassCard className="p-4" intensity="subtle">
@@ -168,6 +171,7 @@ export function PreparationCard({ shipDueAt }: { shipDueAt: string }) {
     );
 }
 
+// Affiche le suivi du colis et ses dernières dates.
 export function TrackingCard({ detail }: { detail: OrderDetail }) {
     const { order } = detail;
     return (
@@ -211,6 +215,7 @@ export function TrackingCard({ detail }: { detail: OrderDetail }) {
     );
 }
 
+// Affiche le litige en cours et son état.
 export function DisputeCard({ detail }: { detail: OrderDetail }) {
     return (
         <div className="rounded-2xl border border-lumiris-amber/30 bg-lumiris-amber/10 p-4">
@@ -228,6 +233,7 @@ export function DisputeCard({ detail }: { detail: OrderDetail }) {
     );
 }
 
+// Affiche les montants payés et remboursés de la commande.
 export function AmountsCard({ detail }: { detail: OrderDetail }) {
     const { order } = detail;
     const shipping = order.shippingCents ?? 0;
@@ -272,6 +278,7 @@ export function AmountsCard({ detail }: { detail: OrderDetail }) {
     );
 }
 
+// Affiche l’adresse de livraison de l’acheteur.
 export function AddressCard({ detail }: { detail: OrderDetail }) {
     const shipTo = detail.shipTo;
     if (!shipTo) return null;

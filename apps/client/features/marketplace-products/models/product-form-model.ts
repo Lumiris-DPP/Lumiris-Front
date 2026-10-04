@@ -31,6 +31,7 @@ export interface ProductFormState {
     status: MarketplaceProductStatus;
 }
 
+// Prépare le formulaire à partir du produit existant.
 export function initialState(product?: MarketplaceItem): ProductFormState {
     return {
         name: product?.name ?? '',
@@ -52,6 +53,7 @@ export function initialState(product?: MarketplaceItem): ProductFormState {
     };
 }
 
+// Vérifie le formulaire et prépare la modification du produit.
 export function editedProductPayload(form: ProductFormState, currency = 'EUR'): ProductPayload {
     if (!form.name.trim()) throw new Error('Le nom du produit est requis.');
     const priceCents = requireEuros(form.priceEuros, 'Prix');

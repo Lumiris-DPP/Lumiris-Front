@@ -24,6 +24,7 @@ import { REFUND_REASON_MAX_LENGTH, refundFailureOf, refundableCents, parseRefund
 import { forgetRefundOperation, readRefundOperation, rememberRefundOperation } from '../models/refund-operation';
 import { useAuthStore } from '@/lib/auth-store';
 
+// Gère un remboursement avec reprise de l’intention persistée.
 export function RefundDialog({
     order,
     open,
@@ -70,6 +71,7 @@ export function RefundDialog({
     const partialValid = partialCents !== null && partialCents > 0 && partialCents <= maxCents;
     const valid = order.canRefund && maxCents > 0 && (mode === 'full' || partialValid);
 
+    // Envoie ou reprend le remboursement avec la même intention persistée.
     const onSubmit = (event: React.SyntheticEvent) => {
         event.preventDefault();
         if ((!valid && !operation) || !userId || storageError || refundMutation.isPending) return;

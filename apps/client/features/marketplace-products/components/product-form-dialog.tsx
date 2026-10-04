@@ -27,6 +27,7 @@ interface ProductFormDialogProps {
     product?: MarketplaceItem;
 }
 
+// Affiche le formulaire de modification d’un produit.
 export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDialogProps) {
     const { form, set, dpps, pending, sizes, onSubmit, error } = useProductForm(open, onOpenChange, product);
 
@@ -217,6 +218,7 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
     );
 }
 
+// Affiche un champ avec son libellé.
 function Field({ label, htmlFor, children }: { label: string; htmlFor: string; children: ReactNode }) {
     return (
         <div className="grid gap-1.5">

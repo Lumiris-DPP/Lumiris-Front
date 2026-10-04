@@ -8,6 +8,7 @@ import { formatDateFr, formatPriceCents } from '@lumiris/utils';
 import { OrderStatusBadge } from './status-badge';
 import { orderFundsLabel } from '../models/orders-model';
 
+// Affiche les commandes et leurs montants dans un tableau.
 export function OrdersTable({
     orders,
     onSelect,

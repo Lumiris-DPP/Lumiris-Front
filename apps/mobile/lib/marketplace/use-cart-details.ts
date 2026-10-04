@@ -7,6 +7,7 @@ import { buildCartDetails, purchasesToSettle, type CartDetails, type CartLine, t
 import { forgetPurchase, pendingPurchaseIds, resolveStoredCartLines, settlePurchase, useCart } from './cart-storage';
 import { toMarketplaceItem } from './product';
 
+// Charge les produits du panier et expose ses montants et problèmes.
 export function useCartDetails(): CartDetails & { retry: () => void } {
     const lines = useCart();
     const productIds = useMemo(() => lines.map((line) => line.productId), [lines]);
@@ -28,6 +29,7 @@ export function useCartDetails(): CartDetails & { retry: () => void } {
     );
 }
 
+// Retire les achats confirmés et oublie les paiements abandonnés.
 function useSettlePaidPurchases(lines: readonly CartLine[]): void {
     const { isAuthenticated } = useUser();
     const awaiting = useMemo(() => lines.length > 0 && pendingPurchaseIds().length > 0, [lines]);

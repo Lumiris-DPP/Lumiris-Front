@@ -40,6 +40,7 @@ const EMPTY_COPY: Record<SellerOrderTab, { title: string; description: string }>
     },
 };
 
+// Affiche les commandes de l’atelier par onglet.
 export function OrdersDashboard() {
     const token = useAuthStore((s) => s.token);
     const { data: orders = [], isLoading, isError, refetch } = useSellerOrders({ enabled: Boolean(token) });
@@ -122,6 +123,7 @@ export function OrdersDashboard() {
     );
 }
 
+// Affiche les comptes de commandes et les fonds retenus.
 function OrdersSummary({ orders }: { orders: readonly SellerOrder[] }) {
     const toShip = orders.filter((o) => o.canShip).length;
     const inTransit = orders.filter((o) => o.status === 'SHIPPED').length;

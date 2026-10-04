@@ -12,6 +12,7 @@ import {
 import { toast } from '@/lib/toast';
 import { canSubmitReason, type SheetKind } from '../models/tracking-model';
 
+// Charge le suivi et gère les actions permises sur la commande.
 export function useOrderTracking(orderId: string | null, isAuthenticated: boolean) {
     const query = useOrderDetail(orderId, { enabled: isAuthenticated && Boolean(orderId) });
     const [sheet, setSheet] = useState<SheetKind | null>(null);
@@ -27,6 +28,7 @@ export function useOrderTracking(orderId: string | null, isAuthenticated: boolea
         cancelOrder.isPending ||
         confirmDelivery.isPending;
 
+    // Envoie le motif pour l’action autorisée et choisie.
     function submitReason(reason: string, fileIds: string[]) {
         if (!orderId || !query.data || submitting || query.isError) return;
         if (!canSubmitReason(query.data.order, sheet)) {
@@ -35,6 +37,7 @@ export function useOrderTracking(orderId: string | null, isAuthenticated: boolea
         }
         const vars = { orderId, input: { reason, fileIds } };
 
+        // Prépare la confirmation qui ferme la feuille après succès.
         function done(message: string) {
             return () => {
                 toast(message);
@@ -42,6 +45,7 @@ export function useOrderTracking(orderId: string | null, isAuthenticated: boolea
             };
         }
 
+        // Affiche la raison de l’échec de l’action.
         function failed(error: Error) {
             toast(error.message || 'Action impossible pour le moment.');
         }
@@ -70,6 +74,7 @@ export function useOrderTracking(orderId: string | null, isAuthenticated: boolea
         }
     }
 
+    // Confirme la réception si le serveur l’autorise encore.
     function confirmReception() {
         if (!orderId || submitting || query.isError || !query.data?.order.canConfirmDelivery) return;
         confirmDelivery.mutate(

@@ -22,11 +22,13 @@ export interface VariantSelection {
 
 const LOW_STOCK_THRESHOLD = 3;
 
+// Prépare la sélection initiale des déclinaisons du produit.
 export function initialSelectionOf(item: MarketplaceItem): VariantSelection {
     const only = item.variants.length === 1 ? item.variants[0] : undefined;
     return { size: only?.sizeLabel?.trim() || null, color: only?.colorLabel?.trim() || null };
 }
 
+// Détermine si la sélection est complète et achetable.
 export function purchaseStateOf(item: MarketplaceItem, selection: VariantSelection): PurchaseState {
     const sizes = sizeOptionsOf(item);
     const colors = colorOptionsOf(item);
@@ -46,6 +48,7 @@ export const PURCHASE_CTA_LABEL = {
     unavailable: 'Indisponible',
 } satisfies Record<PurchaseState['kind'], string>;
 
+// Renvoie le message de stock adapté à la sélection.
 export function stockHintOf(state: PurchaseState): string | null {
     if (state.kind === 'sold-out') return 'Épuisé';
     if (state.kind === 'ready' && state.variant.stock <= LOW_STOCK_THRESHOLD) {
@@ -54,12 +57,14 @@ export function stockHintOf(state: PurchaseState): string | null {
     return null;
 }
 
+// Décrit les frais de livraison connus.
 export function shippingTermsOf(shippingCents: number | null): string {
     if (shippingCents === null) return 'Expédiée à domicile.';
     if (shippingCents === 0) return 'Offerte — expédiée à domicile.';
     return `${formatCents(shippingCents)} — expédiée à domicile.`;
 }
 
+// Résume les frais et le délai de préparation.
 export function deliverySummaryOf(item: MarketplaceItem): string {
     const shipping =
         item.shippingCents === null

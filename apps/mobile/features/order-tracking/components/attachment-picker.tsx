@@ -14,6 +14,7 @@ export interface PickedFile {
     previewUrl: string;
 }
 
+// Permet de choisir et d’envoyer les pièces jointes.
 export function AttachmentPicker({
     files,
     onChange,
@@ -54,6 +55,7 @@ export function AttachmentPicker({
         };
     }, []);
 
+    // Envoie les fichiers choisis et signale les erreurs.
     async function handleSelect(event: React.ChangeEvent<HTMLInputElement>) {
         if (uploading || disabled) return;
         const selected = [...(event.target.files ?? [])].slice(0, MAX_FILES - files.length);

@@ -10,6 +10,7 @@ import { removeFromCart, setCartQuantity } from '@/lib/marketplace/cart-storage'
 import { variantLabel } from '@/lib/marketplace/product';
 import { type CartItemDetail, type UnavailableLine } from '@/lib/marketplace/cart-model';
 
+// Signale les pièces dont la déclinaison reste à choisir.
 export function ChooseVariantNotice({ lines }: { lines: readonly UnavailableLine[] }) {
     return (
         <div className="mb-2 px-4">
@@ -33,6 +34,7 @@ export function ChooseVariantNotice({ lines }: { lines: readonly UnavailableLine
     );
 }
 
+// Propose de recharger le panier en conservant ses pièces.
 export function LoadErrorNotice({ onRetry }: { onRetry: () => void }) {
     return (
         <div className="px-4">
@@ -56,6 +58,7 @@ export function LoadErrorNotice({ onRetry }: { onRetry: () => void }) {
     );
 }
 
+// Signale les pièces retirées de la vente et permet leur retrait.
 export function UnavailableNotice({ lines }: { lines: readonly UnavailableLine[] }) {
     return (
         <div className="mb-2 px-4">
@@ -82,6 +85,7 @@ export function UnavailableNotice({ lines }: { lines: readonly UnavailableLine[]
     );
 }
 
+// Signale le stock insuffisant et permet d’ajuster le panier.
 export function StockNotice({ items }: { items: readonly CartItemDetail[] }) {
     return (
         <div className="mb-2 px-4">
@@ -122,6 +126,7 @@ export function StockNotice({ items }: { items: readonly CartItemDetail[] }) {
     );
 }
 
+// Affiche le panier vide et le lien vers la boutique.
 export function EmptyCart() {
     return (
         <motion.div

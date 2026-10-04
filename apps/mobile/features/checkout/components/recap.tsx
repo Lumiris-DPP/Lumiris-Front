@@ -8,6 +8,7 @@ import { formatCents, installmentLabel, shippingCostLabel } from '@/lib/marketpl
 import { preparationLabel, variantLabel } from '@/lib/marketplace/product';
 import { type CartItemDetail, type CartShipment } from '@/lib/marketplace/cart-model';
 
+// Affiche les articles et les montants du paiement.
 export function CheckoutRecap({
     shipments,
     subtotalCents,
@@ -66,6 +67,7 @@ export function CheckoutRecap({
     );
 }
 
+// Affiche les articles et frais d’un envoi par atelier.
 function ShipmentRecap({
     shipment,
     parcelNumber,
@@ -104,6 +106,7 @@ function ShipmentRecap({
     );
 }
 
+// Affiche un article, sa déclinaison et son montant.
 function ShipmentRecapLine({ item }: { item: CartItemDetail }) {
     const { product, variant, quantity } = item;
     const details = joinNonEmpty([variantLabel(variant), quantity > 1 ? `×${quantity}` : null]);
@@ -135,6 +138,7 @@ function ShipmentRecapLine({ item }: { item: CartItemDetail }) {
     );
 }
 
+// Affiche les conditions de retour et les garanties des pièces.
 function Reassurance({ shipments }: { shipments: readonly CartShipment[] }) {
     const policies = distinctProductTexts(shipments, (product) => product.returnPolicy);
     const warranties = distinctProductTexts(shipments, (product) => product.warrantyDescription);
@@ -158,6 +162,7 @@ function Reassurance({ shipments }: { shipments: readonly CartShipment[] }) {
     );
 }
 
+// Réunit les textes renseignés des produits sans doublon.
 function distinctProductTexts(
     shipments: readonly CartShipment[],
     pick: (product: CartItemDetail['product']) => string | null | undefined,
@@ -166,6 +171,7 @@ function distinctProductTexts(
     return [...new Set(texts.filter((text): text is string => Boolean(text)))];
 }
 
+// Résume le délai de préparation le plus long de l’envoi.
 function shipmentPreparationLabel(shipment: CartShipment): string | null {
     return preparationLabel(Math.max(0, ...shipment.items.map((item) => item.product.preparationDays)));
 }

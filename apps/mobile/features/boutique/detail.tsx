@@ -19,6 +19,7 @@ import { VariantPicker } from './components/variant-picker';
 
 const viewed = new Set<string>();
 
+// Charge la pièce choisie et affiche son détail.
 export function BoutiqueDetail({ productId }: { productId: string }) {
     const router = useRouter();
     const client = useApiClient();
@@ -54,6 +55,7 @@ export function BoutiqueDetail({ productId }: { productId: string }) {
     return <DetailBody key={product.id} product={product} onBack={() => router.back()} />;
 }
 
+// Affiche une pièce introuvable ou une erreur avec relance.
 function ProductUnavailable({ notFound, onRetry }: { notFound: boolean; onRetry: () => void }) {
     return (
         <div
@@ -87,6 +89,7 @@ function ProductUnavailable({ notFound, onRetry }: { notFound: boolean; onRetry:
     );
 }
 
+// Affiche la pièce et gère sa sélection pour l’achat.
 function DetailBody({ product, onBack }: { product: MarketplaceItem; onBack: () => void }) {
     const purchase = useProductPurchase(product);
     const [guideOpen, setGuideOpen] = useState(false);
@@ -159,6 +162,7 @@ function DetailBody({ product, onBack }: { product: MarketplaceItem; onBack: () 
     );
 }
 
+// Affiche les caractéristiques connues de la pièce.
 function ProductFacts({ product }: { product: MarketplaceItem }) {
     return (
         <dl className="grid grid-cols-2 gap-3 rounded-2xl border border-border/60 bg-card p-4 text-sm">
@@ -199,6 +203,7 @@ function ProductFacts({ product }: { product: MarketplaceItem }) {
     );
 }
 
+// Affiche les conditions de livraison, de retour et de garantie.
 function DeliveryTerms({ product }: { product: MarketplaceItem }) {
     return (
         <section
@@ -231,10 +236,12 @@ function DeliveryTerms({ product }: { product: MarketplaceItem }) {
     );
 }
 
+// Formate la date en jour et mois français.
 function formatShortDate(value: string): string {
     return new Date(value).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
 }
 
+// Affiche une information du produit avec son icône.
 function InfoRow({ Icon, label, children }: { Icon: typeof Truck; label: string; children: ReactNode }) {
     return (
         <div className="flex items-start gap-3 p-4">
@@ -255,6 +262,7 @@ const IRIS_GRADE_LABEL_FR: Record<NonNullable<MarketplaceItem['irisGrade']>, str
     E: 'opaque',
 };
 
+// Explique la note Iris de la pièce.
 function IrisGradeExplainer({ grade }: { grade: NonNullable<MarketplaceItem['irisGrade']> }) {
     return (
         <section aria-label="Comprendre le score Iris" className="rounded-2xl border border-border/60 bg-card p-4">

@@ -11,6 +11,7 @@ import { confirmationView } from '../models/confirmation-view';
 const POLL_INTERVAL_MS = 1500;
 const POLL_MAX_MS = 30_000;
 
+// Suit la confirmation du paiement avec une attente bornée.
 export function useOrderConfirmation(routeId: string, piFromQuery: string | null) {
     const { user, isAuthenticated } = useUser();
 

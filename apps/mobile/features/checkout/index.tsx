@@ -30,6 +30,7 @@ import { resetCheckoutIntents, useCheckoutIntent } from './hooks/use-checkout-in
 
 type Step = 'address' | 'payment';
 
+// Gère les étapes du paiement selon le panier et la connexion.
 export function Checkout() {
     const router = useRouter();
     const { user, isAuthenticated } = useUser();

@@ -26,6 +26,7 @@ export interface ConfirmationInput {
     timedOut: boolean;
 }
 
+// Choisit l’état de confirmation sans confondre attente et échec.
 export function confirmationView(input: ConfirmationInput): ConfirmationView {
     if (!input.isAuthenticated) return 'signed-out';
     if (input.group) {
@@ -37,6 +38,7 @@ export function confirmationView(input: ConfirmationInput): ConfirmationView {
     return input.timedOut ? 'error' : 'resolving';
 }
 
+// Nomme le total selon l’état du paiement.
 export function confirmationTotalLabel(status: OrderStatus): string {
     if (status === 'PENDING') return 'Total à confirmer';
     if (status === 'CANCELLED') return 'Total de la commande annulée';
@@ -44,6 +46,7 @@ export function confirmationTotalLabel(status: OrderStatus): string {
     return 'Total payé';
 }
 
+// Résume les remboursements et la clôture des lignes de commande.
 export function confirmationRefundFacts(group: Pick<OrderGroup, 'lines' | 'amountChargedCents'>) {
     const refundedCents = group.lines.reduce((sum, line) => sum + (line.refundedCents ?? 0), 0);
     const closed =

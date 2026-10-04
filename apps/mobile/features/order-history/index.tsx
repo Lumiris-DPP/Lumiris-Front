@@ -15,6 +15,7 @@ import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
 
 const ORDERS_RETURN = encodeURIComponent('/me/orders');
 
+// Affiche les commandes de l’acheteur hors paiements en attente.
 export function OrderHistory() {
     const { isAuthenticated } = useUser();
     const { data: orders = [], isLoading, isError, refetch } = useMyOrders({ enabled: isAuthenticated });
@@ -106,6 +107,7 @@ export function OrderHistory() {
     );
 }
 
+// Affiche le résumé d’une commande et son lien de suivi.
 function OrderRow({ order }: { order: OrderResponse }) {
     const date = formatLongDateFr(order.createdAt);
     const disputed = order.disputeStatus === 'OPEN';

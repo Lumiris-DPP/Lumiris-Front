@@ -14,6 +14,7 @@ import { createIntentCache } from '../models/intent-cache';
 
 const intents = createIntentCache<PaymentIntentResponse>();
 
+// Vide le cache des intentions de paiement.
 export function resetCheckoutIntents(): void {
     intents.clear();
 }
@@ -26,6 +27,7 @@ interface IntentState {
     error: unknown;
 }
 
+// Charge l’intention du contexte courant et ignore les réponses périmées.
 export function useCheckoutIntent(context: CheckoutContext | null): {
     intent: PaymentIntentResponse | null;
     error: unknown;

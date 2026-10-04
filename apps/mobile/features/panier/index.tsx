@@ -15,6 +15,7 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 
 import { useCartDetails } from '@/lib/marketplace/use-cart-details';
 
+// Affiche le panier et les problèmes à résoudre avant le paiement.
 export function Panier() {
     const router = useRouter();
     const {

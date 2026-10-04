@@ -63,10 +63,12 @@ export interface CartDetails {
     hasBlockingIssue: boolean;
 }
 
+// Identifie une ligne par produit et déclinaison.
 export function cartLineKey(productId: string, variantId: string | null): string {
     return `${productId}:${variantId ?? ''}`;
 }
 
+// Calcule les lignes, les envois et les problèmes du panier.
 export function buildCartDetails(
     lines: readonly CartLine[],
     products: readonly MarketplaceItem[] | undefined,
@@ -127,6 +129,7 @@ export function buildCartDetails(
     };
 }
 
+// Résout les déclinaisons uniques et réunit les lignes correspondantes.
 export function resolveCartLines<T extends PurchasedLine>(
     lines: readonly T[],
     products: readonly MarketplaceItem[],
@@ -142,6 +145,7 @@ export function resolveCartLines<T extends PurchasedLine>(
     return [...merged.values()];
 }
 
+// Retire du panier uniquement les quantités achetées.
 export function subtractPurchase(lines: readonly CartLine[], purchased: readonly PurchasedLine[]): CartLine[] {
     const paid = new Map<string, number>();
     for (const line of purchased) {
@@ -158,10 +162,12 @@ export function subtractPurchase(lines: readonly CartLine[], purchased: readonly
     return remaining;
 }
 
+// Reconnaît les statuts correspondant à une commande payée.
 export function isPaidOrderStatus(status: OrderStatus): boolean {
     return status !== 'PENDING' && status !== 'CANCELLED' && status !== 'REFUNDED';
 }
 
+// Classe les achats confirmés ou abandonnés sans traiter ceux en attente.
 export function purchasesToSettle(
     paymentIntentIds: readonly string[],
     orders: ReadonlyArray<{ paymentIntentId?: string | null; status: OrderStatus }>,
@@ -176,11 +182,13 @@ export function purchasesToSettle(
     return { paid, dropped };
 }
 
+// Trouve la déclinaison choisie ou l’unique déclinaison du produit.
 function resolveVariant(product: MarketplaceItem, variantId: string | null): MarketplaceVariant | null {
     if (variantId) return product.variants.find((v) => v.id === variantId) ?? null;
     return product.variants.length === 1 ? (product.variants[0] ?? null) : null;
 }
 
+// Regroupe les articles par atelier avec leurs frais de livraison.
 function groupByArtisan(items: readonly CartItemDetail[]): CartShipment[] {
     const byArtisan = new Map<string, CartShipment>();
     for (const item of items) {

@@ -1,3 +1,4 @@
+// Prépare le secret et l’apparence du formulaire Stripe.
 export function stripeOptions(clientSecret: string) {
     return {
         clientSecret,

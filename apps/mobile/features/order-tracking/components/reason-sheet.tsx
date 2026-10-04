@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@lumiris/ui/components/sheet';
 import { AttachmentPicker, type PickedFile } from './attachment-picker';
 
+// Permet de saisir un motif et ses pièces jointes.
 export function ReasonSheet({
     open,
     title,

@@ -15,6 +15,7 @@ import { CheckoutRecap } from './recap';
 const CHECKOUT_RETURN = encodeURIComponent('/checkout');
 type Step = 'address' | 'payment';
 
+// Affiche le chargement du paiement.
 export function CheckoutLoader({ label }: { label: string }) {
     return (
         <div className="flex h-full items-center justify-center gap-2 bg-background text-sm text-muted-foreground">
@@ -23,6 +24,7 @@ export function CheckoutLoader({ label }: { label: string }) {
     );
 }
 
+// Affiche le formulaire d’adresse et les montants du panier.
 export function AddressForm({
     savedAddress,
     shipments,
@@ -60,6 +62,7 @@ export function AddressForm({
     );
 }
 
+// Affiche l’étape de paiement et le bouton de retour.
 export function CheckoutHeader({ step, onBack }: { step: Step; onBack: () => void }) {
     return (
         <motion.header
@@ -84,6 +87,7 @@ export function CheckoutHeader({ step, onBack }: { step: Step; onBack: () => voi
     );
 }
 
+// Affiche l’étape actuelle du paiement.
 function StepDots({ active }: { active: number }) {
     return (
         <span className="flex items-center gap-1.5" aria-hidden>
@@ -99,6 +103,7 @@ function StepDots({ active }: { active: number }) {
     );
 }
 
+// Propose la connexion nécessaire pour payer.
 export function SignInGate({ onBack }: { onBack: () => void }) {
     return (
         <div className="flex h-full flex-col items-center justify-center gap-5 bg-background px-8 text-center">
@@ -138,6 +143,7 @@ export function SignInGate({ onBack }: { onBack: () => void }) {
     );
 }
 
+// Affiche un message bloquant et son action de reprise.
 export function CheckoutMessage({
     title,
     description,

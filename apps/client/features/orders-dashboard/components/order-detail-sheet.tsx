@@ -31,6 +31,7 @@ import { orderFundsText } from '../models/orders-model';
 import { readRefundOperation } from '../models/refund-operation';
 import { useAuthStore } from '@/lib/auth-store';
 
+// Affiche le détail d’une commande et ses dialogues d’action.
 export function OrderDetailSheet({ order, onClose }: { order: SellerOrder | null; onClose: () => void }) {
     const [shipOpen, setShipOpen] = useState(false);
     const [refundOpen, setRefundOpen] = useState(false);
@@ -109,6 +110,7 @@ export function OrderDetailSheet({ order, onClose }: { order: SellerOrder | null
     );
 }
 
+// Affiche les actions permises et la reprise d’un remboursement.
 function OrderActions({
     order,
     onShip,
@@ -184,6 +186,7 @@ function OrderActions({
     );
 }
 
+// Demande confirmation avant d’annuler la commande.
 function CancelOrderButton({ order }: { order: SellerOrder }) {
     const [open, setOpen] = useState(false);
     const cancelMutation = useCancelSellerOrder();
@@ -229,6 +232,7 @@ function CancelOrderButton({ order }: { order: SellerOrder }) {
     );
 }
 
+// Affiche les montants et l’état des fonds de la commande.
 function MoneySection({ order }: { order: SellerOrder }) {
     const currency = order.currency ?? 'EUR';
     const rows = [
@@ -269,6 +273,7 @@ function MoneySection({ order }: { order: SellerOrder }) {
     );
 }
 
+// Affiche l’adresse de livraison de la commande.
 function AddressSection({ order }: { order: SellerOrder }) {
     return (
         <section>
@@ -302,6 +307,7 @@ function AddressSection({ order }: { order: SellerOrder }) {
     );
 }
 
+// Affiche le transporteur et le suivi du colis.
 function TrackingSection({ order }: { order: SellerOrder }) {
     return (
         <section>
@@ -324,10 +330,12 @@ function TrackingSection({ order }: { order: SellerOrder }) {
     );
 }
 
+// Permet d’envoyer un message à l’acheteur.
 function MessageComposer({ orderId, disputeOpen }: { orderId: string; disputeOpen: boolean }) {
     const [message, setMessage] = useState('');
     const postMessage = usePostSellerMessage();
 
+    // Envoie le message saisi et signale le résultat.
     const send = () => {
         if (message.trim().length < 3 || postMessage.isPending) return;
         postMessage.mutate(
