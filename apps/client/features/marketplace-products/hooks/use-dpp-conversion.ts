@@ -14,8 +14,8 @@ export function useDppConversion(open: boolean, onOpenChange: (open: boolean) =>
     const { data: dpps = [], isLoading, error: dppsError } = useDppForms({ enabled: open });
     const convert = useConvertDppToProduct();
 
-    const { hasActiveSubscription } = useSubscription();
-    const sellBlocked = !hasActiveSubscription;
+    const { saleState } = useSubscription();
+    const sellBlocked = saleState !== 'active';
 
     const [dppFormId, setDppFormId] = useState('');
     const [priceEuros, setPriceEuros] = useState('');
