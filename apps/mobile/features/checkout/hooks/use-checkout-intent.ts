@@ -44,7 +44,8 @@ export function useCheckoutIntent(context: CheckoutContext | null): {
         let cancelled = false;
         request.then(
             (intent) => {
-                rememberPurchase(paymentIntentIdOf(intent.clientSecret), context.lines, context.buyerId);
+                const paymentIntentId = paymentIntentIdOf(intent.clientSecret);
+                if (paymentIntentId) rememberPurchase(paymentIntentId, context.lines, context.buyerId);
                 if (!cancelled) setState({ attempt, key, request, intent, error: null });
             },
             (error: unknown) => {

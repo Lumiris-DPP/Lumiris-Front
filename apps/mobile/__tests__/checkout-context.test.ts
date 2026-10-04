@@ -52,4 +52,9 @@ describe('paymentIntentIdOf', () => {
     it('lit l’identifiant du PaymentIntent dans son client secret', () => {
         expect(paymentIntentIdOf('pi_3Abc_secret_xyz')).toBe('pi_3Abc');
     });
+
+    it('ne renvoie jamais un secret client de forme inattendue', () => {
+        expect(paymentIntentIdOf('secret_sans_identifiant')).toBeNull();
+        expect(paymentIntentIdOf('_secret_xyz')).toBeNull();
+    });
 });
