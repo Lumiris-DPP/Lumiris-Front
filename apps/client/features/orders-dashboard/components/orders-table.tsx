@@ -6,7 +6,7 @@ import { Button } from '@lumiris/ui/components/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
 import { formatDateFr, formatPriceCents } from '@lumiris/utils';
 import { OrderStatusBadge } from './status-badge';
-import { orderFundsText } from '../models/orders-model';
+import { orderFundsLabel } from '../models/orders-model';
 
 // Une seule table pour les cinq onglets : ils décrivent le même objet à des moments différents,
 // pas cinq objets différents. Le détail et les actions vivent dans la feuille latérale.
@@ -64,11 +64,7 @@ export function OrdersTable({
                             <TableCell className="text-right tabular-nums">
                                 {formatPriceCents(order.netCents, order.currency ?? 'EUR')}
                                 <span className="block text-[11px] text-muted-foreground">
-                                    {order.status === 'REFUNDED' || order.status === 'CANCELLED' || order.refundedCents
-                                        ? orderFundsText(order).split('.')[0]
-                                        : order.released
-                                          ? 'versé'
-                                          : 'retenu'}
+                                    {orderFundsLabel(order)}
                                 </span>
                             </TableCell>
                             <TableCell className="text-muted-foreground">{formatDateFr(order.createdAt)}</TableCell>

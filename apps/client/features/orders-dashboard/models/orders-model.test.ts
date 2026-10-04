@@ -1,7 +1,7 @@
 import { strict as assert } from 'node:assert';
 import { test } from 'node:test';
 import type { SellerOrder } from '@lumiris/api-client';
-import { groupByTab, heldOrderCents, orderFundsText } from './orders-model';
+import { groupByTab, heldOrderCents, orderFundsLabel, orderFundsText } from './orders-model';
 import { parseRefundCents, refundableCents } from './refund-model';
 
 const order: SellerOrder = {
@@ -67,5 +67,19 @@ test('le texte des fonds respecte annulation, remboursement partiel/total et ver
             assert.doesNotMatch(partial + full, /partent automatiquement|Fonds retenus/);
             assert.match(partial, released ? /versement initial/ : /Aucun versement effectué/);
         }
+    }
+});
+
+test('la colonne des fonds a son libellé court, sans découper la phrase du détail', () => {
+    assert.equal(orderFundsLabel(order), 'retenu');
+    assert.equal(orderFundsLabel({ ...order, released: true }), 'versé');
+    assert.equal(orderFundsLabel({ ...order, status: 'CANCELLED' }), 'Commande clôturée');
+    assert.equal(orderFundsLabel({ ...order, status: 'PAID', refundedCents: 200 }), 'Acheteur partiellement remboursé');
+    assert.equal(
+        orderFundsLabel({ ...order, status: 'REFUNDED', refundedCents: 1200 }),
+        'Acheteur intégralement remboursé',
+    );
+    for (const variant of [{ status: 'CANCELLED' as const }, { refundedCents: 200 }, { refundedCents: 1200 }]) {
+        assert.ok(orderFundsText({ ...order, ...variant }).startsWith(`${orderFundsLabel({ ...order, ...variant })}.`));
     }
 });
