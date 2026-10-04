@@ -178,6 +178,7 @@ export function RefundDialog({
                             <Label htmlFor="refund-reason">Motif (visible par l’acheteur)</Label>
                             <Textarea
                                 id="refund-reason"
+                                className="field-sizing-fixed"
                                 rows={3}
                                 value={reason}
                                 maxLength={REFUND_REASON_MAX_LENGTH}

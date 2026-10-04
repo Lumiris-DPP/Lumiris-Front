@@ -1,6 +1,7 @@
 import { expect, test } from 'bun:test';
 import type { OrderResponse } from '@lumiris/api-client';
-import { canSubmitReason, formatDate, isOrderNotFound } from './tracking-model';
+import { formatDayMonthFr } from '@lumiris/utils';
+import { canSubmitReason, isOrderNotFound } from './tracking-model';
 
 const order: OrderResponse = {
     id: 'order-a',
@@ -29,5 +30,5 @@ test('seul un 404 signifie introuvable, pas une panne ou un refus de connexion',
         expect(isOrderNotFound(Object.assign(new Error(), { status }))).toBe(false);
     }
     expect(isOrderNotFound(null)).toBe(false);
-    expect(formatDate('invalide')).toBe('');
+    expect(formatDayMonthFr('invalide') ?? '').toBe('');
 });

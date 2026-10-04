@@ -9,17 +9,11 @@ import { ORDER_STATUS_LABEL_BUYER } from '@lumiris/api-client';
 import { useMyOrders } from '@lumiris/api-client/react';
 import { routes } from '@/lib/routes';
 import { useUser } from '@/lib/auth/use-user';
+import { formatLongDateFr } from '@lumiris/utils';
 import { formatCents } from '@/lib/marketplace';
 import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
 
 const ORDERS_RETURN = encodeURIComponent('/me/orders');
-
-function formatDate(iso: string | null | undefined): string | null {
-    if (!iso) return null;
-    const date = new Date(iso);
-    if (Number.isNaN(date.getTime())) return null;
-    return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
-}
 
 export function OrderHistory() {
     const { isAuthenticated } = useUser();
@@ -113,7 +107,7 @@ export function OrderHistory() {
 }
 
 function OrderRow({ order }: { order: OrderResponse }) {
-    const date = formatDate(order.createdAt);
+    const date = formatLongDateFr(order.createdAt);
     const disputed = order.disputeStatus === 'OPEN';
     const shipping = order.shippingCents ?? 0;
 

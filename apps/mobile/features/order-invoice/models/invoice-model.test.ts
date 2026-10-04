@@ -1,6 +1,7 @@
 import { expect, test } from 'bun:test';
 import type { OrderGroup, OrderResponse } from '@lumiris/api-client';
-import { formatInvoiceDate, invoiceAmounts } from './invoice-model';
+import { formatLongDateFr } from '@lumiris/utils';
+import { invoiceAmounts } from './invoice-model';
 
 const line: OrderResponse = {
     id: 'a',
@@ -47,7 +48,7 @@ test('une annulation sans facture ne prouve pas un paiement et une ligne pending
 });
 
 test('une date absente ne devient pas la date du jour', () => {
-    expect(formatInvoiceDate(null)).toBe('—');
-    expect(formatInvoiceDate('invalide')).toBe('—');
-    expect(formatInvoiceDate('2026-10-03T12:00:00Z')).toBe('3 octobre 2026');
+    expect(formatLongDateFr(null) ?? '—').toBe('—');
+    expect(formatLongDateFr('invalide') ?? '—').toBe('—');
+    expect(formatLongDateFr('2026-10-03T12:00:00Z') ?? '—').toBe('3 octobre 2026');
 });

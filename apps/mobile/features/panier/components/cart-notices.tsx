@@ -91,15 +91,18 @@ export function StockNotice({ items }: { items: readonly CartItemDetail[] }) {
                     Stock insuffisant
                 </p>
                 <ul className="mt-1 flex flex-col gap-0.5 text-xs text-muted-foreground">
-                    {items.map((it) => (
-                        <li key={`${it.product.id}:${it.variant.id}`}>
-                            {it.product.name}
-                            {variantLabel(it.variant) ? ` (${variantLabel(it.variant)})` : ''} —{' '}
-                            {it.availableQuantity === 0
-                                ? 'épuisée'
-                                : `plus que ${it.availableQuantity} disponible${it.availableQuantity > 1 ? 's' : ''}`}
-                        </li>
-                    ))}
+                    {items.map((it) => {
+                        const label = variantLabel(it.variant);
+                        return (
+                            <li key={`${it.product.id}:${it.variant.id}`}>
+                                {it.product.name}
+                                {label ? ` (${label})` : ''} —{' '}
+                                {it.availableQuantity === 0
+                                    ? 'épuisée'
+                                    : `plus que ${it.availableQuantity} disponible${it.availableQuantity > 1 ? 's' : ''}`}
+                            </li>
+                        );
+                    })}
                 </ul>
                 <button
                     type="button"

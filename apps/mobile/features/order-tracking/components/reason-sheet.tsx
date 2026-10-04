@@ -86,7 +86,6 @@ export function ReasonSheet({
                     </div>
                 ) : null}
 
-                {}
                 <textarea
                     aria-label={title}
                     disabled={pending}

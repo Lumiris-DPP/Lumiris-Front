@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { formatDayMonthTimeFr } from '@lumiris/utils';
 import type { OrderEvent, OrderStatus } from '@lumiris/api-client';
 import {
     BUYER_TRACKING_STEPS,
@@ -9,18 +10,6 @@ import {
     trackingStepIndex,
 } from '@lumiris/api-client';
 import { Check, CircleDot, PackageCheck, Truck } from 'lucide-react';
-
-function formatDateTime(iso?: string | null): string {
-    if (!iso) return '';
-    const date = new Date(iso);
-    if (Number.isNaN(date.getTime())) return '';
-    return new Intl.DateTimeFormat('fr-FR', {
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-    }).format(date);
-}
 
 const STEP_ICON = [CircleDot, Truck, PackageCheck, Check] as const;
 
@@ -97,7 +86,7 @@ export function OrderTimeline({ events }: { events: readonly OrderEvent[] }) {
                     />
                     <p className="text-sm font-medium text-foreground">{ORDER_EVENT_LABEL[event.type]}</p>
                     <p className="text-[11px] text-muted-foreground">
-                        {ACTOR_LABEL[event.actorType]} · {formatDateTime(event.createdAt)}
+                        {ACTOR_LABEL[event.actorType]} · {formatDayMonthTimeFr(event.createdAt) ?? ''}
                     </p>
                     {event.message ? <p className="mt-0.5 text-xs text-foreground/80">{event.message}</p> : null}
                     <EventAttachments event={event} />

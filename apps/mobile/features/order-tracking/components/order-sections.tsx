@@ -20,7 +20,8 @@ import { TRACKING_STATUS_LABEL } from '@lumiris/api-client';
 import { routes } from '@/lib/routes';
 import { formatCents } from '@/lib/marketplace/money';
 import { GlassCard } from '@/lib/motion/index';
-import { formatDate, type SheetKind } from '../models/tracking-model';
+import { formatDayMonthFr } from '@lumiris/utils';
+import type { SheetKind } from '../models/tracking-model';
 
 export function BuyerActions({
     detail,
@@ -68,7 +69,6 @@ export function BuyerActions({
             ) : null}
 
             <div className="flex gap-2">
-                {}
                 <button
                     type="button"
                     disabled={submitting}
@@ -104,7 +104,7 @@ export function BuyerActions({
 
             {order.returnDeadline && order.canRequestReturn ? (
                 <p className="text-center text-[11px] text-muted-foreground">
-                    Retour possible jusqu’au {formatDate(order.returnDeadline)}.
+                    Retour possible jusqu’au {formatDayMonthFr(order.returnDeadline) ?? ''}.
                 </p>
             ) : null}
         </div>
@@ -159,8 +159,8 @@ export function PreparationCard({ shipDueAt }: { shipDueAt: string }) {
                 <div className="min-w-0">
                     <p className="text-sm font-semibold text-foreground">En préparation à l&apos;atelier</p>
                     <p className="mt-0.5 text-[13px] leading-relaxed text-muted-foreground">
-                        L&apos;atelier s&apos;est engagé à expédier ta pièce au plus tard le {formatDate(shipDueAt)}. Tu
-                        recevras le suivi dès que le colis part.
+                        L&apos;atelier s&apos;est engagé à expédier ta pièce au plus tard le{' '}
+                        {formatDayMonthFr(shipDueAt) ?? ''}. Tu recevras le suivi dès que le colis part.
                     </p>
                 </div>
             </div>
@@ -179,20 +179,22 @@ export function TrackingCard({ detail }: { detail: OrderDetail }) {
             <p className="mt-2 text-sm text-foreground">
                 {order.carrier} · <span className="font-mono text-xs">{order.trackingNumber}</span>
             </p>
-            {}
+
             {order.trackingStatus ? (
                 <p className="mt-1 inline-flex items-center gap-1.5 text-xs font-medium text-lumiris-cyan">
                     <Radio className="h-3.5 w-3.5" aria-hidden />
                     {order.trackingStatusLabel ?? TRACKING_STATUS_LABEL[order.trackingStatus]}
                     {order.trackingUpdatedAt ? (
                         <span className="font-normal text-muted-foreground">
-                            · {formatDate(order.trackingUpdatedAt)}
+                            · {formatDayMonthFr(order.trackingUpdatedAt) ?? ''}
                         </span>
                     ) : null}
                 </p>
             ) : null}
             {order.shippedAt ? (
-                <p className="text-[11px] text-muted-foreground">Expédié le {formatDate(order.shippedAt)}</p>
+                <p className="text-[11px] text-muted-foreground">
+                    Expédié le {formatDayMonthFr(order.shippedAt) ?? ''}
+                </p>
             ) : null}
             {order.trackingUrl ? (
                 <a

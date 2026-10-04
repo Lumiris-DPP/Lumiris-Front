@@ -150,7 +150,6 @@ export function PaymentStep({
                 </aside>
             </div>
 
-            {}
             <div className="fixed inset-x-0 bottom-0 z-nav mx-auto max-w-md border-t border-border/60 bg-background/90 px-4 pt-3 pb-6 backdrop-blur md:hidden">
                 {payAction}
             </div>
