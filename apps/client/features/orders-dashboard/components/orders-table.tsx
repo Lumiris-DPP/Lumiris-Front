@@ -65,7 +65,7 @@ export function OrdersTable({
                                 {formatPriceCents(order.netCents, order.currency ?? 'EUR')}
                                 <span className="block text-[11px] text-muted-foreground">
                                     {order.status === 'REFUNDED' || order.status === 'CANCELLED' || order.refundedCents
-                                        ? orderFundsText(order)
+                                        ? orderFundsText(order).split('.')[0]
                                         : order.released
                                           ? 'versé'
                                           : 'retenu'}
