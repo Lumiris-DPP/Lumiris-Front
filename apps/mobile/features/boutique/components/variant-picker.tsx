@@ -18,8 +18,7 @@ export function VariantPicker({ item, selection, onChange, onOpenSizeGuide }: Va
     const colors = colorOptionsOf(item);
     if (sizes.length === 0 && colors.length === 0) return null;
 
-    // Une combinaison inexistante est masquée plutôt qu'affichée désactivée ; une combinaison
-    // épuisée reste visible et barrée, parce que savoir que sa taille est partie est une information.
+    // Un axe incompatible libère l'autre sélection ; les ruptures restent visibles.
     const sizeVariant = (size: string) => findVariant(item, size, colors.length > 0 ? selection.color : null);
     /** Résout la déclinaison de la couleur dans la taille choisie. */
     const colorVariant = (color: string) => findVariant(item, sizes.length > 0 ? selection.size : null, color);
@@ -45,14 +44,23 @@ export function VariantPicker({ item, selection, onChange, onOpenSizeGuide }: Va
                     <div className="flex flex-wrap gap-2">
                         {sizes.map((size) => {
                             const variant = sizeVariant(size);
-                            if (selection.color && !variant) return null;
-                            const soldOut = variant != null && variant.stock === 0;
+                            const soldOut = item.variants
+                                .filter((v) => v.sizeLabel?.trim() === size)
+                                .every((v) => v.stock === 0);
                             return (
                                 <Chip
                                     key={size}
                                     selected={selection.size === size}
                                     disabled={soldOut}
-                                    onClick={() => onChange({ ...selection, size })}
+                                    onClick={() =>
+                                        onChange({
+                                            size,
+                                            color:
+                                                selection.color && (!variant || variant.stock === 0)
+                                                    ? null
+                                                    : selection.color,
+                                        })
+                                    }
                                 >
                                     {size}
                                     {soldOut ? <SoldOutMention /> : null}
@@ -71,15 +79,24 @@ export function VariantPicker({ item, selection, onChange, onOpenSizeGuide }: Va
                     <div className="flex flex-wrap gap-2">
                         {colors.map(({ label, hex }) => {
                             const variant = colorVariant(label);
-                            if (selection.size && !variant) return null;
-                            const soldOut = variant != null && variant.stock === 0;
+                            const soldOut = item.variants
+                                .filter((v) => v.colorLabel?.trim() === label)
+                                .every((v) => v.stock === 0);
                             return (
                                 <Chip
                                     key={label}
                                     selected={selection.color === label}
                                     disabled={soldOut}
                                     showCheck={!hex}
-                                    onClick={() => onChange({ ...selection, color: label })}
+                                    onClick={() =>
+                                        onChange({
+                                            size:
+                                                selection.size && (!variant || variant.stock === 0)
+                                                    ? null
+                                                    : selection.size,
+                                            color: label,
+                                        })
+                                    }
                                 >
                                     {hex ? (
                                         <span
