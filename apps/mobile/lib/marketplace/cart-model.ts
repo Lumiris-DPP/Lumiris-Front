@@ -95,6 +95,7 @@ export function buildCartDetails(
     products: readonly MarketplaceItem[] | undefined,
     loadState: CartLoadState,
 ): CartDetails {
+    lines = resolveCartLines(lines, products ?? []);
     const byId = new Map<string, MarketplaceItem>();
     for (const product of products ?? []) byId.set(product.id, product);
 
@@ -147,6 +148,22 @@ export function buildCartDetails(
         loadState,
         hasBlockingIssue: loadState !== 'ready' || unavailable.length > 0 || needsVariant.length > 0,
     };
+}
+
+// Résout les anciennes lignes univoques et fusionne leurs doublons exacts.
+export function resolveCartLines<T extends PurchasedLine>(
+    lines: readonly T[],
+    products: readonly MarketplaceItem[],
+): T[] {
+    const merged = new Map<string, T>();
+    for (const line of lines) {
+        const product = products.find((item) => item.id === line.productId);
+        const variantId = line.variantId ?? (product?.variants.length === 1 ? (product.variants[0]?.id ?? null) : null);
+        const key = cartLineKey(line.productId, variantId);
+        const previous = merged.get(key);
+        merged.set(key, { ...line, variantId, quantity: (previous?.quantity ?? 0) + line.quantity });
+    }
+    return [...merged.values()];
 }
 
 /**

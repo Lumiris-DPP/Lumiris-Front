@@ -7,7 +7,8 @@
 import { useSyncExternalStore } from 'react';
 import { readUser } from '../auth/storage';
 import { USER_KEYS, userScopedKey } from '../storage-keys';
-import { cartLineKey, subtractPurchase, type CartLine, type PurchasedLine } from './cart-model';
+import { cartLineKey, resolveCartLines, subtractPurchase, type CartLine, type PurchasedLine } from './cart-model';
+import type { MarketplaceItem } from './product';
 
 const EVENT = 'lumiris:cart-changed';
 const USER_CHANGED = 'lumiris:user-changed';
@@ -134,6 +135,18 @@ function readPurchases(): PendingPurchase[] {
         return Array.isArray(parsed) ? parsed.filter(isPendingPurchase) : [];
     } catch {
         return [];
+    }
+}
+
+// Migre les identités du panier et des paiements encore mémorisés.
+export function resolveStoredCartLines(products: readonly MarketplaceItem[]): void {
+    const current = read();
+    const next = resolveCartLines(current, products);
+    if (JSON.stringify(current) !== JSON.stringify(next)) write(next);
+    const purchases = readPurchases();
+    const resolved = purchases.map((purchase) => ({ ...purchase, lines: resolveCartLines(purchase.lines, products) }));
+    if (JSON.stringify(purchases) !== JSON.stringify(resolved)) {
+        window.localStorage.setItem(purchasesKey(), JSON.stringify(resolved));
     }
 }
 
