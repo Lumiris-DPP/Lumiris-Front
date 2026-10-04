@@ -14,7 +14,7 @@ import { CheckoutRecap } from './recap';
 
 const CHECKOUT_RETURN = encodeURIComponent('/checkout');
 type Step = 'address' | 'payment';
-// Attente plein écran, le temps que le panier soit relu.
+
 export function CheckoutLoader({ label }: { label: string }) {
     return (
         <div className="flex h-full items-center justify-center gap-2 bg-background text-sm text-muted-foreground">
@@ -23,7 +23,6 @@ export function CheckoutLoader({ label }: { label: string }) {
     );
 }
 
-/** Réunit la saisie de livraison et le récapitulatif des colis. */
 export function AddressForm({
     savedAddress,
     shipments,
@@ -61,7 +60,6 @@ export function AddressForm({
     );
 }
 
-/** Affiche l’étape du paiement et son retour. */
 export function CheckoutHeader({ step, onBack }: { step: Step; onBack: () => void }) {
     return (
         <motion.header
@@ -86,7 +84,6 @@ export function CheckoutHeader({ step, onBack }: { step: Step; onBack: () => voi
     );
 }
 
-/** Indique visuellement la progression des deux étapes. */
 function StepDots({ active }: { active: number }) {
     return (
         <span className="flex items-center gap-1.5" aria-hidden>
@@ -102,7 +99,6 @@ function StepDots({ active }: { active: number }) {
     );
 }
 
-/** Propose la connexion avec un retour sécurisé au paiement. */
 export function SignInGate({ onBack }: { onBack: () => void }) {
     return (
         <div className="flex h-full flex-col items-center justify-center gap-5 bg-background px-8 text-center">
@@ -142,7 +138,6 @@ export function SignInGate({ onBack }: { onBack: () => void }) {
     );
 }
 
-/** Présente un obstacle au paiement avec l’action pour le résoudre. */
 export function CheckoutMessage({
     title,
     description,

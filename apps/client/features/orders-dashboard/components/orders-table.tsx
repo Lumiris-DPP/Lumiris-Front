@@ -8,8 +8,6 @@ import { formatDateFr, formatPriceCents } from '@lumiris/utils';
 import { OrderStatusBadge } from './status-badge';
 import { orderFundsLabel } from '../models/orders-model';
 
-// Une seule table pour les cinq onglets : ils décrivent le même objet à des moments différents,
-// pas cinq objets différents. Le détail et les actions vivent dans la feuille latérale.
 export function OrdersTable({
     orders,
     onSelect,

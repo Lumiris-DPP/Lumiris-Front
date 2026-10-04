@@ -8,8 +8,6 @@ import { formatCents, installmentLabel, shippingCostLabel } from '@/lib/marketpl
 import { preparationLabel, variantLabel } from '@/lib/marketplace/product';
 import { type CartItemDetail, type CartShipment } from '@/lib/marketplace/cart-model';
 
-// Récapitulatif du panier, identique aux deux étapes du tunnel : l'acheteur doit voir la même
-// décomposition avant de saisir son adresse et avant de payer, sinon le total semble bouger.
 export function CheckoutRecap({
     shipments,
     subtotalCents,
@@ -68,7 +66,6 @@ export function CheckoutRecap({
     );
 }
 
-/** Récapitule les articles et le port d’un atelier. */
 function ShipmentRecap({
     shipment,
     parcelNumber,
@@ -107,7 +104,6 @@ function ShipmentRecap({
     );
 }
 
-/** Affiche une ligne du colis et sa quantité. */
 function ShipmentRecapLine({ item }: { item: CartItemDetail }) {
     const { product, variant, quantity } = item;
     const details = joinNonEmpty([variantLabel(variant), quantity > 1 ? `×${quantity}` : null]);
@@ -139,8 +135,6 @@ function ShipmentRecapLine({ item }: { item: CartItemDetail }) {
     );
 }
 
-// Ce qui se passe après le paiement, rappelé au moment où l'acheteur hésite : c'est là que la
-// question « et si ça ne va pas ? » se pose, pas sur la fiche produit consultée dix minutes plus tôt.
 function Reassurance({ shipments }: { shipments: readonly CartShipment[] }) {
     const policies = distinctProductTexts(shipments, (product) => product.returnPolicy);
     const warranties = distinctProductTexts(shipments, (product) => product.warrantyDescription);
@@ -164,7 +158,6 @@ function Reassurance({ shipments }: { shipments: readonly CartShipment[] }) {
     );
 }
 
-/** Rassemble les conditions de vente distinctes des pièces du colis. */
 function distinctProductTexts(
     shipments: readonly CartShipment[],
     pick: (product: CartItemDetail['product']) => string | null | undefined,
@@ -173,7 +166,6 @@ function distinctProductTexts(
     return [...new Set(texts.filter((text): text is string => Boolean(text)))];
 }
 
-// Le colis part quand sa pièce la plus longue à préparer est prête.
 function shipmentPreparationLabel(shipment: CartShipment): string | null {
     return preparationLabel(Math.max(0, ...shipment.items.map((item) => item.product.preparationDays)));
 }

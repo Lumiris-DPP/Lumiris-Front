@@ -6,7 +6,6 @@ import { ImagePlus, Loader2, X } from 'lucide-react';
 import { useApiClient } from '@lumiris/api-client/react';
 import { toast } from '@/lib/toast';
 
-// Au-delà, l'envoi devient lent sur un réseau mobile et l'arbitre n'y gagne rien.
 const MAX_FILES = 3;
 const MAX_BYTES = 8 * 1024 * 1024;
 
@@ -15,9 +14,6 @@ export interface PickedFile {
     previewUrl: string;
 }
 
-// Sélecteur de photos : téléverse immédiatement et rend des identifiants. L'aperçu local permet
-// de vérifier ce qu'on envoie AVANT de valider — sur un litige, une photo floue envoyée par erreur
-// se paie cher.
 export function AttachmentPicker({
     files,
     onChange,
@@ -58,7 +54,6 @@ export function AttachmentPicker({
         };
     }, []);
 
-    // Téléverse les photos sélectionnées et conserve chaque réussite du lot.
     async function handleSelect(event: React.ChangeEvent<HTMLInputElement>) {
         if (uploading || disabled) return;
         const selected = [...(event.target.files ?? [])].slice(0, MAX_FILES - files.length);

@@ -10,12 +10,8 @@ import {
     type ShippingAddress,
 } from '@/lib/marketplace/shipping-address';
 
-/** Conserve les chiffres saisis pour le code postal. */
 const onlyDigits = (value: string) => value.replace(/\D/g, '');
 
-// Première étape du tunnel : on demande l'adresse AVANT de préparer le paiement. L'atelier ne
-// peut pas expédier sans elle, et créer un PaymentIntent pour un panier qui n'ira nulle part
-// laisserait des commandes en attente et du stock réservé pour rien.
 export function AddressStep({
     initial,
     shipmentCount,
@@ -32,11 +28,9 @@ export function AddressStep({
     );
     const complete = isShippingAddressComplete(address);
 
-    /** Met à jour le champ de livraison demandé. */
     const set = <K extends keyof ShippingAddress>(key: K, value: ShippingAddress[K]) =>
         setAddress((a) => ({ ...a, [key]: value }));
 
-    /** Valide et mémorise l’adresse avant de préparer le paiement. */
     const submit = (event: React.SyntheticEvent) => {
         event.preventDefault();
         if (!complete) return;
@@ -130,8 +124,6 @@ export function AddressStep({
     );
 }
 
-// `min-w-0` sur le conteneur et `w-full` sur le champ : sans eux un input garde sa largeur
-// intrinsèque (~20 caractères) et déborde du viewport dès qu'il partage sa ligne.
 function Field({
     label,
     value,

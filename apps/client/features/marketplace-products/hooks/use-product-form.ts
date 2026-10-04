@@ -10,7 +10,6 @@ import type { ProductFormState } from '../models/product-form-model';
 import { sizesOf } from '../models/product-payload';
 import { productErrorMessage } from '../models/product-error';
 
-/** Pilote les saisies et la sauvegarde du produit édité. */
 export function useProductForm(open: boolean, onOpenChange: (open: boolean) => void, product?: MarketplaceItem) {
     const [form, setForm] = useState<ProductFormState>(() => initialState(product));
     const [error, setError] = useState<string | null>(null);
@@ -26,11 +25,9 @@ export function useProductForm(open: boolean, onOpenChange: (open: boolean) => v
         }
     }, [open, product]);
 
-    /** Met à jour une saisie du produit sans écraser les autres champs. */
     const set = <K extends keyof ProductFormState>(key: K, value: ProductFormState[K]) =>
         setForm((f) => ({ ...f, [key]: value }));
 
-    /** Valide les saisies avant de demander la modification du produit. */
     const onSubmit = (event: SyntheticEvent) => {
         event.preventDefault();
         if (pending || !product) return;
@@ -44,12 +41,12 @@ export function useProductForm(open: boolean, onOpenChange: (open: boolean) => v
             toast.error(message);
             return;
         }
-        /** Annonce la réussite et termine la mutation demandée. */
+
         const onSuccess = () => {
             toast.success('Produit mis à jour.');
             onOpenChange(false);
         };
-        /** Affiche la cause exacte de l’échec de la requête. */
+
         const onError = (error: Error) => {
             const message = productErrorMessage(error);
             setError(message);

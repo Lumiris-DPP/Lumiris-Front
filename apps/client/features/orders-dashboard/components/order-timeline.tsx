@@ -10,8 +10,6 @@ const ACTOR_LABEL: Record<OrderEvent['actorType'], string> = {
     SYSTEM: 'Automatique',
 };
 
-// Journal des transitions — c'est la pièce d'audit exigée sur les litiges, donc chaque entrée
-// nomme son auteur : « qui a décidé quoi, quand » est exactement ce qu'on vient y chercher.
 export function OrderTimeline({ events }: { events: readonly OrderEvent[] }) {
     if (events.length === 0) {
         return <p className="text-xs text-muted-foreground">Aucun événement enregistré.</p>;
@@ -36,8 +34,6 @@ export function OrderTimeline({ events }: { events: readonly OrderEvent[] }) {
     );
 }
 
-// Preuves versées au dossier : c'est sur elles que se tranche un litige, elles doivent être
-// consultables en pleine taille d'un clic.
 function EventAttachments({ event }: { event: OrderEvent }) {
     const attachments = event.attachments ?? [];
     if (attachments.length === 0) {

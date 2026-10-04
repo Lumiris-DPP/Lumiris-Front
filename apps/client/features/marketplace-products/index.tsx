@@ -10,7 +10,6 @@ import { VacationBanner } from './components/vacation-banner';
 import { SellerConnectBanner, SellerStatsCards } from './components/seller-overview';
 import { SubscriptionSaleNotice } from './components/subscription-sale-notice';
 
-/** Affiche le catalogue artisan et ouvre la conversion des passeports. */
 export function MarketplaceProducts() {
     const [convertOpen, setConvertOpen] = useState(false);
 

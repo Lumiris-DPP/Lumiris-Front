@@ -14,8 +14,6 @@ interface FavoriteButtonProps {
     className?: string;
 }
 
-// Un seul composant pour la carte et la fiche : la position et l'échelle passent par className,
-// pas par une prop de variante qui n'aurait qu'un cas.
 export function FavoriteButton({ item, className }: FavoriteButtonProps) {
     const router = useRouter();
     const { isAuthenticated } = useUser();
@@ -23,7 +21,6 @@ export function FavoriteButton({ item, className }: FavoriteButtonProps) {
     const toggle = useToggleFavorite();
     const isFavorite = favorites.some((favorite) => favorite.id === item.id);
 
-    // On ne laisse jamais partir un 401 : la couche HTTP effacerait la session stockée.
     const onClick = () => {
         if (!isAuthenticated) {
             toast('Connecte-toi pour garder cette pièce en favori', {

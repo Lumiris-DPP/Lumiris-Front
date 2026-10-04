@@ -24,7 +24,6 @@ import { REFUND_REASON_MAX_LENGTH, refundFailureOf, refundableCents, parseRefund
 import { forgetRefundOperation, readRefundOperation, rememberRefundOperation } from '../models/refund-operation';
 import { useAuthStore } from '@/lib/auth-store';
 
-// Prépare un remboursement dans le plafond renvoyé par la commande.
 export function RefundDialog({
     order,
     open,
@@ -71,7 +70,6 @@ export function RefundDialog({
     const partialValid = partialCents !== null && partialCents > 0 && partialCents <= maxCents;
     const valid = order.canRefund && maxCents > 0 && (mode === 'full' || partialValid);
 
-    // Envoie la saisie validée avec les contrats API existants.
     const onSubmit = (event: React.SyntheticEvent) => {
         event.preventDefault();
         if ((!valid && !operation) || !userId || storageError || refundMutation.isPending) return;
@@ -106,7 +104,7 @@ export function RefundDialog({
                     if (failure.release) {
                         forgetRefundOperation(userId, order.id);
                         setOperation(null);
-                        // Le refus vient souvent d'une commande changée ailleurs : son plafond se relit.
+
                         void queryClient.invalidateQueries({ queryKey: orderKeys.sellerAll() });
                     }
                     toast.error(failure.message);

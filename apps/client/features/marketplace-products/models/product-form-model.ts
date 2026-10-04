@@ -12,7 +12,6 @@ import { MAX_PREPARATION_DAYS, MAX_WEIGHT_GRAMS, requireEuros, requireInteger } 
 
 export const NO_DPP = 'none';
 
-/** Décrit les saisies du formulaire de modification du produit. */
 export interface ProductFormState {
     name: string;
     description: string;
@@ -32,7 +31,6 @@ export interface ProductFormState {
     status: MarketplaceProductStatus;
 }
 
-/** Prépare les saisies depuis le produit existant sans perdre ses variantes. */
 export function initialState(product?: MarketplaceItem): ProductFormState {
     return {
         name: product?.name ?? '',
@@ -54,7 +52,6 @@ export function initialState(product?: MarketplaceItem): ProductFormState {
     };
 }
 
-/** Construit le remplacement complet du produit depuis des saisies validées. */
 export function editedProductPayload(form: ProductFormState, currency = 'EUR'): ProductPayload {
     if (!form.name.trim()) throw new Error('Le nom du produit est requis.');
     const priceCents = requireEuros(form.priceEuros, 'Prix');

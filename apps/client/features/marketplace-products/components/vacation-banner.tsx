@@ -12,21 +12,18 @@ import { formatDateFr } from '@lumiris/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { usePendingOrderCount } from '@/features/workspace-shell/hooks';
 
-/** Formate une date locale pour le champ de retour de congés. */
 function localDateInput(date: Date): string {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${date.getFullYear()}-${month}-${day}`;
 }
 
-/** Calcule la prochaine date du calendrier local. */
 function tomorrow(): string {
     const date = new Date();
     date.setDate(date.getDate() + 1);
     return localDateInput(date);
 }
 
-/** Affiche la pause de l’atelier et ses commandes de reprise. */
 export function VacationBanner() {
     const token = useAuthStore((s) => s.token);
     const { data: profile } = useArtisanMe({ enabled: Boolean(token) });
@@ -58,9 +55,8 @@ export function VacationBanner() {
                     disabled={pending}
                     onClick={() =>
                         resumeMutation.mutate(undefined, {
-                            /** Annonce la réussite et termine la mutation demandée. */
                             onSuccess: () => toast.success('Atelier de nouveau actif.'),
-                            /** Affiche la cause exacte de l’échec de la requête. */
+
                             onError: (e) => toast.error(e.message || 'Échec de la reprise.'),
                         })
                     }
@@ -72,15 +68,13 @@ export function VacationBanner() {
         );
     }
 
-    /** Valide les saisies avant de lancer la mutation demandée. */
     const submit = (event: SyntheticEvent) => {
         event.preventDefault();
         pauseMutation.mutate(
             { until: new Date(`${until}T00:00:00`).toISOString() },
             {
-                /** Annonce la réussite et termine la mutation demandée. */
                 onSuccess: () => toast.success('Atelier mis en pause.'),
-                /** Affiche la cause exacte de l’échec de la requête. */
+
                 onError: (e) => toast.error(e.message || 'Échec de la mise en pause.'),
             },
         );

@@ -10,13 +10,8 @@ import { formatCents } from '@/lib/marketplace/money';
 
 import { formatInvoiceDate, invoiceAmounts } from './models/invoice-model';
 
-// Construit le retour de connexion vers la facture demandée.
 const INVOICE_RETURN = (pi: string) => encodeURIComponent(routes.orderInvoice(pi));
 
-// Facture imprimable rattachée au PaymentIntent (GET /api/orders/group/{pi}). Le segment [id]
-// de la route est le paymentIntentId. La feuille porte `.facture-print` : l'impression (voir
-// globals.css) masque l'app et n'imprime que cette feuille — l'export PDF passe par le
-// navigateur (window.print → « Enregistrer au format PDF »).
 export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
     const { user, isAuthenticated } = useUser();
     const {
@@ -30,8 +25,6 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
     const amounts = group ? invoiceAmounts(group) : null;
     const printable = isAuthenticated && !isError && Boolean(amounts?.paymentConfirmed);
 
-    // Impression automatique une seule fois, dès que la facture est prête : le bouton
-    // « Télécharger la facture » ouvre cette vue puis déclenche l'impression du navigateur.
     useEffect(() => {
         if (!printable || !group || autoPrinted.current === paymentIntentId) return;
         const timer = window.setTimeout(() => {
@@ -85,7 +78,7 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
 
     return (
         <div className="flex h-full flex-col overflow-y-auto bg-background">
-            {/* Barre d'action — écran uniquement (masquée à l'impression). */}
+            {}
             <div className="facture-no-print mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 pt-12 pb-3 md:px-6">
                 <Link
                     href={routes.order(paymentIntentId)}
@@ -105,7 +98,7 @@ export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
                 </button>
             </div>
 
-            {/* Feuille de facture — seule partie imprimée. */}
+            {}
             <div className="mx-auto w-full max-w-3xl px-4 pb-24 md:px-6">
                 <article className="facture-print rounded-2xl border border-border/60 bg-card p-6 text-foreground md:p-10">
                     <header className="flex flex-col gap-4 border-b border-border/60 pb-6 sm:flex-row sm:items-start sm:justify-between">

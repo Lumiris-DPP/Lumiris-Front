@@ -11,9 +11,6 @@ import { removeFromCart, setCartQuantity } from '@/lib/marketplace/cart-storage'
 import { variantLabel } from '@/lib/marketplace/product';
 import { type CartItemDetail, type CartShipment } from '@/lib/marketplace/cart-model';
 
-// Un colis = un atelier. Le regroupement rend lisible ce que l'acheteur paie en livraison et
-// combien de paquets il recevra — sur un panier multi-atelier, c'est la seule façon honnête
-// d'expliquer le total.
 export function ShipmentCard({ shipment, index, total }: { shipment: CartShipment; index: number; total: number }) {
     return (
         <section className="opal-shadow overflow-hidden rounded-2xl border border-border/60 bg-card">
@@ -43,11 +40,10 @@ export function ShipmentCard({ shipment, index, total }: { shipment: CartShipmen
     );
 }
 
-/** Présente une déclinaison du panier et ses commandes de quantité. */
 function CartRow({ item }: { item: CartItemDetail }) {
     const { product, variant } = item;
     const label = variantLabel(variant);
-    // Un « + » grisé sans motif se lit comme une panne : on dit ce qui bloque.
+
     const atStockLimit = item.quantity >= item.availableQuantity;
     return (
         <li className="flex gap-3 border-b border-border/40 p-3 last:border-b-0">

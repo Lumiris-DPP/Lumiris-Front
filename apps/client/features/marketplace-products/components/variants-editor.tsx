@@ -8,7 +8,6 @@ import { Label } from '@lumiris/ui/components/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
 import { HEX_COLOR, newVariantRow, variantRowsError, type VariantRow } from '../models/product-payload';
 
-/** Décrit les déclinaisons et suggestions de leur éditeur. */
 interface VariantsEditorProps {
     value: VariantRow[];
     onChange: (next: VariantRow[]) => void;
@@ -16,18 +15,14 @@ interface VariantsEditorProps {
     colorSuggestions?: readonly string[];
 }
 
-/** Affiche la grille des déclinaisons avec leurs erreurs de validation. */
 export function VariantsEditor({ value, onChange, sizeSuggestions, colorSuggestions }: VariantsEditorProps) {
     const error = variantRowsError(value);
 
-    /** Modifie un champ de la déclinaison sélectionnée. */
     const patch = (key: string, field: keyof VariantRow, fieldValue: string) =>
         onChange(value.map((row) => (row.key === key ? { ...row, [field]: fieldValue } : row)));
 
-    /** Retire la déclinaison sélectionnée de la grille. */
     const remove = (key: string) => onChange(value.filter((row) => row.key !== key));
 
-    /** Complète les combinaisons sans retirer les déclinaisons persistées. */
     const generate = (sizes: string[], colors: string[]) => {
         const existing = new Set(
             value.map((row) => `${row.sizeLabel.trim().toLowerCase()}\0${row.colorLabel.trim().toLowerCase()}`),
@@ -160,7 +155,6 @@ export function VariantsEditor({ value, onChange, sizeSuggestions, colorSuggesti
     );
 }
 
-/** Propose des tailles et couleurs pour compléter les déclinaisons. */
 function GridGenerator({
     sizeSuggestions,
     colorSuggestions,
@@ -174,7 +168,6 @@ function GridGenerator({
     const [sizes, setSizes] = useState(() => (sizeSuggestions ?? []).join(', '));
     const [colors, setColors] = useState(() => (colorSuggestions ?? []).join(', '));
 
-    /** Sépare et nettoie les valeurs saisies pour la génération de grille. */
     const parsed = (raw: string) =>
         raw
             .split(',')

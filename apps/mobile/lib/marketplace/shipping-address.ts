@@ -1,9 +1,5 @@
 'use client';
 
-// Dernière adresse de livraison utilisée, scopée par user. Elle n'a rien de confidentiel au-delà
-// de l'appareil déjà déverrouillé, et la retenir évite de la ressaisir à chaque commande — c'est
-// le principal frottement d'un achat mobile.
-
 import type { CartShippingAddress } from '@lumiris/api-client';
 import { readUser } from '../auth/storage';
 import { USER_KEYS, userScopedKey } from '../storage-keys';
@@ -20,19 +16,16 @@ export const EMPTY_ADDRESS: ShippingAddress = {
     phone: '',
 };
 
-/** Choisit la clé du panier du compte courant ou de l’invité. */
 function currentKey(): string {
     return userScopedKey(readUser()?.id ?? null, USER_KEYS.shippingAddress);
 }
 
-/** Vérifie la forme d’une adresse relue du stockage. */
 function isAddress(value: unknown): value is ShippingAddress {
     if (!value || typeof value !== 'object') return false;
     const v = value as Record<string, unknown>;
     return typeof v.fullName === 'string' && typeof v.line1 === 'string' && typeof v.city === 'string';
 }
 
-/** Relit l’adresse de livraison du compte courant. */
 export function readShippingAddress(): ShippingAddress | null {
     if (typeof window === 'undefined') return null;
     try {
@@ -45,14 +38,11 @@ export function readShippingAddress(): ShippingAddress | null {
     }
 }
 
-/** Enregistre l’adresse de livraison du compte courant. */
 export function writeShippingAddress(address: ShippingAddress): void {
     if (typeof window === 'undefined') return;
     window.localStorage.setItem(currentKey(), JSON.stringify(address));
 }
 
-// Champs strictement nécessaires à une expédition : un colis part avec un nom, une rue, un code
-// postal et une ville. Le complément et le téléphone restent facultatifs.
 export function isShippingAddressComplete(address: ShippingAddress): boolean {
     return (
         address.fullName.trim().length > 1 &&
@@ -62,7 +52,6 @@ export function isShippingAddressComplete(address: ShippingAddress): boolean {
     );
 }
 
-// Normalise avant envoi : les espaces de saisie n'ont rien à faire sur une étiquette de colis.
 export function normalizeShippingAddress(address: ShippingAddress): ShippingAddress {
     return {
         fullName: address.fullName.trim(),

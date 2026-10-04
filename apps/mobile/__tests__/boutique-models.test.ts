@@ -18,7 +18,6 @@ import {
     stockHintOf,
 } from '@/features/boutique/models/purchase-state';
 
-/** Produit de catalogue avec axes et stock pour les scénarios de sélection et de filtrage. */
 function product(overrides: Partial<ProductDto> = {}): ProductDto {
     return {
         id: 'piece',

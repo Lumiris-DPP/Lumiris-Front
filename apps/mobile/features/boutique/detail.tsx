@@ -17,20 +17,16 @@ import { SizeGuideSheet } from './components/size-guide-sheet';
 import { useProductPurchase } from './hooks/use-product-purchase';
 import { VariantPicker } from './components/variant-picker';
 
-// Une vue comptée au plus une fois par produit et par chargement de page (évite le double
-// StrictMode + les refetch). Le backend agrège ces vues pour le tableau de bord vendeur.
 const viewed = new Set<string>();
 
-// Fiche produit publique : charge la pièce, compte une vue et distingue la pièce absente de la panne.
 export function BoutiqueDetail({ productId }: { productId: string }) {
     const router = useRouter();
     const client = useApiClient();
-    // Fiche produit publique unique (deep-link direct) : plus de scan du catalogue complet.
+
     const { data: dto, isLoading, error, refetch } = useMarketplaceProduct(productId);
 
     const product = useMemo<MarketplaceItem | null>(() => (dto ? toMarketplaceItem(dto) : null), [dto]);
 
-    // Ping de vue fire-and-forget dès que la fiche existe (statistiques vendeur).
     useEffect(() => {
         if (!product || viewed.has(productId)) return;
         viewed.add(productId);
@@ -51,8 +47,6 @@ export function BoutiqueDetail({ productId }: { productId: string }) {
     }
 
     if (!product) {
-        // 404 (NOT_FOUND) = pièce non publiée / vendeur non payable → « introuvable ».
-        // Toute autre erreur (réseau/serveur) = chargement impossible, distinct de l'absence.
         const notFound = !error || (isApiError(error) && error.code === 'NOT_FOUND');
         return <ProductUnavailable notFound={notFound} onRetry={() => void refetch()} />;
     }
@@ -60,7 +54,6 @@ export function BoutiqueDetail({ productId }: { productId: string }) {
     return <DetailBody key={product.id} product={product} onBack={() => router.back()} />;
 }
 
-// Pièce absente ou panne de lecture : la panne propose de réessayer, l'absence non.
 function ProductUnavailable({ notFound, onRetry }: { notFound: boolean; onRetry: () => void }) {
     return (
         <div
@@ -94,7 +87,6 @@ function ProductUnavailable({ notFound, onRetry }: { notFound: boolean; onRetry:
     );
 }
 
-// Corps de la fiche : la sélection et l'ajout au panier viennent de useProductPurchase, le reste s'affiche.
 function DetailBody({ product, onBack }: { product: MarketplaceItem; onBack: () => void }) {
     const purchase = useProductPurchase(product);
     const [guideOpen, setGuideOpen] = useState(false);
@@ -167,7 +159,6 @@ function DetailBody({ product, onBack }: { product: MarketplaceItem; onBack: () 
     );
 }
 
-// Caractéristiques déclarées de la pièce ; une donnée absente n'a pas de ligne.
 function ProductFacts({ product }: { product: MarketplaceItem }) {
     return (
         <dl className="grid grid-cols-2 gap-3 rounded-2xl border border-border/60 bg-card p-4 text-sm">
@@ -208,7 +199,6 @@ function ProductFacts({ product }: { product: MarketplaceItem }) {
     );
 }
 
-// Livraison, retours et garantie, annoncés AVANT l'achat (plus de « frais calculés au paiement »).
 function DeliveryTerms({ product }: { product: MarketplaceItem }) {
     return (
         <section
@@ -241,12 +231,10 @@ function DeliveryTerms({ product }: { product: MarketplaceItem }) {
     );
 }
 
-/** Affiche la date de retour de l’atelier en français. */
 function formatShortDate(value: string): string {
     return new Date(value).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
 }
 
-/** Affiche une condition de vente avec son pictogramme et son libellé. */
 function InfoRow({ Icon, label, children }: { Icon: typeof Truck; label: string; children: ReactNode }) {
     return (
         <div className="flex items-start gap-3 p-4">
@@ -259,8 +247,6 @@ function InfoRow({ Icon, label, children }: { Icon: typeof Truck; label: string;
     );
 }
 
-// Explication acheteur du score Iris — libellés FR courts (le badge et l'échelle A→E restent
-// alignés sur scoring-ui). Rend la note lisible sur la fiche produit sans jargon.
 const IRIS_GRADE_LABEL_FR: Record<NonNullable<MarketplaceItem['irisGrade']>, string> = {
     A: 'exceptionnel',
     B: 'bon',
@@ -269,7 +255,6 @@ const IRIS_GRADE_LABEL_FR: Record<NonNullable<MarketplaceItem['irisGrade']>, str
     E: 'opaque',
 };
 
-/** Explique à l’acheteur la note Iris de la pièce. */
 function IrisGradeExplainer({ grade }: { grade: NonNullable<MarketplaceItem['irisGrade']> }) {
     return (
         <section aria-label="Comprendre le score Iris" className="rounded-2xl border border-border/60 bg-card p-4">

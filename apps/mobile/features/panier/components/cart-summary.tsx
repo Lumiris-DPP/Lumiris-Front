@@ -6,7 +6,6 @@ import { usePaymentOptions } from '@lumiris/api-client/react';
 
 import { formatCents, installmentLabel, shippingCostLabel } from '@/lib/marketplace/money';
 
-/** Présente le total par colis et autorise le paiement du panier vérifiable. */
 export function CartSummary({
     subtotalCents,
     shippingCents,

@@ -11,14 +11,9 @@ import {
     type BoutiqueFiltersState,
 } from '../models/filters-model';
 
-/** Lit le catalogue pour les filtres donnés et rend les pièces filtrées, les facettes et l'état de la lecture. */
 export function useBoutiqueCatalogue(filters: BoutiqueFiltersState) {
     const query = filters.q.trim();
 
-    // Deux requêtes, et c'est délibéré : les facettes et les bornes de prix dérivent du catalogue
-    // ENTIER. Les faire dériver du résultat textuel ferait disparaître les puces à mesure qu'on tape
-    // et sauter les bornes du curseur sous le doigt, avec une sélection de prix devenue hors bornes.
-    // Le spread conditionnel garde la MÊME clé TanStack quand la recherche est vide : une requête.
     const catalogue = useMarketplaceSearch({ sort: filters.sort });
     const results = useMarketplaceSearch(
         { sort: filters.sort, ...(query ? { q: query } : {}) },

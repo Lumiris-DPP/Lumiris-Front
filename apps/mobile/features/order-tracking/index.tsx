@@ -38,9 +38,7 @@ const CANCEL_REASONS = [
     'Délai de préparation trop long',
 ] as const;
 
-// Expose le suivi sous une frontière Suspense pour la lecture de l’identifiant.
 export function OrderTracking() {
-    // useSearchParams (identifiant de commande en query string) impose une frontière Suspense.
     return (
         <Suspense fallback={<CenteredSpinner label="Chargement du suivi…" />}>
             <OrderTrackingInner />
@@ -48,13 +46,11 @@ export function OrderTracking() {
     );
 }
 
-// Isole les saisies à chaque changement d’identifiant de commande.
 function OrderTrackingInner() {
     const orderId = useSearchParams().get('id');
     return <OrderTrackingContent key={orderId ?? ''} orderId={orderId} />;
 }
 
-// Compose le suivi de la commande courante et ses feuilles de saisie.
 function OrderTrackingContent({ orderId }: { orderId: string | null }) {
     const { isAuthenticated } = useUser();
     const { data, isLoading, error, refetch, sheet, setSheet, submitting, submitReason, confirmReception } =
@@ -213,7 +209,6 @@ function OrderTrackingContent({ orderId }: { orderId: string | null }) {
     );
 }
 
-// Affiche la photo de la pièce ou son illustration de repli.
 function ProductThumb({ photoUrl, name }: { photoUrl?: string | null; name?: string | null }) {
     return (
         <div className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-muted">
@@ -226,7 +221,6 @@ function ProductThumb({ photoUrl, name }: { photoUrl?: string | null; name?: str
     );
 }
 
-// Signale le chargement du suivi.
 function CenteredSpinner({ label }: { label: string }) {
     return (
         <div className="flex h-full items-center justify-center gap-2 bg-background text-sm text-muted-foreground">
@@ -235,7 +229,6 @@ function CenteredSpinner({ label }: { label: string }) {
     );
 }
 
-// Présente une commande inaccessible avec une navigation de sortie.
 function CenteredMessage({ title, action }: { title: string; action: { label: string; href: string } }) {
     return (
         <div className="flex h-full flex-col items-center justify-center gap-4 bg-background px-8 text-center">

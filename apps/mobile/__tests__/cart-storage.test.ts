@@ -34,7 +34,6 @@ afterAll(() => {
     else Reflect.deleteProperty(globalThis, 'window');
 });
 
-/** Installe un compte local complet pour contrôler le cloisonnement du stockage. */
 function account(id: string) {
     writeUser({
         id,

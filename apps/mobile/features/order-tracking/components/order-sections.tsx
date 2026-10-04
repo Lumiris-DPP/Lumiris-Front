@@ -22,7 +22,6 @@ import { formatCents } from '@/lib/marketplace/money';
 import { GlassCard } from '@/lib/motion/index';
 import { formatDate, type SheetKind } from '../models/tracking-model';
 
-// Propose les actions autorisées par la dernière lecture des permissions serveur.
 export function BuyerActions({
     detail,
     submitting,
@@ -69,8 +68,7 @@ export function BuyerActions({
             ) : null}
 
             <div className="flex gap-2">
-                {/* Écrire à l'atelier reste possible à tout moment : une question ne doit pas
-                    obliger à ouvrir un litige. */}
+                {}
                 <button
                     type="button"
                     disabled={submitting}
@@ -113,8 +111,6 @@ export function BuyerActions({
     );
 }
 
-// Un retour accepté n'a de valeur que si l'acheteur sait où renvoyer la pièce ; un retour refusé,
-// que s'il connaît le motif. C'est la réponse de l'atelier, mise là où on la cherche.
 export function ReturnInstructions({ detail }: { detail: OrderDetail }) {
     const { order } = detail;
     const approved = order.status === 'RETURN_APPROVED';
@@ -155,8 +151,6 @@ export function ReturnInstructions({ detail }: { detail: OrderDetail }) {
     );
 }
 
-// Le trou visuel de la fenêtre « payée, pas encore expédiée » : sans cette carte, l'acheteur d'une
-// pièce fabriquée à la commande ne voit rien bouger et finit par écrire, voire ouvrir un litige.
 export function PreparationCard({ shipDueAt }: { shipDueAt: string }) {
     return (
         <GlassCard className="p-4" intensity="subtle">
@@ -174,7 +168,6 @@ export function PreparationCard({ shipDueAt }: { shipDueAt: string }) {
     );
 }
 
-// Affiche les faits de suivi transmis par le transporteur.
 export function TrackingCard({ detail }: { detail: OrderDetail }) {
     const { order } = detail;
     return (
@@ -186,9 +179,7 @@ export function TrackingCard({ detail }: { detail: OrderDetail }) {
             <p className="mt-2 text-sm text-foreground">
                 {order.carrier} · <span className="font-mono text-xs">{order.trackingNumber}</span>
             </p>
-            {/* Ce que le transporteur constate, quand il le pousse : c'est la seule ligne de cet
-                écran qui bouge sans que personne n'ait agi. Le libellé vient du transporteur
-                lui-même — il sait dire « disponible au point relais », pas nous. */}
+            {}
             {order.trackingStatus ? (
                 <p className="mt-1 inline-flex items-center gap-1.5 text-xs font-medium text-lumiris-cyan">
                     <Radio className="h-3.5 w-3.5" aria-hidden />
@@ -218,7 +209,6 @@ export function TrackingCard({ detail }: { detail: OrderDetail }) {
     );
 }
 
-// Présente le dossier de litige ouvert.
 export function DisputeCard({ detail }: { detail: OrderDetail }) {
     return (
         <div className="rounded-2xl border border-lumiris-amber/30 bg-lumiris-amber/10 p-4">
@@ -236,7 +226,6 @@ export function DisputeCard({ detail }: { detail: OrderDetail }) {
     );
 }
 
-// Présente les montants persistés de la ligne et son lien de facture.
 export function AmountsCard({ detail }: { detail: OrderDetail }) {
     const { order } = detail;
     const shipping = order.shippingCents ?? 0;
@@ -281,7 +270,6 @@ export function AmountsCard({ detail }: { detail: OrderDetail }) {
     );
 }
 
-// Affiche l’adresse de livraison transmise par le serveur.
 export function AddressCard({ detail }: { detail: OrderDetail }) {
     const shipTo = detail.shipTo;
     if (!shipTo) return null;

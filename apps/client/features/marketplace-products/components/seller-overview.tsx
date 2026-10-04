@@ -8,7 +8,6 @@ import { StatCard } from '@lumiris/ui/components/stat-card';
 import { formatPriceCents } from '@lumiris/utils';
 import { useAuthStore } from '@/lib/auth-store';
 
-/** Propose une activation des paiements lorsque le compte vendeur la nécessite. */
 export function SellerConnectBanner() {
     const token = useAuthStore((s) => s.token);
     const { data: status } = useSellerStatus({ enabled: Boolean(token) });
@@ -16,15 +15,12 @@ export function SellerConnectBanner() {
 
     if (!token || status?.chargesEnabled) return null;
 
-    /** Ouvre le parcours hébergé d’activation des paiements. */
     const activate = () =>
         onboarding.mutate(undefined, {
-            /** Redirige vers l’URL d’activation des paiements renvoyée par le serveur. */
             onSuccess: ({ url }) => {
                 window.location.href = url;
             },
 
-            /** Signale que le parcours d’activation des paiements ne peut pas être ouvert. */
             onError: () => toast.error("Impossible d'ouvrir l'onboarding des paiements."),
         });
 
@@ -59,7 +55,6 @@ export function SellerConnectBanner() {
     );
 }
 
-/** Affiche les statistiques du catalogue vendeur connecté. */
 export function SellerStatsCards() {
     const token = useAuthStore((s) => s.token);
     const { data: stats } = useSellerStats({ enabled: Boolean(token) });

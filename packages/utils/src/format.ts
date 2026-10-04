@@ -113,17 +113,14 @@ function frenchDateParts(value: FrenchDateInput, parts: Intl.DateTimeFormatOptio
     return new Intl.DateTimeFormat('fr-FR', parts).format(date);
 }
 
-/** « 12 août » — null si la date est absente ou invalide, à l'appelant de choisir son repli. */
 export function formatDayMonthFr(value: FrenchDateInput): string | null {
     return frenchDateParts(value, { day: 'numeric', month: 'long' });
 }
 
-/** « 12 août 2026 » — null si la date est absente ou invalide. */
 export function formatLongDateFr(value: FrenchDateInput): string | null {
     return frenchDateParts(value, { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-/** « 12 août, 14:05 » — null si la date est absente ou invalide. */
 export function formatDayMonthTimeFr(value: FrenchDateInput): string | null {
     return frenchDateParts(value, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 }

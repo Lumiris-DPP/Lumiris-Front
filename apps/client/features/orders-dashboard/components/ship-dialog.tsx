@@ -19,13 +19,9 @@ import { Label } from '@lumiris/ui/components/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@lumiris/ui/components/select';
 import { toast } from '@lumiris/ui/components/sonner';
 
-// Transporteurs proposés d'office : couvrent l'essentiel des envois d'un atelier français.
-// « Autre » laisse saisir un nom libre plutôt que de bloquer une expédition hors liste.
 const CARRIERS = ['Colissimo', 'Chronopost', 'Mondial Relay', 'UPS', 'DHL', 'DPD', 'Remise en main propre'] as const;
 const OTHER = 'Autre';
 
-// Modèles d'URL de suivi : l'acheteur reçoit un lien cliquable sans que l'atelier ait à le
-// chercher. Un transporteur absent d'ici laisse simplement le champ libre.
 const TRACKING_URL_TEMPLATE: Record<string, (tracking: string) => string> = {
     Colissimo: (t) => `https://www.laposte.fr/outils/suivre-vos-envois?code=${t}`,
     Chronopost: (t) => `https://www.chronopost.fr/tracking-no-cms/suivi-page?listeNumerosLT=${t}`,
@@ -35,7 +31,6 @@ const TRACKING_URL_TEMPLATE: Record<string, (tracking: string) => string> = {
     DPD: (t) => `https://www.dpd.fr/trace/${t}`,
 };
 
-// Prépare une expédition manuelle ou une étiquette avec le client API existant.
 export function ShipDialog({
     order,
     open,
@@ -65,7 +60,6 @@ export function ShipDialog({
     const valid = order.canShip && carrier.length > 1 && trackingNumber.trim().length > 3;
     const pending = shipMutation.isPending || labelMutation.isPending;
 
-    // Demande une étiquette si la commande autorise encore l’expédition.
     const onGenerateLabel = () => {
         if (pending || !order.canShip) return;
         labelMutation.mutate(order.id, {
@@ -73,8 +67,7 @@ export function ShipDialog({
                 toast.success('Étiquette éditée', {
                     description: 'Le suivi est transmis à l’acheteur, la commande est marquée expédiée.',
                 });
-                // Le PDF s'ouvre dans un onglet plutôt que de se télécharger : l'atelier imprime
-                // depuis la visionneuse, et l'URL présignée expire de toute façon.
+
                 window.open(label.labelUrl, '_blank', 'noopener,noreferrer');
                 onOpenChange(false);
             },
@@ -82,7 +75,6 @@ export function ShipDialog({
         });
     };
 
-    // Envoie la saisie validée avec les contrats API existants.
     const onSubmit = (event: React.SyntheticEvent) => {
         event.preventDefault();
         if (!valid || pending || !order.canShip) return;
@@ -217,10 +209,6 @@ export function ShipDialog({
     );
 }
 
-// Chemin nominal quand l'intégration transporteur est active : le bordereau est fabriqué depuis
-// l'adresse déjà stockée sur la commande, le suivi revient rempli, et la commande passe expédiée
-// sans aucune saisie. La saisie manuelle reste dessous — c'est le seul chemin d'une remise en main
-// propre ou d'un transporteur hors agrégateur.
 function OneClickLabel({ ready, pending, onGenerate }: { ready: boolean; pending: boolean; onGenerate: () => void }) {
     if (!ready) {
         return (

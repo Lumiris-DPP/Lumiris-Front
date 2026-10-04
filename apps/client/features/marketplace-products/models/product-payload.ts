@@ -9,7 +9,6 @@ import type {
 
 export const MIN_PUBLISHED_PRICE_CENTS = 50;
 
-/** Décrit une déclinaison éditable avec son identité et sa version. */
 export interface VariantRow {
     key: string;
     id?: string;
@@ -21,7 +20,6 @@ export interface VariantRow {
     version?: number;
 }
 
-/** Décrit les mesures saisies en centimètres pour les tailles du produit. */
 export interface SizeGuideDraft {
     labels: string[];
     values: Record<string, string>;
@@ -29,17 +27,14 @@ export interface SizeGuideDraft {
 
 export const EMPTY_SIZE_GUIDE: SizeGuideDraft = { labels: [], values: {} };
 
-/** Identifie une cellule du guide par sa taille et sa mesure. */
 export function cellKey(sizeLabel: string, label: string): string {
     return `${sizeLabel}\0${label}`;
 }
 
-/** Crée une déclinaison locale sans identité serveur. */
 export function newVariantRow(sizeLabel = '', colorLabel = ''): VariantRow {
     return { key: crypto.randomUUID(), sizeLabel, colorLabel, colorHex: '', sku: '', stock: '0' };
 }
 
-/** Prépare les déclinaisons existantes en conservant stocks et versions. */
 export function variantRowsFrom(product?: MarketplaceItem): VariantRow[] {
     const variants = product?.variants ?? [];
     if (variants.length === 0) return [{ ...newVariantRow(), stock: String(product?.stock ?? 0) }];
@@ -55,7 +50,6 @@ export function variantRowsFrom(product?: MarketplaceItem): VariantRow[] {
     }));
 }
 
-/** Prépare les mesures existantes en centimètres dans leur ordre déclaré. */
 export function sizeGuideFrom(product?: MarketplaceItem): SizeGuideDraft {
     const measurements = product?.sizeGuide ?? [];
     const labels: string[] = [];
@@ -67,7 +61,6 @@ export function sizeGuideFrom(product?: MarketplaceItem): SizeGuideDraft {
     return { labels, values };
 }
 
-/** Liste les tailles distinctes déclarées par les déclinaisons. */
 export function sizesOf(rows: readonly VariantRow[]): string[] {
     const sizes: string[] = [];
     for (const row of rows) {
@@ -79,7 +72,6 @@ export function sizesOf(rows: readonly VariantRow[]): string[] {
 
 export const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
 
-/** Retourne la première erreur de stock, de combinaison ou de teinte. */
 export function variantRowsError(rows: readonly VariantRow[]): string | null {
     if (rows.length === 0) return 'Ajoutez au moins une déclinaison.';
     const seen = new Set<string>();
@@ -95,7 +87,6 @@ export function variantRowsError(rows: readonly VariantRow[]): string | null {
     return null;
 }
 
-/** Construit les déclinaisons validées en conservant leurs identités et versions. */
 export function toVariantPayload(rows: readonly VariantRow[]): ProductVariantPayload[] {
     const error = variantRowsError(rows);
     if (error) throw new Error(error);
@@ -111,7 +102,6 @@ export function toVariantPayload(rows: readonly VariantRow[]): ProductVariantPay
     }));
 }
 
-/** Convertit les mesures valides en millimètres entiers sans ignorer une erreur. */
 export function toSizeGuidePayload(draft: SizeGuideDraft, sizes: readonly string[]): SizeMeasurementPayload[] {
     const measurements: SizeMeasurementPayload[] = [];
     draft.labels.forEach((label, position) => {
@@ -134,7 +124,6 @@ export function toSizeGuidePayload(draft: SizeGuideDraft, sizes: readonly string
     return measurements;
 }
 
-/** Reconstruit le PUT complet en ne changeant que le statut demandé. */
 export function productPayloadFrom(product: MarketplaceItem, status?: MarketplaceProductStatus): ProductPayload {
     return {
         name: product.name,

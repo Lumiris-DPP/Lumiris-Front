@@ -13,7 +13,6 @@ import { CheckoutRecap } from './recap';
 const PAYMENT_REFUSED =
     'Ta carte a été refusée. Aucun montant n’a été prélevé — saisis une autre carte pour réessayer.';
 
-/** Confirme le paiement avec Stripe et conserve le refus à l’écran. */
 export function PaymentStep({
     address,
     shipments,
@@ -39,13 +38,10 @@ export function PaymentStep({
     const [payError, setPayError] = useState<string | null>(null);
     const errorRef = useRef<HTMLParagraphElement | null>(null);
 
-    // Le bouton de paiement vit dans une barre fixe : sans ce recentrage, le refus s'affiche
-    // au-dessus de la zone visible et l'écran paraît n'avoir rien fait.
     useEffect(() => {
         if (payError) errorRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }, [payError]);
 
-    /** Soumet le paiement Stripe et ouvre la confirmation serveur après son retour. */
     async function handleSubmit(event: React.SyntheticEvent) {
         event.preventDefault();
         if (!stripe || !elements || submitting) return;
@@ -56,8 +52,6 @@ export function PaymentStep({
             const { error, paymentIntent } = await stripe.confirmPayment({
                 elements,
                 confirmParams: {
-                    // Retour après redirection (3-D Secure) : Stripe ajoute ?payment_intent=…
-                    // que l'écran de confirmation lit pour charger le groupe de commande.
                     return_url: `${window.location.origin}${routes.order('latest')}`,
                     shipping: {
                         name: address.fullName,
@@ -82,9 +76,7 @@ export function PaymentStep({
                 onPaid(paymentIntent.id);
                 return;
             }
-            // Tout autre état (`requires_payment_method` sur une carte refusée, `canceled`) laisse
-            // l'acheteur sur l'écran de paiement : sans message, l'écran semblait simplement ne
-            // rien faire et il ne savait pas qu'il pouvait ressaisir sa carte.
+
             setPayError(PAYMENT_REFUSED);
         } catch {
             setPayError('Le paiement n’a pas pu être confirmé. Vérifie ta connexion et réessaie.');
@@ -158,7 +150,7 @@ export function PaymentStep({
                 </aside>
             </div>
 
-            {/* Barre de paiement fixe — mobile uniquement (sur md+ le bouton vit dans le récap). */}
+            {}
             <div className="fixed inset-x-0 bottom-0 z-nav mx-auto max-w-md border-t border-border/60 bg-background/90 px-4 pt-3 pb-6 backdrop-blur md:hidden">
                 {payAction}
             </div>
@@ -166,7 +158,6 @@ export function PaymentStep({
     );
 }
 
-/** Récapitule l’adresse validée et permet de la modifier. */
 function DeliverySummary({ address, onEdit }: { address: ShippingAddress; onEdit: () => void }) {
     return (
         <section className="flex items-start gap-3 rounded-2xl border border-border/60 bg-card p-3">

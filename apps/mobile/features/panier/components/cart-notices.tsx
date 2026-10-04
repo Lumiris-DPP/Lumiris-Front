@@ -10,8 +10,6 @@ import { removeFromCart, setCartQuantity } from '@/lib/marketplace/cart-storage'
 import { variantLabel } from '@/lib/marketplace/product';
 import { type CartItemDetail, type UnavailableLine } from '@/lib/marketplace/cart-model';
 
-// L'atelier a décliné sa pièce depuis l'ajout au panier : l'acheteur doit choisir sa taille avant
-// de payer, plutôt que de découvrir un refus au moment du paiement.
 export function ChooseVariantNotice({ lines }: { lines: readonly UnavailableLine[] }) {
     return (
         <div className="mb-2 px-4">
@@ -35,7 +33,6 @@ export function ChooseVariantNotice({ lines }: { lines: readonly UnavailableLine
     );
 }
 
-// Le catalogue n'a pas répondu : le panier est conservé tel quel et le paiement attend une relecture.
 export function LoadErrorNotice({ onRetry }: { onRetry: () => void }) {
     return (
         <div className="px-4">
@@ -59,8 +56,6 @@ export function LoadErrorNotice({ onRetry }: { onRetry: () => void }) {
     );
 }
 
-// Une pièce disparue ou en rupture ne doit pas se découvrir à l'écran de paiement, sous forme
-// d'erreur technique : on nomme le problème ici, avec le geste qui le résout.
 export function UnavailableNotice({ lines }: { lines: readonly UnavailableLine[] }) {
     return (
         <div className="mb-2 px-4">
@@ -87,8 +82,6 @@ export function UnavailableNotice({ lines }: { lines: readonly UnavailableLine[]
     );
 }
 
-// Le stock a baissé depuis l'ajout au panier : on propose d'ajuster plutôt que de laisser le
-// paiement échouer sur un « stock insuffisant » venu du serveur.
 export function StockNotice({ items }: { items: readonly CartItemDetail[] }) {
     return (
         <div className="mb-2 px-4">
@@ -126,7 +119,6 @@ export function StockNotice({ items }: { items: readonly CartItemDetail[] }) {
     );
 }
 
-/** Propose la boutique lorsque le panier est vide. */
 export function EmptyCart() {
     return (
         <motion.div

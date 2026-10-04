@@ -18,7 +18,6 @@ interface PurchaseBarProps {
     onBuyNow: () => void;
 }
 
-/** Barre d'achat fixe de la fiche : prix, délai, stock de la déclinaison choisie et boutons d'achat. */
 export function PurchaseBar({ product, state, added, inCart, onAdd, onBuyNow }: PurchaseBarProps) {
     const { data: paymentOptions } = usePaymentOptions();
     const installment = installmentLabel(product.priceCents, paymentOptions);
@@ -46,7 +45,7 @@ export function PurchaseBar({ product, state, added, inCart, onAdd, onBuyNow }: 
                         {deliverySummaryOf(product)}
                     </p>
                 </div>
-                {/* Région annoncée : changer de taille annonce la rupture ou le stock restant. */}
+                {}
                 <p
                     aria-live="polite"
                     className={cn(

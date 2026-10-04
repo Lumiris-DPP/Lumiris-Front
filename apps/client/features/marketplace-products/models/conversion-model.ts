@@ -3,7 +3,6 @@ import { MIN_PUBLISHED_PRICE_CENTS, sizesOf, toSizeGuidePayload, toVariantPayloa
 import type { SizeGuideDraft, VariantRow } from './product-payload';
 import { MAX_PREPARATION_DAYS, MAX_WEIGHT_GRAMS, requireEuros, requireInteger } from './product-input';
 
-/** Décrit les saisies de conversion du passeport en annonce. */
 interface ConversionDraft {
     priceEuros: string;
     shippingEuros: string;
@@ -17,7 +16,6 @@ interface ConversionDraft {
     photoUrl: string;
 }
 
-/** Construit une annonce publiée sans masquer une saisie invalide. */
 export function convertedProductPayload(draft: ConversionDraft): ConvertDppRequest {
     const priceCents = requireEuros(draft.priceEuros, 'Prix');
     if (priceCents < MIN_PUBLISHED_PRICE_CENTS) throw new Error('Un produit publié doit coûter au moins 0,50 €.');

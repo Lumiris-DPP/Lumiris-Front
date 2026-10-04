@@ -11,7 +11,6 @@ interface SizeGuideSheetProps {
     measurements: readonly SizeMeasurement[];
 }
 
-/** Présente les mesures de taille renseignées par l’atelier. */
 export function SizeGuideSheet({ open, onOpenChange, measurements }: SizeGuideSheetProps) {
     const grid = pivotSizeGuide(measurements);
 

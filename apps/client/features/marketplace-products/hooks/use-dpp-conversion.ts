@@ -9,7 +9,6 @@ import type { SizeGuideDraft, VariantRow } from '../models/product-payload';
 import { convertedProductPayload } from '../models/conversion-model';
 import { productErrorMessage } from '../models/product-error';
 
-/** Pilote les saisies et la conversion du passeport sélectionné. */
 export function useDppConversion(open: boolean, onOpenChange: (open: boolean) => void) {
     const { data: dpps = [], isLoading, error: dppsError } = useDppForms({ enabled: open });
     const convert = useConvertDppToProduct();
@@ -34,7 +33,6 @@ export function useDppConversion(open: boolean, onOpenChange: (open: boolean) =>
     const canSubmit = dppFormId !== '' && !convert.isPending && !sellBlocked && !isLoading && !dppsError;
     const [error, setError] = useState<string | null>(null);
 
-    /** Réinitialise les saisies et erreurs de conversion. */
     const reset = () => {
         setError(null);
         setDppFormId('');
@@ -50,7 +48,6 @@ export function useDppConversion(open: boolean, onOpenChange: (open: boolean) =>
         setPhotoUrl('');
     };
 
-    /** Valide les saisies avant de lancer la mutation demandée. */
     const submit = () => {
         if (!canSubmit) return;
         let payload;
@@ -77,7 +74,6 @@ export function useDppConversion(open: boolean, onOpenChange: (open: boolean) =>
         convert.mutate(
             { dppFormId, payload },
             {
-                /** Annonce la réussite et termine la mutation demandée. */
                 onSuccess: (item) => {
                     toast.success('DPP converti en produit', {
                         description: `« ${item.name} » est en vente${item.inAppSale ? ' (paiement in-app)' : ''}.`,
@@ -85,7 +81,7 @@ export function useDppConversion(open: boolean, onOpenChange: (open: boolean) =>
                     reset();
                     onOpenChange(false);
                 },
-                /** Affiche la cause exacte de l’échec de la requête. */
+
                 onError: (e) => {
                     const message = productErrorMessage(e);
                     setError(message);

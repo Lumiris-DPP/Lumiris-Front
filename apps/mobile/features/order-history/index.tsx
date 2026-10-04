@@ -14,7 +14,6 @@ import { GlassCard, IridescentBackground, slideUpFade } from '@/lib/motion';
 
 const ORDERS_RETURN = encodeURIComponent('/me/orders');
 
-// Formate la date de commande sans inventer de valeur absente.
 function formatDate(iso: string | null | undefined): string | null {
     if (!iso) return null;
     const date = new Date(iso);
@@ -22,9 +21,6 @@ function formatDate(iso: string | null | undefined): string | null {
     return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
 }
 
-// Une ligne par PIÈCE, pas par paiement : chaque atelier expédie son propre colis, donc chaque
-// pièce a son suivi, sa fenêtre de retour et son éventuel litige. Regrouper par paiement
-// masquerait qu'un colis est arrivé pendant qu'un autre est encore en préparation.
 export function OrderHistory() {
     const { isAuthenticated } = useUser();
     const { data: orders = [], isLoading, isError, refetch } = useMyOrders({ enabled: isAuthenticated });
@@ -116,7 +112,6 @@ export function OrderHistory() {
     );
 }
 
-// Relie chaque pièce à son suivi et à son statut actuel.
 function OrderRow({ order }: { order: OrderResponse }) {
     const date = formatDate(order.createdAt);
     const disputed = order.disputeStatus === 'OPEN';

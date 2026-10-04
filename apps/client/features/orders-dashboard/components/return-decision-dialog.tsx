@@ -17,8 +17,6 @@ import { Label } from '@lumiris/ui/components/label';
 import { Textarea } from '@lumiris/ui/components/textarea';
 import { toast } from '@lumiris/ui/components/sonner';
 
-// Accepter et refuser ouvrent la même boîte : la seule différence est la décision transmise, et
-// un refus exige un motif — l'acheteur peut en faire un litige, le dossier doit tenir.
 export function ReturnDecisionDialog({
     order,
     open,
@@ -35,7 +33,6 @@ export function ReturnDecisionDialog({
         if (open) setNote('');
     }, [open]);
 
-    // Transmet la décision de retour et le motif saisis par le vendeur.
     const decide = (accepted: boolean) => {
         if (decideMutation.isPending || !order.canDecideReturn) return;
         if (!accepted && note.trim().length < 3) {

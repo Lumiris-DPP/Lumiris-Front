@@ -27,7 +27,6 @@ interface BoutiqueFiltersProps {
     materialOptions: readonly string[];
 }
 
-/** Barre sticky : tri rapide + déclencheur de la modale de filtres. */
 export function BoutiqueFilters({
     state,
     onChange,
@@ -106,7 +105,6 @@ interface SheetProps extends BoutiqueFiltersProps {
     onOpenChange: (open: boolean) => void;
 }
 
-/** Affiche les facettes du catalogue dans la feuille de filtres. */
 function BoutiqueFilterSheet({
     open,
     onOpenChange,
@@ -227,7 +225,6 @@ function BoutiqueFilterSheet({
     );
 }
 
-/** Regroupe les choix d’une même facette dans un champ accessible. */
 function FilterGroup({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <fieldset className="flex flex-col gap-3">
@@ -239,8 +236,6 @@ function FilterGroup({ label, children }: { label: string; children: React.React
     );
 }
 
-// Le champ pilote un brouillon local et ne remonte qu'après 300 ms : chaque frappe déclencherait
-// sinon une requête catalogue. La soumission du formulaire vide le délai (touche Entrée / Rechercher).
 function SearchField({ value, onChange }: { value: string; onChange: (next: string) => void }) {
     const [draft, setDraft] = useState(value);
 
