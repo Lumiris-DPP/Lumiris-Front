@@ -5,9 +5,6 @@ import { Loader2 } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@lumiris/ui/components/sheet';
 import { AttachmentPicker, type PickedFile } from './attachment-picker';
 
-// Une seule feuille pour toutes les actions qui n'exigent qu'un texte : demander un retour,
-// ouvrir un litige, répondre dans un litige. Le libellé arrive en props — la feuille ne connaît
-// aucune de ces trois situations.
 export function ReasonSheet({
     open,
     title,
@@ -27,7 +24,7 @@ export function ReasonSheet({
     suggestions?: readonly string[];
     submitLabel: string;
     pending: boolean;
-    /** Autorise les photos : pertinent pour un retour, un litige ou un message, pas pour une annulation. */
+
     withAttachments?: boolean;
     onSubmit: (reason: string, fileIds: string[]) => void;
     onClose: () => void;
@@ -89,8 +86,7 @@ export function ReasonSheet({
                     </div>
                 ) : null}
 
-                {/* Le titre de la feuille sert d'étiquette au champ : le répéter au-dessus du
-                    textarea alourdirait l'écran sans rien apprendre. */}
+                {}
                 <textarea
                     aria-label={title}
                     disabled={pending}

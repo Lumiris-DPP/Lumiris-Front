@@ -30,7 +30,6 @@ import { resetCheckoutIntents, useCheckoutIntent } from './hooks/use-checkout-in
 
 type Step = 'address' | 'payment';
 
-// Tunnel de paiement en deux étapes, adresse puis Payment Element, sur un panier relu sans erreur.
 export function Checkout() {
     const router = useRouter();
     const { user, isAuthenticated } = useUser();
@@ -41,13 +40,8 @@ export function Checkout() {
     const [step, setStep] = useState<Step>('address');
     const [address, setAddress] = useState<ShippingAddress | null>(null);
 
-    // L'adresse déjà utilisée est proposée d'office ; l'acheteur la confirme d'un geste au lieu
-    // de la retaper. Lue au montage seulement — ensuite l'état de l'écran fait foi.
     const [savedAddress] = useState(() => readShippingAddress());
 
-    // Le PaymentIntent n'est préparé qu'une fois l'adresse validée et le panier relu sans problème :
-    // un panier en chargement, en panne ou avec une ligne invalide ne se paie pas, même en partie.
-    // Le contexte porte l'acheteur, les lignes exactes et l'adresse : si l'un change, il change.
     const buyerId = user?.id ?? null;
     const context = useMemo(
         () => checkoutContextOf({ onPaymentStep: step === 'payment', address, buyerId, hasBlockingIssue, items }),
@@ -71,8 +65,6 @@ export function Checkout() {
         );
     }
 
-    // Porte d'authentification : un invité doit se connecter avant de payer. Le panier n'est PAS
-    // vidé — il sera fusionné et restauré au retour (returnTo=/checkout).
     if (screen.kind === 'sign-in') {
         return <SignInGate onBack={() => router.replace('/panier')} />;
     }
@@ -102,8 +94,6 @@ export function Checkout() {
     }
 
     if (screen.kind === 'refused' || screen.kind === 'payment-down') {
-        // Refus métier (stock, atelier, taille) : le message du serveur dit quoi corriger. Incident
-        // (réseau, service indisponible) : on propose de réessayer, sans message technique.
         const refused = screen.kind === 'refused';
         return refused ? (
             <CheckoutMessage
@@ -146,8 +136,6 @@ export function Checkout() {
                         <Loader2 className="h-4 w-4 animate-spin" /> Préparation du paiement sécurisé…
                     </div>
                 ) : (
-                    // Le client secret ne peut pas changer sous un Payment Element monté : un nouveau
-                    // contexte remonte le formulaire sur le nouveau PaymentIntent.
                     <Elements
                         key={intent.clientSecret}
                         stripe={getStripe(intent.publishableKey)}
@@ -161,9 +149,6 @@ export function Checkout() {
                             amountTotalCents={intent.amountTotalCents}
                             onEditAddress={() => setStep('address')}
                             onPaid={(paymentIntentId) => {
-                                // Rattache la conversion au passeport d'origine (clic suggestion). Le
-                                // panier n'est pas vidé ici : l'écran de confirmation retire les lignes
-                                // payées une fois le paiement confirmé par le serveur.
                                 for (const publicCode of takeConversionOrigins(items.map((it) => it.product.id))) {
                                     trackEvent({ publicCode, type: 'CONVERSION' });
                                 }

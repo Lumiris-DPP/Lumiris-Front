@@ -16,8 +16,6 @@ interface BoutiqueCardProps {
     index: number;
 }
 
-// Lien étalé plutôt que carte enveloppée dans un <a> : le bouton favori doit rester un frère du
-// lien (un <button> dans un <a> est du HTML invalide) tout en se posant sur l'image.
 export function BoutiqueCard({ item, index }: BoutiqueCardProps) {
     const grade = item.irisGrade;
     const isE = grade === 'E';

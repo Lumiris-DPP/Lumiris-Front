@@ -11,8 +11,6 @@ import { BoutiqueFilters } from './components/filters';
 import { EMPTY_BOUTIQUE_FILTERS, type BoutiqueFiltersState } from './models/filters-model';
 import { useBoutiqueCatalogue } from './hooks/use-boutique-catalogue';
 
-// Écran Boutique : l'état des filtres vit ici, la lecture du catalogue dans useBoutiqueCatalogue et
-// les calculs de facettes dans filters-model.
 export function Boutique() {
     const [filters, setFilters] = useState<BoutiqueFiltersState>(EMPTY_BOUTIQUE_FILTERS);
     const { query, items, priceBounds, categoryOptions, materialOptions, isLoading, isError, retry } =
@@ -56,8 +54,7 @@ export function Boutique() {
             />
 
             <div className="flex-1 overflow-y-auto px-5 pb-28">
-                {/* Le nombre de pièces change à chaque filtre : annoncé, il dit au lecteur d'écran ce
-                    que la grille vient de faire. */}
+                {}
                 <p role="status" className="sr-only">
                     {isLoading || isError ? '' : `${items.length} pièce${items.length > 1 ? 's' : ''}`}
                 </p>
@@ -93,7 +90,6 @@ export function Boutique() {
     );
 }
 
-/** Affiche les cartes provisoires pendant le chargement du catalogue. */
 function BoutiqueSkeleton() {
     return (
         <div className="grid grid-cols-2 gap-3" aria-hidden>
@@ -104,7 +100,6 @@ function BoutiqueSkeleton() {
     );
 }
 
-/** Annonce une panne du catalogue et permet de relancer sa lecture. */
 function BoutiqueError({ onRetry }: { onRetry: () => void }) {
     return (
         <div
@@ -132,7 +127,6 @@ function BoutiqueError({ onRetry }: { onRetry: () => void }) {
     );
 }
 
-/** Présente une boutique ou une recherche sans résultat avec son action utile. */
 function BoutiqueEmpty({
     title,
     body,

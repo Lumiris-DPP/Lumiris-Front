@@ -10,7 +10,6 @@ import {
 } from '@lumiris/api-client';
 import { Check, CircleDot, PackageCheck, Truck } from 'lucide-react';
 
-/** Affiche la date et l’heure d’un événement de commande. */
 function formatDateTime(iso?: string | null): string {
     if (!iso) return '';
     const date = new Date(iso);
@@ -25,9 +24,6 @@ function formatDateTime(iso?: string | null): string {
 
 const STEP_ICON = [CircleDot, Truck, PackageCheck, Check] as const;
 
-// Fil de progression du rail principal : quatre étapes lisibles d'un coup d'œil. Une commande
-// qui bifurque (retour, litige, remboursement) quitte ce rail — la timeline détaillée en dessous
-// prend alors le relais et raconte ce qui s'est réellement passé.
 export function TrackingSteps({ status }: { status: OrderStatus }) {
     const current = trackingStepIndex(status);
     if (current < 0) {
@@ -85,12 +81,11 @@ const ACTOR_LABEL: Record<OrderEvent['actorType'], string> = {
     SYSTEM: 'Automatique',
 };
 
-/** Présente le fil des événements serveur de la commande. */
 export function OrderTimeline({ events }: { events: readonly OrderEvent[] }) {
     if (events.length === 0) {
         return <p className="text-xs text-muted-foreground">Aucun évènement pour l’instant.</p>;
     }
-    // Le plus récent en tête : c'est la seule ligne que l'acheteur lit vraiment quand il ouvre l'écran.
+
     const ordered = [...events].reverse();
     return (
         <ol className="flex flex-col gap-3 border-l border-border/60 pl-4">
@@ -112,8 +107,6 @@ export function OrderTimeline({ events }: { events: readonly OrderEvent[] }) {
     );
 }
 
-// Preuves jointes à une étape (photo d'un article abîmé, étiquette de retour). Les URL sont
-// présignées et expirent : on les affiche, on ne les met pas en cache.
 function EventAttachments({ event }: { event: OrderEvent }) {
     const attachments = event.attachments ?? [];
     if (attachments.length === 0) {

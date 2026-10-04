@@ -10,9 +10,7 @@ import { AlertTriangle, Loader2, LogIn } from 'lucide-react';
 
 import { routes } from '@/lib/routes';
 
-/** Place la confirmation dans la frontière nécessaire aux paramètres de retour Stripe. */
 export function OrderConfirmation({ routeId }: { routeId: string }) {
-    // useSearchParams (retour de redirection Stripe) impose une frontière Suspense.
     return (
         <Suspense fallback={<CenteredSpinner label="Récupération de ta commande…" />}>
             <OrderConfirmationInner key={routeId} routeId={routeId} />
@@ -20,15 +18,13 @@ export function OrderConfirmation({ routeId }: { routeId: string }) {
     );
 }
 
-// Confirmation d'achat : n'affirme que ce que le serveur a relu, et ne retire du panier que les
-// lignes du paiement confirmé — ouvrir l'URL seule ne prouve rien et ne détruit rien.
 function OrderConfirmationInner({ routeId }: { routeId: string }) {
     const searchParams = useSearchParams();
     const { view, group, targetPi, wardrobe, refetchGroup, refetchOrders } = useOrderConfirmation(
         routeId,
         searchParams.get('payment_intent'),
     );
-    // Invité : la commande n'est pas lisible sans session, l'écran n'annonce donc aucun paiement.
+
     if (view === 'signed-out') {
         return (
             <div className="flex h-full flex-col items-center justify-center gap-5 bg-background px-8 text-center">
@@ -92,7 +88,6 @@ function OrderConfirmationInner({ routeId }: { routeId: string }) {
     return <ConfirmationDetails group={group} view={view} targetPi={targetPi} wardrobeCount={wardrobe.length} />;
 }
 
-// Message plein écran quand aucune commande ne peut être affichée, avec la seule action utile.
 function ConfirmationMessage({
     title,
     description,
@@ -126,7 +121,6 @@ function ConfirmationMessage({
     );
 }
 
-/** Annonce le chargement de la commande à l’acheteur. */
 function CenteredSpinner({ label }: { label: string }) {
     return (
         <div className="flex h-full items-center justify-center gap-2 bg-background text-sm text-muted-foreground">

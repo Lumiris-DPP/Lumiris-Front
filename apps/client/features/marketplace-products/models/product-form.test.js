@@ -14,7 +14,6 @@ import {
     variantRowsFrom,
 } from './product-payload';
 
-/** Fournit une annonce complète avec ses versions et son délai brut. */
 function productFixture() {
     return {
         id: 'product',
@@ -54,7 +53,6 @@ function productFixture() {
     };
 }
 
-/** Fournit les saisies minimales de conversion sans stock explicite. */
 function conversionFixture() {
     return {
         priceEuros: '159,99',

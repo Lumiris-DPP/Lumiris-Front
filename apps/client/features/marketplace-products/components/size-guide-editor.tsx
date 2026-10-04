@@ -7,14 +7,12 @@ import { Label } from '@lumiris/ui/components/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@lumiris/ui/components/table';
 import { cellKey, type SizeGuideDraft } from '../models/product-payload';
 
-/** Décrit les tailles et mesures de leur éditeur. */
 interface SizeGuideEditorProps {
     sizes: readonly string[];
     value: SizeGuideDraft;
     onChange: (next: SizeGuideDraft) => void;
 }
 
-/** Affiche les mesures des tailles déclarées par les déclinaisons. */
 export function SizeGuideEditor({ sizes, value, onChange }: SizeGuideEditorProps) {
     if (sizes.length === 0) {
         return (
@@ -27,7 +25,6 @@ export function SizeGuideEditor({ sizes, value, onChange }: SizeGuideEditorProps
         );
     }
 
-    /** Renomme une mesure en conservant les valeurs déjà saisies. */
     const setLabel = (index: number, label: string) => {
         const previous = value.labels[index] ?? '';
         const values = { ...value.values };
@@ -40,7 +37,6 @@ export function SizeGuideEditor({ sizes, value, onChange }: SizeGuideEditorProps
         onChange({ labels: value.labels.map((existing, i) => (i === index ? label : existing)), values });
     };
 
-    /** Retire une mesure et ses cellules pour toutes les tailles. */
     const removeLabel = (index: number) => {
         const removed = value.labels[index];
         const values = { ...value.values };
@@ -48,7 +44,6 @@ export function SizeGuideEditor({ sizes, value, onChange }: SizeGuideEditorProps
         onChange({ labels: value.labels.filter((_, i) => i !== index), values });
     };
 
-    /** Modifie la mesure saisie pour une taille donnée. */
     const setCell = (size: string, label: string, cm: string) =>
         onChange({ ...value, values: { ...value.values, [cellKey(size, label)]: cm } });
 

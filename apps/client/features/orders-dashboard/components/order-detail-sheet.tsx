@@ -31,8 +31,6 @@ import { orderFundsText } from '../models/orders-model';
 import { readRefundOperation } from '../models/refund-operation';
 import { useAuthStore } from '@/lib/auth-store';
 
-// Détail d'une commande et toutes ses actions au même endroit : le vendeur décide sur pièce
-// (adresse, motif du retour, historique) sans changer d'écran.
 export function OrderDetailSheet({ order, onClose }: { order: SellerOrder | null; onClose: () => void }) {
     const [shipOpen, setShipOpen] = useState(false);
     const [refundOpen, setRefundOpen] = useState(false);
@@ -111,7 +109,6 @@ export function OrderDetailSheet({ order, onClose }: { order: SellerOrder | null
     );
 }
 
-// Propose les transitions autorisées par la dernière lecture des permissions serveur.
 function OrderActions({
     order,
     onShip,
@@ -187,9 +184,6 @@ function OrderActions({
     );
 }
 
-// Rupture de stock, pièce abîmée à la préparation : le vendeur doit pouvoir renoncer sans laisser
-// l'acheteur attendre un colis qui ne partira jamais. Remboursement intégral, pièce remise au
-// catalogue. Irréversible, donc confirmé.
 function CancelOrderButton({ order }: { order: SellerOrder }) {
     const [open, setOpen] = useState(false);
     const cancelMutation = useCancelSellerOrder();
@@ -235,7 +229,6 @@ function CancelOrderButton({ order }: { order: SellerOrder }) {
     );
 }
 
-// Présente les montants et le reversement persistés pour cette commande.
 function MoneySection({ order }: { order: SellerOrder }) {
     const currency = order.currency ?? 'EUR';
     const rows = [
@@ -276,7 +269,6 @@ function MoneySection({ order }: { order: SellerOrder }) {
     );
 }
 
-// Affiche l’adresse de livraison du dossier vendeur.
 function AddressSection({ order }: { order: SellerOrder }) {
     return (
         <section>
@@ -310,7 +302,6 @@ function AddressSection({ order }: { order: SellerOrder }) {
     );
 }
 
-// Affiche le suivi fourni lors de l’expédition.
 function TrackingSection({ order }: { order: SellerOrder }) {
     return (
         <section>
@@ -333,13 +324,10 @@ function TrackingSection({ order }: { order: SellerOrder }) {
     );
 }
 
-// Fil de conversation avec l'acheteur, toujours disponible : la plupart des incidents se règlent
-// par un message avant de devenir un retour ou un litige.
 function MessageComposer({ orderId, disputeOpen }: { orderId: string; disputeOpen: boolean }) {
     const [message, setMessage] = useState('');
     const postMessage = usePostSellerMessage();
 
-    // Envoie le message à la commande affichée sans perdre le texte en cas d’échec.
     const send = () => {
         if (message.trim().length < 3 || postMessage.isPending) return;
         postMessage.mutate(

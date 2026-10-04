@@ -1,23 +1,18 @@
-// Vue produit normalisée pour l'UI Boutique — projetée depuis le DTO backend
-// (MarketplaceItemResponse, catalogue public réel). Le passeport (DPP) reste lié
-// via dppFormId ; la fiche produit affiche les données réelles de l'annonce.
-
 import type { MarketplaceItem as MarketplaceItemDto, MarketplaceVariant, SizeMeasurement } from '@lumiris/api-client';
 import type { IrisGrade } from '@lumiris/types';
 
 export interface MarketplaceItem {
-    /** Identifiant produit — clé du panier et de la fiche Boutique. */
     id: string;
-    /** DPP source (passeport numérique) rattaché à l'annonce, s'il existe. */
+
     dppFormId: string | null;
-    /** Atelier vendeur — regroupe les lignes du panier en colis (un par atelier). */
+
     artisanProfileId: string;
     name: string;
     description: string | null;
     category: string | null;
     material: string | null;
     originCountry: string | null;
-    /** Prix en centimes (source de vérité) + en euros (affichage). */
+
     priceCents: number;
     price: number;
     currency: string;
@@ -27,21 +22,21 @@ export interface MarketplaceItem {
     irisGrade: IrisGrade | null;
     irisTotal: number | null;
     createdAt: string | null;
-    /** Frais de port de l'offre en centimes. `null` = inconnu, `0` = livraison offerte. */
+
     shippingCents: number | null;
-    /** Conditions de retour affichées à l'acheteur avant paiement. */
+
     returnPolicy: string | null;
-    /** Garantie / SAV annoncés par l'atelier. */
+
     warrantyDescription: string | null;
-    /** Déclinaisons vendables. Une annonce en a toujours au moins une. */
+
     variants: MarketplaceVariant[];
-    /** Cotes relevées par l'atelier, en millimètres. */
+
     sizeGuide: SizeMeasurement[];
-    /** Délai d'expédition promis à l'acheteur, congés de l'atelier inclus. 0 = pièce en stock. */
+
     preparationDays: number;
-    /** Date de retour de l'atelier, quand il est en congés. */
+
     atelierPausedUntil: string | null;
-    /** DTO d'origine — le cache des favoris est indexé dessus. */
+
     source: MarketplaceItemDto;
 }
 
@@ -55,8 +50,6 @@ export const MARKETPLACE_SORT_LABEL: Record<MarketplaceSort, string> = {
     iris: 'Score Iris',
 };
 
-// RÈGLE GRAVÉE : `relevance` vient en tête et reste le tri par défaut. Il ne dépend
-// JAMAIS ni de la commission marketplace (~5%, masquée) ni du score Iris.
 export const MARKETPLACE_SORT_ORDER: readonly MarketplaceSort[] = [
     'relevance',
     'newest',
@@ -67,12 +60,10 @@ export const MARKETPLACE_SORT_ORDER: readonly MarketplaceSort[] = [
 
 const GRADES: ReadonlySet<string> = new Set(['A', 'B', 'C', 'D', 'E']);
 
-/** Conserve uniquement une note Iris reconnue. */
 function asGrade(value: string | null | undefined): IrisGrade | null {
     return value && GRADES.has(value) ? (value as IrisGrade) : null;
 }
 
-/** Projette un article du catalogue public backend vers la vue Boutique. */
 export function toMarketplaceItem(dto: MarketplaceItemDto): MarketplaceItem {
     return {
         id: dto.id,
@@ -103,7 +94,6 @@ export function toMarketplaceItem(dto: MarketplaceItemDto): MarketplaceItem {
     };
 }
 
-/** Libellé lisible d'une déclinaison, nul quand elle ne porte aucun axe. */
 export function variantLabel(variant: MarketplaceVariant): string | null {
     const size = variant.sizeLabel?.trim();
     const color = variant.colorLabel?.trim();
@@ -111,7 +101,6 @@ export function variantLabel(variant: MarketplaceVariant): string | null {
     return size || color || null;
 }
 
-/** Liste les tailles distinctes réellement proposées par l’atelier. */
 export function sizeOptionsOf(item: MarketplaceItem): readonly string[] {
     const sizes: string[] = [];
     for (const variant of item.variants) {
@@ -126,7 +115,6 @@ interface ColorOption {
     hex: string | null;
 }
 
-/** Liste les couleurs distinctes et leur teinte déclarée. */
 export function colorOptionsOf(item: MarketplaceItem): readonly ColorOption[] {
     const colors: ColorOption[] = [];
     for (const variant of item.variants) {
@@ -138,7 +126,6 @@ export function colorOptionsOf(item: MarketplaceItem): readonly ColorOption[] {
     return colors;
 }
 
-/** Résout la déclinaison correspondant exactement aux axes choisis. */
 export function findVariant(
     item: MarketplaceItem,
     size: string | null,
@@ -151,7 +138,6 @@ export function findVariant(
     );
 }
 
-/** « Expédiée sous N jours », ou null pour une pièce en stock. */
 export function preparationLabel(days: number): string | null {
     return days >= 1 ? `Expédiée sous ${days} jour${days > 1 ? 's' : ''}` : null;
 }

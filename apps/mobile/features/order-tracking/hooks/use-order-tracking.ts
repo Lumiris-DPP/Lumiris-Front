@@ -12,7 +12,6 @@ import {
 import { toast } from '@/lib/toast';
 import { canSubmitReason, type SheetKind } from '../models/tracking-model';
 
-// Coordonne la lecture et les mutations sans déplacer les transitions du serveur.
 export function useOrderTracking(orderId: string | null, isAuthenticated: boolean) {
     const query = useOrderDetail(orderId, { enabled: isAuthenticated && Boolean(orderId) });
     const [sheet, setSheet] = useState<SheetKind | null>(null);
@@ -28,7 +27,6 @@ export function useOrderTracking(orderId: string | null, isAuthenticated: boolea
         cancelOrder.isPending ||
         confirmDelivery.isPending;
 
-    // Conserve le motif et les pièces jointes lorsque le serveur refuse l'action.
     function submitReason(reason: string, fileIds: string[]) {
         if (!orderId || !query.data || submitting || query.isError) return;
         if (!canSubmitReason(query.data.order, sheet)) {
@@ -36,14 +34,14 @@ export function useOrderTracking(orderId: string | null, isAuthenticated: boolea
             return;
         }
         const vars = { orderId, input: { reason, fileIds } };
-        // Ferme la feuille uniquement après confirmation de la mutation.
+
         function done(message: string) {
             return () => {
                 toast(message);
                 setSheet(null);
             };
         }
-        // Présente l’échec en laissant la saisie disponible pour un nouvel essai.
+
         function failed(error: Error) {
             toast(error.message || 'Action impossible pour le moment.');
         }
@@ -72,7 +70,6 @@ export function useOrderTracking(orderId: string | null, isAuthenticated: boolea
         }
     }
 
-    // Confirme la réception seulement si la dernière lecture la permet encore.
     function confirmReception() {
         if (!orderId || submitting || query.isError || !query.data?.order.canConfirmDelivery) return;
         confirmDelivery.mutate(

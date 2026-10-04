@@ -11,7 +11,6 @@ const TONE_VARIANT: Record<OrderStatusTone, BadgeVariant> = {
     warning: 'danger',
 };
 
-// Un litige masque l'état logistique : c'est lui qui appelle une réponse, pas l'étape du colis.
 export function OrderStatusBadge({ status, disputeStatus }: { status: OrderStatus; disputeStatus: DisputeStatus }) {
     if (disputeStatus === 'OPEN') {
         return <Badge variant="destructive">{DISPUTE_STATUS_LABEL.OPEN}</Badge>;

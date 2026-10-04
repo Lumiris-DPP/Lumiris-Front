@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { createIntentCache } from '@/features/checkout/models/intent-cache';
 
-// Compte les requêtes envoyées au serveur pour une suite de contextes.
 function requests(keys: readonly string[]): number {
     const cache = createIntentCache<string>();
     let sent = 0;

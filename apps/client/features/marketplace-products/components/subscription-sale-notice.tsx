@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { Button } from '@lumiris/ui/components/button';
 import { useSubscription } from '@/lib/use-subscription';
 
-// Affiche la vérification, sa panne ou l'abonnement réellement requis.
 export function SubscriptionSaleNotice() {
     const { saleState, refetch, isFetching } = useSubscription();
     if (saleState === 'active') return null;

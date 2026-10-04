@@ -21,14 +21,12 @@ import { useProductForm } from '../hooks/use-product-form';
 import { SizeGuideEditor } from './size-guide-editor';
 import { VariantsEditor } from './variants-editor';
 
-/** Décrit le produit et les commandes du dialogue de modification. */
 interface ProductFormDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     product?: MarketplaceItem;
 }
 
-/** Affiche les sections du formulaire de modification du produit artisan. */
 export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDialogProps) {
     const { form, set, dpps, pending, sizes, onSubmit, error } = useProductForm(open, onOpenChange, product);
 
@@ -219,7 +217,6 @@ export function ProductFormDialog({ open, onOpenChange, product }: ProductFormDi
     );
 }
 
-/** Associe un libellé au champ du formulaire de produit. */
 function Field({ label, htmlFor, children }: { label: string; htmlFor: string; children: ReactNode }) {
     return (
         <div className="grid gap-1.5">

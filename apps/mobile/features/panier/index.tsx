@@ -15,8 +15,6 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 
 import { useCartDetails } from '@/lib/marketplace/use-cart-details';
 
-// Panier de l'acheteur : colis par atelier, lignes à corriger et total. Une lecture du catalogue en
-// cours ou en panne ne vide rien et ne déclare aucune pièce indisponible.
 export function Panier() {
     const router = useRouter();
     const {
@@ -34,7 +32,7 @@ export function Panier() {
         retry,
     } = useCartDetails();
     const empty = lines.length === 0;
-    // Tant que les fiches ne sont pas relues, le compteur dit ce que contient le panier local.
+
     const shownCount = loadState === 'ready' ? count : lines.reduce((sum, line) => sum + line.quantity, 0);
 
     return (

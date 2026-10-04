@@ -24,7 +24,7 @@ import type { confirmationView } from '../models/confirmation-view';
 
 import type { OrderGroup } from '@lumiris/api-client';
 import { confirmationRefundFacts, confirmationTotalLabel } from '../models/confirmation-view';
-/** Affiche les montants serveur et les suites de la commande selon sa confirmation. */
+
 export function ConfirmationDetails({
     group,
     view,
@@ -99,8 +99,6 @@ export function ConfirmationDetails({
             </div>
 
             {view === 'pending-timeout' ? (
-                // Borne atteinte, commande toujours en attente : repli explicite avec une porte de
-                // sortie, plutôt qu'un écran qui n'évoluera plus.
                 <div className="mt-8 px-4">
                     <section className="rounded-2xl border border-lumiris-amber/30 bg-lumiris-amber/10 p-4">
                         <div className="flex items-center gap-2">
@@ -126,8 +124,7 @@ export function ConfirmationDetails({
                     <h2 className="mb-3 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                         {group.lines.length > 1 ? `Articles (${group.lines.length})` : 'Article'}
                     </h2>
-                    {/* Chaque ligne mène à son propre suivi : un panier multi-atelier donne
-                            plusieurs colis, qui n'avancent pas au même rythme. */}
+                    {}
                     <ul className="flex flex-col gap-1">
                         {group.lines.map((line) => (
                             <li key={line.id}>

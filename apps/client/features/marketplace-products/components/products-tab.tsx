@@ -26,7 +26,6 @@ import { ProductFormDialog } from './product-form-dialog';
 import { MIN_PUBLISHED_PRICE_CENTS, productPayloadFrom } from '../models/product-payload';
 import { STATUS_LABEL } from '../models/labels';
 
-/** Affiche les produits et leurs actions de modification et de statut. */
 export function ProductsTab({ onCreate }: { onCreate: () => void }) {
     const token = useAuthStore((s) => s.token);
     const { data: products = [], isLoading, error } = useMyProducts({ enabled: Boolean(token) });
@@ -37,27 +36,23 @@ export function ProductsTab({ onCreate }: { onCreate: () => void }) {
     const [editing, setEditing] = useState<MarketplaceItem | undefined>(undefined);
     const [toDelete, setToDelete] = useState<MarketplaceItem | undefined>(undefined);
 
-    /** Sélectionne le produit et ouvre son formulaire de modification. */
     const openEdit = (product: MarketplaceItem) => {
         setEditing(product);
         setFormOpen(true);
     };
 
-    /** Envoie le PUT complet du produit avec son nouveau statut. */
     const setStatus = (product: MarketplaceItem, status: MarketplaceProductStatus) => {
         if (updateMutation.isPending) return;
         updateMutation.mutate(
             { id: product.id, payload: productPayloadFrom(product, status) },
             {
-                /** Annonce la réussite et termine la mutation demandée. */
                 onSuccess: () => toast.success(status === 'ARCHIVED' ? 'Produit archivé.' : 'Produit publié.'),
-                /** Affiche la cause exacte de l’échec de la requête. */
+
                 onError: (e) => toast.error(e.message || 'Échec de la mise à jour.'),
             },
         );
     };
 
-    /** Valide le prix avant de publier ou archiver le produit. */
     const toggleVisibility = (product: MarketplaceItem) => {
         if (product.status === 'PUBLISHED') {
             setStatus(product, 'ARCHIVED');
@@ -73,15 +68,12 @@ export function ProductsTab({ onCreate }: { onCreate: () => void }) {
         setStatus(product, 'PUBLISHED');
     };
 
-    /** Demande la suppression du produit et propose son archivage en cas de conflit. */
     const confirmDelete = () => {
         if (!toDelete) return;
         const product = toDelete;
         deleteMutation.mutate(product.id, {
-            /** Annonce la réussite et termine la mutation demandée. */
             onSuccess: () => toast.success('Produit supprimé.'),
 
-            /** Affiche la cause exacte de l’échec de la requête. */
             onError: (e) => {
                 if (isApiError(e) && e.status === 409) {
                     toast.error(e.message || 'Suppression impossible.', {
@@ -89,7 +81,7 @@ export function ProductsTab({ onCreate }: { onCreate: () => void }) {
                             'Ce produit a des commandes et ne peut pas être supprimé. Vous pouvez l’archiver pour le retirer de la vente.',
                         action: {
                             label: 'Archiver',
-                            /** Déclenche l’action proposée dans la notification. */
+
                             onClick: () => setStatus(product, 'ARCHIVED'),
                         },
                     });

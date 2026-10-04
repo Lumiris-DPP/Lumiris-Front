@@ -1,4 +1,3 @@
-// Apparence du Payment Element alignée sur le design system (extraite pour garder le JSX lisible).
 export function stripeOptions(clientSecret: string) {
     return {
         clientSecret,

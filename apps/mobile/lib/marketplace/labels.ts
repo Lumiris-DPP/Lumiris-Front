@@ -17,12 +17,10 @@ const CATEGORY_LABEL_FR: Record<string, string> = {
     other: 'Autre',
 };
 
-/** Met en majuscule la première lettre du libellé. */
 export function capitalize(value: string): string {
     return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-/** Traduit la catégorie de la pièce pour l’acheteur. */
 export function marketplaceCategoryLabel(value: string): string {
     const slug = value.trim();
     return CATEGORY_LABEL_FR[slug.toLowerCase()] ?? capitalize(slug);

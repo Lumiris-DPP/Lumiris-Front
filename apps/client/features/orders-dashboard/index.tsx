@@ -17,8 +17,6 @@ import { OrdersTable } from './components/orders-table';
 import { OrderDetailSheet } from './components/order-detail-sheet';
 import { groupByTab, heldOrderCents } from './models/orders-model';
 
-// Ce que chaque onglet dit quand il est vide — un tableau vide sans phrase laisse le vendeur
-// se demander s'il attend une donnée ou s'il n'a simplement rien à faire.
 const EMPTY_COPY: Record<SellerOrderTab, { title: string; description: string }> = {
     TO_SHIP: {
         title: 'Aucune commande à expédier',
@@ -42,20 +40,16 @@ const EMPTY_COPY: Record<SellerOrderTab, { title: string; description: string }>
     },
 };
 
-// Compose les onglets à partir des commandes du vendeur connecté.
 export function OrdersDashboard() {
     const token = useAuthStore((s) => s.token);
     const { data: orders = [], isLoading, isError, refetch } = useSellerOrders({ enabled: Boolean(token) });
     const [selected, setSelected] = useState<string | null>(null);
 
     const byTab = useMemo(() => groupByTab(orders), [orders]);
-    // Le vendeur arrive sur ce qui l'attend : le premier onglet non vide dans l'ordre de
-    // priorité, plutôt qu'un « à expédier » vide qui masquerait un litige en cours.
+
     const [tab, setTab] = useState<SellerOrderTab | null>(null);
     const activeTab = tab ?? SELLER_ORDER_TABS.find((key) => byTab[key].length > 0) ?? 'TO_SHIP';
 
-    // La commande sélectionnée doit refléter le rafraîchissement de la liste (une action change
-    // son état) : on la relit dans les données fraîches plutôt que de figer une copie.
     const selectedOrder = selected ? (orders.find((o) => o.id === selected) ?? null) : null;
 
     if (isLoading) {
@@ -128,7 +122,6 @@ export function OrdersDashboard() {
     );
 }
 
-// Résume les expéditions, retours et fonds retenus des commandes chargées.
 function OrdersSummary({ orders }: { orders: readonly SellerOrder[] }) {
     const toShip = orders.filter((o) => o.canShip).length;
     const inTransit = orders.filter((o) => o.status === 'SHIPPED').length;

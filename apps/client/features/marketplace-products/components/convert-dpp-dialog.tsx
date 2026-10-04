@@ -19,7 +19,6 @@ import { SizeGuideEditor } from './size-guide-editor';
 import { VariantsEditor } from './variants-editor';
 import { SubscriptionSaleNotice } from './subscription-sale-notice';
 
-/** Affiche les sections de conversion du passeport en produit artisan. */
 export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
     const {
         dpps,

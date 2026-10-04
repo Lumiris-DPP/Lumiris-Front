@@ -9,7 +9,6 @@ import {
 } from '@/lib/marketplace/cart-model';
 import type { MarketplaceItem } from '@/lib/marketplace/product';
 
-// Fiche minimale du catalogue : une annonce, ses déclinaisons, son atelier et son port.
 function product(
     id: string,
     options: { artisan?: string; priceCents?: number; shippingCents?: number; stocks?: Record<string, number> } = {},
@@ -88,7 +87,6 @@ describe('buildCartDetails — lecture du catalogue', () => {
     });
 
     it('stock public insuffisant : signalé sans bloquer, le serveur tranche (réservation de l’acheteur comprise)', () => {
-        // L'acheteur détient la dernière unité réservée à une tentative précédente : le stock public est à 0.
         const cart = buildCartDetails([line('p1', 'p1-m', 1)], [product('p1', { stocks: { 'p1-m': 0 } })], 'ready');
         expect(cart.overstocked).toHaveLength(1);
         expect(cart.hasBlockingIssue).toBe(false);

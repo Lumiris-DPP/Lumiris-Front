@@ -1,6 +1,3 @@
-// Contexte d'un paiement : acheteur, lignes exactes du panier et adresse. Deux contextes différents
-// ne partagent jamais un PaymentIntent. Calcul pur, testé avec Bun.
-
 import type { CartIntentRequest } from '@lumiris/api-client';
 import type { CartItemDetail, PurchasedLine } from '@/lib/marketplace/cart-model';
 import type { ShippingAddress } from '@/lib/marketplace/shipping-address';
@@ -11,7 +8,6 @@ export interface CheckoutContext {
     address: ShippingAddress;
 }
 
-/** Clé du contexte : change dès que l'acheteur, une ligne, une quantité ou l'adresse change. */
 export function checkoutContextKey(context: CheckoutContext): string {
     const lines = context.lines
         .map((line) => `${line.productId}:${line.variantId ?? ''}:${line.quantity}`)
@@ -22,14 +18,12 @@ export function checkoutContextKey(context: CheckoutContext): string {
     return `${context.buyerId}#${lines}#${address}`;
 }
 
-/** Identifiant du PaymentIntent porté par son client secret (`pi_…_secret_…`). */
 export function paymentIntentIdOf(clientSecret: string): string {
     const end = clientSecret.indexOf('_secret_');
     return end > 0 ? clientSecret.slice(0, end) : clientSecret;
 }
 
 interface CheckoutContextInput {
-    /** Étape courante du tunnel : le paiement ne se prépare qu'à l'étape « paiement ». */
     onPaymentStep: boolean;
     address: ShippingAddress | null;
     buyerId: string | null;
@@ -37,7 +31,6 @@ interface CheckoutContextInput {
     items: ReadonlyArray<Pick<CartItemDetail, 'product' | 'variant' | 'quantity'>>;
 }
 
-/** Contexte à payer, ou null tant que l'adresse, l'acheteur ou un panier relu sans problème manque. */
 export function checkoutContextOf(input: CheckoutContextInput): CheckoutContext | null {
     const { onPaymentStep, address, buyerId, hasBlockingIssue, items } = input;
     if (!onPaymentStep || !address || !buyerId || hasBlockingIssue || items.length === 0) return null;
@@ -48,7 +41,6 @@ export function checkoutContextOf(input: CheckoutContextInput): CheckoutContext 
     };
 }
 
-/** Corps de la demande de PaymentIntent ; une ligne sans déclinaison laisse le serveur la résoudre. */
 export function cartIntentRequestOf(context: CheckoutContext): CartIntentRequest {
     return {
         items: context.lines.map((line) => ({

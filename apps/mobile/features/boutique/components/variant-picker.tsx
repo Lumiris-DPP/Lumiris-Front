@@ -11,16 +11,13 @@ interface VariantPickerProps {
     onOpenSizeGuide?: () => void;
 }
 
-// Rien n'est rendu quand l'annonce n'a qu'une déclinaison sans libellé : une pièce unique s'affiche
-// exactement comme avant les déclinaisons.
 export function VariantPicker({ item, selection, onChange, onOpenSizeGuide }: VariantPickerProps) {
     const sizes = sizeOptionsOf(item);
     const colors = colorOptionsOf(item);
     if (sizes.length === 0 && colors.length === 0) return null;
 
-    // Un axe incompatible libère l'autre sélection ; les ruptures restent visibles.
     const sizeVariant = (size: string) => findVariant(item, size, colors.length > 0 ? selection.color : null);
-    /** Résout la déclinaison de la couleur dans la taille choisie. */
+
     const colorVariant = (color: string) => findVariant(item, sizes.length > 0 ? selection.size : null, color);
 
     return (
@@ -117,7 +114,6 @@ export function VariantPicker({ item, selection, onChange, onOpenSizeGuide }: Va
     );
 }
 
-// Le barré ne se lit qu'à l'œil : le lecteur d'écran entend la rupture avec la taille ou la couleur.
 function SoldOutMention() {
     return <span className="sr-only">, épuisée</span>;
 }
