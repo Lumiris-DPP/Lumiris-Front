@@ -14,8 +14,8 @@ import { SubscriptionSaleNotice } from './components/subscription-sale-notice';
 export function MarketplaceProducts() {
     const [convertOpen, setConvertOpen] = useState(false);
 
-    const { hasActiveSubscription } = useSubscription();
-    const sellBlocked = !hasActiveSubscription;
+    const { saleState } = useSubscription();
+    const sellBlocked = saleState !== 'active';
 
     return (
         <div className="space-y-4 p-8">
@@ -25,7 +25,7 @@ export function MarketplaceProducts() {
 
             <div className="flex flex-col items-end gap-1.5">
                 <Button
-                    onClick={() => hasActiveSubscription && setConvertOpen(true)}
+                    onClick={() => !sellBlocked && setConvertOpen(true)}
                     disabled={sellBlocked}
                     className="bg-lumiris-cyan text-white hover:bg-lumiris-cyan/90"
                 >
@@ -34,7 +34,7 @@ export function MarketplaceProducts() {
                 <SubscriptionSaleNotice />
             </div>
 
-            <ProductsTab onCreate={() => hasActiveSubscription && setConvertOpen(true)} />
+            <ProductsTab onCreate={() => !sellBlocked && setConvertOpen(true)} />
 
             <ConvertDppDialog open={convertOpen} onOpenChange={setConvertOpen} />
         </div>
