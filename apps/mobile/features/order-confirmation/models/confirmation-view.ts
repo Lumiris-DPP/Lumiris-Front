@@ -48,3 +48,20 @@ export function confirmationTotalLabel(status: OrderStatus): string {
     // Un remboursement peut être partiel : le total encaissé ne devient pas le total remboursé.
     return 'Total payé';
 }
+
+// Décrit les remboursements réellement enregistrés sur chaque ligne.
+export function confirmationRefundFacts(group: Pick<OrderGroup, 'lines' | 'amountChargedCents'>) {
+    const refundedCents = group.lines.reduce((sum, line) => sum + (line.refundedCents ?? 0), 0);
+    const closed =
+        group.lines.length > 0 &&
+        group.lines.every((line) => line.status === 'CANCELLED' || line.status === 'REFUNDED');
+    return {
+        refundedCents,
+        message:
+            refundedCents > 0
+                ? `Un remboursement ${refundedCents >= group.amountChargedCents ? 'total' : 'partiel'} a été émis vers ton moyen de paiement. Le montant remboursé figure ci-dessus.`
+                : closed
+                  ? 'Cette commande est clôturée. Aucun remboursement n’est enregistré ; consulte son suivi pour le détail du paiement.'
+                  : null,
+    };
+}
