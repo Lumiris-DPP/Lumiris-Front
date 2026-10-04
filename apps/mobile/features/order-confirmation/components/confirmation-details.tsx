@@ -23,7 +23,7 @@ import { formatCents } from '@/lib/marketplace/money';
 import type { confirmationView } from '../models/confirmation-view';
 
 import type { OrderGroup } from '@lumiris/api-client';
-import { confirmationTotalLabel } from '../models/confirmation-view';
+import { confirmationRefundFacts, confirmationTotalLabel } from '../models/confirmation-view';
 /** Affiche les montants serveur et les suites de la commande selon sa confirmation. */
 export function ConfirmationDetails({
     group,
@@ -38,6 +38,7 @@ export function ConfirmationDetails({
 }) {
     const settling = view === 'pending' || view === 'pending-timeout';
     const unwound = view === 'unwound';
+    const refundFacts = confirmationRefundFacts(group);
     const sellerCount = new Set(group.lines.map((line) => line.sellerName ?? '')).size;
     return (
         <div className="flex h-full flex-col overflow-y-auto bg-background pb-28">
@@ -69,7 +70,9 @@ export function ConfirmationDetails({
                 >
                     {unwound
                         ? group.status === 'REFUNDED'
-                            ? 'Commande remboursée'
+                            ? refundFacts.refundedCents > 0 && refundFacts.refundedCents < group.amountChargedCents
+                                ? 'Commande partiellement remboursée'
+                                : 'Commande remboursée'
                             : 'Commande annulée'
                         : settling
                           ? 'Paiement en cours de confirmation'
@@ -169,6 +172,12 @@ export function ConfirmationDetails({
                             <dt className="text-foreground">{confirmationTotalLabel(group.status)}</dt>
                             <dd className="text-foreground tabular-nums">{formatCents(group.amountChargedCents)}</dd>
                         </div>
+                        {refundFacts.refundedCents > 0 ? (
+                            <div className="flex items-center justify-between">
+                                <dt>Montant remboursé</dt>
+                                <dd>{formatCents(refundFacts.refundedCents)}</dd>
+                            </div>
+                        ) : null}
                     </dl>
                 </section>
 
@@ -186,12 +195,8 @@ export function ConfirmationDetails({
                             La préparation commence après confirmation du paiement.
                         </p>
                     ) : null}
-                    {unwound ? (
-                        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-                            {group.status === 'REFUNDED'
-                                ? 'Le remboursement est parti vers ton moyen de paiement — compte 5 à 10 jours ouvrés selon ta banque. Ta facture reste consultable : elle porte le montant remboursé.'
-                                : 'Cette commande a été annulée : rien ne t’a été débité, et la pièce est retournée au catalogue de l’atelier.'}
-                        </p>
+                    {refundFacts.message ? (
+                        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{refundFacts.message}</p>
                     ) : null}
                     <p
                         className={cn(
@@ -200,8 +205,8 @@ export function ConfirmationDetails({
                         )}
                     >
                         {sellerCount > 1
-                            ? `${sellerCount} ateliers préparent ta commande : tu recevras ${sellerCount} colis, chacun avec son suivi. Tu es prévenu à chaque expédition.`
-                            : 'L’atelier prépare ta pièce. Tu reçois une notification avec le numéro de suivi dès l’expédition.'}
+                            ? 'Chaque article conserve son propre suivi, y compris en cas d’annulation ou de remboursement. Consulte les articles ci-dessus pour connaître les expéditions.'
+                            : 'Consulte le suivi de ta pièce pour connaître sa préparation et son expédition.'}
                     </p>
                     <p
                         className={cn(
@@ -209,8 +214,7 @@ export function ConfirmationDetails({
                             (unwound || settling) && 'hidden',
                         )}
                     >
-                        Lumiris retient le paiement jusqu’à la livraison — tu peux demander un retour pendant 14 jours
-                        après réception.
+                        Le suivi indique les actions disponibles pour chaque article.
                     </p>
                 </section>
 
