@@ -1,7 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { AlertTriangle, Wand2 } from 'lucide-react';
+import { Wand2 } from 'lucide-react';
 import { Button } from '@lumiris/ui/components/button';
 import {
     Dialog,
@@ -18,16 +17,15 @@ import { newVariantRow } from '../models/product-payload';
 import { useDppConversion } from '../hooks/use-dpp-conversion';
 import { SizeGuideEditor } from './size-guide-editor';
 import { VariantsEditor } from './variants-editor';
+import { SubscriptionSaleNotice } from './subscription-sale-notice';
 
 /** Affiche les sections de conversion du passeport en produit artisan. */
 export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-    const router = useRouter();
     const {
         dpps,
         isLoading,
         dppsError,
         pending,
-        sellBlocked,
         dppFormId,
         setDppFormId,
         priceEuros,
@@ -80,25 +78,7 @@ export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpen
                             {dppsError.message}
                         </p>
                     )}
-                    {sellBlocked && (
-                        <div className="flex items-start gap-2.5 rounded-lg border border-lumiris-amber/40 bg-lumiris-amber/10 p-3 text-sm">
-                            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-lumiris-amber" aria-hidden />
-                            <div className="space-y-1.5">
-                                <p className="font-medium text-foreground">Abonnement ATELIER requis pour vendre</p>
-                                <p className="text-xs text-muted-foreground">
-                                    Un abonnement ATELIER actif est nécessaire pour mettre une pièce en vente.
-                                </p>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-7"
-                                    onClick={() => router.push('/subscription')}
-                                >
-                                    Voir l&apos;abonnement
-                                </Button>
-                            </div>
-                        </div>
-                    )}
+                    <SubscriptionSaleNotice />
                     <div className="space-y-2">
                         <Label htmlFor="convert-dpp">Passeport (DPP)</Label>
                         <Select value={dppFormId} onValueChange={setDppFormId} disabled={isLoading}>
