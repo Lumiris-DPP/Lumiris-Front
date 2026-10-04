@@ -10,6 +10,7 @@ const ACTOR_LABEL: Record<OrderEvent['actorType'], string> = {
     SYSTEM: 'Automatique',
 };
 
+// Affiche les évènements de la commande.
 export function OrderTimeline({ events }: { events: readonly OrderEvent[] }) {
     if (events.length === 0) {
         return <p className="text-xs text-muted-foreground">Aucun événement enregistré.</p>;
@@ -34,6 +35,7 @@ export function OrderTimeline({ events }: { events: readonly OrderEvent[] }) {
     );
 }
 
+// Affiche les pièces jointes d’un évènement.
 function EventAttachments({ event }: { event: OrderEvent }) {
     const attachments = event.attachments ?? [];
     if (attachments.length === 0) {

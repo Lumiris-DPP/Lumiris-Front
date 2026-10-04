@@ -8,6 +8,7 @@ import { StatCard } from '@lumiris/ui/components/stat-card';
 import { formatPriceCents } from '@lumiris/utils';
 import { useAuthStore } from '@/lib/auth-store';
 
+// Propose d’activer les paiements de l’atelier.
 export function SellerConnectBanner() {
     const token = useAuthStore((s) => s.token);
     const { data: status } = useSellerStatus({ enabled: Boolean(token) });
@@ -15,6 +16,7 @@ export function SellerConnectBanner() {
 
     if (!token || status?.chargesEnabled) return null;
 
+    // Ouvre la page d’activation des paiements.
     const activate = () =>
         onboarding.mutate(undefined, {
             onSuccess: ({ url }) => {
@@ -55,6 +57,7 @@ export function SellerConnectBanner() {
     );
 }
 
+// Affiche les chiffres de vente de l’atelier.
 export function SellerStatsCards() {
     const token = useAuthStore((s) => s.token);
     const { data: stats } = useSellerStats({ enabled: Boolean(token) });

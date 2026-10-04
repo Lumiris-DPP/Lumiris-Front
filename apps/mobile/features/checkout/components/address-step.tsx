@@ -10,8 +10,10 @@ import {
     type ShippingAddress,
 } from '@/lib/marketplace/shipping-address';
 
+// Retire les caractères autres que les chiffres.
 const onlyDigits = (value: string) => value.replace(/\D/g, '');
 
+// Permet de saisir et de valider l’adresse de livraison.
 export function AddressStep({
     initial,
     shipmentCount,
@@ -28,9 +30,11 @@ export function AddressStep({
     );
     const complete = isShippingAddressComplete(address);
 
+    // Modifie un champ du formulaire.
     const set = <K extends keyof ShippingAddress>(key: K, value: ShippingAddress[K]) =>
         setAddress((a) => ({ ...a, [key]: value }));
 
+    // Valide l’adresse et transmet les champs nettoyés.
     const submit = (event: React.SyntheticEvent) => {
         event.preventDefault();
         if (!complete) return;
@@ -124,6 +128,7 @@ export function AddressStep({
     );
 }
 
+// Affiche un champ avec son libellé.
 function Field({
     label,
     value,

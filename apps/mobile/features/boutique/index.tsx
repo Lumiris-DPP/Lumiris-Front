@@ -11,6 +11,7 @@ import { BoutiqueFilters } from './components/filters';
 import { EMPTY_BOUTIQUE_FILTERS, type BoutiqueFiltersState } from './models/filters-model';
 import { useBoutiqueCatalogue } from './hooks/use-boutique-catalogue';
 
+// Affiche le catalogue filtré et les états de chargement.
 export function Boutique() {
     const [filters, setFilters] = useState<BoutiqueFiltersState>(EMPTY_BOUTIQUE_FILTERS);
     const { query, items, priceBounds, categoryOptions, materialOptions, isLoading, isError, retry } =
@@ -89,6 +90,7 @@ export function Boutique() {
     );
 }
 
+// Affiche les emplacements des pièces pendant le chargement.
 function BoutiqueSkeleton() {
     return (
         <div className="grid grid-cols-2 gap-3" aria-hidden>
@@ -99,6 +101,7 @@ function BoutiqueSkeleton() {
     );
 }
 
+// Affiche l’erreur du catalogue et le bouton de relance.
 function BoutiqueError({ onRetry }: { onRetry: () => void }) {
     return (
         <div
@@ -126,6 +129,7 @@ function BoutiqueError({ onRetry }: { onRetry: () => void }) {
     );
 }
 
+// Explique l’absence de résultats et propose une action.
 function BoutiqueEmpty({
     title,
     body,

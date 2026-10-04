@@ -6,6 +6,7 @@ import { usePaymentOptions } from '@lumiris/api-client/react';
 
 import { formatCents, installmentLabel, shippingCostLabel } from '@/lib/marketplace/money';
 
+// Affiche les montants du panier et l’accès au paiement.
 export function CartSummary({
     subtotalCents,
     shippingCents,

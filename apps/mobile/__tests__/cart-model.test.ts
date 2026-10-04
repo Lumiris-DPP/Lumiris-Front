@@ -9,6 +9,7 @@ import {
 } from '@/lib/marketplace/cart-model';
 import type { MarketplaceItem } from '@/lib/marketplace/product';
 
+// Prépare un produit pour les tests.
 function product(
     id: string,
     options: { artisan?: string; priceCents?: number; shippingCents?: number; stocks?: Record<string, number> } = {},
@@ -43,6 +44,7 @@ function product(
     };
 }
 
+// Prépare une ligne de panier pour les tests.
 function line(productId: string, variantId: string | null, quantity = 1, addedAt = '2026-10-03T10:00:00Z'): CartLine {
     return { productId, variantId, quantity, addedAt };
 }

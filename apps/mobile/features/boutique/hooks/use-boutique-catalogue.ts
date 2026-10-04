@@ -11,6 +11,7 @@ import {
     type BoutiqueFiltersState,
 } from '../models/filters-model';
 
+// Charge le catalogue et applique la recherche et les filtres.
 export function useBoutiqueCatalogue(filters: BoutiqueFiltersState) {
     const query = filters.q.trim();
 

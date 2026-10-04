@@ -38,6 +38,7 @@ const CANCEL_REASONS = [
     'Délai de préparation trop long',
 ] as const;
 
+// Affiche le suivi de commande sous une attente de navigation.
 export function OrderTracking() {
     return (
         <Suspense fallback={<CenteredSpinner label="Chargement du suivi…" />}>
@@ -46,11 +47,13 @@ export function OrderTracking() {
     );
 }
 
+// Lit l’identifiant de commande dans l’adresse de navigation.
 function OrderTrackingInner() {
     const orderId = useSearchParams().get('id');
     return <OrderTrackingContent key={orderId ?? ''} orderId={orderId} />;
 }
 
+// Affiche le détail du suivi ou son état de chargement.
 function OrderTrackingContent({ orderId }: { orderId: string | null }) {
     const { isAuthenticated } = useUser();
     const { data, isLoading, error, refetch, sheet, setSheet, submitting, submitReason, confirmReception } =
@@ -209,6 +212,7 @@ function OrderTrackingContent({ orderId }: { orderId: string | null }) {
     );
 }
 
+// Affiche la photo du produit ou son image de remplacement.
 function ProductThumb({ photoUrl, name }: { photoUrl?: string | null; name?: string | null }) {
     return (
         <div className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-muted">
@@ -221,6 +225,7 @@ function ProductThumb({ photoUrl, name }: { photoUrl?: string | null; name?: str
     );
 }
 
+// Affiche un indicateur de chargement centré.
 function CenteredSpinner({ label }: { label: string }) {
     return (
         <div className="flex h-full items-center justify-center gap-2 bg-background text-sm text-muted-foreground">
@@ -229,6 +234,7 @@ function CenteredSpinner({ label }: { label: string }) {
     );
 }
 
+// Affiche un message centré avec les actions proposées.
 function CenteredMessage({ title, action }: { title: string; action: { label: string; href: string } }) {
     return (
         <div className="flex h-full flex-col items-center justify-center gap-4 bg-background px-8 text-center">

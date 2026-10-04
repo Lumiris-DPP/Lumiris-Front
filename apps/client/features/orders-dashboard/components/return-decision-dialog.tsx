@@ -17,6 +17,7 @@ import { Label } from '@lumiris/ui/components/label';
 import { Textarea } from '@lumiris/ui/components/textarea';
 import { toast } from '@lumiris/ui/components/sonner';
 
+// Permet d’accepter ou de refuser un retour.
 export function ReturnDecisionDialog({
     order,
     open,
@@ -33,6 +34,7 @@ export function ReturnDecisionDialog({
         if (open) setNote('');
     }, [open]);
 
+    // Envoie la décision de retour avec son éventuel motif.
     const decide = (accepted: boolean) => {
         if (decideMutation.isPending || !order.canDecideReturn) return;
         if (!accepted && note.trim().length < 3) {

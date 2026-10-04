@@ -9,6 +9,7 @@ import type { SizeGuideDraft, VariantRow } from '../models/product-payload';
 import { convertedProductPayload } from '../models/conversion-model';
 import { productErrorMessage } from '../models/product-error';
 
+// Gère la saisie et l’envoi de la conversion d’un passeport.
 export function useDppConversion(open: boolean, onOpenChange: (open: boolean) => void) {
     const { data: dpps = [], isLoading, error: dppsError } = useDppForms({ enabled: open });
     const convert = useConvertDppToProduct();
@@ -33,6 +34,7 @@ export function useDppConversion(open: boolean, onOpenChange: (open: boolean) =>
     const canSubmit = dppFormId !== '' && !convert.isPending && !sellBlocked && !isLoading && !dppsError;
     const [error, setError] = useState<string | null>(null);
 
+    // Vide le formulaire de conversion.
     const reset = () => {
         setError(null);
         setDppFormId('');
@@ -48,6 +50,7 @@ export function useDppConversion(open: boolean, onOpenChange: (open: boolean) =>
         setPhotoUrl('');
     };
 
+    // Vérifie la saisie et convertit le passeport choisi en produit.
     const submit = () => {
         if (!canSubmit) return;
         let payload;

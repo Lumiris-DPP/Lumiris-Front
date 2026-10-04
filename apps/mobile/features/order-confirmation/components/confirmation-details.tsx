@@ -25,6 +25,7 @@ import type { confirmationView } from '../models/confirmation-view';
 import type { OrderGroup } from '@lumiris/api-client';
 import { confirmationRefundFacts, confirmationTotalLabel } from '../models/confirmation-view';
 
+// Affiche les montants et informations de la confirmation.
 export function ConfirmationDetails({
     group,
     view,

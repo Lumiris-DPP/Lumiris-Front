@@ -11,8 +11,10 @@ import { formatCents } from '@/lib/marketplace/money';
 import { formatLongDateFr } from '@lumiris/utils';
 import { invoiceAmounts } from './models/invoice-model';
 
+// Encode le chemin de facture pour le retour après connexion.
 const INVOICE_RETURN = (pi: string) => encodeURIComponent(routes.orderInvoice(pi));
 
+// Affiche la facture et imprime seulement un paiement confirmé.
 export function OrderInvoice({ paymentIntentId }: { paymentIntentId: string }) {
     const { user, isAuthenticated } = useUser();
     const {

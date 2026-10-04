@@ -12,18 +12,21 @@ import { formatDateFr } from '@lumiris/utils';
 import { useAuthStore } from '@/lib/auth-store';
 import { usePendingOrderCount } from '@/features/workspace-shell/hooks';
 
+// Formate une date locale pour le champ de saisie.
 function localDateInput(date: Date): string {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${date.getFullYear()}-${month}-${day}`;
 }
 
+// Renvoie la date locale de demain.
 function tomorrow(): string {
     const date = new Date();
     date.setDate(date.getDate() + 1);
     return localDateInput(date);
 }
 
+// Permet d’annoncer ou de terminer une pause de l’atelier.
 export function VacationBanner() {
     const token = useAuthStore((s) => s.token);
     const { data: profile } = useArtisanMe({ enabled: Boolean(token) });
@@ -68,6 +71,7 @@ export function VacationBanner() {
         );
     }
 
+    // Enregistre la date de fin de pause de l’atelier.
     const submit = (event: SyntheticEvent) => {
         event.preventDefault();
         pauseMutation.mutate(

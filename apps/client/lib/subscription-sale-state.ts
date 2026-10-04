@@ -6,6 +6,7 @@ interface SubscriptionRead {
     data?: { hasActiveSubscription: boolean };
 }
 
+// Distingue l’accès connu de la vérification actuelle de l’abonnement.
 export function subscriptionAccess(read: SubscriptionRead): {
     hasActiveSubscription: boolean;
     saleState: SubscriptionSaleState;

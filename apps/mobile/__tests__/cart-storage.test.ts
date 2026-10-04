@@ -34,6 +34,7 @@ afterAll(() => {
     else Reflect.deleteProperty(globalThis, 'window');
 });
 
+// Installe le compte utilisé par le test.
 function account(id: string) {
     writeUser({
         id,

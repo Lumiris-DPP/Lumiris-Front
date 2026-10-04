@@ -1,6 +1,7 @@
 import type { SellerOrder, SellerOrderTab } from '@lumiris/api-client';
 import { sellerOrderTab } from '@lumiris/api-client';
 
+// Classe les commandes selon leur statut et leur litige.
 export function groupByTab(orders: readonly SellerOrder[]): Record<SellerOrderTab, SellerOrder[]> {
     const grouped: Record<SellerOrderTab, SellerOrder[]> = {
         TO_SHIP: [],
@@ -15,12 +16,14 @@ export function groupByTab(orders: readonly SellerOrder[]): Record<SellerOrderTa
     return grouped;
 }
 
+// Renvoie les fonds encore retenus pour la commande.
 export function heldOrderCents(order: SellerOrder): number {
     return order.released || order.status === 'REFUNDED' || order.status === 'CANCELLED' ? 0 : order.netCents;
 }
 
 type FundsState = 'refunded-fully' | 'refunded-partially' | 'closed' | 'released' | 'held';
 
+// Détermine l’état des fonds d’après les remboursements et versements.
 function fundsStateOf(order: SellerOrder): FundsState {
     const refunded = order.refundedCents ?? 0;
     if (refunded > 0) {
@@ -40,10 +43,12 @@ const FUNDS_LABEL = {
     held: 'retenu',
 } satisfies Record<FundsState, string>;
 
+// Renvoie le libellé court de l’état des fonds.
 export function orderFundsLabel(order: SellerOrder): string {
     return FUNDS_LABEL[fundsStateOf(order)];
 }
 
+// Explique l’état des fonds et des remboursements.
 export function orderFundsText(order: SellerOrder): string {
     const state = fundsStateOf(order);
     if (state === 'refunded-fully' || state === 'refunded-partially') {

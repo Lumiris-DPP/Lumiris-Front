@@ -13,6 +13,7 @@ import { CheckoutRecap } from './recap';
 const PAYMENT_REFUSED =
     'Ta carte a été refusée. Aucun montant n’a été prélevé — saisis une autre carte pour réessayer.';
 
+// Affiche le paiement Stripe et gère sa confirmation.
 export function PaymentStep({
     address,
     shipments,
@@ -42,6 +43,7 @@ export function PaymentStep({
         if (payError) errorRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }, [payError]);
 
+    // Confirme le paiement Stripe et signale son état ou son erreur.
     async function handleSubmit(event: React.SyntheticEvent) {
         event.preventDefault();
         if (!stripe || !elements || submitting) return;
@@ -157,6 +159,7 @@ export function PaymentStep({
     );
 }
 
+// Affiche l’adresse de livraison et permet sa modification.
 function DeliverySummary({ address, onEdit }: { address: ShippingAddress; onEdit: () => void }) {
     return (
         <section className="flex items-start gap-3 rounded-2xl border border-border/60 bg-card p-3">

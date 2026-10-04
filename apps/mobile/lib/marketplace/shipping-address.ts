@@ -16,16 +16,19 @@ export const EMPTY_ADDRESS: ShippingAddress = {
     phone: '',
 };
 
+// Identifie le stockage de l’adresse pour le compte courant.
 function currentKey(): string {
     return userScopedKey(readUser()?.id ?? null, USER_KEYS.shippingAddress);
 }
 
+// Vérifie les champs essentiels d’une adresse enregistrée.
 function isAddress(value: unknown): value is ShippingAddress {
     if (!value || typeof value !== 'object') return false;
     const v = value as Record<string, unknown>;
     return typeof v.fullName === 'string' && typeof v.line1 === 'string' && typeof v.city === 'string';
 }
 
+// Relit l’adresse valide du compte courant.
 export function readShippingAddress(): ShippingAddress | null {
     if (typeof window === 'undefined') return null;
     try {
@@ -38,11 +41,13 @@ export function readShippingAddress(): ShippingAddress | null {
     }
 }
 
+// Enregistre l’adresse du compte courant.
 export function writeShippingAddress(address: ShippingAddress): void {
     if (typeof window === 'undefined') return;
     window.localStorage.setItem(currentKey(), JSON.stringify(address));
 }
 
+// Vérifie les champs nécessaires à la livraison.
 export function isShippingAddressComplete(address: ShippingAddress): boolean {
     return (
         address.fullName.trim().length > 1 &&
@@ -52,6 +57,7 @@ export function isShippingAddressComplete(address: ShippingAddress): boolean {
     );
 }
 
+// Nettoie les champs de l’adresse de livraison.
 export function normalizeShippingAddress(address: ShippingAddress): ShippingAddress {
     return {
         fullName: address.fullName.trim(),

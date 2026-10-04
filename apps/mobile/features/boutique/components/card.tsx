@@ -16,6 +16,7 @@ interface BoutiqueCardProps {
     index: number;
 }
 
+// Affiche une pièce du catalogue avec son prix et ses informations.
 export function BoutiqueCard({ item, index }: BoutiqueCardProps) {
     const grade = item.irisGrade;
     const isE = grade === 'E';

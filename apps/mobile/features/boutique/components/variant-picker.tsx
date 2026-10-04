@@ -11,13 +11,16 @@ interface VariantPickerProps {
     onOpenSizeGuide?: () => void;
 }
 
+// Permet de choisir une taille et une couleur disponibles.
 export function VariantPicker({ item, selection, onChange, onOpenSizeGuide }: VariantPickerProps) {
     const sizes = sizeOptionsOf(item);
     const colors = colorOptionsOf(item);
     if (sizes.length === 0 && colors.length === 0) return null;
 
+    // Cherche la déclinaison de cette taille avec la couleur choisie.
     const sizeVariant = (size: string) => findVariant(item, size, colors.length > 0 ? selection.color : null);
 
+    // Cherche la déclinaison de cette couleur avec la taille choisie.
     const colorVariant = (color: string) => findVariant(item, sizes.length > 0 ? selection.size : null, color);
 
     return (
@@ -114,6 +117,7 @@ export function VariantPicker({ item, selection, onChange, onOpenSizeGuide }: Va
     );
 }
 
+// Annonce une déclinaison épuisée aux lecteurs d’écran.
 function SoldOutMention() {
     return <span className="sr-only">, épuisée</span>;
 }

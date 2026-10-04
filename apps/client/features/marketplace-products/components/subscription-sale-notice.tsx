@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Button } from '@lumiris/ui/components/button';
 import { useSubscription } from '@/lib/use-subscription';
 
+// Affiche l’état de vérification de l’abonnement pour vendre.
 export function SubscriptionSaleNotice() {
     const { saleState, refetch, isFetching } = useSubscription();
     if (saleState === 'active') return null;

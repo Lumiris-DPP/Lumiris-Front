@@ -27,14 +27,17 @@ export interface SizeGuideDraft {
 
 export const EMPTY_SIZE_GUIDE: SizeGuideDraft = { labels: [], values: {} };
 
+// Identifie une mesure pour une taille et un libellé.
 export function cellKey(sizeLabel: string, label: string): string {
     return `${sizeLabel}\0${label}`;
 }
 
+// Crée une déclinaison vide avec un identifiant local.
 export function newVariantRow(sizeLabel = '', colorLabel = ''): VariantRow {
     return { key: crypto.randomUUID(), sizeLabel, colorLabel, colorHex: '', sku: '', stock: '0' };
 }
 
+// Prépare les déclinaisons du formulaire depuis le produit.
 export function variantRowsFrom(product?: MarketplaceItem): VariantRow[] {
     const variants = product?.variants ?? [];
     if (variants.length === 0) return [{ ...newVariantRow(), stock: String(product?.stock ?? 0) }];
@@ -50,6 +53,7 @@ export function variantRowsFrom(product?: MarketplaceItem): VariantRow[] {
     }));
 }
 
+// Prépare les mesures du formulaire en centimètres.
 export function sizeGuideFrom(product?: MarketplaceItem): SizeGuideDraft {
     const measurements = product?.sizeGuide ?? [];
     const labels: string[] = [];
@@ -61,6 +65,7 @@ export function sizeGuideFrom(product?: MarketplaceItem): SizeGuideDraft {
     return { labels, values };
 }
 
+// Liste les tailles renseignées sans doublon.
 export function sizesOf(rows: readonly VariantRow[]): string[] {
     const sizes: string[] = [];
     for (const row of rows) {
@@ -72,6 +77,7 @@ export function sizesOf(rows: readonly VariantRow[]): string[] {
 
 export const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
 
+// Vérifie les combinaisons, les stocks et les teintes.
 export function variantRowsError(rows: readonly VariantRow[]): string | null {
     if (rows.length === 0) return 'Ajoutez au moins une déclinaison.';
     const seen = new Set<string>();
@@ -87,6 +93,7 @@ export function variantRowsError(rows: readonly VariantRow[]): string | null {
     return null;
 }
 
+// Vérifie les déclinaisons et prépare leur enregistrement.
 export function toVariantPayload(rows: readonly VariantRow[]): ProductVariantPayload[] {
     const error = variantRowsError(rows);
     if (error) throw new Error(error);
@@ -102,6 +109,7 @@ export function toVariantPayload(rows: readonly VariantRow[]): ProductVariantPay
     }));
 }
 
+// Vérifie les mesures et les convertit en millimètres.
 export function toSizeGuidePayload(draft: SizeGuideDraft, sizes: readonly string[]): SizeMeasurementPayload[] {
     const measurements: SizeMeasurementPayload[] = [];
     draft.labels.forEach((label, position) => {
@@ -124,6 +132,7 @@ export function toSizeGuidePayload(draft: SizeGuideDraft, sizes: readonly string
     return measurements;
 }
 
+// Prépare les données du produit en conservant ses déclinaisons.
 export function productPayloadFrom(product: MarketplaceItem, status?: MarketplaceProductStatus): ProductPayload {
     return {
         name: product.name,

@@ -23,6 +23,7 @@ interface CheckoutScreenInput {
 
 const REFUSAL_CODES: readonly string[] = ['VALIDATION_ERROR', 'NOT_FOUND'];
 
+// Choisit l’écran adapté à l’état du paiement.
 export function checkoutScreenOf(input: CheckoutScreenInput): CheckoutScreen {
     if (input.loadState === 'ready' && input.lineCount === 0) return { kind: 'empty' };
 

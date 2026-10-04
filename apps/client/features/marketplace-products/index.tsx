@@ -10,6 +10,7 @@ import { VacationBanner } from './components/vacation-banner';
 import { SellerConnectBanner, SellerStatsCards } from './components/seller-overview';
 import { SubscriptionSaleNotice } from './components/subscription-sale-notice';
 
+// Affiche la boutique et les outils de vente de l’atelier.
 export function MarketplaceProducts() {
     const [convertOpen, setConvertOpen] = useState(false);
 

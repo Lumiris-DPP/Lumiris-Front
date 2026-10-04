@@ -9,6 +9,7 @@ import { initialSelectionOf, purchaseStateOf, type VariantSelection } from '../m
 
 const ADDED_FEEDBACK_MS = 1600;
 
+// Gère la sélection et l’ajout de la pièce au panier.
 export function useProductPurchase(product: MarketplaceItem) {
     const router = useRouter();
     const cart = useCart();
@@ -27,6 +28,7 @@ export function useProductPurchase(product: MarketplaceItem) {
     const inCart = cart.some((line) => line.productId === product.id && line.variantId === (variant?.id ?? null));
     const variantId = state.kind === 'ready' ? state.variant.id : null;
 
+    // Ajoute la déclinaison choisie au panier avec une confirmation visuelle.
     const add = useCallback(() => {
         if (!variantId) return;
         addToCart(product.id, variantId, 1);
@@ -36,6 +38,7 @@ export function useProductPurchase(product: MarketplaceItem) {
         feedbackTimer.current = setTimeout(() => setAdded(false), ADDED_FEEDBACK_MS);
     }, [product.id, variantId]);
 
+    // Ajoute la déclinaison choisie puis ouvre le panier.
     const buyNow = useCallback(() => {
         if (!variantId) return;
         addToCart(product.id, variantId, 1);

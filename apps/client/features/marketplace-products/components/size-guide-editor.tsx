@@ -13,6 +13,7 @@ interface SizeGuideEditorProps {
     onChange: (next: SizeGuideDraft) => void;
 }
 
+// Permet de saisir les mesures pour chaque taille.
 export function SizeGuideEditor({ sizes, value, onChange }: SizeGuideEditorProps) {
     if (sizes.length === 0) {
         return (
@@ -25,6 +26,7 @@ export function SizeGuideEditor({ sizes, value, onChange }: SizeGuideEditorProps
         );
     }
 
+    // Renomme une mesure en conservant ses valeurs.
     const setLabel = (index: number, label: string) => {
         const previous = value.labels[index] ?? '';
         const values = { ...value.values };
@@ -37,6 +39,7 @@ export function SizeGuideEditor({ sizes, value, onChange }: SizeGuideEditorProps
         onChange({ labels: value.labels.map((existing, i) => (i === index ? label : existing)), values });
     };
 
+    // Supprime une mesure et ses valeurs.
     const removeLabel = (index: number) => {
         const removed = value.labels[index];
         const values = { ...value.values };
@@ -44,6 +47,7 @@ export function SizeGuideEditor({ sizes, value, onChange }: SizeGuideEditorProps
         onChange({ labels: value.labels.filter((_, i) => i !== index), values });
     };
 
+    // Enregistre la mesure d’une taille.
     const setCell = (size: string, label: string, cm: string) =>
         onChange({ ...value, values: { ...value.values, [cellKey(size, label)]: cm } });
 

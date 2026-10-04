@@ -14,6 +14,7 @@ interface FavoriteButtonProps {
     className?: string;
 }
 
+// Affiche le bouton de favori et vérifie la connexion.
 export function FavoriteButton({ item, className }: FavoriteButtonProps) {
     const router = useRouter();
     const { isAuthenticated } = useUser();
@@ -21,6 +22,7 @@ export function FavoriteButton({ item, className }: FavoriteButtonProps) {
     const toggle = useToggleFavorite();
     const isFavorite = favorites.some((favorite) => favorite.id === item.id);
 
+    // Ajoute ou retire le favori après vérification de la connexion.
     const onClick = () => {
         if (!isAuthenticated) {
             toast('Connecte-toi pour garder cette pièce en favori', {

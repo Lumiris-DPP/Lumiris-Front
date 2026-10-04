@@ -11,6 +11,7 @@ import { removeFromCart, setCartQuantity } from '@/lib/marketplace/cart-storage'
 import { variantLabel } from '@/lib/marketplace/product';
 import { type CartItemDetail, type CartShipment } from '@/lib/marketplace/cart-model';
 
+// Affiche les articles et la livraison d’un atelier.
 export function ShipmentCard({ shipment, index, total }: { shipment: CartShipment; index: number; total: number }) {
     return (
         <section className="opal-shadow overflow-hidden rounded-2xl border border-border/60 bg-card">
@@ -40,6 +41,7 @@ export function ShipmentCard({ shipment, index, total }: { shipment: CartShipmen
     );
 }
 
+// Affiche une ligne du panier et ses contrôles de quantité.
 function CartRow({ item }: { item: CartItemDetail }) {
     const { product, variant } = item;
     const label = variantLabel(variant);

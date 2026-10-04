@@ -10,6 +10,7 @@ import { AlertTriangle, Loader2, LogIn } from 'lucide-react';
 
 import { routes } from '@/lib/routes';
 
+// Affiche la confirmation de commande sous une attente de navigation.
 export function OrderConfirmation({ routeId }: { routeId: string }) {
     return (
         <Suspense fallback={<CenteredSpinner label="Récupération de ta commande…" />}>
@@ -18,6 +19,7 @@ export function OrderConfirmation({ routeId }: { routeId: string }) {
     );
 }
 
+// Choisit le contenu selon l’état de confirmation de la commande.
 function OrderConfirmationInner({ routeId }: { routeId: string }) {
     const searchParams = useSearchParams();
     const { view, group, targetPi, wardrobe, refetchGroup, refetchOrders } = useOrderConfirmation(
@@ -88,6 +90,7 @@ function OrderConfirmationInner({ routeId }: { routeId: string }) {
     return <ConfirmationDetails group={group} view={view} targetPi={targetPi} wardrobeCount={wardrobe.length} />;
 }
 
+// Affiche le message de confirmation et les actions proposées.
 function ConfirmationMessage({
     title,
     description,
@@ -121,6 +124,7 @@ function ConfirmationMessage({
     );
 }
 
+// Affiche un indicateur de chargement centré.
 function CenteredSpinner({ label }: { label: string }) {
     return (
         <div className="flex h-full items-center justify-center gap-2 bg-background text-sm text-muted-foreground">

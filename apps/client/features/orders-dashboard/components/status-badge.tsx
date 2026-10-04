@@ -11,6 +11,7 @@ const TONE_VARIANT: Record<OrderStatusTone, BadgeVariant> = {
     warning: 'danger',
 };
 
+// Affiche le statut de la commande et son éventuel litige.
 export function OrderStatusBadge({ status, disputeStatus }: { status: OrderStatus; disputeStatus: DisputeStatus }) {
     if (disputeStatus === 'OPEN') {
         return <Badge variant="destructive">{DISPUTE_STATUS_LABEL.OPEN}</Badge>;

@@ -106,6 +106,7 @@ export function formatDateFr(value: string | Date | undefined | null): string {
 
 type FrenchDateInput = string | Date | undefined | null;
 
+// Formate une date valide avec les éléments français demandés.
 function frenchDateParts(value: FrenchDateInput, parts: Intl.DateTimeFormatOptions): string | null {
     if (!value) return null;
     const date = value instanceof Date ? value : new Date(value);
@@ -113,14 +114,17 @@ function frenchDateParts(value: FrenchDateInput, parts: Intl.DateTimeFormatOptio
     return new Intl.DateTimeFormat('fr-FR', parts).format(date);
 }
 
+// Formate le jour et le mois français ou renvoie une absence.
 export function formatDayMonthFr(value: FrenchDateInput): string | null {
     return frenchDateParts(value, { day: 'numeric', month: 'long' });
 }
 
+// Formate le jour, le mois et l’année français ou renvoie une absence.
 export function formatLongDateFr(value: FrenchDateInput): string | null {
     return frenchDateParts(value, { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
+// Formate la date et l’heure françaises ou renvoie une absence.
 export function formatDayMonthTimeFr(value: FrenchDateInput): string | null {
     return frenchDateParts(value, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 }

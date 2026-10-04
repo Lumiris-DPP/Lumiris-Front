@@ -5,6 +5,7 @@ import { useSubscriptionState } from '@lumiris/api-client/react';
 import { useAuthStore } from './auth-store';
 import { subscriptionAccess } from './subscription-sale-state';
 
+// Expose l’abonnement et son état de vérification.
 export function useSubscription() {
     const token = useAuthStore((s) => s.token);
     const query = useSubscriptionState({ enabled: Boolean(token) });

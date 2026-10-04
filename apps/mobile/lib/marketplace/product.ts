@@ -60,10 +60,12 @@ export const MARKETPLACE_SORT_ORDER: readonly MarketplaceSort[] = [
 
 const GRADES: ReadonlySet<string> = new Set(['A', 'B', 'C', 'D', 'E']);
 
+// Reconnaît les notes Iris autorisées.
 function asGrade(value: string | null | undefined): IrisGrade | null {
     return value && GRADES.has(value) ? (value as IrisGrade) : null;
 }
 
+// Prépare le produit de la boutique avec ses valeurs de remplacement.
 export function toMarketplaceItem(dto: MarketplaceItemDto): MarketplaceItem {
     return {
         id: dto.id,
@@ -94,6 +96,7 @@ export function toMarketplaceItem(dto: MarketplaceItemDto): MarketplaceItem {
     };
 }
 
+// Réunit la taille et la couleur renseignées de la déclinaison.
 export function variantLabel(variant: MarketplaceVariant): string | null {
     const size = variant.sizeLabel?.trim();
     const color = variant.colorLabel?.trim();
@@ -101,6 +104,7 @@ export function variantLabel(variant: MarketplaceVariant): string | null {
     return size || color || null;
 }
 
+// Liste les tailles du produit sans doublon.
 export function sizeOptionsOf(item: MarketplaceItem): readonly string[] {
     const sizes: string[] = [];
     for (const variant of item.variants) {
@@ -115,6 +119,7 @@ interface ColorOption {
     hex: string | null;
 }
 
+// Liste les couleurs du produit sans doublon.
 export function colorOptionsOf(item: MarketplaceItem): readonly ColorOption[] {
     const colors: ColorOption[] = [];
     for (const variant of item.variants) {
@@ -126,6 +131,7 @@ export function colorOptionsOf(item: MarketplaceItem): readonly ColorOption[] {
     return colors;
 }
 
+// Cherche la déclinaison correspondant à la taille et à la couleur.
 export function findVariant(
     item: MarketplaceItem,
     size: string | null,
@@ -138,6 +144,7 @@ export function findVariant(
     );
 }
 
+// Décrit le délai de préparation renseigné.
 export function preparationLabel(days: number): string | null {
     return days >= 1 ? `Expédiée sous ${days} jour${days > 1 ? 's' : ''}` : null;
 }

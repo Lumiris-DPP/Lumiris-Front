@@ -18,6 +18,7 @@ interface PurchaseBarProps {
     onBuyNow: () => void;
 }
 
+// Affiche le prix et les actions d’achat permises.
 export function PurchaseBar({ product, state, added, inCart, onAdd, onBuyNow }: PurchaseBarProps) {
     const { data: paymentOptions } = usePaymentOptions();
     const priceLabel = formatCents(product.priceCents);

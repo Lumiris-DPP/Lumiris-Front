@@ -31,6 +31,7 @@ const TRACKING_URL_TEMPLATE: Record<string, (tracking: string) => string> = {
     DPD: (t) => `https://www.dpd.fr/trace/${t}`,
 };
 
+// Permet de générer une étiquette ou de saisir le suivi.
 export function ShipDialog({
     order,
     open,
@@ -60,6 +61,7 @@ export function ShipDialog({
     const valid = order.canShip && carrier.length > 1 && trackingNumber.trim().length > 3;
     const pending = shipMutation.isPending || labelMutation.isPending;
 
+    // Demande une étiquette d’expédition et signale le résultat.
     const onGenerateLabel = () => {
         if (pending || !order.canShip) return;
         labelMutation.mutate(order.id, {
@@ -75,6 +77,7 @@ export function ShipDialog({
         });
     };
 
+    // Enregistre le transporteur et le numéro de suivi saisis.
     const onSubmit = (event: React.SyntheticEvent) => {
         event.preventDefault();
         if (!valid || pending || !order.canShip) return;
@@ -209,6 +212,7 @@ export function ShipDialog({
     );
 }
 
+// Propose de générer l’étiquette si l’adresse d’enlèvement est prête.
 function OneClickLabel({ ready, pending, onGenerate }: { ready: boolean; pending: boolean; onGenerate: () => void }) {
     if (!ready) {
         return (

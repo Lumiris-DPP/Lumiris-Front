@@ -11,16 +11,19 @@ const USER_CHANGED = 'lumiris:user-changed';
 
 const subscribers = new Set<() => void>();
 
+// Identifie le stockage du panier pour le compte courant.
 function currentKey(): string {
     return userScopedKey(readUser()?.id ?? null, USER_KEYS.cart);
 }
 
+// Signale la modification du panier aux abonnés.
 function notify(): void {
     if (typeof window === 'undefined') return;
     window.dispatchEvent(new CustomEvent(EVENT));
     subscribers.forEach((cb) => cb());
 }
 
+// Vérifie la forme d’une ligne de panier enregistrée.
 function isCartLine(value: unknown): value is CartLine {
     if (!value || typeof value !== 'object') return false;
     const v = value as Record<string, unknown>;
@@ -30,10 +33,12 @@ function isCartLine(value: unknown): value is CartLine {
     return v.variantId === undefined || v.variantId === null || typeof v.variantId === 'string';
 }
 
+// Compare le produit et la déclinaison d’une ligne.
 function sameLine(line: CartLine, productId: string, variantId: string | null): boolean {
     return line.productId === productId && line.variantId === variantId;
 }
 
+// Relit les lignes valides du panier courant.
 function read(): CartLine[] {
     if (typeof window === 'undefined') return [];
     try {
@@ -50,12 +55,14 @@ function read(): CartLine[] {
     }
 }
 
+// Enregistre le panier courant et signale sa modification.
 function write(lines: readonly CartLine[]): void {
     if (typeof window === 'undefined') return;
     window.localStorage.setItem(currentKey(), JSON.stringify(lines));
     notify();
 }
 
+// Ajoute une quantité à la ligne du produit et de sa déclinaison.
 export function addToCart(productId: string, variantId: string | null, quantity = 1): void {
     const current = read();
     const existing = current.find((line) => sameLine(line, productId, variantId));
@@ -67,6 +74,7 @@ export function addToCart(productId: string, variantId: string | null, quantity 
     write([...current, { productId, variantId, quantity: Math.max(1, quantity), addedAt: new Date().toISOString() }]);
 }
 
+// Modifie la quantité ou retire la ligne si elle est nulle.
 export function setCartQuantity(productId: string, variantId: string | null, quantity: number): void {
     const current = read();
     if (quantity <= 0) {
@@ -76,6 +84,7 @@ export function setCartQuantity(productId: string, variantId: string | null, qua
     write(current.map((line) => (sameLine(line, productId, variantId) ? { ...line, quantity } : line)));
 }
 
+// Retire la ligne du produit et de sa déclinaison.
 export function removeFromCart(productId: string, variantId: string | null): void {
     write(read().filter((line) => !sameLine(line, productId, variantId)));
 }
@@ -87,10 +96,12 @@ interface PendingPurchase {
 
 const MAX_PENDING_PURCHASES = 20;
 
+// Identifie le stockage des achats en attente du compte courant.
 function purchasesKey(): string {
     return userScopedKey(readUser()?.id ?? null, USER_KEYS.pendingPurchases);
 }
 
+// Vérifie la forme d’un achat en attente enregistré.
 function isPendingPurchase(value: unknown): value is PendingPurchase {
     if (!value || typeof value !== 'object') return false;
     const v = value as Record<string, unknown>;
@@ -107,6 +118,7 @@ function isPendingPurchase(value: unknown): value is PendingPurchase {
     );
 }
 
+// Relit les achats en attente valides du compte courant.
 function readPurchases(): PendingPurchase[] {
     if (typeof window === 'undefined') return [];
     try {
@@ -117,6 +129,7 @@ function readPurchases(): PendingPurchase[] {
     }
 }
 
+// Enregistre les déclinaisons résolues du panier et des achats en attente.
 export function resolveStoredCartLines(products: readonly MarketplaceItem[]): void {
     const current = read();
     const next = resolveCartLines(current, products);
@@ -128,6 +141,7 @@ export function resolveStoredCartLines(products: readonly MarketplaceItem[]): vo
     }
 }
 
+// Conserve les lignes du paiement pour l’acheteur toujours connecté.
 export function rememberPurchase(paymentIntentId: string, lines: readonly PurchasedLine[], buyerId: string): void {
     if (typeof window === 'undefined' || readUser()?.id !== buyerId) return;
     const others = readPurchases().filter((purchase) => purchase.paymentIntentId !== paymentIntentId);
@@ -135,10 +149,12 @@ export function rememberPurchase(paymentIntentId: string, lines: readonly Purcha
     window.localStorage.setItem(purchasesKey(), JSON.stringify(next));
 }
 
+// Liste les paiements encore en attente de confirmation.
 export function pendingPurchaseIds(): string[] {
     return readPurchases().map((purchase) => purchase.paymentIntentId);
 }
 
+// Retire du panier les lignes achetées pour le paiement confirmé.
 export function settlePurchase(paymentIntentId: string): void {
     const purchase = readPurchases().find((p) => p.paymentIntentId === paymentIntentId);
     if (!purchase) return;
@@ -146,6 +162,7 @@ export function settlePurchase(paymentIntentId: string): void {
     write(subtractPurchase(read(), purchase.lines));
 }
 
+// Retire le paiement des achats en attente.
 export function forgetPurchase(paymentIntentId: string): void {
     if (typeof window === 'undefined') return;
     window.localStorage.setItem(
@@ -154,6 +171,7 @@ export function forgetPurchase(paymentIntentId: string): void {
     );
 }
 
+// Relit les lignes valides du panier indiqué.
 function readKey(key: string): CartLine[] {
     if (typeof window === 'undefined') return [];
     try {
@@ -170,6 +188,7 @@ function readKey(key: string): CartLine[] {
     }
 }
 
+// Fusionne le panier invité avec celui du compte par quantité maximale.
 export function migrateAnonCartToUser(userId: string): void {
     if (typeof window === 'undefined') return;
 
@@ -200,6 +219,7 @@ const EMPTY: readonly CartLine[] = [];
 let snapshotCache: readonly CartLine[] = EMPTY;
 let snapshotSerialized = '';
 
+// Renvoie un instantané stable du panier tant que son contenu ne change pas.
 function getSnapshot(): readonly CartLine[] {
     const current = read();
     const serialized = JSON.stringify(current);
@@ -210,10 +230,12 @@ function getSnapshot(): readonly CartLine[] {
     return snapshotCache;
 }
 
+// Renvoie un panier vide pour le rendu serveur.
 function getServerSnapshot(): readonly CartLine[] {
     return EMPTY;
 }
 
+// Écoute les changements du panier et fournit le désabonnement.
 function subscribe(cb: () => void): () => void {
     subscribers.add(cb);
     if (typeof window !== 'undefined') {
@@ -231,10 +253,12 @@ function subscribe(cb: () => void): () => void {
     };
 }
 
+// Expose le panier courant et suit ses modifications.
 export function useCart(): readonly CartLine[] {
     return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
+// Compte les quantités du panier courant.
 export function useCartCount(): number {
     const lines = useCart();
     return lines.reduce((sum, line) => sum + line.quantity, 0);

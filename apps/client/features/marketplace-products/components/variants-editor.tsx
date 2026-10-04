@@ -15,14 +15,18 @@ interface VariantsEditorProps {
     colorSuggestions?: readonly string[];
 }
 
+// Permet de modifier les déclinaisons et leur stock.
 export function VariantsEditor({ value, onChange, sizeSuggestions, colorSuggestions }: VariantsEditorProps) {
     const error = variantRowsError(value);
 
+    // Modifie un champ de la déclinaison choisie.
     const patch = (key: string, field: keyof VariantRow, fieldValue: string) =>
         onChange(value.map((row) => (row.key === key ? { ...row, [field]: fieldValue } : row)));
 
+    // Retire la déclinaison choisie.
     const remove = (key: string) => onChange(value.filter((row) => row.key !== key));
 
+    // Ajoute les combinaisons de tailles et de couleurs manquantes.
     const generate = (sizes: string[], colors: string[]) => {
         const existing = new Set(
             value.map((row) => `${row.sizeLabel.trim().toLowerCase()}\0${row.colorLabel.trim().toLowerCase()}`),
@@ -155,6 +159,7 @@ export function VariantsEditor({ value, onChange, sizeSuggestions, colorSuggesti
     );
 }
 
+// Affiche la saisie des tailles et couleurs à combiner.
 function GridGenerator({
     sizeSuggestions,
     colorSuggestions,
@@ -168,6 +173,7 @@ function GridGenerator({
     const [sizes, setSizes] = useState(() => (sizeSuggestions ?? []).join(', '));
     const [colors, setColors] = useState(() => (colorSuggestions ?? []).join(', '));
 
+    // Sépare les valeurs saisies et retire les entrées vides.
     const parsed = (raw: string) =>
         raw
             .split(',')

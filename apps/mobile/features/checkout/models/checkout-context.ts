@@ -8,6 +8,7 @@ export interface CheckoutContext {
     address: ShippingAddress;
 }
 
+// Identifie le paiement par compte, articles et adresse.
 export function checkoutContextKey(context: CheckoutContext): string {
     const lines = context.lines
         .map((line) => `${line.productId}:${line.variantId ?? ''}:${line.quantity}`)
@@ -18,6 +19,7 @@ export function checkoutContextKey(context: CheckoutContext): string {
     return `${context.buyerId}#${lines}#${address}`;
 }
 
+// Extrait l’identifiant de paiement du secret client.
 export function paymentIntentIdOf(clientSecret: string): string {
     const end = clientSecret.indexOf('_secret_');
     return end > 0 ? clientSecret.slice(0, end) : clientSecret;
@@ -31,6 +33,7 @@ interface CheckoutContextInput {
     items: ReadonlyArray<Pick<CartItemDetail, 'product' | 'variant' | 'quantity'>>;
 }
 
+// Prépare le contexte de paiement lorsque ses conditions sont réunies.
 export function checkoutContextOf(input: CheckoutContextInput): CheckoutContext | null {
     const { onPaymentStep, address, buyerId, hasBlockingIssue, items } = input;
     if (!onPaymentStep || !address || !buyerId || hasBlockingIssue || items.length === 0) return null;
@@ -41,6 +44,7 @@ export function checkoutContextOf(input: CheckoutContextInput): CheckoutContext 
     };
 }
 
+// Prépare les articles et l’adresse de la demande de paiement.
 export function cartIntentRequestOf(context: CheckoutContext): CartIntentRequest {
     return {
         items: context.lines.map((line) => ({

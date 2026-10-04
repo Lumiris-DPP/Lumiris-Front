@@ -19,6 +19,7 @@ import { SizeGuideEditor } from './size-guide-editor';
 import { VariantsEditor } from './variants-editor';
 import { SubscriptionSaleNotice } from './subscription-sale-notice';
 
+// Affiche le formulaire de conversion d’un passeport en produit.
 export function ConvertDppDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
     const {
         dpps,

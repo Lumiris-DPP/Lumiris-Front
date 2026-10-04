@@ -26,6 +26,7 @@ import { ProductFormDialog } from './product-form-dialog';
 import { MIN_PUBLISHED_PRICE_CENTS, productPayloadFrom } from '../models/product-payload';
 import { STATUS_LABEL } from '../models/labels';
 
+// Affiche les produits de l’atelier et leurs actions.
 export function ProductsTab({ onCreate }: { onCreate: () => void }) {
     const token = useAuthStore((s) => s.token);
     const { data: products = [], isLoading, error } = useMyProducts({ enabled: Boolean(token) });
@@ -36,11 +37,13 @@ export function ProductsTab({ onCreate }: { onCreate: () => void }) {
     const [editing, setEditing] = useState<MarketplaceItem | undefined>(undefined);
     const [toDelete, setToDelete] = useState<MarketplaceItem | undefined>(undefined);
 
+    // Ouvre le formulaire du produit choisi.
     const openEdit = (product: MarketplaceItem) => {
         setEditing(product);
         setFormOpen(true);
     };
 
+    // Enregistre le statut du produit.
     const setStatus = (product: MarketplaceItem, status: MarketplaceProductStatus) => {
         if (updateMutation.isPending) return;
         updateMutation.mutate(
@@ -53,6 +56,7 @@ export function ProductsTab({ onCreate }: { onCreate: () => void }) {
         );
     };
 
+    // Publie ou archive le produit après vérification.
     const toggleVisibility = (product: MarketplaceItem) => {
         if (product.status === 'PUBLISHED') {
             setStatus(product, 'ARCHIVED');
@@ -68,6 +72,7 @@ export function ProductsTab({ onCreate }: { onCreate: () => void }) {
         setStatus(product, 'PUBLISHED');
     };
 
+    // Supprime le produit choisi et signale le résultat.
     const confirmDelete = () => {
         if (!toDelete) return;
         const product = toDelete;
