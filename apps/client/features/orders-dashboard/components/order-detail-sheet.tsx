@@ -27,6 +27,9 @@ import { OrderTimeline } from './order-timeline';
 import { RefundDialog } from './refund-dialog';
 import { ReturnDecisionDialog } from './return-decision-dialog';
 import { ShipDialog } from './ship-dialog';
+import { orderFundsText } from '../models/orders-model';
+import { readRefundOperation } from '../models/refund-operation';
+import { useAuthStore } from '@/lib/auth-store';
 
 // Détail d'une commande et toutes ses actions au même endroit : le vendeur décide sur pièce
 // (adresse, motif du retour, historique) sans changer d'écran.
@@ -37,7 +40,14 @@ export function OrderDetailSheet({ order, onClose }: { order: SellerOrder | null
 
     return (
         <Sheet open={Boolean(order)} onOpenChange={(open) => !open && onClose()}>
-            <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-lg">
+            <SheetContent
+                side="right"
+                className="w-full overflow-y-auto sm:max-w-lg"
+                onCloseAutoFocus={(event) => {
+                    event.preventDefault();
+                    if (order) document.getElementById(`order-detail-${order.id}`)?.focus();
+                }}
+            >
                 {order ? (
                     <>
                         <SheetHeader>
@@ -114,8 +124,20 @@ function OrderActions({
     onDecideReturn: () => void;
 }) {
     const receivedMutation = useMarkReturnReceived();
+    const userId = useAuthStore((s) => s.userId);
+    let awaitingRefund = false;
+    try {
+        awaitingRefund = Boolean(userId && readRefundOperation(userId, order.id));
+    } catch {
+        awaitingRefund = true;
+    }
     const hasAction =
-        order.canShip || order.canDecideReturn || order.canMarkReturnReceived || order.canRefund || order.canCancel;
+        order.canShip ||
+        order.canDecideReturn ||
+        order.canMarkReturnReceived ||
+        order.canRefund ||
+        order.canCancel ||
+        awaitingRefund;
     if (!hasAction) {
         return null;
     }
@@ -155,9 +177,9 @@ function OrderActions({
                     J’ai reçu le retour
                 </Button>
             )}
-            {order.canRefund && (
+            {(order.canRefund || awaitingRefund) && (
                 <Button onClick={onRefund} variant="ghost" className="gap-1.5 text-destructive">
-                    <Undo2 className="h-4 w-4" /> Rembourser
+                    <Undo2 className="h-4 w-4" /> {awaitingRefund ? 'Reprendre le remboursement' : 'Rembourser'}
                 </Button>
             )}
             {order.canCancel && <CancelOrderButton order={order} />}
@@ -247,9 +269,8 @@ function MoneySection({ order }: { order: SellerOrder }) {
                 ) : null}
             </dl>
             <p className="mt-2 text-[11px] text-muted-foreground">
-                {order.released
-                    ? `Fonds versés le ${formatDateFr(order.releasedAt)}.`
-                    : 'Fonds retenus par Lumiris jusqu’à la livraison — ils partent automatiquement ensuite.'}
+                {orderFundsText(order)}
+                {order.releasedAt ? ` Versement initial le ${formatDateFr(order.releasedAt)}.` : null}
             </p>
         </section>
     );
