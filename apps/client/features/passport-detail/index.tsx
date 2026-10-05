@@ -21,7 +21,7 @@ import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import { Toaster, toast } from '@lumiris/ui/components/sonner';
 import { IrisScoreCard } from '@lumiris/scoring-ui';
-import { useDeleteDppForm, useDppForm, useDuplicateDppForm } from '@lumiris/api-client/react';
+import { useDeleteDppForm, useDppForm, useDuplicateDppForm, useRepairerRequests } from '@lumiris/api-client/react';
 import { isApiError, type DppFormDto } from '@lumiris/api-client';
 import { useAuthStore } from '@/lib/auth-store';
 import { useAuthRole } from '@/lib/use-auth';
@@ -49,6 +49,18 @@ export function PassportDetail({ passportId }: { passportId: string }) {
     const role = useAuthRole();
     const isRepairerViewer = role === 'repairer';
     const token = useAuthStore((s) => s.token);
+    // Le backend (DppEventService) ne laisse le retoucheur écrire un événement / voir l'historique
+    // que s'il a réellement été en charge de la demande (ACCEPTED/IN_PROGRESS, ou COMPLETED sans
+    // avoir été refusé/décliné) — quoteRefusedAt/repairerDeclinedAt distinguent un COMPLETED
+    // "jamais honoré" d'un COMPLETED "intervention terminée".
+    const { data: repairerRequests = [] } = useRepairerRequests({ enabled: isRepairerViewer });
+    const repairerRequest = isRepairerViewer ? repairerRequests.find((r) => r.dppFormId === passportId) : undefined;
+    const canManageEvents =
+        !isRepairerViewer ||
+        (repairerRequest !== undefined &&
+            ['ACCEPTED', 'IN_PROGRESS', 'COMPLETED'].includes(repairerRequest.status) &&
+            !repairerRequest.quoteRefusedAt &&
+            !repairerRequest.repairerDeclinedAt);
     const drafts = useDraftStore((s) => s.drafts);
     const draft = drafts[passportId];
 
@@ -126,9 +138,11 @@ export function PassportDetail({ passportId }: { passportId: string }) {
                     <BlockchainAnchorCard view={view} />
                     {apiDpp && (
                         <>
+                            {/* Le backend ne renvoie déjà que les documents visibles pour ce rôle (opérateur
+                                circulaire pour un retoucheur, tout pour le propriétaire). */}
                             <DocumentsCard documents={apiDpp.documents ?? []} />
                             {/* Events and Iris score only exist once a DPP is published. */}
-                            {!isDraft && (
+                            {!isDraft && canManageEvents && (
                                 <>
                                     <EventFormCard
                                         passportId={passportId}
@@ -151,14 +165,20 @@ export function PassportDetail({ passportId }: { passportId: string }) {
                         ) : (
                             <div className="space-y-4">
                                 <IrisScoreCard dppId={passportId} />
+                                {/* Un retoucheur voit ses propres QR Public + Opérateur (il peut en avoir besoin
+                                    pour ses propres usages), mais jamais le niveau Autorités. La duplication
+                                    reste un outil de gestion du propriétaire uniquement. */}
                                 {apiDpp.publicCode && (
                                     <AccessQrCard
                                         dppId={passportId}
                                         publicCode={apiDpp.publicCode}
                                         documents={apiDpp.documents ?? []}
+                                        levels={isRepairerViewer ? ['PUBLIC', 'CIRCULAR_OPERATORS'] : undefined}
                                     />
                                 )}
-                                <DuplicateDppButton dppId={passportId} label="Dupliquer ce passeport" />
+                                {!isRepairerViewer && (
+                                    <DuplicateDppButton dppId={passportId} label="Dupliquer ce passeport" />
+                                )}
                             </div>
                         )}
                     </aside>

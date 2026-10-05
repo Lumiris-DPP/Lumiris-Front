@@ -1,6 +1,7 @@
 import type { Http } from '../core/http';
 import type {
     RepairAppointmentRequest,
+    RepairDeclineRequest,
     RepairerClaimPreview,
     RepairerClaimRequest,
     RepairerProfileResponse,
@@ -93,6 +94,12 @@ export function repairersApi(http: Http) {
         },
         submitQuote(requestId: string, req: RepairQuoteRequest): Promise<RepairRequestResponse> {
             return http.request<RepairRequestResponse>(`/api/repairers/me/requests/${requestId}/quote`, {
+                method: 'POST',
+                body: req,
+            });
+        },
+        declineRequest(requestId: string, req?: RepairDeclineRequest): Promise<RepairRequestResponse> {
+            return http.request<RepairRequestResponse>(`/api/repairers/me/requests/${requestId}/decline`, {
                 method: 'POST',
                 body: req,
             });

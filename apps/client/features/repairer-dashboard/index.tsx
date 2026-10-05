@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Inbox } from 'lucide-react';
-import type { RepairRequestStatus } from '@lumiris/api-client';
+import type { RepairRequestResponse, RepairRequestStatus } from '@lumiris/api-client';
 import { useRepairerMe, useRepairerRequests } from '@lumiris/api-client/react';
 import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
@@ -24,13 +24,27 @@ function greeting(name: string): string {
     return `Bonjour ${firstName}`;
 }
 
+// COMPLETED recouvre aussi un devis refusé ou une demande déclinée avant tout devis — ni l'un ni
+// l'autre n'est une intervention réellement terminée.
+function isActuallyCompleted(request: RepairRequestResponse): boolean {
+    return request.status === 'COMPLETED' && !request.repairerDeclinedAt && !request.quoteRefusedAt;
+}
+
+function requestStatusLabel(request: RepairRequestResponse): string {
+    if (request.status === 'COMPLETED') {
+        if (request.repairerDeclinedAt) return 'Déclinée';
+        if (request.quoteRefusedAt) return 'Devis refusé';
+    }
+    return STATUS_LABEL[request.status];
+}
+
 export function RepairerDashboard() {
     const { data: repairer, isLoading: repairerLoading } = useRepairerMe();
     const { data: requests = [], isLoading: requestsLoading } = useRepairerRequests();
 
     const stats = useMemo(() => {
         const inProgress = requests.filter((r) => r.status === 'ACCEPTED' || r.status === 'IN_PROGRESS').length;
-        const completed = requests.filter((r) => r.status === 'COMPLETED').length;
+        const completed = requests.filter(isActuallyCompleted).length;
         const generatedCents = requests.filter((r) => r.paidAt).reduce((sum, r) => sum + (r.quoteAmountCents ?? 0), 0);
         return { total: requests.length, inProgress, completed, generatedCents };
     }, [requests]);
@@ -113,7 +127,7 @@ export function RepairerDashboard() {
                                     </p>
                                 </div>
                                 <span className="text-xs font-medium text-muted-foreground">
-                                    {STATUS_LABEL[r.status]}
+                                    {requestStatusLabel(r)}
                                 </span>
                             </Link>
                         ))

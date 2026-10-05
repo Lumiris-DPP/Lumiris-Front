@@ -2,7 +2,13 @@
 
 import { useState } from 'react';
 import type { RepairRequestResponse } from '@lumiris/api-client';
-import { useCompleteRepair, useRepairerRequests, useStartRepair, useSubmitQuote } from '@lumiris/api-client/react';
+import {
+    useCompleteRepair,
+    useDeclineRepairRequest,
+    useRepairerRequests,
+    useStartRepair,
+    useSubmitQuote,
+} from '@lumiris/api-client/react';
 import { Button } from '@lumiris/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@lumiris/ui/components/card';
 import { Input } from '@lumiris/ui/components/input';
@@ -45,7 +51,12 @@ export function RepairerRequestCard({ passportId }: { passportId: string }) {
 function RequestAction({ request }: { request: RepairRequestResponse }) {
     switch (request.status) {
         case 'PENDING':
-            return <QuoteForm requestId={request.id} />;
+            return (
+                <div className="space-y-2">
+                    <QuoteForm requestId={request.id} />
+                    <DeclineAction requestId={request.id} />
+                </div>
+            );
         case 'DRAFT':
             return (
                 <p className="text-sm text-muted-foreground">
@@ -60,10 +71,69 @@ function RequestAction({ request }: { request: RepairRequestResponse }) {
         case 'REFUSED':
             return <p className="text-sm text-muted-foreground">Le client a refusé ce devis.</p>;
         case 'COMPLETED':
+            if (request.repairerDeclinedAt) {
+                return <p className="text-sm text-muted-foreground">Vous avez décliné cette demande.</p>;
+            }
+            if (request.quoteRefusedAt) {
+                return <p className="text-sm text-muted-foreground">Le client a refusé votre devis.</p>;
+            }
             return <p className="text-sm text-muted-foreground">Intervention terminée.</p>;
         default:
             return null;
     }
+}
+
+function DeclineAction({ requestId }: { requestId: string }) {
+    const declineRequest = useDeclineRepairRequest();
+    const [expanded, setExpanded] = useState(false);
+    const [reason, setReason] = useState('');
+
+    if (!expanded) {
+        return (
+            <div className="flex justify-end">
+                <Button type="button" variant="ghost" size="sm" onClick={() => setExpanded(true)}>
+                    Refuser la demande
+                </Button>
+            </div>
+        );
+    }
+
+    function onDecline() {
+        declineRequest.mutate(
+            { requestId, reason: reason.trim() || undefined },
+            {
+                onSuccess: () => toast.success('Demande déclinée.'),
+                onError: () => toast.error('Impossible de décliner la demande.'),
+            },
+        );
+    }
+
+    return (
+        <div className="space-y-2 rounded-lg border border-border p-3">
+            <p className="text-[11px] tracking-wider text-muted-foreground uppercase">Refuser la demande</p>
+            <Textarea
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Motif du refus, pour le client (optionnel)"
+                rows={2}
+                className="min-h-0"
+            />
+            <div className="flex justify-end gap-2">
+                <Button type="button" variant="ghost" size="sm" onClick={() => setExpanded(false)}>
+                    Annuler
+                </Button>
+                <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    disabled={declineRequest.isPending}
+                    onClick={onDecline}
+                >
+                    {declineRequest.isPending ? 'Envoi…' : 'Confirmer le refus'}
+                </Button>
+            </div>
+        </div>
+    );
 }
 
 function QuoteForm({ requestId }: { requestId: string }) {

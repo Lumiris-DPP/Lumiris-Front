@@ -15,13 +15,15 @@ interface AccessQrCardProps {
     dppId: string;
     publicCode: string;
     documents: DppFormDocument[];
+    /** Niveaux affichés — un retoucheur ne voit que Public + Opérateur, jamais Autorités. */
+    levels?: DppAccessLevel[];
 }
 
 /**
  * Les trois QR du passeport. Ils existent dès la publication et ne changent jamais : rien à
  * générer, rien à révoquer, rien qui expire — seul le niveau d'accès distingue les trois.
  */
-export function AccessQrCard({ dppId, publicCode, documents }: AccessQrCardProps) {
+export function AccessQrCard({ dppId, publicCode, documents, levels = ACCESS_LEVEL_ORDER }: AccessQrCardProps) {
     const tokensQuery = useDppAccessTokens(dppId);
     const tokenByLevel = new Map(tokensQuery.data?.map((t) => [t.accessLevel, t.token]));
 
@@ -32,8 +34,8 @@ export function AccessQrCard({ dppId, publicCode, documents }: AccessQrCardProps
             </CardHeader>
             <CardContent>
                 <Tabs defaultValue="PUBLIC">
-                    <TabsList className="grid w-full grid-cols-3">
-                        {ACCESS_LEVEL_ORDER.map((level) => {
+                    <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${levels.length}, 1fr)` }}>
+                        {levels.map((level) => {
                             const { label, icon: Icon } = ACCESS_LEVELS[level];
                             return (
                                 <TabsTrigger key={level} value={level} className="gap-1.5 text-xs">
@@ -44,7 +46,7 @@ export function AccessQrCard({ dppId, publicCode, documents }: AccessQrCardProps
                         })}
                     </TabsList>
 
-                    {ACCESS_LEVEL_ORDER.map((level) => (
+                    {levels.map((level) => (
                         <TabsContent key={level} value={level} className="pt-4">
                             <LevelPanel
                                 level={level}

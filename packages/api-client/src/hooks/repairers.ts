@@ -257,6 +257,24 @@ export function useSubmitQuote(
     });
 }
 
+export function useDeclineRepairRequest(
+    options?: Omit<
+        UseMutationOptions<RepairRequestResponse, Error, { requestId: string; reason?: string }>,
+        'mutationFn'
+    >,
+) {
+    const client = useApiClient();
+    const queryClient = useQueryClient();
+    return useMutation<RepairRequestResponse, Error, { requestId: string; reason?: string }>({
+        mutationFn: ({ requestId, reason }) => client.repairers.declineRequest(requestId, { reason }),
+        ...options,
+        onSuccess: (...args) => {
+            queryClient.invalidateQueries({ queryKey: repairerKeys.custom('requests') });
+            return options?.onSuccess?.(...args);
+        },
+    });
+}
+
 export function useStartRepair(options?: Omit<UseMutationOptions<RepairRequestResponse, Error, string>, 'mutationFn'>) {
     const client = useApiClient();
     const queryClient = useQueryClient();
